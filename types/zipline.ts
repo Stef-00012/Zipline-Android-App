@@ -1,4 +1,4 @@
-// /api/user
+export type APISelfUser = Omit<APIUser, "avatar">
 
 export interface APIUser {
 	id: string;
@@ -10,8 +10,20 @@ export interface APIUser {
 	oauthProviders: Array<OAuthProvider>;
 	totpSecret: string;
 	passkeys: Array<Passkey>;
-	quota: null;
+	quota: APIUserQuota | null;
 	sessions: Array<string>;
+	avatar: string;
+}
+
+export interface APIUserQuota {
+    "id": string,
+    "createdAt": string,
+    "updatedAt": string,
+    "filesQuota": "BY_BYTES" | "BY_FILES",
+    "maxBytes": string | null,
+    "maxFiles": number | null,
+    "maxUrls": number | null,
+    "userId": "cm5ohf5r90003pl01r1vn6yus"
 }
 
 export interface APIUserView {
@@ -64,7 +76,7 @@ export interface PasskeyRegResponse {
 }
 
 export interface PasskeyRegClientExtensionResults {
-	credProps: null;
+	credProps: unknown | null;
 }
 
 export type APIRecentFiles = Array<APIFile>;
@@ -76,17 +88,19 @@ export interface APIFile {
 	favorite: boolean;
 	id: string;
 	originalName: string | null;
+	name: string;
 	size: number;
 	type: string;
 	views: number;
 	maxViews: number | null;
+	folderId: string | null;
 	thumbnail: string | null;
-	tags: Array<string>;
-	password: string | null;
+	tags: Array<APITag>;
+	password: boolean;
 	url: string;
 }
 
-export interface APIStats {
+export interface APIUserStats {
 	filesUploaded: number;
 	favoriteFiles: number;
 	views: number;
@@ -99,3 +113,258 @@ export interface APIStats {
 		[key: string]: number;
 	};
 }
+
+export interface APISettings {
+	coreReturnHttpsUrls: boolean;
+	coreDefaultDomain: string | null;
+	coreTempDirectory: string;
+	chunksEnabled: boolean;
+	chunksMax: string;
+	chunksSize: string;
+	tasksDeleteInterval: string;
+	tasksClearInvitesInterval: string;
+	tasksMaxViewsInterval: string;
+	tasksThumbnailsInterval: string;
+	tasksMetricsInterval: string;
+	filesRoute: string;
+	filesLength: number;
+	filesDefaultFormat: "random" | "uuid" | "date" | "name" | "gfycat";
+	filesDisabledExtensions: Array<string>;
+	filesMaxFileSize: string;
+	filesDefaultExpiration: string | null;
+	filesAssumeMimetypes: boolean;
+	filesDefaultDateFormat: string;
+	filesRemoveGpsMetadata: boolean;
+	urlsRoute: string;
+	urlsLength: number;
+	featuresImageCompression: boolean;
+	featuresRobotsTxt: boolean;
+	featuresHealthcheck: boolean;
+	featuresUserRegistration: boolean;
+	featuresOauthRegistration: boolean;
+	featuresDeleteOnMaxViews: boolean;
+	featuresThumbnailsEnabled: boolean;
+	featuresThumbnailsNumberThreads: number;
+	featuresMetricsEnabled: boolean;
+	featuresMetricsAdminOnly: boolean;
+	featuresMetricsShowUserSpecific: boolean;
+	invitesEnabled: boolean;
+	invitesLength: number;
+	websiteTitle: string;
+	websiteTitleLogo: string | null;
+	websiteExternalLinks: Array<ExternalLink>;
+	websiteLoginBackground: string | null;
+	websiteLoginBackgroundBlur: boolean;
+	websiteDefaultAvatar: string | null;
+	websiteTos: string | null;
+	websiteThemeDefault: string;
+	websiteThemeDark: string;
+	websiteThemeLight: string;
+	oauthBypassLocalLogin: boolean;
+	oauthLoginOnly: boolean;
+	oauthDiscordClientId: string | null;
+	oauthDiscordClientSecret: string | null;
+	oauthDiscordRedirectUri: string | null;
+	oauthGoogleClientId: string | null;
+	oauthGoogleClientSecret: string | null;
+	oauthGoogleRedirectUri: string | null;
+	oauthGithubClientId: string | null;
+	oauthGithubClientSecret: string | null;
+	oauthGithubRedirectUri: string | null;
+	oauthOidcClientId: string | null;
+	oauthOidcClientSecret: string | null;
+	oauthOidcAuthorizeUrl: string | null;
+	oauthOidcTokenUrl: string | null;
+	oauthOidcUserinfoUrl: string | null;
+	oauthOidcRedirectUri: string | null;
+	mfaTotpEnabled: boolean;
+	mfaTotpIssuer: string;
+	mfaPasskeys: boolean;
+	ratelimitEnabled: boolean;
+	ratelimitMax: number;
+	ratelimitWindow: number | null;
+	ratelimitAdminBypass: boolean;
+	ratelimitAllowList: Array<string>;
+	httpWebhookOnUpload: string | null;
+	httpWebhookOnShorten: string | null;
+	discordWebhookUrl: string | null;
+	discordUsername: string | null;
+	discordAvatarUrl: string | null;
+	discordOnUploadWebhookUrl: string | null;
+	discordOnUploadUsername: string | null;
+	discordOnUploadAvatarUrl: string | null;
+	discordOnUploadContent: string | null;
+	discordOnUploadEmbed: UploadEmbed;
+	discordOnShortenWebhookUrl: string | null;
+	discordOnShortenUsername: string | null;
+	discordOnShortenAvatarUrl: string | null;
+	discordOnShortenContent: string | null;
+	discordOnShortenEmbed: ShortenEmbed;
+	pwaEnabled: boolean;
+	pwaTitle: string;
+	pwaShortName: string;
+	pwaDescription: string;
+	pwaThemeColor: string;
+	pwaBackgroundColor: string;
+}
+
+export interface ExternalLink {
+	url: string;
+	name: string;
+}
+
+export interface UploadEmbed {
+	url: boolean;
+	color: string | null;
+	title: string | null;
+	footer: string | null;
+	thumbnail: boolean;
+	timestamp: boolean;
+	description: string | null;
+	imageOrVideo: boolean;
+}
+
+export type ShortenEmbed = UploadEmbed;
+
+export type APIUserNoIncl = Omit<
+	APIUser,
+	| "view"
+	| "oauthProviders"
+	| "totpSecret"
+	| "passkeys"
+	| "quota"
+	| "sessions"
+	| "avatar"
+> & {
+	passkeys: [];
+	totpSecret: null;
+	view: Record<string, never>;
+	oauthProviders: [];
+	quota: null;
+	sessions: [];
+	avatar: null;
+};
+
+export type APIUsersNoIncl = Array<APIUserNoIncl>;
+
+export type APIUsers = Array<APIUser>;
+
+export interface APIURL {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	code: string;
+	vanity: string | null;
+	destination: string;
+	views: number;
+	maxViews: number | null;
+	password: string | null;
+	userId: string;
+}
+
+export type APIURLs = Array<APIURL>;
+
+export interface APIFolder {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	name: string;
+	public: boolean;
+	userId: string;
+	files: Array<APIFile>;
+}
+
+export type APIFolderNoIncl = Omit<APIFolder, "files">;
+
+export type APIFolders = Array<APIFolder>;
+
+export type APIFoldersNoIncl = Array<APIFolderNoIncl>;
+
+export interface APITag {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	name: string;
+	color: string;
+	files: Array<TagFile>;
+}
+
+export interface TagFile {
+	id: string;
+}
+
+export interface APIFiles {
+	page: Array<APIFile>;
+	total: number;
+	pages: number;
+}
+
+export interface APIStats {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	data: APIStatData;
+}
+
+export interface APIStatData {
+	users: number;
+	files: number;
+	fileViews: number;
+	urls: number;
+	urlViews: number;
+	storage: number;
+	filesUsers: Array<APIStatUserFile>;
+	urlsUsers: Array<APIStatUserURL>;
+	types: Array<APIStatFileType>;
+}
+
+export interface APIStatUserFile {
+	username: string;
+	sum: number;
+	storage: number;
+	views: number;
+}
+
+export interface APIStatUserURL {
+	username: string;
+	sum: number;
+	views: number;
+}
+
+export interface APIStatFileType {
+	type: string;
+	sum: number;
+}
+
+export interface APIInvite {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	expiresAt: string | null;
+	code: string;
+	uses: number;
+	maxUses: number;
+	inviterId: string;
+	inviter: APIInviteInvier;
+}
+
+export interface APIInviteInvier {
+	username: string;
+	id: string;
+	role: APIUser["role"];
+}
+
+export type APIInvites = Array<APIInvite>;
+
+export interface APIExport {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	completed: boolean;
+	path: string;
+	files: number;
+	size: string;
+	userId: string;
+}
+
+export type APIExports = Array<APIExport>;

@@ -3,13 +3,13 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { View, Text, Pressable, Image } from "react-native";
 import type React from "react";
 import { styles } from "@/styles/header";
-import { type PropsWithChildren, useEffect, useState } from "react";
-import { getUser, getUserAvatar } from "@/functions/zipline";
-import type { APIUser } from "@/types/zipline";
+import { useEffect, useState } from "react";
+import { getUser, getUserAvatar } from "@/functions/zipline/user";
+import type { APISelfUser } from "@/types/zipline";
 
 export default function Header() {
 	const [avatar, setAvatar] = useState<string | null>(null);
-	const [user, setUser] = useState<APIUser | null>(null);
+	const [user, setUser] = useState<APISelfUser | null>(null);
 
 	useEffect(() => {
 		(async () => {

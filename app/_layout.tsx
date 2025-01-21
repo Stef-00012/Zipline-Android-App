@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import { Slot, useRouter } from "expo-router";
 
 import { ShareIntentProvider } from "expo-share-intent";
-import { Text } from "react-native";
 
 export default function Layout() {
 	const router = useRouter();

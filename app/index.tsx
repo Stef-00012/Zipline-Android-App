@@ -3,8 +3,9 @@ import { useShareIntentContext } from "expo-share-intent";
 import { useEffect, useState } from "react";
 import { Text, View, TextInput, Pressable } from "react-native";
 import { styles } from "@/styles/home";
-import { getRecentFiles, getStats, getUser } from "@/functions/zipline";
-import type { APIRecentFiles, APIStats, APIUser } from "@/types/zipline";
+import { getRecentFiles, getUser } from "@/functions/zipline/user";
+import { getUserStats } from "@/functions/zipline/stats";
+import type { APIRecentFiles, APISelfUser, APIUserStats } from "@/types/zipline";
 import * as db from "@/functions/database";
 
 export default function Home() {
@@ -25,9 +26,9 @@ export default function Home() {
 
 	const [token, setToken] = useState<string | null>(db.get("token"));
 	const [url, setUrl] = useState<string | null>(db.get("url"));
-	const [user, setUser] = useState<APIUser | null>(null);
+	const [user, setUser] = useState<APISelfUser | null>(null);
 	const [recentFiles, setRecentFiles] = useState<APIRecentFiles | null>();
-	const [stats, setStats] = useState<APIStats | null>();
+	const [stats, setStats] = useState<APIUserStats | null>();
 
 	const mainContainerStyles = user ? {
 		...styles.mainContainer
@@ -40,7 +41,7 @@ export default function Home() {
 		(async () => {
 			const user = await getUser();
 			const recentFiles = await getRecentFiles();
-			const stats = await getStats();
+			const stats = await getUserStats();
 
 			setUser(user);
 			setRecentFiles(recentFiles);
@@ -51,7 +52,7 @@ export default function Home() {
 	async function handleLogin() {
 		const user = await getUser();
 		const recentFiles = await getRecentFiles();
-		const stats = await getStats();
+		const stats = await getUserStats();
 
 		setUser(user);
 		setRecentFiles(recentFiles);
@@ -95,7 +96,7 @@ export default function Home() {
 						/>
 						<Pressable
 							style={styles.button}
-							onPress={async (event) => {
+							onPress={async () => {
 								setUrl(inputtedUrl);
 								db.set("url", inputtedUrl || "");
 

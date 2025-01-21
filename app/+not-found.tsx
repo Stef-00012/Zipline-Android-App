@@ -1,32 +1,26 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { useRouter } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { styles } from "@/styles/not-found";
 
 export default function NotFoundScreen() {
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
-  );
-}
+	const router = useRouter();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-});
+	return (
+		<View style={styles.container}>
+			<Text style={styles.code}>404</Text>
+			<Text style={styles.text}>This page doesn't exist</Text>
+
+			<Pressable
+                style={styles.button}
+				onPress={() => {
+					router.replace({
+						pathname: "/",
+					});
+				}}
+			>
+				Head to the Dashboard
+			</Pressable>
+		</View>
+	);
+}

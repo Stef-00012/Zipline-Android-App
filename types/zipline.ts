@@ -1,4 +1,4 @@
-export type APISelfUser = Omit<APIUser, "avatar">
+export type APISelfUser = Omit<APIUser, "avatar">;
 
 export interface APIUser {
 	id: string;
@@ -16,14 +16,14 @@ export interface APIUser {
 }
 
 export interface APIUserQuota {
-    "id": string,
-    "createdAt": string,
-    "updatedAt": string,
-    "filesQuota": "BY_BYTES" | "BY_FILES",
-    "maxBytes": string | null,
-    "maxFiles": number | null,
-    "maxUrls": number | null,
-    "userId": "cm5ohf5r90003pl01r1vn6yus"
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	filesQuota: "BY_BYTES" | "BY_FILES";
+	maxBytes: string | null;
+	maxFiles: number | null;
+	maxUrls: number | null;
+	userId: "cm5ohf5r90003pl01r1vn6yus";
 }
 
 export interface APIUserView {
@@ -288,6 +288,8 @@ export interface APITag {
 	color: string;
 	files: Array<TagFile>;
 }
+
+export type APITags = Array<APITag>;
 
 export interface TagFile {
 	id: string;

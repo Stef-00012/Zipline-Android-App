@@ -4,7 +4,7 @@ import { View, Text, Pressable, Image } from "react-native";
 import type React from "react";
 import { styles } from "@/styles/header";
 import { useEffect, useState } from "react";
-import { getUser, getUserAvatar } from "@/functions/zipline/user";
+import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
 import type { APISelfUser } from "@/types/zipline";
 
 export default function Header() {
@@ -13,8 +13,8 @@ export default function Header() {
 
 	useEffect(() => {
 		(async () => {
-			const avatar = await getUserAvatar();
-			const user = await getUser();
+			const avatar = await getCurrentUserAvatar();
+			const user = await getCurrentUser();
 
 			setAvatar(avatar);
 			setUser(user);

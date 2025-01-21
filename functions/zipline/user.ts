@@ -1,12 +1,9 @@
 import * as db from "@/functions/database";
-import type {
-	APIRecentFiles,
-	APISelfUser,
-} from "@/types/zipline";
+import type { APIRecentFiles, APISelfUser } from "@/types/zipline";
 import axios from "axios";
 
 // GET /api/user
-export async function getUser(): Promise<APISelfUser | null> {
+export async function getCurrentUser(): Promise<APISelfUser | null> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -46,7 +43,7 @@ export async function getRecentFiles(): Promise<APIRecentFiles | null> {
 }
 
 // GET /api/user/avatar
-export async function getUserAvatar(): Promise<string | null> {
+export async function getCurrentUserAvatar(): Promise<string | null> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -64,3 +61,24 @@ export async function getUserAvatar(): Promise<string | null> {
 		return null;
 	}
 }
+
+type EditCurrentUserOptions = Partial<
+	Omit<
+		APISelfUser,
+		| "role"
+		| "id"
+		| "createdAt"
+		| "updatedAt"
+		| "oauthProviders"
+		| "totpSecret"
+		| "passkeys"
+		| "quota"
+		| "sessions"
+		| "view"
+	> & {
+		view?: Partial<APISelfUser["view"]>;
+		avatar?: string;
+		password?: string;
+	}
+>;
+export async function editCurrentUser(options: EditCurrentUserOptions = {}) {}

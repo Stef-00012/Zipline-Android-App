@@ -2,7 +2,6 @@ import * as db from "@/functions/database";
 import type { APIExports } from "@/types/zipline";
 import axios from "axios";
 
-
 // GET /api/user/export
 export async function getUserExports(): Promise<APIExports | null> {
 	const token = db.get("token");
@@ -44,7 +43,9 @@ export async function createUserExport(): Promise<{ running: boolean } | null> {
 }
 
 // DELETE /api/user/export?id=[id]
-export async function deleteUserExport(id: string): Promise<{ deleted: boolean } | null> {
+export async function deleteUserExport(
+	id: string,
+): Promise<{ deleted: boolean } | null> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -62,4 +63,3 @@ export async function deleteUserExport(id: string): Promise<{ deleted: boolean }
 		return null;
 	}
 }
-

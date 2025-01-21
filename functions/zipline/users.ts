@@ -33,6 +33,25 @@ export async function getUsers<T extends boolean | undefined = undefined>(
 	}
 }
 
+export async function getUser(id: string): Promise<APIUser | null> {
+	const token = db.get("token");
+	const url = db.get("url");
+
+	if (!url || !token) return null;
+
+	try {
+		const res = await axios.get(`${url}/api/users/${id}`, {
+			headers: {
+				Authorization: token,
+			},
+		});
+
+		return res.data;
+	} catch (e) {
+		return null;
+	}
+}
+
 // POST /api/users
 export async function createUser(
 	username: string,
@@ -93,36 +112,38 @@ export async function deleteUser(
 	}
 }
 
+type EditUserOptions = Partial<
+	Omit<
+		APIUser,
+		| "id"
+		| "createdAt"
+		| "updatedAt"
+		| "role"
+		| "view"
+		| "oauthProviders"
+		| "totpSecret"
+		| "passkeys"
+		| "sessions"
+		| "quota"
+	> & {
+		role?: Exclude<APIUser["role"], "SUPERADMIN">;
+		quota?: Partial<
+			Omit<
+				APIUserQuota,
+				"id" | "createdAt" | "updatedAt" | "filesQuota" | "userId"
+			> & {
+				filesType?: APIUserQuota["filesQuota"] | "NONE";
+			}
+		>;
+		password: string;
+	}
+>;
 // PATCH /api/users/[id]
 export async function editUser(
 	id: string,
-	options: Partial<
-		Omit<
-			APIUser,
-			| "id"
-			| "createdAt"
-			| "updatedAt"
-			| "role"
-			| "view"
-			| "oauthProviders"
-			| "totpSecret"
-			| "passkeys"
-			| "sessions"
-			| "quota"
-		> & {
-			role?: Exclude<APIUser["role"], "SUPERADMIN">;
-			quota?: Partial<
-				Omit<
-					APIUserQuota,
-					"id" | "createdAt" | "updatedAt" | "filesQuota" | "userId"
-				> & {
-					filesType?: APIUserQuota["filesQuota"];
-				}
-			>;
-		}
-	> = {},
+	options: EditUserOptions = {},
 ): Promise<APIUser | null> {
-    const token = db.get("token");
+	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;

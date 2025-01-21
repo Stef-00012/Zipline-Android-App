@@ -1,8 +1,5 @@
 import * as db from "@/functions/database";
-import type {
-	APIURLs,
-	APIURL,
-} from "@/types/zipline";
+import type { APIURLs, APIURL } from "@/types/zipline";
 import axios from "axios";
 
 // GET /user/urls
@@ -14,6 +11,26 @@ export async function getURLs(): Promise<APIURLs | null> {
 
 	try {
 		const res = await axios.get(`${url}/api/user/urls`, {
+			headers: {
+				Authorization: token,
+			},
+		});
+
+		return res.data;
+	} catch (e) {
+		return null;
+	}
+}
+
+// GET /user/urls/[id]
+export async function getURL(id: string): Promise<APIURL | null> {
+	const token = db.get("token");
+	const url = db.get("url");
+
+	if (!url || !token) return null;
+
+	try {
+		const res = await axios.get(`${url}/api/user/urls/${id}`, {
 			headers: {
 				Authorization: token,
 			},

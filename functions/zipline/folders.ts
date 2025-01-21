@@ -1,9 +1,5 @@
 import * as db from "@/functions/database";
-import type {
-	APIFoldersNoIncl,
-	APIFolders,
-    APIFolder,
-} from "@/types/zipline";
+import type { APIFoldersNoIncl, APIFolders, APIFolder } from "@/types/zipline";
 import axios from "axios";
 
 // GET /api/user/folders
@@ -32,18 +28,15 @@ export async function getFolders<T extends boolean | undefined = undefined>(
 	}
 }
 
-// POST /api/user/folders
-export async function createFolder(name: string, isPublic = false): Promise<APIFolder | null> {
-    const token = db.get("token");
+// GET /api/user/folders/[id]
+export async function getFolder(id: string): Promise<APIFolder | null> {
+	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;
 
 	try {
-		const res = await axios.post(`${url}/api/user/folders`, {
-            name,
-            isPublic
-        }, {
+		const res = await axios.get(`${url}/api/user/folders/${id}`, {
 			headers: {
 				Authorization: token,
 			},
@@ -55,21 +48,58 @@ export async function createFolder(name: string, isPublic = false): Promise<APIF
 	}
 }
 
-// PATCH /api/user/folders/[id]
-export async function editFolder(id: string, isPublic: boolean): Promise<APIFolder | null> {
-    const token = db.get("token");
+// POST /api/user/folders
+export async function createFolder(
+	name: string,
+	isPublic = false,
+): Promise<APIFolder | null> {
+	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;
 
 	try {
-		const res = await axios.patch(`${url}/api/user/folders/${id}`, {
-            isPublic
-        }, {
-			headers: {
-				Authorization: token,
+		const res = await axios.post(
+			`${url}/api/user/folders`,
+			{
+				name,
+				isPublic,
 			},
-		});
+			{
+				headers: {
+					Authorization: token,
+				},
+			},
+		);
+
+		return res.data;
+	} catch (e) {
+		return null;
+	}
+}
+
+// PATCH /api/user/folders/[id]
+export async function editFolder(
+	id: string,
+	isPublic: boolean,
+): Promise<APIFolder | null> {
+	const token = db.get("token");
+	const url = db.get("url");
+
+	if (!url || !token) return null;
+
+	try {
+		const res = await axios.patch(
+			`${url}/api/user/folders/${id}`,
+			{
+				isPublic,
+			},
+			{
+				headers: {
+					Authorization: token,
+				},
+			},
+		);
 
 		return res.data;
 	} catch (e) {
@@ -79,7 +109,7 @@ export async function editFolder(id: string, isPublic: boolean): Promise<APIFold
 
 // DELETE /api/user/folders/[id]
 export async function deleteFolder(id: string): Promise<APIFolder | null> {
-    const token = db.get("token");
+	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;
@@ -89,9 +119,9 @@ export async function deleteFolder(id: string): Promise<APIFolder | null> {
 			headers: {
 				Authorization: token,
 			},
-            data: {
-                delete: "folder"
-            }
+			data: {
+				delete: "folder",
+			},
 		});
 
 		return res.data;
@@ -101,8 +131,11 @@ export async function deleteFolder(id: string): Promise<APIFolder | null> {
 }
 
 // DELETE /api/user/folders/[folderId]
-export async function removeFileFromFolder(folderId: string, fileId: string): Promise<APIFolder | null> {
-    const token = db.get("token");
+export async function removeFileFromFolder(
+	folderId: string,
+	fileId: string,
+): Promise<APIFolder | null> {
+	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;
@@ -112,10 +145,10 @@ export async function removeFileFromFolder(folderId: string, fileId: string): Pr
 			headers: {
 				Authorization: token,
 			},
-            data: {
-                delete: "file",
-                id: fileId
-            }
+			data: {
+				delete: "file",
+				id: fileId,
+			},
 		});
 
 		return res.data;
@@ -125,20 +158,27 @@ export async function removeFileFromFolder(folderId: string, fileId: string): Pr
 }
 
 // POST /api/user/folders/[folderId]
-export async function addFileToFolder(folderId: string, fileId: string): Promise<APIFolder | null> {
-    const token = db.get("token");
+export async function addFileToFolder(
+	folderId: string,
+	fileId: string,
+): Promise<APIFolder | null> {
+	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;
 
 	try {
-		const res = await axios.post(`${url}/api/user/folders/${folderId}`, {
-            id: fileId
-        }, {
-			headers: {
-				Authorization: token,
-			}
-		});
+		const res = await axios.post(
+			`${url}/api/user/folders/${folderId}`,
+			{
+				id: fileId,
+			},
+			{
+				headers: {
+					Authorization: token,
+				},
+			},
+		);
 
 		return res.data;
 	} catch (e) {

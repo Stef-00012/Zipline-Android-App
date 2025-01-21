@@ -2,7 +2,7 @@ import * as db from "@/functions/database";
 import type { APIFile, APIFiles, APISettings } from "@/types/zipline";
 import axios from "axios";
 import { getSettings } from "@/functions/zipline/settings";
-import bytesFn, { BytesOptions } from "bytes";
+import bytesFn from "bytes";
 import { convertToBlob, generateRandomString, guessMimetype } from "../util";
 import type { Mimetypes } from "@/types/mimetypes";
 
@@ -154,7 +154,7 @@ interface UploadFileOptions {
 	expiresAt?: Date;
 }
 // POST /api/upload
-export async function uploadToZipline(
+export async function uploadFile(
 	file: string,
 	options: UploadFileOptions = {},
 ) {

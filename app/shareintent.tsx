@@ -5,6 +5,14 @@ import {
 	type ShareIntent as ShareIntentType,
 	useShareIntentContext,
 } from "expo-share-intent";
+import { useEffect, useState } from "react";
+import { convertToBlob, getFileDataURI } from "@/functions/util";
+import * as FileSystem from "expo-file-system";
+
+interface UploadFile {
+	blob: Blob;
+	path: string;
+}
 
 const WebUrlComponent = ({ shareIntent }: { shareIntent: ShareIntentType }) => {
 	return (
@@ -37,13 +45,41 @@ export default function ShareIntent() {
 	const router = useRouter();
 	const { hasShareIntent, shareIntent, error, resetShareIntent } =
 		useShareIntentContext();
+	const [files, setFiles] = useState<Array<UploadFile>>([]);
 
-        console.log({
-            hasShareIntent,
-            shareIntent,
-            error,
-            resetShareIntent
-        })
+		useEffect(() => {
+			console.debug({
+				hasShareIntent,
+				shareIntent,
+				files: shareIntent.files?.[0],
+				error,
+			});
+
+			if (hasShareIntent) {
+				(async () => {
+					const files: Array<UploadFile> = []
+
+					for (const file of shareIntent.files || []) {
+						const fileInfo = await FileSystem.getInfoAsync(file.path);
+						
+						if (!fileInfo.exists || fileInfo.isDirectory) continue;
+						
+						const dataURI = await getFileDataURI(file.path);
+
+						if (!dataURI) return;
+
+						const blob = convertToBlob(dataURI)
+
+						if (blob) files.push({
+							blob,
+							path: file.path,
+						});
+					}
+
+					setFiles(files);
+				})()
+			}
+		}, [shareIntent, hasShareIntent, error])
 
 	return (
 		<View style={styles.container}>

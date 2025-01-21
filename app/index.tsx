@@ -3,7 +3,7 @@ import { useShareIntentContext } from "expo-share-intent";
 import { useEffect, useState } from "react";
 import { Text, View, TextInput, Pressable } from "react-native";
 import { styles } from "@/styles/home";
-import { getRecentFiles, getUser } from "@/functions/zipline/user";
+import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
 import { getUserStats } from "@/functions/zipline/stats";
 import type { APIRecentFiles, APISelfUser, APIUserStats } from "@/types/zipline";
 import * as db from "@/functions/database";
@@ -39,7 +39,7 @@ export default function Home() {
 
 	useEffect(() => {
 		(async () => {
-			const user = await getUser();
+			const user = await getCurrentUser();
 			const recentFiles = await getRecentFiles();
 			const stats = await getUserStats();
 
@@ -50,7 +50,7 @@ export default function Home() {
 	});
 
 	async function handleLogin() {
-		const user = await getUser();
+		const user = await getCurrentUser();
 		const recentFiles = await getRecentFiles();
 		const stats = await getUserStats();
 

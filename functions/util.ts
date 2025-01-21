@@ -1,5 +1,6 @@
 import mimetypesJSON from "@/assets/mimetypes.json";
 import type { Mimetypes } from "@/types/mimetypes";
+import * as FileSystem from "expo-file-system";
 
 const mimetypes = mimetypesJSON as Mimetypes;
 
@@ -32,4 +33,14 @@ export function convertToBlob(data: string): Blob {
 	const blob = new Blob([bytes], { type: mimetype || "image/png" });
 
 	return blob;
+}
+
+export async function getFileDataURI(filePath: string): Promise<string | null> {
+	const base64Data = await FileSystem.readAsStringAsync(filePath, {
+		encoding: FileSystem.EncodingType.Base64,
+	});
+
+	const dataURI = `data:image/jpg;base64,${base64Data}`;
+
+	return dataURI;
 }

@@ -2,20 +2,30 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-        display: "flex",
         flex: 1,
-        justifyContent: "center",
+        display: "flex"
     },
     code: {
-        color: "white",
-        fontSize: 40
+        color: "#304270",
+        fontSize: 40,
+        margin: "auto",
+        justifyContent: "center",
+        alignItems: "center"
     },
     text: {
-        color: "#6c7a8d",
+        color: "#304270",
         fontSize: 20,
+        margin: "auto",
+        justifyContent: "center",
+        alignItems: "center"
     },
     button: {
         color: "white",
         backgroundColor: "#323ea8"
+    },
+    buttonText: {
+        textAlign: "center",
+        fontWeight: "bold",
+        color: "white"
     }
 });

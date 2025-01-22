@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 
 import { styles } from "@/styles/not-found";
 
@@ -19,7 +19,7 @@ export default function NotFoundScreen() {
 					});
 				}}
 			>
-				Head to the Dashboard
+				<Text styles={styles.buttonText}>Head to the Dashboard</Text>
 			</Pressable>
 		</View>
 	);

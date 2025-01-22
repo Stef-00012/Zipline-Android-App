@@ -1,5 +1,5 @@
-import * as db from "@/functions/database";
 import type { APIInvites } from "@/types/zipline";
+import * as db from "@/functions/database";
 import axios from "axios";
 
 // GET /api/auth/invites

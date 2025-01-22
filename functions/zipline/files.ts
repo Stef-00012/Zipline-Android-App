@@ -1,10 +1,10 @@
-import * as db from "@/functions/database";
-import type { APIFile, APIFiles, APISettings } from "@/types/zipline";
-import axios from "axios";
-import { getSettings } from "@/functions/zipline/settings";
-import bytesFn from "bytes";
 import { convertToBlob, generateRandomString, guessMimetype } from "../util";
+import type { APIFile, APIFiles, APISettings } from "@/types/zipline";
+import { getSettings } from "@/functions/zipline/settings";
 import type { Mimetypes } from "@/types/mimetypes";
+import * as db from "@/functions/database";
+import bytesFn from "bytes";
+import axios from "axios";
 
 // GET /api/user/files
 export async function getFiles(page: number): Promise<APIFiles | null> {

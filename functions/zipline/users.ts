@@ -1,11 +1,11 @@
 import * as db from "@/functions/database";
+import axios from "axios";
 import type {
 	APIUsersNoIncl,
 	APIUsers,
 	APIUser,
 	APIUserQuota,
 } from "@/types/zipline";
-import axios from "axios";
 
 // GET /api/users(?noincl=true)
 export async function getUsers<T extends boolean | undefined = undefined>(

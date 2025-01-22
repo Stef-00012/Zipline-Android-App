@@ -1,12 +1,12 @@
-import { useRouter } from "expo-router";
-import { useShareIntentContext } from "expo-share-intent";
-import { useEffect, useState } from "react";
-import { Text, View, TextInput, Pressable } from "react-native";
-import { styles } from "@/styles/home";
-import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
-import { getUserStats } from "@/functions/zipline/stats";
 import type { APIRecentFiles, APISelfUser, APIUserStats } from "@/types/zipline";
+import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
+import { Text, View, TextInput, Pressable } from "react-native";
+import { useShareIntentContext } from "expo-share-intent";
+import { getUserStats } from "@/functions/zipline/stats";
+import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
+import { useRouter } from "expo-router";
+import { styles } from "@/styles/home";
 
 export default function Home() {
 	const router = useRouter();
@@ -24,11 +24,12 @@ export default function Home() {
 	const [inputtedUrl, setInputtedUrl] = useState<string | null>(null);
 	const [inputtedToken, setInputtedToken] = useState<string | null>(null);
 
-	const [token, setToken] = useState<string | null>(db.get("token"));
 	const [url, setUrl] = useState<string | null>(db.get("url"));
+	const [token, setToken] = useState<string | null>(db.get("token"));
+
 	const [user, setUser] = useState<APISelfUser | null>(null);
-	const [recentFiles, setRecentFiles] = useState<APIRecentFiles | null>();
 	const [stats, setStats] = useState<APIUserStats | null>();
+	const [recentFiles, setRecentFiles] = useState<APIRecentFiles | null>();
 
 	const mainContainerStyles = user ? {
 		...styles.mainContainer
@@ -40,23 +41,23 @@ export default function Home() {
 	useEffect(() => {
 		(async () => {
 			const user = await getCurrentUser();
-			const recentFiles = await getRecentFiles();
 			const stats = await getUserStats();
+			const recentFiles = await getRecentFiles();
 
 			setUser(user);
-			setRecentFiles(recentFiles);
 			setStats(stats);
+			setRecentFiles(recentFiles);
 		})();
-	});
+	}, []);
 
 	async function handleLogin() {
 		const user = await getCurrentUser();
-		const recentFiles = await getRecentFiles();
 		const stats = await getUserStats();
+		const recentFiles = await getRecentFiles();
 
 		setUser(user);
-		setRecentFiles(recentFiles);
 		setStats(stats);
+		setRecentFiles(recentFiles);
 	}
 
 	return (

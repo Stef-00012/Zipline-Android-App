@@ -1,5 +1,5 @@
-import * as db from "@/functions/database";
 import type { APITag, APITags } from "@/types/zipline";
+import * as db from "@/functions/database";
 import axios from "axios";
 
 // GET /api/user/tags

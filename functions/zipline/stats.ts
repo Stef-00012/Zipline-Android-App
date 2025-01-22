@@ -1,5 +1,5 @@
-import * as db from "@/functions/database";
 import type { APIUserStats, APIStats } from "@/types/zipline";
+import * as db from "@/functions/database";
 import axios from "axios";
 
 // GET /api/stats

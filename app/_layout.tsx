@@ -1,3 +1,4 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ShareIntentProvider } from "expo-share-intent";
 import { Slot, useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
@@ -23,8 +24,10 @@ export default function Layout() {
 				backgroundColor="#0c101c"
 			/>
 			
-			<Header/>
-			<Slot />
+			<SafeAreaView style={{ flex: 1 }}>
+				<Header/>
+				<Slot />
+			</SafeAreaView>
 		</ShareIntentProvider>
 	);
 }

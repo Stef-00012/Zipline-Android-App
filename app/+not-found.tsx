@@ -19,7 +19,7 @@ export default function NotFoundScreen() {
 					});
 				}}
 			>
-				<Text styles={styles.buttonText}>Head to the Dashboard</Text>
+				<Text style={styles.buttonText}>Head to the Dashboard</Text>
 			</Pressable>
 		</View>
 	);

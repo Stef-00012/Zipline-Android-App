@@ -1,7 +1,7 @@
-import { Slot, useRouter } from "expo-router";
-import Header from "@/components/Header";
-
 import { ShareIntentProvider } from "expo-share-intent";
+import { Slot, useRouter } from "expo-router";
+import { StatusBar } from 'expo-status-bar';
+import Header from "@/components/Header";
 
 export default function Layout() {
 	const router = useRouter();
@@ -18,6 +18,11 @@ export default function Layout() {
 					}),
 			}}
 		>
+			<StatusBar
+				style="light"
+				backgroundColor="#0c101c"
+			/>
+			
 			<Header/>
 			<Slot />
 		</ShareIntentProvider>

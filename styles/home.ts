@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     loginContainer: {
         display: "flex",
         flex: 1,
-        backgroundColor: "#181c28",
+        backgroundColor: "#0c101c",
         justifyContent: "center",
         alignContent: "center",
     },

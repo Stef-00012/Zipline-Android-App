@@ -3,7 +3,7 @@ import type { APIFile, APIFiles, APISettings } from "@/types/zipline";
 import { getSettings } from "@/functions/zipline/settings";
 import type { Mimetypes } from "@/types/mimetypes";
 import * as db from "@/functions/database";
-import bytesFn from "bytes";
+import bytes from "bytes";
 import axios from "axios";
 
 // GET /api/user/files
@@ -167,9 +167,9 @@ export async function uploadFile(
 
 	const settings = await getSettings();
 
-	const chunksMax = bytesFn(settings?.chunksMax || "95mb") || 95 * 1024 * 1024;
+	const chunksMax = bytes(settings?.chunksMax || "95mb") || 95 * 1024 * 1024;
 	const chunksSize =
-		bytesFn(settings?.chunksSize || "25mb") || 25 * 1024 * 1024;
+		bytes(settings?.chunksSize || "25mb") || 25 * 1024 * 1024;
 
 	const headers: {
 		[key: string]: string;

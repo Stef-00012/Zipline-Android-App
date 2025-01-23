@@ -1,30 +1,36 @@
 import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
+import { type PropsWithChildren, useEffect, useRef, useState } from "react";
 import { Stack, IconButton } from "@react-native-material/core";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { View, Text, Pressable, Image } from "react-native";
 import type { APISelfUser } from "@/types/zipline";
-import { useEffect, useState } from "react";
 import { styles } from "@/styles/header";
 import type React from "react";
 
-export default function Header() {
+export default function Header({ children }: PropsWithChildren) {
 	const [avatar, setAvatar] = useState<string | null>(null);
 	const [user, setUser] = useState<APISelfUser | null>(null);
 
 	useEffect(() => {
-		(async () => {
-			const avatar = await getCurrentUserAvatar();
-			const user = await getCurrentUser();
-
-			setAvatar(avatar);
-			setUser(user);
-		})();
-	});
+		if (!avatar || !user) {
+			(async () => {
+				const avatar = await getCurrentUserAvatar();
+				const user = await getCurrentUser();
+	
+				setAvatar(avatar);
+				setUser(user);
+			})();
+		}
+	}, [avatar, user]);
 
 	return (
-		<View>
+		<View style={styles.headerContainer}>
 			{avatar && user ? (
-				<View>
+				<View
+					style={{
+						marginBottom: 70 
+					}}
+				>
 					<View style={styles.header}>
 						<View style={styles.headerLeft}>
 							<IconButton
@@ -61,6 +67,7 @@ export default function Header() {
 			) : (
 				<View />
 			)}
+			{children}
 		</View>
 	);
 }

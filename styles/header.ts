@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+    headerContainer: {
+        flex: 1
+    },
     header: {
         position: "absolute",
         top: 0,
@@ -39,6 +42,7 @@ export const styles = StyleSheet.create({
     userMenuContainer: {
         flexWrap: "wrap",
         flexDirection: "row",
+        marginRight: 5
     },
     userMenuAvatar: {
         borderRadius: 8

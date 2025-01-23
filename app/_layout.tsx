@@ -25,8 +25,9 @@ export default function Layout() {
 			/>
 			
 			<SafeAreaView style={{ flex: 1 }}>
-				<Header/>
-				<Slot />
+				<Header>
+					<Slot />
+				</Header>
 			</SafeAreaView>
 		</ShareIntentProvider>
 	);

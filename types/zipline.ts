@@ -1,3 +1,5 @@
+export type DashURL = `http${'s' | ''}://${string}.${string}`;
+
 export type APISelfUser = Omit<APIUser, "avatar">;
 
 export interface APIUser {

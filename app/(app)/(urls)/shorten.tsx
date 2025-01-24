@@ -6,6 +6,7 @@ import { Pressable, Text, TextInput, View, ToastAndroid } from "react-native";
 import { createURL, type CreateURLParams } from "@/functions/zipline/urls";
 import * as Clipboard from "expo-clipboard";
 import { styles } from "@/styles/shorten";
+import type { DashUrl } from "@/types/zipline";
 
 export default function Page() {
 	const router = useRouter();
@@ -28,7 +29,7 @@ export default function Page() {
 		})();
 	});
 
-	const [url, setUrl] = useState<string | null>(null);
+	const [url, setUrl] = useState<DashUrl | null>(null);
 	const [vanity, setVanity] = useState<string | null>(null);
 	const [maxViews, setMaxViews] = useState<string | null>(null);
 	const [password, setPassword] = useState<string | null>(null);

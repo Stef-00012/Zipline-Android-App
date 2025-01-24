@@ -12,6 +12,7 @@ import type {
 	APIRecentFiles,
 	APISelfUser,
 	APIUserStats,
+	DashUrl
 } from "@/types/zipline";
 import {
 	Text,
@@ -41,7 +42,7 @@ export default function Home() {
 		})();
 	});
 
-	const url = db.get("url");
+	const url = db.get("url") as DashUrl | null;
 
 	const [user, setUser] = useState<APISelfUser | null>(null);
 	const [stats, setStats] = useState<APIUserStats | null>();

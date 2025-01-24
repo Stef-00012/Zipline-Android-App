@@ -3,7 +3,7 @@ import AutoHeightImage from "react-native-auto-height-image";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntentContext } from "expo-share-intent";
 import { getFiles } from "@/functions/zipline/files";
-import type { APIFiles } from "@/types/zipline";
+import type { APIFiles, DashUrl } from "@/types/zipline";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { styles } from "@/styles/files";
@@ -31,7 +31,7 @@ export default function Home() {
 	const [files, setFiles] = useState<APIFiles | null>(null);
 	const [filesWidth, setFilesWidth] = useState<number>(0);
 
-	const url = db.get("url");
+	const url = db.get("url") as DashUrl | null;
 
 	useEffect(() => {
 		(async () => {
@@ -46,28 +46,30 @@ export default function Home() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
-				<View style={styles.header}>
-					<Text style={styles.headerText}>Files</Text>
-					<View style={styles.headerButtons}>
-						<Pressable style={styles.headerButton} onPress={() => {
-							console.info("Favorite Files Clicked")
-						}}>
-							<MaterialIcons name="star-border" size={30} color={styles.headerButton.color} />
-						</Pressable>
+				{files && (
+				    <View style={styles.header}>
+    					<Text style={styles.headerText}>Files</Text>
+    					<View style={styles.headerButtons}>
+    						<Pressable style={styles.headerButton} onPress={() => {
+    							console.info("Favorite Files Clicked")
+    						}}>
+    							<MaterialIcons name="star-border" size={30} color={styles.headerButton.color} />
+    						</Pressable>
 
-						<Pressable style={styles.headerButton} onPress={() => {
-							console.info("Tags Clicked")
-						}}>
-							<MaterialIcons name="sell" size={30} color={styles.headerButton.color} />
-						</Pressable>
+    						<Pressable style={styles.headerButton} onPress={() => {
+    							console.info("Tags Clicked")
+    						}}>
+    							<MaterialIcons name="sell" size={30} color={styles.headerButton.color} />
+    						</Pressable>
 
-						<Pressable style={styles.headerButton} onPress={() => {
-							console.info("Upload File Clicked")
-						}}>
-							<MaterialIcons name="upload-file" size={30} color={styles.headerButton.color} />
-						</Pressable>
-					</View>
-				</View>
+    						<Pressable style={styles.headerButton} onPress={() => {
+    							console.info("Upload File Clicked")
+    						}}>
+    							<MaterialIcons name="upload-file" size={30} color={styles.headerButton.color} />
+    						</Pressable>
+    					</View>
+    				</View>
+				)}
 
 				<ScrollView
 					contentContainerStyle={styles.imagesContainer}

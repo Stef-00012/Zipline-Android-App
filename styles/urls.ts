@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
         borderWidth: 4,
         borderColor: "#222c47",
         borderStyle: "solid",
-        borderRadius: 15,
+        borderRadius: 10,
         margin: 10,
     },
     pagesContainer: {
@@ -98,9 +98,45 @@ export const styles = StyleSheet.create({
         color: "#2d3f70"
     },
     
-    container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
-    tableHeader: { height: 50, backgroundColor: '#537791', borderTopLeftRadius: 10, borderTopRightRadius: 10 },
-    text: { textAlign: 'center', fontWeight: '100' },
-    dataWrapper: { marginTop: -1 },
-    row: { height: 40, backgroundColor: '#E7E6E1' }
+    container: {
+        flex: 1,
+        padding: 16,
+        paddingTop: 30,
+        backgroundColor: '#fff'
+    },
+    tableHeader: {
+        height: 50,
+        backgroundColor: '#0c101c',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
+    },
+    dataWrapper: {
+        marginTop: -1
+    },
+    row: {
+        // height: 60,
+        backgroundColor: '#0c101c',
+        padding: 8,
+        borderTopWidth: 1,
+        borderTopColor: "",
+        borderBottomWidth: 1,
+        borderBottomColor: ""
+    },
+    lastRow: {
+        borderBottomWidth: 0
+    },
+    firstRow: {
+        borderTopWidth: 0
+    },
+    tableVerticalScroll: {
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
+    },
+    rowText: {
+        color: "white",
+        textAlign: "center"
+    },
+    link: {
+        color: "#575DB5"
+    }
 });

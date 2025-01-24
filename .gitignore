@@ -38,3 +38,4 @@ yarn-error.*
 /android
 /ios
 biome.json
+package-lock.json

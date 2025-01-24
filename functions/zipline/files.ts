@@ -7,14 +7,14 @@ import bytes from "bytes";
 import axios from "axios";
 
 // GET /api/user/files
-export async function getFiles(page: number): Promise<APIFiles | null> {
+export async function getFiles(page: string): Promise<APIFiles | null> {
 	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return null;
 
 	const params = new URLSearchParams({
-		page: String(page),
+		page: page,
 	});
 
 	try {
@@ -26,6 +26,7 @@ export async function getFiles(page: number): Promise<APIFiles | null> {
 
 		return res.data;
 	} catch (e) {
+		console.error(e)
 		return null;
 	}
 }

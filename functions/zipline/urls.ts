@@ -42,16 +42,18 @@ export async function getURL(id: string): Promise<APIURL | null> {
 	}
 }
 
-interface CreateURLParams {
+export interface CreateURLParams {
 	destination: string;
 	vanity?: string;
-	maxView?: number;
+	maxViews?: number;
+	password?: string;
 }
 // POST /api/user/urls
 export async function createURL({
 	destination,
 	vanity,
-	maxView,
+	maxViews,
+	password
 }: CreateURLParams): Promise<{
 	url: string;
 } | null> {
@@ -62,7 +64,8 @@ export async function createURL({
 
 	const headers: { [key: string]: string | number } = {};
 
-	if (maxView) headers["X-Zipline-Max-Views"] = maxView;
+	if (maxViews) headers["X-Zipline-Max-Views"] = maxViews;
+	if (password) headers["X-Zipline-Password"] = password;
 
 	try {
 		const res = await axios.post(

@@ -48,7 +48,7 @@ export default function Page() {
             setUrls(urls);
             setSettings(settings)
         })()
-    })
+    }, [])
 
     return (
         <View style={styles.mainContainer}>

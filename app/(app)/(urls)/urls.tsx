@@ -6,10 +6,13 @@ import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useShareIntentContext } from "expo-share-intent";
 import { useEffect, useState } from "react";
-import { Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
 import { Row, Table } from "react-native-table-component";
 import * as db from "@/functions/database";
+import { timeDifference } from "@/functions/util"
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as Clipboard from "expo-clipboard";
+
 
 export default function Page() {
     const router = useRouter();
@@ -69,8 +72,8 @@ export default function Page() {
                                 <View>
                                     <Table>
                                         <Row
-                                            data={["Code", "Vanity", "URL", "Views", "Max Views"]}
-                                            widthArr={[80, 100, 200, 100, 100]}
+                                            data={["Code", "Vanity", "URL", "Views", "Max Views", "Created", "Actions"]}
+                                            widthArr={[80, 100, 200, 100, 100, 130, 130]}
                                             style={styles.tableHeader}
                                             textStyle={styles.rowText}
                                         />
@@ -136,6 +139,56 @@ export default function Page() {
                                                         </Text>
                                                     )
                                                     
+                                                    const created = (
+                                                        <Text style={styles.rowText}>
+                                                            {timeDifference(new Date(), new Date(url.createdAt))}
+                                                        </Text>
+                                                    )
+                                                    
+                                                    const actions = (
+                                                        <View style={styles.actionsContainer}>
+                                                            <Pressable style={styles.actionButton} onPress={async () => {
+                                                                const urlDest = url.vanity
+                                                                    ? `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}`
+                                                                    : `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}`
+                                                                    
+                                                                const saved = await Clipboard.setStringAsync(urlDest);
+                                                                
+                                                                if (saved)
+                                        							return ToastAndroid.show(
+                                        								"URL copied to clipboard",
+                                        								ToastAndroid.SHORT,
+                                        							);
+                                        							
+                                        						return ToastAndroid.show(
+                                    								"Failed to paste to the clipboard",
+                                    								ToastAndroid.SHORT,
+                                    							);
+                                                            }}>
+                                                                <MaterialIcons name="content-copy" size={20} color={"white"} />
+                                                            </Pressable>
+                                                            
+                                                            <Pressable style={styles.actionButton} onPress={() => {
+                                                                const urlId = url.id
+                                                                
+                                                                console.info("Edit Pressed")
+                                                            }}>
+                                                                <MaterialIcons name="edit" size={20} color={"white"} />
+                                                            </Pressable>
+                                                            
+                                                            <Pressable style={{
+                                                                ...styles.actionButton,
+                                                                ...styles.actionButtonDanger
+                                                            }} onPress={() => {
+                                                                const urlId = url.id
+                                                                
+                                                                console.info("Delete Pressed")
+                                                            }}>
+                                                                <MaterialIcons name="delete" size={20} color={"white"} />
+                                                            </Pressable>
+                                                        </View>
+                                                    )
+                                                    
                                                     let rowStyle = styles.row
                                                     
                                                     if (index === 0) rowStyle = {
@@ -157,10 +210,12 @@ export default function Page() {
                                                                     url.vanity ? vanity : noVanity,
                                                                     destination,
                                                                     views,
-                                                                    maxViews
+                                                                    maxViews,
+                                                                    created,
+                                                                    actions
                                                                 ]
                                                             }
-                                                            widthArr={[80, 100, 200, 100, 100]}
+                                                            widthArr={[80, 100, 200, 100, 100, 130, 130]}
                                                             style={rowStyle}
                                                             textStyle={styles.text}
                                                         />

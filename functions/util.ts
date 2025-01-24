@@ -44,3 +44,49 @@ export async function getFileDataURI(filePath: string): Promise<string | null> {
 
 	return dataURI;
 }
+
+export function timeDifference(current: Date, previous: Date) {
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+    const msPerMonth = msPerDay * 30;
+    const msPerYear = msPerDay * 365;
+
+    const elapsed = current.getTime() - previous.getTime();
+
+    if (elapsed < msPerMinute) {
+         const difference = Math.round(elapsed / 1000)
+         
+        return difference + ` second${difference > 1 ? 's' : ''} ago`;
+    }
+
+    else if (elapsed < msPerHour) {
+         const difference = Math.round(elapsed / msPerMinute)
+         
+        return difference + ` minute${difference > 1 ? 's' : ''} ago`;
+    }
+
+    else if (elapsed < msPerDay ) {
+        const difference = Math.round(elapsed / msPerHour)
+         
+        return difference + ` hour${difference > 1 ? 's' : ''} ago`;
+    }
+
+    else if (elapsed < msPerMonth) {
+        const difference = Math.round(elapsed / msPerDay)
+         
+        return difference + ` day${difference > 1 ? 's' : ''} ago`;
+    }
+
+    else if (elapsed < msPerYear) {
+        const difference = Math.round(elapsed / msPerMonth)
+         
+        return difference + ` month${difference > 1 ? 's' : ''} ago`;
+    }
+
+    else {
+        const difference = Math.round(elapsed / msPerYear)
+         
+        return difference + ` year${difference > 1 ? 's' : ''} ago`;
+    }
+}

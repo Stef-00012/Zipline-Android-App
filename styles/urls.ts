@@ -138,5 +138,20 @@ export const styles = StyleSheet.create({
     },
     link: {
         color: "#575DB5"
+    },
+    actionsContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        paddingTop: 10,
+        paddingRight: 10,
+    },
+    actionButton: {
+        borderRadius: 4,
+        marginHorizontal: 0,
+        backgroundColor: "#323ea8",
+        padding: 5
+    },
+    actionButtonDanger: {
+        backgroundColor: "#CF4238"
     }
 });

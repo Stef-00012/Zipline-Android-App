@@ -160,6 +160,7 @@ export const styles = StyleSheet.create({
 	popupScrollView: {
 		flexGrow: 0,
 		flexShrink: 1,
+		maxHeight: 400
 	},
 	popupSubHeaderText: {
 		marginTop: 10,

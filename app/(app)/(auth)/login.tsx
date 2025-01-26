@@ -16,21 +16,13 @@ export default function Login() {
 
     const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
-	// useFocusEffect(() => {
-	// 	(async () => {
-	// 		const authenticated = await isAuthenticated();
-
-	// 		if (authenticated) router.replace("/");
-	// 	})();
-	// });
-	console.debug("login.tsx: useLoginAuth()");
-
 	useLoginAuth()
-	
+
 	return (
 		<View style={styles.loginContainer}>
 			<View style={styles.loginBox}>
 				{error && <Text style={styles.errorText}>{error}</Text>}
+
 				<TextInput
 					onChangeText={(content) => {
                         setInputtedUrl(content.length > 0 ? content : null);

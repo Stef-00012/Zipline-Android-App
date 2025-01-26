@@ -8,7 +8,7 @@ import * as FileSystem from "expo-file-system";
 import * as db from "@/functions/database";
 import axios from "axios";
 
-interface GetFilesOptions {
+export interface GetFilesOptions {
 	id?: string;
 	favorite?: boolean;
 }

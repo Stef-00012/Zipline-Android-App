@@ -136,13 +136,6 @@ export interface APISettings {
 	coreDefaultDomain: string | null;
 	coreTempDirectory: string;
 	chunksEnabled: boolean;
-	// chunksMax: string;
-	// chunksSize: string;
-	// tasksDeleteInterval: string;
-	// tasksClearInvitesInterval: string;
-	// tasksMaxViewsInterval: string;
-	// tasksThumbnailsInterval: string;
-	// tasksMetricsInterval: string;
 	chunksMax: number;
 	chunksSize: number;
 	tasksDeleteInterval: number;
@@ -154,7 +147,6 @@ export interface APISettings {
 	filesLength: number;
 	filesDefaultFormat: "random" | "uuid" | "date" | "name" | "gfycat";
 	filesDisabledExtensions: Array<string>;
-	// filesMaxFileSize: string;
 	filesMaxFileSize: number;
 	filesDefaultExpiration: string | null;
 	filesAssumeMimetypes: boolean;

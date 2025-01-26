@@ -7,6 +7,8 @@ import * as Clipboard from "expo-clipboard";
 import { styles } from "@/styles/components/shareIntentShorten";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntentContext } from "expo-share-intent";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 interface Props {
     defaultUrl: string
@@ -17,15 +19,8 @@ export default function ShareIntentShorten({
 }: Props) {
 	const router = useRouter();
 
-	const { resetShareIntent } = useShareIntentContext();
-
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
-
-			if (!authenticated) return router.replace("/login");
-		})();
-	});
+	useAuth()
+	const resetShareIntent = useShareIntent(true)
 
 	const [url, setUrl] = useState<string | null>(defaultUrl);
 	const [vanity, setVanity] = useState<string | null>(null);

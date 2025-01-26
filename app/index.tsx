@@ -34,7 +34,7 @@ export default function Home() {
 	const router = useRouter();
 
 	useFocusEffect(() => {
-		// if (__DEV__) router.replace("/invites");
+		if (__DEV__) router.replace("/files");
 	});
 
 	async function handleAuth() {

@@ -11,6 +11,7 @@ import * as db from "@/functions/database";
 import {
 	type ExternalPathString,
 	Link,
+	useRouter,
 } from "expo-router";
 import { createFolder, deleteFolder, editFolder, getFolders } from "@/functions/zipline/folders";
 import Popup from "@/components/Popup";
@@ -19,23 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Folders() {
-
-	// // biome-ignore lint/correctness/useExhaustiveDependencies: .
-	// useEffect(() => {
-	// 	if (hasShareIntent) {
-	// 		router.replace({
-	// 			pathname: "/shareintent",
-	// 		});
-	// 	}
-	// }, [hasShareIntent]);
-
-	// useFocusEffect(() => {
-	// 	(async () => {
-	// 		const authenticated = await isAuthenticated();
-
-	// 		if (!authenticated) return router.replace("/login");
-	// 	})();
-	// });
+	const router = useRouter();
 
 	useAuth()
 	useShareIntent()
@@ -223,7 +208,7 @@ export default function Folders() {
 															onPress={() => {
 																const folderId = folder.id;
 
-																console.debug("Open Folder Pressed");
+																router.replace(`/files?folderId=${folderId}`)
 															}}
 														>
 															<MaterialIcons

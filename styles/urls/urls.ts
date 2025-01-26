@@ -114,7 +114,6 @@ export const styles = StyleSheet.create({
 		marginTop: -1,
 	},
 	row: {
-		// height: 60,
 		backgroundColor: "#0c101c",
 		padding: 8,
 		borderTopWidth: 1,

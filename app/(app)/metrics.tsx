@@ -2,24 +2,10 @@ import { getStats } from "@/functions/zipline/stats";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import type { APIStats } from "@/types/zipline";
-import { useRouter } from "expo-router";
-import { useShareIntentContext } from "expo-share-intent";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
 export default function Metrics() {
-    const router = useRouter();
-    const { hasShareIntent } = useShareIntentContext();
-
-    // // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-    // useEffect(() => {
-    //     if (hasShareIntent) {
-    //         router.replace({
-    //             pathname: "/shareintent",
-    //         });
-    //     }
-    // }, [hasShareIntent]);
-
     useAuth()
 	useShareIntent()
 

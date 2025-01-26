@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
-import type { APISelfUser, APISettings, APIUser, APIUserQuota, APIUsersNoIncl, DashURL } from "@/types/zipline";
+import type { APISettings, APIUser, APIUserQuota, APIUsersNoIncl, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
@@ -17,28 +17,9 @@ import * as FileSystem from "expo-file-system";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { router } from "expo-router";
 
 export default function Users() {
-
-	// // biome-ignore lint/correctness/useExhaustiveDependencies: .
-	// useEffect(() => {
-	// 	if (hasShareIntent) {
-	// 		router.replace({
-	// 			pathname: "/shareintent",
-	// 		});
-	// 	}
-	// }, [hasShareIntent]);
-
-	// useFocusEffect(() => {
-	// 	(async () => {
-	// 		const authenticated = await isAuthenticated();
-
-	// 		if (!authenticated) return router.replace("/login");
-
-	// 		if (authenticated === "USER") return router.replace("/");
-	// 	})();
-	// });
-
 	useAuth(true)
 	useShareIntent()
 
@@ -393,8 +374,6 @@ export default function Users() {
 							const filename = fileURI.split('/').pop() || "avatar.png"
 
 							setNewUserAvatarName(filename)
-
-							console.debug(filename)
 						}}>
 							<Text style={styles.inputButtonText}>{newUserAvatar ? newUserAvatarName : "Select an Avatar..."}</Text>
 						</Pressable>
@@ -511,7 +490,6 @@ export default function Users() {
 									marginRight: 10
 								}} onPress={async () => {
 									const userId = userToDeleteData.id
-									console.debug("deletedData", false)
 
 									const deletedUser = await deleteUser(userId, false)
 
@@ -538,8 +516,6 @@ export default function Users() {
 									...styles.actionButtonDelete
 								}} onPress={async () => {
 									const userId = userToDeleteData.id
-
-									console.debug("deletedData", true)
 
 									const deletedUser = await deleteUser(userId, true)
 
@@ -675,7 +651,9 @@ export default function Users() {
 														<Pressable
 															style={styles.actionButton}
 															onPress={async () => {
-																console.debug("View User Files Pressed")
+																const userId = user.id
+
+																router.replace(`/files?id=${userId}`)
 															}}
 														>
 															<MaterialIcons

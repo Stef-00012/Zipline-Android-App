@@ -55,31 +55,6 @@ export default function UploadFile({
 	
 	useAuth()
 	useShareIntent(fromShareIntent)
-	
-	// const { hasShareIntent, resetShareIntent } = useShareIntentContext();
-	
-	// if (!fromShareIntent) {
-	// 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	// 	useEffect(() => {
-	// 		if (hasShareIntent) {
-	// 			router.replace({
-	// 				pathname: "/shareintent",
-	// 			});
-	// 		}
-	// 	}, [hasShareIntent]);
-	// }
-
-	// useFocusEffect(() => {
-	// 	(async () => {
-	// 		const authenticated = await isAuthenticated();
-
-	// 		if (!authenticated) {
-	// 			resetShareIntent()
-
-	// 			return router.replace("/login");
-	// 		}
-	// 	})();
-	// });
 
 	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>(defaultFiles || []);
 	const [uploadedFiles, setUploadedFiles] = useState<

@@ -1,9 +1,7 @@
-app/(app)/(files)/files
-    - add support for custom user ID when admin
-    - show favorite files
-    - add tags handling
-app/(app)/(folder)/* -  folder files view
-create single file view
-create user settings
-create settings
-app/(app)/metrics - build from scratch
+user settings
+server settings
+handle both user menu (top right) and hamburger menu (top left) presses
+    - user menu => open settings
+    - hamburger menu => animation of the menu coming from outside the screen from the left
+app/(app)/metrics
+single file view

@@ -148,8 +148,6 @@ export async function editUser(
 
 	if (!url || !token) return null;
 
-	console.debug(options)
-
 	try {
 		const res = await axios.patch(`${url}/api/users/${id}`, options, {
 			headers: {
@@ -159,7 +157,6 @@ export async function editUser(
 
 		return res.data;
 	} catch (e) {
-		console.error(e)
 		return null;
 	}
 }

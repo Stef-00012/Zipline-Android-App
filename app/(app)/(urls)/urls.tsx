@@ -18,24 +18,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Urls() {
-
-	// // biome-ignore lint/correctness/useExhaustiveDependencies: .
-	// useEffect(() => {
-	// 	if (hasShareIntent) {
-	// 		router.replace({
-	// 			pathname: "/shareintent",
-	// 		});
-	// 	}
-	// }, [hasShareIntent]);
-
-	// useFocusEffect(() => {
-	// 	(async () => {
-	// 		const authenticated = await isAuthenticated();
-
-	// 		if (!authenticated) return router.replace("/login");
-	// 	})();
-	// });
-
 	useAuth()
 	useShareIntent()
 

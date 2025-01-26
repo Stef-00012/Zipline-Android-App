@@ -1,10 +1,13 @@
 import type { Mimetypes } from "@/types/mimetypes";
 import { guessExtension } from "@/functions/util";
-import { Image as NativeImage, Text, View } from "react-native";
+import { Image as NativeImage, Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { styles } from "@/styles/components/fileDisplay";
+import type { APIFile, DashURL } from "@/types/zipline";
+import * as db from "@/functions/database";
+import { type ExternalPathString, useRouter } from "expo-router";
 
 interface Props {
 	uri: string;
@@ -17,6 +20,7 @@ interface Props {
 	passwordProtected?: boolean;
 	originalName?: string | null;
 	openable?: boolean;
+	file?: APIFile;
 }
 
 export default function FileDisplay({
@@ -30,23 +34,37 @@ export default function FileDisplay({
 	openable = true,
 	autoHeight = false,
 	passwordProtected = false,
+	file
 }: Props) {
+	const router = useRouter()
+	const dashUrl = db.get("url") as DashURL | null;
+
+	if (file) {
+		mimetype = file.type;
+		uri = `${dashUrl}/raw/${file.name}`;
+		name = file.name;
+		originalName = file.originalName;
+		passwordProtected = file.password
+	}
+
 	if (passwordProtected) {
 		return (
-			<View
-			style={{
-				...styles.nonDisplayableFileContainer,
-				height,
-				width,
-			}}
-			>
-				<MaterialIcons name="lock" size={60} color={"white"} />
-				<Text
-					style={styles.nonDisplayableFileText}
+			<Pressable onPress={handlePress}>
+				<View
+					style={{
+						...styles.nonDisplayableFileContainer,
+						height,
+						width,
+					}}
 				>
-					{openable ? "Click to view password " : ""}{originalName || name}
-				</Text>
-			</View>
+					<MaterialIcons name="lock" size={60} color={"white"} />
+					<Text
+						style={styles.nonDisplayableFileText}
+					>
+						{openable ? "Click to view password " : ""}{originalName || name}
+					</Text>
+				</View>
+			</Pressable>
 		)
 	}
 
@@ -108,33 +126,41 @@ export default function FileDisplay({
 
 	if (displayableMimetypes.includes(mimetype))
 		return (
-			<Image
-				source={{
-					uri: uri,
-				}}
-				style={{
-					height: imageHeight,
-					width: width,
-				}}
-				alt={alt || originalName || name}
-				contentFit="contain"
-			/>
+			<Pressable onPress={handlePress}>
+				<Image
+					source={{
+						uri: uri,
+					}}
+					style={{
+						height: imageHeight,
+						width: width,
+					}}
+					alt={alt || originalName || name}
+					contentFit="contain"
+				/>
+			</Pressable>
 		);
 
 	return (
-		<View
-			style={{
-				...styles.nonDisplayableFileContainer,
-				height,
-				width,
-			}}
-		>
-			<MaterialIcons name="description" size={60} color={"white"} />
-			<Text
-				style={styles.nonDisplayableFileText}
+		<Pressable onPress={handlePress}>
+			<View
+				style={{
+					...styles.nonDisplayableFileContainer,
+					height,
+					width,
+				}}
 			>
-				{openable ? "Click to view " : ""}{originalName || name}
-			</Text>
-		</View>
+				<MaterialIcons name="description" size={60} color={"white"} />
+				<Text
+					style={styles.nonDisplayableFileText}
+				>
+					{openable ? "Click to view " : ""}{originalName || name}
+				</Text>
+			</View>
+		</Pressable>
 	);
+
+	function handlePress() {
+        if (file) router.replace(`${dashUrl}${file.url}` as ExternalPathString)
+    }
 }

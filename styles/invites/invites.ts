@@ -114,7 +114,6 @@ export const styles = StyleSheet.create({
         marginTop: -1,
     },
     row: {
-        // height: 60,
         backgroundColor: "#0c101c",
         padding: 8,
         borderTopWidth: 1,
@@ -154,4 +153,49 @@ export const styles = StyleSheet.create({
     actionButtonDanger: {
         backgroundColor: "#CF4238",
     },
+	popupContent: {
+        height: "auto",
+        width: "100%"
+    },
+	errorText: {
+		color: "red",
+		fontWeight: "bold",
+		textAlign: "center",
+	},
+	mainHeaderText: {
+        fontSize: 22,
+        fontWeight: "bold",
+        color: "white",
+    },
+    textInput: {
+		width: "100%",
+		borderWidth: 2,
+		borderColor: "#222c47",
+		margin: "auto",
+		color: "white",
+		height: 40,
+		paddingHorizontal: 10,
+		fontSize: 15,
+		borderRadius: 6,
+		marginTop: 5,
+	},
+	popupHeaderText: {
+        marginTop: 10,
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "white",
+    },
+    button: {
+		width: "100%",
+		backgroundColor: "#323ea8",
+		padding: 10,
+		marginTop: 15,
+		borderRadius: 6,
+		margin: "auto",
+	},
+	buttonText: {
+		textAlign: "center",
+		fontWeight: "bold",
+		color: "white",
+	},
 });

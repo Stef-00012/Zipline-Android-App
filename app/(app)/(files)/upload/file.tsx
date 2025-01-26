@@ -34,7 +34,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import Popup from "@/components/Popup";
 
-interface SelectedFile {
+export interface SelectedFile {
 	name: string;
 	uri: string;
 	mimetype?: string;
@@ -44,23 +44,28 @@ interface SelectedFile {
 interface Props {
 	showFileSelector?: boolean;
 	defaultFiles?: Array<SelectedFile>;
+	fromShareIntent?: boolean;
 }
 
 export default function UploadFile({
 	showFileSelector = true,
-	defaultFiles
+	defaultFiles,
+	fromShareIntent = false
 }: Props) {
 	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
+	
+	if (!fromShareIntent) {
+		const { hasShareIntent } = useShareIntentContext();
+		
+		// biome-ignore lint/correctness/useExhaustiveDependencies: .
+		useEffect(() => {
+			if (hasShareIntent) {
+				router.replace({
+					pathname: "/shareintent",
+				});
+			}
+		}, [hasShareIntent]);
+	}
 
 	useFocusEffect(() => {
 		(async () => {
@@ -105,7 +110,7 @@ export default function UploadFile({
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
-	const [fileNameEnabled, setFileNameEnabled] = useState<boolean>(true);
+	const [fileNameEnabled, setFileNameEnabled] = useState<boolean>(defaultFiles ? defaultFiles.length <= 1 : true);
 	const [uploading, setUploading] = useState<boolean>(false);
 
 	useEffect(() => {

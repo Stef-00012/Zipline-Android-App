@@ -40,5 +40,8 @@ export const styles = StyleSheet.create({
     },
     menuItemSelected: {
         backgroundColor: "#0d1325"
+    },
+    selectedText: {
+        color: "white"
     }
 })

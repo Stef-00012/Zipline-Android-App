@@ -8,8 +8,12 @@ import * as FileSystem from "expo-file-system";
 import * as db from "@/functions/database";
 import axios from "axios";
 
+interface GetFilesOptions {
+	id?: string;
+	favorite?: boolean;
+}
 // GET /api/user/files
-export async function getFiles(page: string): Promise<APIFiles | null> {
+export async function getFiles(page: string, options: GetFilesOptions = {}): Promise<APIFiles | null> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -18,6 +22,9 @@ export async function getFiles(page: string): Promise<APIFiles | null> {
 	const params = new URLSearchParams({
 		page: page,
 	});
+
+	if (options.id) params.append("id", options.id);
+	if (options.favorite) params.append("favorite", "true");
 
 	try {
 		const res = await axios.get(`${url}/api/user/files?${params}`, {

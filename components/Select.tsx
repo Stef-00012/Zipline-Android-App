@@ -33,7 +33,10 @@ export default function Select({
 			renderButton={(selectedItem, isOpen) => {
 				return (
 					<View style={styles.selectButton}>
-						<Text style={styles.selectText}>
+						<Text style={{
+							...styles.selectText,
+							...(selectedItem?.label && styles.selectedText)
+						}}>
 							{selectedItem?.label || placeholder}
 						</Text>
 

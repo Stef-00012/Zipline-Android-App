@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
+import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
 import type { APIFolders, APISettings, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { isAuthenticated } from "@/functions/zipline/auth";
@@ -16,7 +16,9 @@ import {
 	useFocusEffect,
 	useRouter,
 } from "expo-router";
-import { deleteFolder, editFolder, getFolders } from "@/functions/zipline/folders";
+import { createFolder, deleteFolder, editFolder, getFolders } from "@/functions/zipline/folders";
+import Popup from "@/components/Popup";
+import { Switch } from "@react-native-material/core";
 
 export default function Folders() {
 	const router = useRouter();
@@ -42,6 +44,13 @@ export default function Folders() {
 	const [folders, setFolders] = useState<APIFolders | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);
 
+	const [createNewFolder, setCreateNewFolder] = useState<boolean>(false);
+
+	const [newFolderName, setNewFolderName] = useState<string | null>(null);
+	const [newFolderPublic, setNewFolderPublic] = useState<boolean>(false);
+
+	const [newFolderError, setNewFolderError] = useState<string | null>(null);
+
 	const dashUrl = db.get("url") as DashURL | null;
 
 	useEffect(() => {
@@ -57,6 +66,72 @@ export default function Folders() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
+				<Popup hidden={!createNewFolder} onClose={() => {
+					setCreateNewFolder(false)
+					setNewFolderName(null)
+					setNewFolderPublic(false)
+				}}>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Create Folder</Text>
+						{newFolderError && <Text style={styles.errorText}>{newFolderError}</Text>}
+
+						<Text style={styles.popupHeaderText}>Name:</Text>
+						<TextInput
+							style={styles.textInput}
+							onChangeText={(content) => {
+								setNewFolderName(content);
+							}}
+							value={newFolderName || ""}
+							placeholder="myFolder"
+							placeholderTextColor="#222c47"
+						/>
+
+						<View style={styles.switchContainer}>
+							<Switch
+								value={newFolderPublic}
+								onValueChange={() => setNewFolderPublic((prev) => !prev)}
+								thumbColor={newFolderPublic ? "#2e3e6b" : "#222c47"}
+								trackColor={{
+									true: "#21273b",
+									false: "#181c28",
+								}}
+							/>
+							<Text
+								style={{
+									...styles.switchText
+								}}
+							>
+								Public
+							</Text>
+						</View>
+
+						<Pressable
+							style={styles.button}
+							onPress={async () => {
+								setNewFolderError(null)
+
+								if (!newFolderName || newFolderName.length <= 0) return setNewFolderError("Please insert a folder name");
+
+								const createdInvite = await createFolder(newFolderName, newFolderPublic);
+		
+								if (!createdInvite)
+									return setNewFolderError("An error occurred while creating the folder");
+
+								setNewFolderName(null);
+								setNewFolderPublic(false);
+
+								const newFolders = await getFolders()
+
+								setFolders(newFolders)
+
+								setCreateNewFolder(false);
+							}}
+						>
+							<Text style={styles.buttonText}>Create</Text>
+						</Pressable>
+					</View>
+				</Popup>
+
 				{folders && settings && dashUrl ? (
 					<View style={{ flex: 1 }}>
 						<View style={styles.header}>
@@ -65,7 +140,7 @@ export default function Folders() {
 								<Pressable
 									style={styles.headerButton}
 									onPress={() => {
-										console.debug("Create New Folder Pressed")
+										setCreateNewFolder(true)
 									}}
 								>
 									<MaterialIcons

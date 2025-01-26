@@ -43,23 +43,28 @@ interface SelectedFile {
 interface Props {
 	showFileSelector?: boolean;
 	defaultText?: string;
+	fromShareIntent?: boolean;
 }
 
 export default function UploadText({
 	showFileSelector = true,
-	defaultText
+	defaultText,
+	fromShareIntent = false
 }: Props) {
 	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
+	
+	if (!fromShareIntent) {
+		const { hasShareIntent } = useShareIntentContext();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
+		// biome-ignore lint/correctness/useExhaustiveDependencies: .
+		useEffect(() => {
+			if (hasShareIntent) {
+				router.replace({
+					pathname: "/shareintent",
+				});
+			}
+		}, [hasShareIntent]);
+	}
 
 	useFocusEffect(() => {
 		(async () => {

@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
+import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
 import type { APIInvites, APISettings, APIURLs, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { isAuthenticated } from "@/functions/zipline/auth";
@@ -16,7 +16,10 @@ import {
 	useFocusEffect,
 	useRouter,
 } from "expo-router";
-import { deleteInvite, getInvites } from "@/functions/zipline/invites";
+import { createInvite, deleteInvite, getInvites } from "@/functions/zipline/invites";
+import Popup from "@/components/Popup";
+import Select from "@/components/Select";
+import { dates } from "@/constants/invites";
 
 export default function Invites() {
 	const router = useRouter();
@@ -36,11 +39,20 @@ export default function Invites() {
 			const authenticated = await isAuthenticated();
 
 			if (!authenticated) return router.replace("/login");
+
+			if (authenticated === "USER") return router.replace("/")
 		})();
 	});
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);
+
+	const [createNewInvite, setCreateNewInvite] = useState<boolean>(false);
+
+	const [newInviteExpires, setNewInviteExpires] = useState<string>("never");
+	const [newInviteMaxUses, setNewInviteMaxUses] = useState<number>();
+
+	const [newInviteError, setNewInviteError] = useState<string | null>(null);
 
 	const dashUrl = db.get("url") as DashURL | null;
 
@@ -57,6 +69,77 @@ export default function Invites() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
+				<Popup hidden={!createNewInvite} onClose={() => {
+					setCreateNewInvite(false)
+					setNewInviteExpires("never")
+					setNewInviteMaxUses(undefined)
+				}}>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Create Invite</Text>
+						{newInviteError && <Text style={styles.errorText}>{newInviteError}</Text>}
+
+						<Text style={styles.popupHeaderText}>Expires At:</Text>
+						<Select
+							placeholder="Select Date..."
+							data={dates}
+							onSelect={(selectedDate) => {
+								setNewInviteExpires(selectedDate.value);
+							}}
+							defaultValue={dates.find(date => date.value === "never")}
+						/>
+
+						<Text style={styles.popupHeaderText}>Max Uses:</Text>
+						<TextInput
+							style={styles.textInput}
+							onChangeText={(content) => {
+								setNewInviteMaxUses(Math.abs(Number.parseInt(content)) || undefined);
+							}}
+							value={newInviteMaxUses ? String(newInviteMaxUses) : ""}
+							keyboardType="numeric"
+							placeholder="5"
+							placeholderTextColor="#222c47"
+						/>
+
+						<Pressable
+							style={styles.button}
+							onPress={async () => {
+								setNewInviteError(null)
+
+								const createdInvite = await createInvite(newInviteExpires, newInviteMaxUses);
+		
+								if (!createdInvite)
+									return setNewInviteError("An error occurred while creating the invite");
+
+								const urlDest = `${dashUrl}/invite/${createdInvite.code}`
+		
+								const saved = await Clipboard.setStringAsync(urlDest);
+		
+								setNewInviteExpires("never");
+								setNewInviteMaxUses(undefined);
+
+								const newInvites = await getInvites()
+
+								setInvites(newInvites)
+
+								setCreateNewInvite(false);
+		
+								if (saved)
+									return ToastAndroid.show(
+										"Invite URL copied to clipboard",
+										ToastAndroid.SHORT,
+									);
+
+								ToastAndroid.show(
+									"Failed to copy the invite URL to the clipboard",
+									ToastAndroid.SHORT,
+								);
+							}}
+						>
+							<Text style={styles.buttonText}>Create</Text>
+						</Pressable>
+					</View>
+				</Popup>
+
 				{invites && settings && dashUrl ? (
 					<View style={{ flex: 1 }}>
 						<View style={styles.header}>
@@ -65,7 +148,7 @@ export default function Invites() {
 								<Pressable
 									style={styles.headerButton}
 									onPress={() => {
-										console.debug("Create Invite Pressed")
+										setCreateNewInvite(true)
 									}}
 								>
 									<MaterialIcons

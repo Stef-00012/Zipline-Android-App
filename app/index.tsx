@@ -49,7 +49,7 @@ export default function Home() {
 	}, []);
 
 	useFocusEffect(() => {
-		if (__DEV__) router.replace("/urls");
+		if (__DEV__) router.replace("/files?favorite=true&id=&def=22");
 	});
 
 	async function handleAuth() {
@@ -72,7 +72,7 @@ export default function Home() {
 							{recentFiles.map((file) => (
 								<View key={file.id} style={styles.recentFileContainer}>
 									<FileDisplay
-										uri={`${url}/raw${file.url}`}
+										uri={`${url}/raw/${file.name}`}
 										originalName={file.originalName}
 										name={file.name}
 										width={200}

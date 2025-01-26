@@ -7,7 +7,7 @@ import FileDisplay from "@/components/FileDisplay";
 import { styles } from "@/styles/files/files";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function Files() {
 	const router = useRouter();
@@ -22,6 +22,12 @@ export default function Files() {
 		}
 	}, [hasShareIntent]);
 
+	const searchParams = useLocalSearchParams<{
+		id?: string;
+		favorites?: string
+		page?: string
+	}>()
+
 	const [page, setPage] = useState<string>("1");
 	const [prevPageDisabled, setPrevPageDisabled] = useState<boolean>(true);
 	const [nextPageDisabled, setNextPageDisabled] = useState<boolean>(false);
@@ -35,13 +41,24 @@ export default function Files() {
 
 	useEffect(() => {
 		(async () => {
-			const files = await getFiles(page);
+			let fetchPage = page;
+
+			if (searchParams.page && Number.parseInt(searchParams.page) > 0) {
+				fetchPage = searchParams.page;
+
+				setPage(fetchPage);
+			}
+
+			const files = await getFiles(fetchPage, {
+				id: searchParams.id,
+				favorite: searchParams.favorites === "true"
+			});
 
 			if ((files?.pages || 1) > 1) setAllPageDisabled(false);
 
 			setFiles(files);
 		})();
-	}, [page]);
+	}, [page, searchParams]);
 
 	return (
 		<View style={styles.mainContainer}>
@@ -79,7 +96,7 @@ export default function Files() {
 							<Pressable
 								style={styles.headerButton}
 								onPress={() => {
-									console.debug("Upload File Clicked");
+									router.replace("/upload/file")
 								}}
 							>
 								<MaterialIcons
@@ -128,6 +145,10 @@ export default function Files() {
 
 							if (page === "1") return;
 							if (Number.parseInt(page) - 1 === 1) setPrevPageDisabled(true);
+							if ((files?.pages || 1) < Number.parseInt(page)) {
+								setNextPageDisabled(true);
+								return setPage(String(files?.pages|| "1"))
+							}
 
 							const newPage = String(Number.parseInt(page) - 1);
 

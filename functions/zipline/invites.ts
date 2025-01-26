@@ -44,6 +44,7 @@ export async function createInvite(expiresAt?: string, maxUses?: number): Promis
 
 		return res.data;
 	} catch (e) {
+		console.error(e)
 		return null;
 	}
 }

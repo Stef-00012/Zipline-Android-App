@@ -1,10 +1,8 @@
 import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { isAuthenticated } from "@/functions/zipline/auth";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
-import { useShareIntentContext } from "expo-share-intent";
 import { createURL, type CreateURLParams, deleteURL, editURL, type EditURLOptions, getURLs } from "@/functions/zipline/urls";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/urls/urls";
@@ -14,31 +12,32 @@ import * as db from "@/functions/database";
 import {
 	type ExternalPathString,
 	Link,
-	useFocusEffect,
-	useRouter,
 } from "expo-router";
 import Popup from "@/components/Popup";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Urls() {
-	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
+	// // biome-ignore lint/correctness/useExhaustiveDependencies: .
+	// useEffect(() => {
+	// 	if (hasShareIntent) {
+	// 		router.replace({
+	// 			pathname: "/shareintent",
+	// 		});
+	// 	}
+	// }, [hasShareIntent]);
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
+	// useFocusEffect(() => {
+	// 	(async () => {
+	// 		const authenticated = await isAuthenticated();
 
-			if (!authenticated) return router.replace("/login");
-		})();
-	});
+	// 		if (!authenticated) return router.replace("/login");
+	// 	})();
+	// });
+
+	useAuth()
+	useShareIntent()
 
 	const [urls, setUrls] = useState<APIURLs | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);

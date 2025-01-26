@@ -1,18 +1,12 @@
 import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
 import type { APISelfUser, APISettings, APIUser, APIUserQuota, APIUsersNoIncl, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { isAuthenticated } from "@/functions/zipline/auth";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
-import { useShareIntentContext } from "expo-share-intent";
 import { getFileDataURI, timeDifference } from "@/functions/util";
 import { styles } from "@/styles/users/users";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
-import {
-	useFocusEffect,
-	useRouter,
-} from "expo-router";
 import { createUser, deleteUser, editUser, type EditUserOptions, getUsers } from "@/functions/zipline/users";
 import { Image } from "expo-image";
 import Popup from "@/components/Popup";
@@ -21,30 +15,32 @@ import { fileQuotaTypes, userRoles } from "@/constants/users";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { getCurrentUser } from "@/functions/zipline/user";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Users() {
-	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
+	// // biome-ignore lint/correctness/useExhaustiveDependencies: .
+	// useEffect(() => {
+	// 	if (hasShareIntent) {
+	// 		router.replace({
+	// 			pathname: "/shareintent",
+	// 		});
+	// 	}
+	// }, [hasShareIntent]);
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
+	// useFocusEffect(() => {
+	// 	(async () => {
+	// 		const authenticated = await isAuthenticated();
 
-			if (!authenticated) return router.replace("/login");
+	// 		if (!authenticated) return router.replace("/login");
 
-			if (authenticated === "USER") return router.replace("/");
-		})();
-	});
+	// 		if (authenticated === "USER") return router.replace("/");
+	// 	})();
+	// });
+
+	useAuth(true)
+	useShareIntent()
 
 	const [users, setUsers] = useState<APIUsersNoIncl | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);

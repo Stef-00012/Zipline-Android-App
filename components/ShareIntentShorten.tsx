@@ -5,6 +5,8 @@ import { Pressable, Text, TextInput, View, ToastAndroid } from "react-native";
 import { createURL, type CreateURLParams } from "@/functions/zipline/urls";
 import * as Clipboard from "expo-clipboard";
 import { styles } from "@/styles/components/shareIntentShorten";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useShareIntentContext } from "expo-share-intent";
 
 interface Props {
     defaultUrl: string
@@ -14,6 +16,8 @@ export default function ShareIntentShorten({
     defaultUrl
 }: Props) {
 	const router = useRouter();
+
+	const { resetShareIntent } = useShareIntentContext();
 
 	useFocusEffect(() => {
 		(async () => {
@@ -36,6 +40,27 @@ export default function ShareIntentShorten({
 	return (
 		<View style={styles.shortenContainer}>
 			<View style={styles.shortenBox}>
+				<View style={styles.header}>
+					<Text style={styles.mainHeaderText}>Shorten URL</Text>
+
+					<View style={styles.headerButtons}>
+						<Pressable
+							style={styles.headerButton}
+							onPress={() => {
+								resetShareIntent();
+
+								router.replace("/urls")
+							}}
+						>
+							<MaterialIcons
+								name="link"
+								size={30}
+								color={styles.headerButton.color}
+							/>
+						</Pressable>
+					</View>
+				</View>
+
 				{error && <Text style={styles.errorText}>{error}</Text>}
 
 				<Text style={styles.headerText}>URL:</Text>

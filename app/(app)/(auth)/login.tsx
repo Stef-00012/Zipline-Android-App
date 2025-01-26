@@ -1,23 +1,13 @@
 import { Pressable, Text, View, TextInput } from "react-native";
 import { isAuthenticated } from "@/functions/zipline/auth";
-import { useShareIntentContext } from "expo-share-intent";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import * as db from "@/functions/database";
 import { styles } from "@/styles/auth/login";
+import { useLoginAuth } from "@/hooks/useLoginAuth";
 
 export default function Login() {
 	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
 
 	const [error, setError] = useState<string>();
 
@@ -26,14 +16,17 @@ export default function Login() {
 
     const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
+	// useFocusEffect(() => {
+	// 	(async () => {
+	// 		const authenticated = await isAuthenticated();
 
-			if (authenticated) router.replace("/");
-		})();
-	});
+	// 		if (authenticated) router.replace("/");
+	// 	})();
+	// });
+	console.debug("login.tsx: useLoginAuth()");
 
+	useLoginAuth()
+	
 	return (
 		<View style={styles.loginContainer}>
 			<View style={styles.loginBox}>

@@ -8,15 +8,12 @@ import {
 	ToastAndroid,
 } from "react-native";
 import { guessExtension, guessMimetype } from "@/functions/util";
-import { isAuthenticated } from "@/functions/zipline/auth";
 import { getSettings } from "@/functions/zipline/settings";
-import { useShareIntentContext } from "expo-share-intent";
 import type { APIUploadResponse } from "@/types/zipline";
 import { getFolders } from "@/functions/zipline/folders";
 import {
 	type ExternalPathString,
 	Link,
-	useFocusEffect,
 	useRouter,
 } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
@@ -32,6 +29,8 @@ import * as Clipboard from "expo-clipboard";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import Popup from "@/components/Popup";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 interface SelectedFile {
 	name: string;
@@ -53,26 +52,29 @@ export default function UploadText({
 }: Props) {
 	const router = useRouter();
 	
-	if (!fromShareIntent) {
-		const { hasShareIntent } = useShareIntentContext();
+	// if (!fromShareIntent) {
+	// 	const { hasShareIntent } = useShareIntentContext();
 
-		// biome-ignore lint/correctness/useExhaustiveDependencies: .
-		useEffect(() => {
-			if (hasShareIntent) {
-				router.replace({
-					pathname: "/shareintent",
-				});
-			}
-		}, [hasShareIntent]);
-	}
+	// 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
+	// 	useEffect(() => {
+	// 		if (hasShareIntent) {
+	// 			router.replace({
+	// 				pathname: "/shareintent",
+	// 			});
+	// 		}
+	// 	}, [hasShareIntent]);
+	// }
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
+	// useFocusEffect(() => {
+	// 	(async () => {
+	// 		const authenticated = await isAuthenticated();
 
-			if (!authenticated) return router.replace("/login");
-		})();
-	});
+	// 		if (!authenticated) return router.replace("/login");
+	// 	})();
+	// });
+
+	useAuth()
+	useShareIntent(fromShareIntent)
 
 	const [uploadedFile, setUploadedFile] = useState<
 		APIUploadResponse["files"][0]
@@ -232,7 +234,25 @@ export default function UploadText({
 			</Popup>
 
 			<View>
-				<Text style={styles.headerText}>Upload Text</Text>
+				<View style={styles.header}>
+					<Text style={styles.headerText}>Upload Text</Text>
+
+					<View style={styles.headerButtons}>
+						<Pressable
+							style={styles.headerButton}
+							onPress={() => {
+								router.replace("/files")
+							}}
+						>
+							<MaterialIcons
+								name="folder-open"
+								size={30}
+								color={styles.headerButton.color}
+							/>
+						</Pressable>
+					</View>
+				</View>
+
 				<TextInput
 					multiline
 					editable={!uploading}

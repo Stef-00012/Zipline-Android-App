@@ -4,38 +4,39 @@ import { useFocusEffect, useRouter } from "expo-router";
 import {
 	useShareIntentContext,
 } from "expo-share-intent";
-import { useEffect, useState } from "react";
-import type { SelectedFile } from "@/app/(app)/(files)/upload/file";
 import UploadFile from "@/app/(app)/(files)/upload/file";
 import UploadText from "@/app/(app)/(files)/upload/text";
 import { styles } from "@/styles/shareIntent";
 import ShareIntentShorten from "@/components/ShareIntentShorten";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ShareIntent() {
 	const router = useRouter();
 	const { hasShareIntent, shareIntent, error, resetShareIntent } =
 		useShareIntentContext();
 
-		useFocusEffect(() => {
-			if (!hasShareIntent) {
-				resetShareIntent()
-				router.replace("/")
-	
-				return;
-			}
-	
-			if (error) {
-				console.error(error)
+	useAuth()
 
-				resetShareIntent()
-				return router.replace("/");
-			}
+	useFocusEffect(() => {
+		if (!hasShareIntent) {
+			resetShareIntent()
+			router.replace("/")
 
-			if ((!shareIntent.files || shareIntent.files.length <= 0) && !shareIntent.text && !shareIntent.webUrl) {
-				resetShareIntent()
-				return router.replace("/");
-			}
-		})
+			return;
+		}
+
+		if (error) {
+			console.error(error)
+
+			resetShareIntent()
+			return router.replace("/");
+		}
+
+		if ((!shareIntent.files || shareIntent.files.length <= 0) && !shareIntent.text && !shareIntent.webUrl) {
+			resetShareIntent()
+			return router.replace("/");
+		}
+	})
 
 	return (
 		<View style={styles.mainContainer}>

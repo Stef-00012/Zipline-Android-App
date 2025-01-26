@@ -157,5 +157,23 @@ export const styles = StyleSheet.create({
         color: "white",
         fontFamily: "monospace",
         textAlignVertical: "top",
-    }
+    },
+    header: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+	},
+	headerButtons: {
+		flexDirection: "row",
+		justifyContent: "space-around",
+		paddingTop: 10,
+		paddingRight: 10,
+	},
+	headerButton: {
+		borderWidth: 2,
+		borderRadius: 7,
+		borderColor: "#222c47",
+		marginHorizontal: 2,
+		color: "#2d3f70",
+	},
 });

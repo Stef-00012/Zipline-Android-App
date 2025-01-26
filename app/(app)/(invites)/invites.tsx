@@ -1,48 +1,43 @@
 import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
 import type { APIInvites, APISettings, APIURLs, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { isAuthenticated } from "@/functions/zipline/auth";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
-import { useShareIntentContext } from "expo-share-intent";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/invites/invites";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
-import {
-	type ExternalPathString,
-	Link,
-	useFocusEffect,
-	useRouter,
-} from "expo-router";
 import { createInvite, deleteInvite, getInvites } from "@/functions/zipline/invites";
 import Popup from "@/components/Popup";
 import Select from "@/components/Select";
 import { dates } from "@/constants/invites";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Invites() {
-	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
+	// // biome-ignore lint/correctness/useExhaustiveDependencies: .
+	// useEffect(() => {
+	// 	if (hasShareIntent) {
+	// 		router.replace({
+	// 			pathname: "/shareintent",
+	// 		});
+	// 	}
+	// }, [hasShareIntent]);
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
+	// useFocusEffect(() => {
+	// 	(async () => {
+	// 		const authenticated = await isAuthenticated();
 
-			if (!authenticated) return router.replace("/login");
+	// 		if (!authenticated) return router.replace("/login");
 
-			if (authenticated === "USER") return router.replace("/")
-		})();
-	});
+	// 		if (authenticated === "USER") return router.replace("/")
+	// 	})();
+	// });
+
+	useAuth(true)
+	useShareIntent()
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);

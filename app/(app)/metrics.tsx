@@ -1,4 +1,6 @@
 import { getStats } from "@/functions/zipline/stats";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 import type { APIStats } from "@/types/zipline";
 import { useRouter } from "expo-router";
 import { useShareIntentContext } from "expo-share-intent";
@@ -9,14 +11,17 @@ export default function Metrics() {
     const router = useRouter();
     const { hasShareIntent } = useShareIntentContext();
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-    useEffect(() => {
-        if (hasShareIntent) {
-            router.replace({
-                pathname: "/shareintent",
-            });
-        }
-    }, [hasShareIntent]);
+    // // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    // useEffect(() => {
+    //     if (hasShareIntent) {
+    //         router.replace({
+    //             pathname: "/shareintent",
+    //         });
+    //     }
+    // }, [hasShareIntent]);
+
+    useAuth()
+	useShareIntent()
 
     const [stats, setStats] = useState<APIStats | null>();
     const [formattedStats, setFormattedStats] = useState<APIStats | null>();

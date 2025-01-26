@@ -1,6 +1,5 @@
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useShareIntentContext } from "expo-share-intent";
 import type { APIFiles, DashURL } from "@/types/zipline";
 import { getFiles } from "@/functions/zipline/files";
 import FileDisplay from "@/components/FileDisplay";
@@ -8,25 +7,29 @@ import { styles } from "@/styles/files/files";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Files() {
 	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
+	// // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// useEffect(() => {
+	// 	if (hasShareIntent) {
+	// 		router.replace({
+	// 			pathname: "/shareintent",
+	// 		});
+	// 	}
+	// }, [hasShareIntent]);
 
 	const searchParams = useLocalSearchParams<{
 		id?: string;
 		favorites?: string
 		page?: string
 	}>()
+	
+	useAuth(!!searchParams.id)
+	useShareIntent()
 
 	const [page, setPage] = useState<string>("1");
 	const [prevPageDisabled, setPrevPageDisabled] = useState<boolean>(true);

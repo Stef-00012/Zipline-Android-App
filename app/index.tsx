@@ -1,7 +1,5 @@
 import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
 import { Table, Row, Rows } from "react-native-table-component";
-import { isAuthenticated } from "@/functions/zipline/auth";
-import { useShareIntentContext } from "expo-share-intent";
 import { getUserStats } from "@/functions/zipline/stats";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Text, View, ScrollView } from "react-native";
@@ -16,27 +14,12 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-	const router = useRouter();
-	const { hasShareIntent } = useShareIntentContext();
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		if (hasShareIntent) {
-			router.replace({
-				pathname: "/shareintent",
-			});
-		}
-	}, [hasShareIntent]);
-
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
-
-			if (!authenticated) return router.replace("/login");
-		})();
-	});
+	useAuth()
+	useShareIntent()
 
 	const url = db.get("url") as DashURL | null;
 
@@ -47,9 +30,11 @@ export default function Home() {
 	useEffect(() => {
 		handleAuth();
 	}, []);
+	
+	const router = useRouter();
 
 	useFocusEffect(() => {
-		if (__DEV__) router.replace("/files?favorite=true&id=&def=22");
+		// if (__DEV__) router.replace("/invites");
 	});
 
 	async function handleAuth() {

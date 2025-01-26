@@ -8,15 +8,12 @@ import {
 	ToastAndroid,
 } from "react-native";
 import { guessExtension } from "@/functions/util";
-import { isAuthenticated } from "@/functions/zipline/auth";
 import { getSettings } from "@/functions/zipline/settings";
-import { useShareIntentContext } from "expo-share-intent";
 import type { APIUploadResponse } from "@/types/zipline";
 import { getFolders } from "@/functions/zipline/folders";
 import {
 	type ExternalPathString,
 	Link,
-	useFocusEffect,
 	useRouter,
 } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
@@ -33,6 +30,8 @@ import * as Clipboard from "expo-clipboard";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import Popup from "@/components/Popup";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface SelectedFile {
 	name: string;
@@ -54,26 +53,33 @@ export default function UploadFile({
 }: Props) {
 	const router = useRouter();
 	
-	if (!fromShareIntent) {
-		const { hasShareIntent } = useShareIntentContext();
-		
-		// biome-ignore lint/correctness/useExhaustiveDependencies: .
-		useEffect(() => {
-			if (hasShareIntent) {
-				router.replace({
-					pathname: "/shareintent",
-				});
-			}
-		}, [hasShareIntent]);
-	}
+	useAuth()
+	useShareIntent(fromShareIntent)
+	
+	// const { hasShareIntent, resetShareIntent } = useShareIntentContext();
+	
+	// if (!fromShareIntent) {
+	// 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
+	// 	useEffect(() => {
+	// 		if (hasShareIntent) {
+	// 			router.replace({
+	// 				pathname: "/shareintent",
+	// 			});
+	// 		}
+	// 	}, [hasShareIntent]);
+	// }
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
+	// useFocusEffect(() => {
+	// 	(async () => {
+	// 		const authenticated = await isAuthenticated();
 
-			if (!authenticated) return router.replace("/login");
-		})();
-	});
+	// 		if (!authenticated) {
+	// 			resetShareIntent()
+
+	// 			return router.replace("/login");
+	// 		}
+	// 	})();
+	// });
 
 	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>(defaultFiles || []);
 	const [uploadedFiles, setUploadedFiles] = useState<
@@ -248,8 +254,28 @@ export default function UploadFile({
 			</Popup>
 
 			<View>
-				<Text style={styles.headerText}>Selected Files</Text>
-				<Text style={styles.subHeaderText}>Click a file to remove it</Text>
+				<View style={styles.header}>
+					<View>
+						<Text style={styles.headerText}>Selected Files</Text>
+						<Text style={styles.subHeaderText}>Click a file to remove it</Text>
+					</View>
+
+					<View style={styles.headerButtons}>
+						<Pressable
+							style={styles.headerButton}
+							onPress={() => {
+								router.replace("/files")
+							}}
+						>
+							<MaterialIcons
+								name="folder-open"
+								size={30}
+								color={styles.headerButton.color}
+							/>
+						</Pressable>
+					</View>
+				</View>
+
 				<ScrollView horizontal style={{
 					...styles.scrollView,
 					...(iskeyboardOpen && styles.scrollViewKeyboardOpen)

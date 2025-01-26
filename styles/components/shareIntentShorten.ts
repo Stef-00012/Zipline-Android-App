@@ -52,5 +52,28 @@ export const styles = StyleSheet.create({
         color: "red",
         fontWeight: "bold",
         textAlign: "center"
-    }
+    },
+    header: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+	},
+	headerButtons: {
+		flexDirection: "row",
+		justifyContent: "space-around",
+		paddingTop: 10,
+		paddingRight: 10,
+	},
+	headerButton: {
+		borderWidth: 2,
+		borderRadius: 7,
+		borderColor: "#222c47",
+		marginHorizontal: 2,
+		color: "#2d3f70",
+	},
+	mainHeaderText: {
+		fontSize: 23,
+		fontWeight: "bold",
+		color: "white",
+	}
 });

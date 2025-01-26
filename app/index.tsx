@@ -4,6 +4,8 @@ import { isAuthenticated } from "@/functions/zipline/auth";
 import { useShareIntentContext } from "expo-share-intent";
 import { getUserStats } from "@/functions/zipline/stats";
 import { useFocusEffect, useRouter } from "expo-router";
+import { Text, View, ScrollView } from "react-native";
+import FileDisplay from "@/components/FileDisplay";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { styles } from "@/styles/home";
@@ -12,14 +14,8 @@ import type {
 	APIRecentFiles,
 	APISelfUser,
 	APIUserStats,
-	DashUrl
+	DashURL,
 } from "@/types/zipline";
-import {
-	Text,
-	View,
-	ScrollView,
-	Image,
-} from "react-native";
 
 export default function Home() {
 	const router = useRouter();
@@ -42,7 +38,7 @@ export default function Home() {
 		})();
 	});
 
-	const url = db.get("url") as DashUrl | null;
+	const url = db.get("url") as DashURL | null;
 
 	const [user, setUser] = useState<APISelfUser | null>(null);
 	const [stats, setStats] = useState<APIUserStats | null>();
@@ -54,7 +50,7 @@ export default function Home() {
 
 	useFocusEffect(() => {
 		if (__DEV__) router.replace("/urls");
-	})
+	});
 
 	async function handleAuth() {
 		const user = await getCurrentUser();
@@ -75,15 +71,13 @@ export default function Home() {
 						<ScrollView horizontal style={styles.scrollView}>
 							{recentFiles.map((file) => (
 								<View key={file.id} style={styles.recentFileContainer}>
-									<Image
-										key={file.id}
-										source={{
-											uri: `${url}/raw${file.url}`,
-										}}
-										alt={file.originalName || file.name}
+									<FileDisplay
+										uri={`${url}/raw${file.url}`}
+										originalName={file.originalName}
+										name={file.name}
 										width={200}
 										height={200}
-										resizeMode="contain"
+										passwordProtected={file.password}
 									/>
 								</View>
 							))}
@@ -119,9 +113,7 @@ export default function Home() {
 							</View>
 
 							<View style={styles.statContainer}>
-								<Text style={styles.subHeaderText}>
-									Average Storage Used:
-								</Text>
+								<Text style={styles.subHeaderText}>Average Storage Used:</Text>
 								<Text style={styles.statText}>
 									{bytes(stats.avgStorageUsed, {
 										unitSeparator: " ",

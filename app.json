@@ -8,6 +8,7 @@
 		"scheme": "zipline",
 		"newArchEnabled": true,
 		"userInterfaceStyle": "automatic",
+		"platforms": ["android"],
 		"ios": {
 			"supportsTablet": true,
 			"bundleIdentifier": "com.stefdp.zipline"

@@ -108,15 +108,16 @@ export async function deleteURL(id: string): Promise<APIURL | null> {
 	}
 }
 
-interface editURLOptions {
+export interface EditURLOptions {
 	destination?: string;
 	maxViews?: number;
 	password?: string;
+	vanity?: string;
 }
 // PATCH /api/user/urls/[id]
 export async function editURL(
 	id: string,
-	options: editURLOptions = {},
+	options: EditURLOptions = {},
 ): Promise<APIURL | null> {
 	const token = db.get("token");
 	const url = db.get("url");

@@ -24,8 +24,9 @@ export const styles = StyleSheet.create({
 		marginBottom: 5,
 		marginTop: 5,
 		color: "white",
-        height: 40,
-		padding: 3,
+		height: 40,
+		paddingHorizontal: 10,
+		fontSize: 15,
 		borderRadius: 6,
 	},
 	button: {
@@ -40,7 +41,7 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "white",
 	},
-    errorText: {
-        color: "red"
-    }
+	errorText: {
+		color: "red",
+	},
 });

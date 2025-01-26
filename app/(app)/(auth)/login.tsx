@@ -4,9 +4,9 @@ import { useShareIntentContext } from "expo-share-intent";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
-import { styles } from "@/styles/login";
+import { styles } from "@/styles/auth/login";
 
-export default function Page() {
+export default function Login() {
 	const router = useRouter();
 	const { hasShareIntent } = useShareIntentContext();
 
@@ -42,6 +42,7 @@ export default function Page() {
 					onChangeText={(content) => {
                         setInputtedUrl(content.length > 0 ? content : null);
 					}}
+					keyboardType="url"
 					value={inputtedUrl || undefined}
                     style={styles.textInput}
 					placeholderTextColor="#222c47"
@@ -54,6 +55,8 @@ export default function Page() {
 					}}
 					value={inputtedToken || undefined}
                     style={styles.textInput}
+					secureTextEntry={true}
+					keyboardType="visible-password"
 					placeholderTextColor="#222c47"
 					placeholder="Zipline Token"
                     selectTextOnFocus

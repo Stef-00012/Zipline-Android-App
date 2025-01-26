@@ -5,7 +5,7 @@ import { useShareIntentContext } from "expo-share-intent";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
-export default function Home() {
+export default function Metrics() {
     const router = useRouter();
     const { hasShareIntent } = useShareIntentContext();
 

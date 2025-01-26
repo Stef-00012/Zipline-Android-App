@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    urlsContainer: {
+    invitesContainer: {
         borderWidth: 4,
         borderColor: "#222c47",
         borderStyle: "solid",
@@ -95,38 +95,38 @@ export const styles = StyleSheet.create({
         borderRadius: 7,
         borderColor: "#222c47",
         marginHorizontal: 2,
-        color: "#2d3f70"
+        color: "#2d3f70",
     },
-    
+
     container: {
         flex: 1,
         padding: 16,
         paddingTop: 30,
-        backgroundColor: '#fff'
+        backgroundColor: "#fff",
     },
     tableHeader: {
         height: 50,
-        backgroundColor: '#0c101c',
+        backgroundColor: "#0c101c",
         borderTopLeftRadius: 10,
-        borderTopRightRadius: 10
+        borderTopRightRadius: 10,
     },
     dataWrapper: {
-        marginTop: -1
+        marginTop: -1,
     },
     row: {
         // height: 60,
-        backgroundColor: '#0c101c',
+        backgroundColor: "#0c101c",
         padding: 8,
         borderTopWidth: 1,
         borderTopColor: "",
         borderBottomWidth: 1,
-        borderBottomColor: ""
+        borderBottomColor: "",
     },
     lastRow: {
-        borderBottomWidth: 0
+        borderBottomWidth: 0,
     },
     firstRow: {
-        borderTopWidth: 0
+        borderTopWidth: 0,
     },
     tableVerticalScroll: {
         borderBottomLeftRadius: 10,
@@ -134,10 +134,10 @@ export const styles = StyleSheet.create({
     },
     rowText: {
         color: "white",
-        textAlign: "center"
+        textAlign: "center",
     },
     link: {
-        color: "#575DB5"
+        color: "#575DB5",
     },
     actionsContainer: {
         flexDirection: "row",
@@ -149,9 +149,9 @@ export const styles = StyleSheet.create({
         borderRadius: 4,
         marginHorizontal: 0,
         backgroundColor: "#323ea8",
-        padding: 5
+        padding: 5,
     },
     actionButtonDanger: {
-        backgroundColor: "#CF4238"
-    }
+        backgroundColor: "#CF4238",
+    },
 });

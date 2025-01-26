@@ -4,7 +4,7 @@ import { Stack, IconButton } from "@react-native-material/core";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { View, Text, Pressable, Image } from "react-native";
 import type { APISelfUser } from "@/types/zipline";
-import { styles } from "@/styles/header";
+import { styles } from "@/styles/components/header";
 import type React from "react";
 
 export default function Header({ children }: PropsWithChildren) {
@@ -16,7 +16,7 @@ export default function Header({ children }: PropsWithChildren) {
 			(async () => {
 				const avatar = await getCurrentUserAvatar();
 				const user = await getCurrentUser();
-	
+
 				setAvatar(avatar);
 				setUser(user);
 			})();
@@ -25,7 +25,7 @@ export default function Header({ children }: PropsWithChildren) {
 
 	return (
 		<View style={styles.headerContainer}>
-			{avatar && user ? (
+			{user ? (
 				<View
 					style={{
 						marginBottom: 70 
@@ -38,7 +38,7 @@ export default function Header({ children }: PropsWithChildren) {
 									<MaterialIcons name="menu" color={"#fff"} size={40} />
 								)}
 								onPress={() => {
-									console.log("menu pressed");
+									console.debug("menu pressed");
 								}}
 							/>
 						</View>
@@ -47,17 +47,29 @@ export default function Header({ children }: PropsWithChildren) {
 							<View>
                                 <Pressable
                                     onPress={() => {
-                                        console.log("user menu pressed");
+                                        console.debug("user menu pressed");
                                     }}
                                 >
                                     <View style={styles.userMenuContainer}>
-                                        <Image
-                                            source={{ uri: avatar }}
-                                            width={35}
-                                            height={35}
-                                            style={styles.userMenuAvatar}
-                                        />
-                                        <Text style={styles.userMenuText}>{user.username}</Text>
+                                        {avatar ? (
+											<Image
+												source={{ uri: avatar }}
+												width={35}
+												height={35}
+												style={styles.userMenuAvatar}
+											/>
+										) : (
+											<View style={{
+												...styles.userMenuAvatar,
+												...styles.settingsIcon
+											}}>
+												<MaterialIcons size={22} name="settings" color="#fff" />
+											</View>
+										)}
+                                        <Text style={{
+											...styles.userMenuText,
+											...(!avatar && styles.userMenuTextWithSettingsIcon)
+										}}>{user.username}</Text>
                                     </View>
                                 </Pressable>
                             </View>

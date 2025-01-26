@@ -56,9 +56,9 @@ export async function getUser(id: string): Promise<APIUser | null> {
 export async function createUser(
 	username: string,
 	password: string,
-	role: APIUser["role"],
+	role: Omit<APIUser["role"], "SUPERADMIN">,
 	avatar?: string,
-) {
+): Promise<APIUser | null> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -112,7 +112,7 @@ export async function deleteUser(
 	}
 }
 
-type EditUserOptions = Partial<
+export type EditUserOptions = Partial<
 	Omit<
 		APIUser,
 		| "id"
@@ -148,6 +148,8 @@ export async function editUser(
 
 	if (!url || !token) return null;
 
+	console.debug(options)
+
 	try {
 		const res = await axios.patch(`${url}/api/users/${id}`, options, {
 			headers: {
@@ -157,6 +159,7 @@ export async function editUser(
 
 		return res.data;
 	} catch (e) {
+		console.error(e)
 		return null;
 	}
 }

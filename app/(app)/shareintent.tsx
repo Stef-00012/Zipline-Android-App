@@ -59,22 +59,22 @@ export default function ShareIntent() {
 				(async () => {
 					const files: Array<UploadFile> = []
 
-					for (const file of shareIntent.files || []) {
-						const fileInfo = await FileSystem.getInfoAsync(file.path);
+					// for (const file of shareIntent.files || []) {
+					// 	const fileInfo = await FileSystem.getInfoAsync(file.path);
 						
-						if (!fileInfo.exists || fileInfo.isDirectory) continue;
+					// 	if (!fileInfo.exists || fileInfo.isDirectory) continue;
 						
-						const dataURI = await getFileDataURI(file.path);
+					// 	const dataURI = await getFileDataURI(file.path);
 
-						if (!dataURI) return;
+					// 	if (!dataURI) return;
 
-						const blob = convertToBlob(dataURI)
+					// 	const blob = convertToBlob(dataURI)
 
-						if (blob) files.push({
-							blob,
-							path: file.path,
-						});
-					}
+					// 	if (blob) files.push({
+					// 		blob,
+					// 		path: file.path,
+					// 	});
+					// }
 
 					setFiles(files);
 				})()

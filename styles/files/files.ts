@@ -97,6 +97,6 @@ export const styles = StyleSheet.create({
 		borderRadius: 7,
 		borderColor: "#222c47",
 		marginHorizontal: 2,
-		color: "#2d3f70"
-	}
+		color: "#2d3f70",
+	},
 });

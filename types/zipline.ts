@@ -1,3 +1,5 @@
+import type { Mimetypes } from "@/types/mimetypes";
+
 export type DashURL = `http${'s' | ''}://${string}.${string}`;
 
 export type APISelfUser = Omit<APIUser, "avatar">;
@@ -10,11 +12,11 @@ export interface APIUser {
 	role: "SUPERADMIN" | "ADMIN" | "USER";
 	view: APIUserView;
 	oauthProviders: Array<OAuthProvider>;
-	totpSecret: string;
+	totpSecret: string | null;
 	passkeys: Array<Passkey>;
 	quota: APIUserQuota | null;
 	sessions: Array<string>;
-	avatar: string;
+	avatar: string | null;
 }
 
 export interface APIUserQuota {
@@ -29,15 +31,15 @@ export interface APIUserQuota {
 }
 
 export interface APIUserView {
-	enabled: boolean;
-	align: "left" | "center" | "right";
-	showMimetype: boolean;
-	content: string;
-	embed: boolean;
-	embedTitle: string;
-	embedDescription: string;
-	embedColor: string;
-	embedSiteName: string;
+	enabled?: boolean;
+	align?: "left" | "center" | "right";
+	showMimetype?: boolean;
+	content?: string;
+	embed?: boolean;
+	embedTitle?: string;
+	embedDescription?: string;
+	embedColor?: string;
+	embedSiteName?: string;
 }
 
 export interface OAuthProvider {
@@ -116,23 +118,44 @@ export interface APIUserStats {
 	};
 }
 
+export interface APIUploadFile {
+	id: APIFile["id"];
+	type: keyof Mimetypes;
+	url: string;
+	pending: boolean;
+}
+
+export interface APIUploadResponse {
+	files: Array<APIUploadFile>;
+	partialSuccess: boolean;
+	assumedMimetypes: Array<string | null | APIUploadFile>
+}
+
 export interface APISettings {
 	coreReturnHttpsUrls: boolean;
 	coreDefaultDomain: string | null;
 	coreTempDirectory: string;
 	chunksEnabled: boolean;
-	chunksMax: string;
-	chunksSize: string;
-	tasksDeleteInterval: string;
-	tasksClearInvitesInterval: string;
-	tasksMaxViewsInterval: string;
-	tasksThumbnailsInterval: string;
-	tasksMetricsInterval: string;
+	// chunksMax: string;
+	// chunksSize: string;
+	// tasksDeleteInterval: string;
+	// tasksClearInvitesInterval: string;
+	// tasksMaxViewsInterval: string;
+	// tasksThumbnailsInterval: string;
+	// tasksMetricsInterval: string;
+	chunksMax: number;
+	chunksSize: number;
+	tasksDeleteInterval: number;
+	tasksClearInvitesInterval: number;
+	tasksMaxViewsInterval: number;
+	tasksThumbnailsInterval: number;
+	tasksMetricsInterval: number;
 	filesRoute: string;
 	filesLength: number;
 	filesDefaultFormat: "random" | "uuid" | "date" | "name" | "gfycat";
 	filesDisabledExtensions: Array<string>;
-	filesMaxFileSize: string;
+	// filesMaxFileSize: string;
+	filesMaxFileSize: number;
 	filesDefaultExpiration: string | null;
 	filesAssumeMimetypes: boolean;
 	filesDefaultDateFormat: string;
@@ -234,17 +257,13 @@ export type APIUserNoIncl = Omit<
 	| "oauthProviders"
 	| "totpSecret"
 	| "passkeys"
-	| "quota"
 	| "sessions"
-	| "avatar"
 > & {
 	passkeys: [];
 	totpSecret: null;
 	view: Record<string, never>;
 	oauthProviders: [];
-	quota: null;
 	sessions: [];
-	avatar: null;
 };
 
 export type APIUsersNoIncl = Array<APIUserNoIncl>;

@@ -1,15 +1,15 @@
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import AutoHeightImage from "react-native-auto-height-image";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntentContext } from "expo-share-intent";
+import type { APIFiles, DashURL } from "@/types/zipline";
 import { getFiles } from "@/functions/zipline/files";
-import type { APIFiles, DashUrl } from "@/types/zipline";
+import FileDisplay from "@/components/FileDisplay";
+import { styles } from "@/styles/files/files";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
-import { styles } from "@/styles/files";
 import { useRouter } from "expo-router";
 
-export default function Home() {
+export default function Files() {
 	const router = useRouter();
 	const { hasShareIntent } = useShareIntentContext();
 
@@ -31,7 +31,7 @@ export default function Home() {
 	const [files, setFiles] = useState<APIFiles | null>(null);
 	const [filesWidth, setFilesWidth] = useState<number>(0);
 
-	const url = db.get("url") as DashUrl | null;
+	const url = db.get("url") as DashURL | null;
 
 	useEffect(() => {
 		(async () => {
@@ -47,44 +47,67 @@ export default function Home() {
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
 				{files && (
-				    <View style={styles.header}>
-    					<Text style={styles.headerText}>Files</Text>
-    					<View style={styles.headerButtons}>
-    						<Pressable style={styles.headerButton} onPress={() => {
-    							console.info("Favorite Files Clicked")
-    						}}>
-    							<MaterialIcons name="star-border" size={30} color={styles.headerButton.color} />
-    						</Pressable>
+					<View style={styles.header}>
+						<Text style={styles.headerText}>Files</Text>
+						<View style={styles.headerButtons}>
+							<Pressable
+								style={styles.headerButton}
+								onPress={() => {
+									console.debug("Favorite Files Clicked");
+								}}
+							>
+								<MaterialIcons
+									name="star-border"
+									size={30}
+									color={styles.headerButton.color}
+								/>
+							</Pressable>
 
-    						<Pressable style={styles.headerButton} onPress={() => {
-    							console.info("Tags Clicked")
-    						}}>
-    							<MaterialIcons name="sell" size={30} color={styles.headerButton.color} />
-    						</Pressable>
+							<Pressable
+								style={styles.headerButton}
+								onPress={() => {
+									console.debug("Tags Clicked");
+								}}
+							>
+								<MaterialIcons
+									name="sell"
+									size={30}
+									color={styles.headerButton.color}
+								/>
+							</Pressable>
 
-    						<Pressable style={styles.headerButton} onPress={() => {
-    							console.info("Upload File Clicked")
-    						}}>
-    							<MaterialIcons name="upload-file" size={30} color={styles.headerButton.color} />
-    						</Pressable>
-    					</View>
-    				</View>
+							<Pressable
+								style={styles.headerButton}
+								onPress={() => {
+									console.debug("Upload File Clicked");
+								}}
+							>
+								<MaterialIcons
+									name="upload-file"
+									size={30}
+									color={styles.headerButton.color}
+								/>
+							</Pressable>
+						</View>
+					</View>
 				)}
 
 				<ScrollView
+					showsVerticalScrollIndicator={false}
 					contentContainerStyle={styles.imagesContainer}
 					onLayout={(event) => setFilesWidth(event.nativeEvent.layout.width)}
 				>
 					{files ? (
-						<ScrollView>
+						<ScrollView showsVerticalScrollIndicator={false}>
 							{files.page.map((file) => (
 								<View key={file.id} style={styles.imageContainer}>
-									<AutoHeightImage
-										source={{
-											uri: `${url}/raw/${file.name}`,
-										}}
+									<FileDisplay
+										uri={`${url}/raw/${file.name}`}
 										width={filesWidth - 50}
-										alt={file.originalName || file.name}
+										originalName={file.originalName}
+										name={file.name}
+										autoHeight
+										passwordProtected={file.password}
 									/>
 								</View>
 							))}

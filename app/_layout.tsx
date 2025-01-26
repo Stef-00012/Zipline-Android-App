@@ -1,3 +1,4 @@
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShareIntentProvider } from "expo-share-intent";
 import { Slot, useRouter } from "expo-router";
@@ -25,9 +26,11 @@ export default function Layout() {
 			/>
 			
 			<SafeAreaView style={{ flex: 1 }}>
-				<Header>
-					<Slot />
-				</Header>
+				<KeyboardProvider>
+					<Header>
+						<Slot />
+					</Header>
+				</KeyboardProvider>
 			</SafeAreaView>
 		</ShareIntentProvider>
 	);

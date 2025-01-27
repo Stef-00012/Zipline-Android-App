@@ -34,7 +34,7 @@ export default function Home() {
 	const router = useRouter();
 
 	useFocusEffect(() => {
-		if (__DEV__) router.replace("/files");
+// 		if (__DEV__) router.replace("/files");
 	});
 
 	async function handleAuth() {
@@ -42,9 +42,9 @@ export default function Home() {
 		const stats = await getUserStats();
 		const recentFiles = await getRecentFiles();
 
-		setUser(typeof user === "string");
-		setStats(typeof stats === "string");
-		setRecentFiles(typeof recentFiles === "string");
+		setUser(typeof user === "string" ? null : user);
+		setStats(typeof stats === "string" ? null : stats);
+		setRecentFiles(typeof recentFiles === "string" ? null : recentFiles);
 	}
 
 	return (

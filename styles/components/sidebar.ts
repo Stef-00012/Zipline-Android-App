@@ -9,7 +9,22 @@ export const styles = StyleSheet.create({
         backgroundColor: "#0c101c",
         zIndex: 99998,
     },
-    sidebarContent: {
-        padding: 10,
+    sidebarOption: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        height: 45,
+        padding: 5,
     },
+    sidebarOptionActive: {
+        backgroundColor: "#14192F"
+    },
+    sidebarOptionText: {
+        color: "white",
+        marginLeft: 10
+    },
+    sidebarOptionTextActive: {
+        color: "#6D71B1"
+    }
 });

@@ -42,7 +42,7 @@ export default function Folders() {
 			const folders = await getFolders();
 			const settings = await getSettings();
 
-			setFolders(typeof folders === "string" ? null : "folders");
+			setFolders(typeof folders === "string" ? null : folders);
 			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);

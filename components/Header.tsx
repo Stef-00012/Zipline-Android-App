@@ -82,7 +82,7 @@ export default function Header({ children }: PropsWithChildren) {
 			) : (
 				<View />
 			)}
-			<Sidebar open={sidebarOpen} paddingTop={user ? 70 : 0} />
+			<Sidebar open={sidebarOpen} paddingTop={user ? 70 : 0} setOpen={setSidebarOpen} />
 			{children}
 		</View>
 	);

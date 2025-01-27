@@ -7,8 +7,8 @@ interface SidebarOptionButton {
     icon: keyof typeof MaterialIcons.glyphMap;
     adminOnly: boolean;
     invitesRoute: boolean;
-    subMenus: [];
     type: "button";
+    subMenus: [];
 }
 
 interface SidebarOptionSelect {
@@ -17,8 +17,8 @@ interface SidebarOptionSelect {
     icon: keyof typeof MaterialIcons.glyphMap;
     adminOnly: boolean;
     invitesRoute: boolean;
-    subMenus: Array<SidebarOption>;
     type: "select";
+    subMenus: Array<SidebarOption>;
 }
 
 export type SidebarOption = SidebarOptionButton | SidebarOptionSelect;
@@ -66,6 +66,7 @@ export const sidebarOptions: Array<SidebarOption> = [
         icon: "cloud-upload",
         adminOnly: false,
         invitesRoute: false,
+        type: "select"
         subMenus: [
             {
                 route: "/upload/text",
@@ -86,7 +87,6 @@ export const sidebarOptions: Array<SidebarOption> = [
                 type: "button"
             }
         ],
-        type: "select"
     },
     {
         route: "/urls",
@@ -103,9 +103,10 @@ export const sidebarOptions: Array<SidebarOption> = [
         icon: "admin-panel-settings",
         adminOnly: true,
         invitesRoute: false,
+        type: "select",
         subMenus: [
             {
-                route: "/settings",
+                route: "/admin/settings",
                 name: "Settings",
                 icon: "settings",
                 adminOnly: true,
@@ -114,7 +115,7 @@ export const sidebarOptions: Array<SidebarOption> = [
                 type: "button"
             },
             {
-                route: "/users",
+                route: "/admin/users",
                 name: "Users",
                 icon: "people",
                 adminOnly: true,
@@ -123,7 +124,7 @@ export const sidebarOptions: Array<SidebarOption> = [
                 type: "button"
             },
             {
-                route: "/invites",
+                route: "/admin/invites",
                 name: "Invites",
                 icon: "mail-outline",
                 adminOnly: true,
@@ -132,6 +133,5 @@ export const sidebarOptions: Array<SidebarOption> = [
                 type: "button"
             }
         ],
-        type: "select"
     }
 ];

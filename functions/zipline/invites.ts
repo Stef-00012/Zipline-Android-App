@@ -1,13 +1,13 @@
 import type { APIInvite, APIInvites } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /api/auth/invites
-export async function getInvites(): Promise<APIInvites | null> {
+export async function getInvites(): Promise<APIInvites | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/auth/invites`, {
@@ -18,15 +18,17 @@ export async function getInvites(): Promise<APIInvites | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
-export async function createInvite(expiresAt?: string, maxUses?: number): Promise<APIInvite | null> {
+export async function createInvite(expiresAt?: string, maxUses?: number): Promise<APIInvite | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.post(
@@ -44,15 +46,17 @@ export async function createInvite(expiresAt?: string, maxUses?: number): Promis
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
-export async function deleteInvite(code: string): Promise<APIInvite | null> {
+export async function deleteInvite(code: string): Promise<APIInvite | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(
@@ -66,6 +70,8 @@ export async function deleteInvite(code: string): Promise<APIInvite | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 } 

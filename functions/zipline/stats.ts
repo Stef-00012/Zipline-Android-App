@@ -1,16 +1,16 @@
 import type { APIUserStats, APIStats } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /api/stats
 export async function getStats(
 	from?: string,
 	to?: string,
-): Promise<APIStats | null> {
+): Promise<APIStats | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	const params = new URLSearchParams();
 
@@ -26,16 +26,18 @@ export async function getStats(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // GET /api/user/stats
-export async function getUserStats(): Promise<APIUserStats | null> {
+export async function getUserStats(): Promise<APIUserStats | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/stats`, {
@@ -46,6 +48,8 @@ export async function getUserStats(): Promise<APIUserStats | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

@@ -1,15 +1,15 @@
 import type { APIFoldersNoIncl, APIFolders, APIFolder } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /api/user/folders
 export async function getFolders<T extends boolean | undefined = undefined>(
 	noIncl?: T,
-): Promise<T extends true ? APIFoldersNoIncl | null : APIFolders | null> {
+): Promise<T extends true ? APIFoldersNoIncl | null : APIFolders | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	const params = new URLSearchParams();
 
@@ -24,16 +24,18 @@ export async function getFolders<T extends boolean | undefined = undefined>(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // GET /api/user/folders/[id]
-export async function getFolder(id: string): Promise<APIFolder | null> {
+export async function getFolder(id: string): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/folders/${id}`, {
@@ -44,7 +46,9 @@ export async function getFolder(id: string): Promise<APIFolder | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -52,11 +56,11 @@ export async function getFolder(id: string): Promise<APIFolder | null> {
 export async function createFolder(
 	name: string,
 	isPublic = false,
-): Promise<APIFolder | null> {
+): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.post(
@@ -74,7 +78,9 @@ export async function createFolder(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -82,11 +88,11 @@ export async function createFolder(
 export async function editFolder(
 	id: string,
 	isPublic: boolean,
-): Promise<APIFolder | null> {
+): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.patch(
@@ -103,16 +109,18 @@ export async function editFolder(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // DELETE /api/user/folders/[id]
-export async function deleteFolder(id: string): Promise<APIFolder | null> {
+export async function deleteFolder(id: string): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(`${url}/api/user/folders/${id}`, {
@@ -126,7 +134,9 @@ export async function deleteFolder(id: string): Promise<APIFolder | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -134,11 +144,11 @@ export async function deleteFolder(id: string): Promise<APIFolder | null> {
 export async function removeFileFromFolder(
 	folderId: string,
 	fileId: string,
-): Promise<APIFolder | null> {
+): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(`${url}/api/user/folders/${folderId}`, {
@@ -153,7 +163,9 @@ export async function removeFileFromFolder(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -161,11 +173,11 @@ export async function removeFileFromFolder(
 export async function addFileToFolder(
 	folderId: string,
 	fileId: string,
-): Promise<APIFolder | null> {
+): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.post(
@@ -182,6 +194,8 @@ export async function addFileToFolder(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

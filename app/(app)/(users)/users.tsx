@@ -61,8 +61,8 @@ export default function Users() {
 			const users = await getUsers(true);
 			const settings = await getSettings();
 
-			setUsers(users);
-			setSettings(settings);
+			setUsers(typeof users === "string" ? null : users);
+			setSettings(typeof settings === "string" ? null : users);
 		})();
 	}, []);
 
@@ -269,8 +269,8 @@ export default function Users() {
 			
 									const editedUser = await editUser(userToEdit.id, editUserOptions);
 			
-									if (!editedUser)
-										return setEditError(`An error occurred while updating "${userToEdit.username}"`);
+									if (typeof editedUser === "string")
+										return setEditError(editedUser);
 			
 									ToastAndroid.show(
 										`The user "${editedUser.username}" has been updated`,
@@ -279,7 +279,7 @@ export default function Users() {
 
 									const updatedUsers = await getUsers(true);
 
-									setUsers(updatedUsers);
+									setUsers(typeof updatedUsers === "string" ? null : updatedUsers);
 			
 									setEditUsername(null);
 									setEditPassword(null);
@@ -398,8 +398,8 @@ export default function Users() {
 
 								const createdUser = await createUser(newUserUsername, newUserPassword, userRole, newUserAvatar);
 
-								if (!createdUser)
-									return setNewUserError("An error occurred while creating the user");
+								if (typeof createdUser === "string")
+									return setNewUserError(createdUser);
 
 								ToastAndroid.show(
 									`The user ${createdUser.username} has been created`,
@@ -414,7 +414,7 @@ export default function Users() {
 
 								const newUsers = await getUsers(true);
 
-								setUsers(newUsers);
+								setUsers(typeof newUsers === "string" ? null : newUsers);
 
 								setCreateNewUser(false)
 							}}
@@ -493,13 +493,14 @@ export default function Users() {
 
 									const deletedUser = await deleteUser(userId, false)
 
-									if (!deletedUser) return ToastAndroid.show(
+									if (typeof deletedUser === "string") return ToastAndroid.show(
 										`Failed to delete the user ${userToDeleteData.username}`,
 										ToastAndroid.SHORT
 									)
 
 									const newUsers = await getUsers(true);
-									setUsers(newUsers)
+									
+									setUsers(typeof newUsers === "string" ? null : newUsers)
 
 									ToastAndroid.show(
 										`Successfully deleted the user ${userToDeleteData.username}`,
@@ -519,13 +520,14 @@ export default function Users() {
 
 									const deletedUser = await deleteUser(userId, true)
 
-									if (!deletedUser) return ToastAndroid.show(
+									if (typeof deletedUser === "string") return ToastAndroid.show(
 										`Failed to delete the user "${userToDeleteData.username}"`,
 										ToastAndroid.SHORT
 									)
 
 									const newUsers = await getUsers(true);
-									setUsers(newUsers)
+									
+									setUsers(typeof newUsers === "string" ? null : newUsers)
 
 									ToastAndroid.show(
 										`Successfully deleted the user "${deletedUser.username}" and its data`,

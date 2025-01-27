@@ -6,10 +6,13 @@ import { View, Text, Pressable, Image } from "react-native";
 import type { APISelfUser } from "@/types/zipline";
 import { styles } from "@/styles/components/header";
 import type React from "react";
+import Sidebar from "@/components/Sidebar.tsx"
 
 export default function Header({ children }: PropsWithChildren) {
 	const [avatar, setAvatar] = useState<string | null>(null);
 	const [user, setUser] = useState<APISelfUser | null>(null);
+	
+	const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!avatar || !user) {
@@ -18,7 +21,7 @@ export default function Header({ children }: PropsWithChildren) {
 				const user = await getCurrentUser();
 
 				setAvatar(avatar);
-				setUser(user);
+				setUser(typeof user === "string" ? null : user);
 			})();
 		}
 	}, [avatar, user]);
@@ -38,7 +41,7 @@ export default function Header({ children }: PropsWithChildren) {
 									<MaterialIcons name="menu" color={"#fff"} size={40} />
 								)}
 								onPress={() => {
-									console.debug("menu pressed");
+									setSidebarOpen((prev) => !prev)
 								}}
 							/>
 						</View>
@@ -79,6 +82,7 @@ export default function Header({ children }: PropsWithChildren) {
 			) : (
 				<View />
 			)}
+			<Sidebar open={sidebarOpen} paddingTop={user ? 70 : 0} />
 			{children}
 		</View>
 	);

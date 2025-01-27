@@ -1,5 +1,5 @@
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 import type {
 	APIUsersNoIncl,
 	APIUsers,
@@ -10,11 +10,11 @@ import type {
 // GET /api/users(?noincl=true)
 export async function getUsers<T extends boolean | undefined = undefined>(
 	noIncl?: T,
-): Promise<T extends true ? APIUsersNoIncl | null : APIUsers | null> {
+): Promise<T extends true ? APIUsersNoIncl | null : APIUsers | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	const params = new URLSearchParams();
 
@@ -29,15 +29,17 @@ export async function getUsers<T extends boolean | undefined = undefined>(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
-export async function getUser(id: string): Promise<APIUser | null> {
+export async function getUser(id: string): Promise<APIUser | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/users/${id}`, {
@@ -48,7 +50,9 @@ export async function getUser(id: string): Promise<APIUser | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -58,11 +62,11 @@ export async function createUser(
 	password: string,
 	role: Omit<APIUser["role"], "SUPERADMIN">,
 	avatar?: string,
-): Promise<APIUser | null> {
+): Promise<APIUser | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.post(
@@ -82,7 +86,9 @@ export async function createUser(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -90,11 +96,11 @@ export async function createUser(
 export async function deleteUser(
 	id: string,
 	deleteData = false,
-): Promise<APIUser | null> {
+): Promise<APIUser | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(`${url}/api/users/${id}`, {
@@ -108,7 +114,9 @@ export async function deleteUser(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -142,11 +150,11 @@ export type EditUserOptions = Partial<
 export async function editUser(
 	id: string,
 	options: EditUserOptions = {},
-): Promise<APIUser | null> {
+): Promise<APIUser | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.patch(`${url}/api/users/${id}`, options, {
@@ -157,6 +165,8 @@ export async function editUser(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

@@ -42,8 +42,8 @@ export default function Folders() {
 			const folders = await getFolders();
 			const settings = await getSettings();
 
-			setFolders(folders);
-			setSettings(settings);
+			setFolders(typeof folders === "string" ? null : "folders");
+			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 
@@ -96,17 +96,17 @@ export default function Folders() {
 
 								if (!newFolderName || newFolderName.length <= 0) return setNewFolderError("Please insert a folder name");
 
-								const createdInvite = await createFolder(newFolderName, newFolderPublic);
+								const createdFolder = await createFolder(newFolderName, newFolderPublic);
 		
-								if (!createdInvite)
-									return setNewFolderError("An error occurred while creating the folder");
+								if (typeof createdFolder === "string")
+									return setNewFolderError(createdFolder);
 
 								setNewFolderName(null);
 								setNewFolderPublic(false);
 
 								const newFolders = await getFolders()
 
-								setFolders(newFolders)
+								setFolders(typeof newFolders === "string" ? null : newFolders)
 
 								setCreateNewFolder(false);
 							}}
@@ -259,7 +259,7 @@ export default function Folders() {
 
 																const success = await editFolder(folderId, !folder.public);
 
-                                                                if (!success) return ToastAndroid.show(
+                                                                if (typeof success === "string") return ToastAndroid.show(
                                                                     `Failed to update the folder "${folder.name}"`,
                                                                     ToastAndroid.SHORT
                                                                 )
@@ -299,7 +299,7 @@ export default function Folders() {
 
 																const success = await deleteFolder(folderId);
 
-                                                                if (!success) return ToastAndroid.show(
+                                                                if (typeof success === "string") return ToastAndroid.show(
                                                                     `Failed to delete the folder "${folder.name}"`,
                                                                     ToastAndroid.SHORT
                                                                 )

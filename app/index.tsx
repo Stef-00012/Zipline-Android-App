@@ -42,9 +42,9 @@ export default function Home() {
 		const stats = await getUserStats();
 		const recentFiles = await getRecentFiles();
 
-		setUser(user);
-		setStats(stats);
-		setRecentFiles(recentFiles);
+		setUser(typeof user === "string");
+		setStats(typeof stats === "string");
+		setRecentFiles(typeof recentFiles === "string");
 	}
 
 	return (

@@ -1,13 +1,13 @@
 import type { APIURLs, APIURL } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /user/urls
-export async function getURLs(): Promise<APIURLs | null> {
+export async function getURLs(): Promise<APIURLs | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/urls`, {
@@ -18,16 +18,18 @@ export async function getURLs(): Promise<APIURLs | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // GET /user/urls/[id]
-export async function getURL(id: string): Promise<APIURL | null> {
+export async function getURL(id: string): Promise<APIURL | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/urls/${id}`, {
@@ -38,7 +40,9 @@ export async function getURL(id: string): Promise<APIURL | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -56,11 +60,11 @@ export async function createURL({
 	password
 }: CreateURLParams): Promise<{
 	url: string;
-} | null> {
+} | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	const headers: { [key: string]: string | number } = {};
 
@@ -84,16 +88,18 @@ export async function createURL({
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // DELETE /api/user/urls/[id]
-export async function deleteURL(id: string): Promise<APIURL | null> {
+export async function deleteURL(id: string): Promise<APIURL | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(`${url}/api/user/urls/${id}`, {
@@ -104,7 +110,9 @@ export async function deleteURL(id: string): Promise<APIURL | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -118,11 +126,11 @@ export interface EditURLOptions {
 export async function editURL(
 	id: string,
 	options: EditURLOptions = {},
-): Promise<APIURL | null> {
+): Promise<APIURL | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.patch(`${url}/api/user/urls/${id}`, options, {
@@ -133,6 +141,8 @@ export async function editURL(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

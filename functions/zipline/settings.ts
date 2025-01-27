@@ -1,13 +1,13 @@
 import type { APISettings } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /api/server/settings
-export async function getSettings(): Promise<APISettings | null> {
+export async function getSettings(): Promise<APISettings | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/server/settings`, {
@@ -18,18 +18,20 @@ export async function getSettings(): Promise<APISettings | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // PATCH /api/server/settings
 export async function updateSettings(
 	settings: Partial<APISettings> = {},
-): Promise<APISettings | null> {
+): Promise<APISettings | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.patch(`${url}/api/server/settings`, settings, {
@@ -40,6 +42,8 @@ export async function updateSettings(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

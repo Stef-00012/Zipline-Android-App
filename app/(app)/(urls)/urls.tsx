@@ -52,8 +52,8 @@ export default function Urls() {
 			const urls = await getURLs();
 			const settings = await getSettings();
 
-			setUrls(urls);
-			setSettings(settings);
+			setUrls(typeof urls === "string" ? null : urls);
+			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 
@@ -148,8 +148,8 @@ export default function Urls() {
 		
 								const shortenedUrlData = await createURL(urlData);
 		
-								if (!shortenedUrlData)
-									return setNewUrlError("An error occurred while shortening the URL");
+								if (typeof shortenedUrlData === "string")
+									return setNewUrlError(shortenedUrlData);
 		
 								const saved = await Clipboard.setStringAsync(shortenedUrlData.url);
 		
@@ -160,7 +160,7 @@ export default function Urls() {
 
 								const newUrls = await getURLs()
 
-								setUrls(newUrls)
+								setUrls(typeof newUrls === "string" ? null : newUrls)
 
 								setCreateNewUrl(false);
 		
@@ -268,8 +268,8 @@ export default function Urls() {
 
 										const editedUrlData = await editURL(urlToEdit.id, urlData);
 
-										if (!editedUrlData)
-											return setEditUrlError("An error occurred while shortening the URL");
+										if (typeof editedUrlData === "string")
+											return setEditUrlError(editedUrlData);
 
 										setEditUrlDestination(null);
 										setEditUrlVanity(null);
@@ -278,7 +278,7 @@ export default function Urls() {
 
 										const newUrls = await getURLs()
 
-										setUrls(newUrls)
+										setUrls(typeof newUrls === "string" ? null : newUrls)
 
 										setUrlToEdit(null);
 									}}
@@ -464,7 +464,7 @@ export default function Urls() {
 
 																const success = await deleteURL(urlId);
 
-																if (!success) return ToastAndroid.show(
+																if (typeof success === "string") return ToastAndroid.show(
                                                                     `Failed to delete the url "${url.vanity || url.code}"`,
                                                                     ToastAndroid.SHORT
                                                                 )

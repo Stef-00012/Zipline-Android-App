@@ -101,11 +101,11 @@ export default function UploadText({
 			const folders = await getFolders(true);
 			const settings = await getSettings();
 
-			if (settings) {
+			if (typeof settings !== "string") {
 				setDefaultFormat(settings.filesDefaultFormat);
 			}
 
-			if (!folders) return setFolders([]);
+			if (typeof folders === "string") return setFolders([]);
 
 			const formattedFolders = folders.map((folder) => ({
 				label: folder.name,
@@ -568,7 +568,7 @@ export default function UploadText({
 							password,
 						});
 
-						if (!uploadedFiles) {
+						if (typeof uploadedFiles === "string") {
 							return setFailedUpload(true)
 						}
 

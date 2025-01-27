@@ -63,12 +63,12 @@ export default function Files() {
 		(async () => {
 			const tags = await getTags()
 
-			setTags(tags)
+			setTags(typeof tags === "string" ? tags : null)
 
 			if (searchParams.folderId) {
 				const folder = await getFolder(searchParams.folderId)
 
-				if (!folder) return router.replace("/+not-found");
+				if (typeof folder === "string") return router.replace("/+not-found");
 
 				setName(folder.name)
 
@@ -95,7 +95,7 @@ export default function Files() {
 			if (searchParams.id) {
 				const user = await getUser(searchParams.id)
 
-				if (!user) return router.replace("/+not-found")
+				if (typeof user === "string") return router.replace("/+not-found")
 
 				fetchOptions.id = user.id
 				setName(user.username)
@@ -105,7 +105,7 @@ export default function Files() {
 
 			if ((files?.pages || 1) > 1) setAllPageDisabled(false);
 
-			setFiles(files);
+			setFiles(typeof files === "string" ? null : files);
 		})();
 	}, [page, favorites, searchParams.page]);
 
@@ -183,7 +183,7 @@ export default function Files() {
 
 													const success = await deleteTag(tagId)
 
-													if (!success) return ToastAndroid.show(
+													if (typeof success === string) return ToastAndroid.show(
 														`Failed to delete the tag "${tag.name}"`,
 														ToastAndroid.SHORT
 													)
@@ -255,15 +255,15 @@ export default function Files() {
 		
 								const newTagData = await createTag(newTagName, newTagColor)
 		
-								if (!newTagData)
-									return setNewTagError("An error occurred while creating the tag");
+								if (typeof newTagData === "string")
+									return setNewTagError(newTagData);
 		
 								setNewTagName(null);
 								setNewTagColor("#ffffff");
 
 								const newTags = await getTags()
 
-								setTags(newTags)
+								setTags(typeof newTags === "string" ? null : newTags)
 
 								setCreateNewTag(false);
 								setTagsMenuOpen(true)
@@ -328,15 +328,15 @@ export default function Files() {
 											color: editTagColor
 										})
 
-										if (!editedTagData)
-											return setEditTagError("An error occurred while creating the tag");
+										if (typeof editedTagData === "string")
+											return setEditTagError(editedTagData);
 
 										setEditTagName(null);
 										setEditTagColor("#ffffff");
 
 										const newTags = await getTags()
 
-										setTags(newTags)
+										setTags(typeof newTags === "string" ? null : newTags)
 
 										setTagToEdit(null);
 										setTagsMenuOpen(true)

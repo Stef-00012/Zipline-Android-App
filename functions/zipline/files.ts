@@ -6,18 +6,18 @@ import type {
 } from "@/types/zipline";
 import * as FileSystem from "expo-file-system";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 export interface GetFilesOptions {
 	id?: string;
 	favorite?: boolean;
 }
 // GET /api/user/files
-export async function getFiles(page: string, options: GetFilesOptions = {}): Promise<APIFiles | null> {
+export async function getFiles(page: string, options: GetFilesOptions = {}): Promise<APIFiles | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	const params = new URLSearchParams({
 		page: page,
@@ -35,16 +35,18 @@ export async function getFiles(page: string, options: GetFilesOptions = {}): Pro
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // GET /api/user/files/[id]
-export async function getFile(id: string): Promise<APIFile | null> {
+export async function getFile(id: string): Promise<APIFile | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/files/${id}`, {
@@ -55,16 +57,18 @@ export async function getFile(id: string): Promise<APIFile | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // DELETE /api/user/files/[id]
-export async function deleteFile(id: string): Promise<APIFile | null> {
+export async function deleteFile(id: string): Promise<APIFile | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(`${url}/api/user/files/${id}`, {
@@ -75,7 +79,9 @@ export async function deleteFile(id: string): Promise<APIFile | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -87,11 +93,11 @@ interface UpdateFileTagsOptions {
 export async function updateFileTags(
 	id: string,
 	options: UpdateFileTagsOptions = {},
-): Promise<APIFile | null> {
+): Promise<APIFile | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL"
 
 	try {
 		const file = await getFile(id);
@@ -116,7 +122,9 @@ export async function updateFileTags(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -131,11 +139,11 @@ interface EditFileOptions {
 export async function editFile(
 	id: string,
 	options: EditFileOptions = {},
-): Promise<APIFile | null> {
+): Promise<APIFile | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL"
 
 	try {
 		const res = await axios.patch(`${url}/api/user/files/${id}`, options, {
@@ -146,7 +154,9 @@ export async function editFile(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -169,11 +179,11 @@ export async function uploadFiles(
 		mimetype: string
 	},
 	options: UploadFileOptions = {},
-) {
+): Promise<Array<APIUploadFile> | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL"
 
 	const headers: {
 		[key: string]: string;
@@ -206,8 +216,10 @@ export async function uploadFiles(
 			mimeType: file.mimetype,
 		})
 	
-		return JSON.parse(res.body)?.files as Array<APIUploadFile>;
+		return JSON.parse(res.body)?.files || [];
 	} catch(e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

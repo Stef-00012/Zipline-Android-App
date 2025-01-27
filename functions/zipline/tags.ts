@@ -1,13 +1,13 @@
 import type { APITag, APITags } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /api/user/tags
-export async function getTags(): Promise<APITags | null> {
+export async function getTags(): Promise<APITags | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/tags`, {
@@ -18,7 +18,9 @@ export async function getTags(): Promise<APITags | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -26,11 +28,11 @@ export async function getTags(): Promise<APITags | null> {
 export async function createTag(
 	name: string,
 	color: string,
-): Promise<APITag | null> {
+): Promise<APITag | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.post(
@@ -48,16 +50,18 @@ export async function createTag(
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // DELETE /api/user/tags/[id]
-export async function deleteTag(id: string): Promise<APITag | null> {
+export async function deleteTag(id: string): Promise<APITag | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.delete(`${url}/api/user/tags/${id}`, {
@@ -68,7 +72,9 @@ export async function deleteTag(id: string): Promise<APITag | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
@@ -81,7 +87,7 @@ export async function editTag(id: string, options: EditTagOptions = {}) {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.patch(
@@ -98,6 +104,8 @@ export async function editTag(id: string, options: EditTagOptions = {}) {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }

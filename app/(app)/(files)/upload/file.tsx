@@ -99,11 +99,11 @@ export default function UploadFile({
 			const folders = await getFolders(true);
 			const settings = await getSettings();
 
-			if (settings) {
+			if ( typeof settings !== "string") {
 				setDefaultFormat(settings.filesDefaultFormat);
 			}
 
-			if (!folders) return setFolders([]);
+			if (typeof folders === "string") return setFolders([]);
 
 			const formattedFolders = folders.map((folder) => ({
 				label: folder.name,
@@ -592,8 +592,9 @@ export default function UploadFile({
 								password,
 							});
 
-							if (!uploadedFile) {
+							if (typeof uploadedFile === "string") {
 								fails.push({
+								    error: uploadedFile,
 									uri: file.uri,
 									name: file.name,
 								});

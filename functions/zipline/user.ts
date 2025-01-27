@@ -1,13 +1,13 @@
 import type { APIRecentFiles, APISelfUser } from "@/types/zipline";
 import * as db from "@/functions/database";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 // GET /api/user
-export async function getCurrentUser(): Promise<APISelfUser | null> {
+export async function getCurrentUser(): Promise<APISelfUser | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user`, {
@@ -18,16 +18,18 @@ export async function getCurrentUser(): Promise<APISelfUser | null> {
 
 		return res.data.user;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 
 // GET /api/user/recent
-export async function getRecentFiles(): Promise<APIRecentFiles | null> {
+export async function getRecentFiles(): Promise<APIRecentFiles | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return null;
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.get(`${url}/api/user/recent`, {
@@ -38,7 +40,9 @@ export async function getRecentFiles(): Promise<APIRecentFiles | null> {
 
 		return res.data;
 	} catch (e) {
-		return null;
+		const error = e as AxiosError;
+		
+		return  error.response.error;
 	}
 }
 

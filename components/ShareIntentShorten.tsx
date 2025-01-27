@@ -122,8 +122,8 @@ export default function ShareIntentShorten({
 
 						const shortenedUrlData = await createURL(urlData);
 
-						if (!shortenedUrlData)
-							return setError("An error occurred while shortening the URL");
+						if (typeof shortenedUrlData === "string")
+							return setError(shortenedUrlData);
 
 						const saved = await Clipboard.setStringAsync(shortenedUrlData.url);
 

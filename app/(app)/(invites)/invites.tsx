@@ -36,8 +36,8 @@ export default function Invites() {
 			const invites = await getInvites();
 			const settings = await getSettings();
 
-			setInvites(invites);
-			setSettings(settings);
+			setInvites(typeof invites === "string" ? null : invites);
+			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 
@@ -82,8 +82,8 @@ export default function Invites() {
 
 								const createdInvite = await createInvite(newInviteExpires, newInviteMaxUses);
 		
-								if (!createdInvite)
-									return setNewInviteError("An error occurred while creating the invite");
+								if (typeof createdInvite === "string")
+									return setNewInviteError(createdInvite);
 
 								const urlDest = `${dashUrl}/invite/${createdInvite.code}`
 		
@@ -94,7 +94,7 @@ export default function Invites() {
 
 								const newInvites = await getInvites()
 
-								setInvites(newInvites)
+								setInvites(typeof newInvites === "string" ? null : newInvites)
 
 								setCreateNewInvite(false);
 		
@@ -265,7 +265,7 @@ export default function Invites() {
 
 																const success = await deleteInvite(inviteId);
 
-																if (!success) return ToastAndroid.show(
+																if (typeof success === "string") return ToastAndroid.show(
                                                                     `Failed to delete the invite "${invite.code}"`,
                                                                     ToastAndroid.SHORT
                                                                 )

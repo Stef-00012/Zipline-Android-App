@@ -15,6 +15,7 @@ import React from "react";
 import { createTag, deleteTag, editTag, getTags } from "@/functions/zipline/tags";
 import Popup from "@/components/Popup";
 import { isLightColor } from "@/functions/color";
+import { colorHash } from "@/functions/util";
 
 export default function Files() {
 	const router = useRouter();
@@ -63,7 +64,7 @@ export default function Files() {
 		(async () => {
 			const tags = await getTags()
 
-			setTags(typeof tags === "string" ? tags : null)
+			setTags(typeof tags === "string" ? null : tags)
 
 			if (searchParams.folderId) {
 				const folder = await getFolder(searchParams.folderId)
@@ -103,7 +104,7 @@ export default function Files() {
 
 			const files = await getFiles(fetchPage, fetchOptions);
 
-			if ((files?.pages || 1) > 1) setAllPageDisabled(false);
+			if (typeof files !== "string" && (files?.pages || 1) > 1) setAllPageDisabled(false);
 
 			setFiles(typeof files === "string" ? null : files);
 		})();
@@ -183,7 +184,7 @@ export default function Files() {
 
 													const success = await deleteTag(tagId)
 
-													if (typeof success === string) return ToastAndroid.show(
+													if (typeof success === "string") return ToastAndroid.show(
 														`Failed to delete the tag "${tag.name}"`,
 														ToastAndroid.SHORT
 													)
@@ -243,34 +244,52 @@ export default function Files() {
 							placeholderTextColor="#222c47"
 						/>
 
-						<Pressable
-							style={styles.button}
-							onPress={async () => {
-								setNewTagError(null);
-		
-								if (!newTagName) return setNewTagError("Please insert a name");
-								if (!hexRegex.test(newTagColor)) return setNewTagError("Please insert a valid HEX color");
-		
-								
-		
-								const newTagData = await createTag(newTagName, newTagColor)
-		
-								if (typeof newTagData === "string")
-									return setNewTagError(newTagData);
-		
-								setNewTagName(null);
-								setNewTagColor("#ffffff");
+						<View style={styles.manageTagButtonsContainer}>
+							<Pressable
+								style={{
+									...styles.button,
+									...styles.manageTagButton,
+									...styles.guessButton
+								}}
+								onPress={async () => {
+									const guess = colorHash(newTagName || "")
 
-								const newTags = await getTags()
+									setNewTagColor(guess)
+								}}
+							>
+								<Text style={styles.buttonText}>Guess Color</Text>
+							</Pressable>
 
-								setTags(typeof newTags === "string" ? null : newTags)
+							<Pressable
+								style={{
+									...styles.button,
+									...styles.manageTagButton
+								}}
+								onPress={async () => {
+									setNewTagError(null);
+			
+									if (!newTagName) return setNewTagError("Please insert a name");
+									if (!hexRegex.test(newTagColor)) return setNewTagError("Please insert a valid HEX color");
 
-								setCreateNewTag(false);
-								setTagsMenuOpen(true)
-							}}
-						>
-							<Text style={styles.buttonText}>Create</Text>
-						</Pressable>
+									const newTagData = await createTag(newTagName, newTagColor)
+			
+									if (typeof newTagData === "string")
+										return setNewTagError(newTagData);
+			
+									setNewTagName(null);
+									setNewTagColor("#ffffff");
+
+									const newTags = await getTags()
+
+									setTags(typeof newTags === "string" ? null : newTags)
+
+									setCreateNewTag(false);
+									setTagsMenuOpen(true)
+								}}
+							>
+								<Text style={styles.buttonText}>Create</Text>
+							</Pressable>
+						</View>
 
 						<Text
 							style={styles.popupSubHeaderText}
@@ -313,37 +332,57 @@ export default function Files() {
 									placeholderTextColor="#222c47"
 								/>
 
-								<Pressable
-									style={styles.button}
-									onPress={async () => {
-										setEditTagError(null);
+								<View style={styles.manageTagButtonsContainer}>
+									<Pressable
+										style={{
+											...styles.button,
+											...styles.manageTagButton,
+											...styles.guessButton
+										}}
+										onPress={async () => {
+											const guess = colorHash(editTagName || "")
 
-										if (!editTagName) return setEditTagError("Please insert a name");
-										if (!hexRegex.test(editTagColor)) return setEditTagError("Please insert a valid HEX color");
+											setEditTagColor(guess)
+										}}
+									>
+										<Text style={styles.buttonText}>Guess Color</Text>
+									</Pressable>
 
-										
+									<Pressable
+										style={{
+											...styles.button,
+											...styles.manageTagButton
+										}}
+										onPress={async () => {
+											setEditTagError(null);
 
-										const editedTagData = await editTag(tagToEdit.id, {
-											name: editTagName,
-											color: editTagColor
-										})
+											if (!editTagName) return setEditTagError("Please insert a name");
+											if (!hexRegex.test(editTagColor)) return setEditTagError("Please insert a valid HEX color");
 
-										if (typeof editedTagData === "string")
-											return setEditTagError(editedTagData);
+											
 
-										setEditTagName(null);
-										setEditTagColor("#ffffff");
+											const editedTagData = await editTag(tagToEdit.id, {
+												name: editTagName === tagToEdit.name ? undefined : editTagName,
+												color: editTagColor
+											})
 
-										const newTags = await getTags()
+											if (typeof editedTagData === "string")
+												return setEditTagError(editedTagData);
 
-										setTags(typeof newTags === "string" ? null : newTags)
+											setEditTagName(null);
+											setEditTagColor("#ffffff");
 
-										setTagToEdit(null);
-										setTagsMenuOpen(true)
-									}}
-								>
-									<Text style={styles.buttonText}>Edit</Text>
-								</Pressable>
+											const newTags = await getTags()
+
+											setTags(typeof newTags === "string" ? null : newTags)
+
+											setTagToEdit(null);
+											setTagsMenuOpen(true)
+										}}
+									>
+										<Text style={styles.buttonText}>Edit</Text>
+									</Pressable>
+								</View>
 
 								<Text
 									style={styles.popupSubHeaderText}

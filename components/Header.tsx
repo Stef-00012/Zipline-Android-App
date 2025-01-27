@@ -6,7 +6,7 @@ import { View, Text, Pressable, Image } from "react-native";
 import type { APISelfUser } from "@/types/zipline";
 import { styles } from "@/styles/components/header";
 import type React from "react";
-import Sidebar from "@/components/Sidebar.tsx"
+import Sidebar from "@/components/Sidebar"
 
 export default function Header({ children }: PropsWithChildren) {
 	const [avatar, setAvatar] = useState<string | null>(null);

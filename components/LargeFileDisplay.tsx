@@ -14,8 +14,6 @@ interface Props {
 export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 	const dashUrl = db.get("url") as DashURL | null;
 
-    console.log("aagdrgf")
-
 	return (
 		<Pressable
 			style={{

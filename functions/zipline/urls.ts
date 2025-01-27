@@ -20,7 +20,14 @@ export async function getURLs(): Promise<APIURLs | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -42,7 +49,14 @@ export async function getURL(id: string): Promise<APIURL | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -90,7 +104,14 @@ export async function createURL({
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -112,7 +133,14 @@ export async function deleteURL(id: string): Promise<APIURL | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -143,6 +171,13 @@ export async function editURL(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }

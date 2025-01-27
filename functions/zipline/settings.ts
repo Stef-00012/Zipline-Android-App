@@ -20,7 +20,14 @@ export async function getSettings(): Promise<APISettings | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -44,6 +51,13 @@ export async function updateSettings(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }

@@ -161,7 +161,7 @@ export default function Folders() {
 									>
 										<Table>
 											{folders.map((folder, index) => {
-												const name =  folder.public ? (
+												const name = folder.public ? (
 													<Link
 														key={folder.id}
 														href={
@@ -266,11 +266,6 @@ export default function Folders() {
                                                                     
                                                                 ToastAndroid.show(
                                                                     `Updated the folder "${folder.name}"'s visibility`,
-                                                                    ToastAndroid.SHORT
-                                                                )
-
-                                                                ToastAndroid.show(
-                                                                    `Failed to delete the folder "${folder.name}"'s visibility`,
                                                                     ToastAndroid.SHORT
                                                                 )
 

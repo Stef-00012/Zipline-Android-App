@@ -187,5 +187,16 @@ export const styles = StyleSheet.create({
 	tagFilesText: {
 		color: "gray",
 		marginLeft: 10
+	},
+	manageTagButton: {
+		width: "45%",
+		marginHorizontal: "2.5%",
+	},
+	manageTagButtonsContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+	guessButton: {
+		backgroundColor: "#616060"
 	}
 });

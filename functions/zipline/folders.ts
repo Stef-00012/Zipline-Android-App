@@ -5,7 +5,7 @@ import axios, { type AxiosError } from "axios";
 // GET /api/user/folders
 export async function getFolders<T extends boolean | undefined = undefined>(
 	noIncl?: T,
-): Promise<T extends true ? APIFoldersNoIncl | null : APIFolders | string> {
+): Promise<T extends true ? APIFoldersNoIncl | string : APIFolders | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -26,7 +26,14 @@ export async function getFolders<T extends boolean | undefined = undefined>(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -48,7 +55,14 @@ export async function getFolder(id: string): Promise<APIFolder | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -80,7 +94,14 @@ export async function createFolder(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -111,7 +132,14 @@ export async function editFolder(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -136,7 +164,14 @@ export async function deleteFolder(id: string): Promise<APIFolder | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -165,7 +200,14 @@ export async function removeFileFromFolder(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -196,6 +238,13 @@ export async function addFileToFolder(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }

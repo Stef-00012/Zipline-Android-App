@@ -20,7 +20,14 @@ export async function getInvites(): Promise<APIInvites | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -48,7 +55,14 @@ export async function createInvite(expiresAt?: string, maxUses?: number): Promis
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -72,6 +86,13 @@ export async function deleteInvite(code: string): Promise<APIInvite | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 } 

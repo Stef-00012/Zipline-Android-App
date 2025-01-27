@@ -37,7 +37,14 @@ export async function getFiles(page: string, options: GetFilesOptions = {}): Pro
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -59,7 +66,14 @@ export async function getFile(id: string): Promise<APIFile | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -81,7 +95,14 @@ export async function deleteFile(id: string): Promise<APIFile | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -101,6 +122,8 @@ export async function updateFileTags(
 
 	try {
 		const file = await getFile(id);
+
+		if (typeof file === "string") return file;
 
 		let newTags = (file?.tags || []).map((tag) => tag.id);
 
@@ -124,7 +147,14 @@ export async function updateFileTags(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -156,7 +186,14 @@ export async function editFile(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -220,6 +257,13 @@ export async function uploadFiles(
 	} catch(e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }

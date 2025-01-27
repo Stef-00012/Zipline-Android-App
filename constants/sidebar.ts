@@ -1,7 +1,10 @@
+import type { IconProps } from "@react-native-material/core";
+import type MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
 interface SidebarOptionButton {
     route: string;
     name: string;
-    icon: string;
+    icon: keyof typeof MaterialIcons.glyphMap;
     adminOnly: boolean;
     invitesRoute: boolean;
     subMenus: [];
@@ -11,14 +14,14 @@ interface SidebarOptionButton {
 interface SidebarOptionSelect {
     route: null;
     name: string;
-    icon: string;
+    icon: keyof typeof MaterialIcons.glyphMap;
     adminOnly: boolean;
     invitesRoute: boolean;
     subMenus: Array<SidebarOption>;
     type: "select";
 }
 
-type SidebarOption = SidebarOptionButton | SidebarOptionSelect;
+export type SidebarOption = SidebarOptionButton | SidebarOptionSelect;
 
 export const sidebarOptions: Array<SidebarOption> = [
     {
@@ -102,7 +105,7 @@ export const sidebarOptions: Array<SidebarOption> = [
         invitesRoute: false,
         subMenus: [
             {
-                route: "/administrator/settings",
+                route: "/settings",
                 name: "Settings",
                 icon: "settings",
                 adminOnly: true,
@@ -111,7 +114,7 @@ export const sidebarOptions: Array<SidebarOption> = [
                 type: "button"
             },
             {
-                route: "/administrator/users",
+                route: "/users",
                 name: "Users",
                 icon: "people",
                 adminOnly: true,
@@ -120,7 +123,7 @@ export const sidebarOptions: Array<SidebarOption> = [
                 type: "button"
             },
             {
-                route: "/administrator/invites",
+                route: "/invites",
                 name: "Invites",
                 icon: "mail-outline",
                 adminOnly: true,

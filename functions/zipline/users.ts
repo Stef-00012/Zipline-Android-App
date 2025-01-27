@@ -10,7 +10,7 @@ import type {
 // GET /api/users(?noincl=true)
 export async function getUsers<T extends boolean | undefined = undefined>(
 	noIncl?: T,
-): Promise<T extends true ? APIUsersNoIncl | null : APIUsers | string> {
+): Promise<T extends true ? APIUsersNoIncl | string : APIUsers | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -31,7 +31,14 @@ export async function getUsers<T extends boolean | undefined = undefined>(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -52,7 +59,14 @@ export async function getUser(id: string): Promise<APIUser | string> {
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -88,7 +102,14 @@ export async function createUser(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -116,7 +137,14 @@ export async function deleteUser(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }
 
@@ -167,6 +195,13 @@ export async function editUser(
 	} catch (e) {
 		const error = e as AxiosError;
 		
-		return  error.response.error;
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
 	}
 }

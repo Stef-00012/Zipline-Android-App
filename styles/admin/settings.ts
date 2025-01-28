@@ -55,6 +55,7 @@ export const styles = StyleSheet.create({
 	multilneTextInput: {
 		height: 150,
 		textAlignVertical: "top",
+		fontFamily: "monospace"
 	},
 	switchContainer: {
 		flexDirection: "row",

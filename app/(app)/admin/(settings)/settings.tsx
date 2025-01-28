@@ -3,7 +3,7 @@ import { useShareIntent } from "@/hooks/useShareIntent";
 import type { APISettings, ShortenEmbed, UploadEmbed } from "@/types/zipline";
 import { useState, useEffect } from "react";
 import { getSettings, updateSettings } from "@/functions/zipline/settings";
-import { View, ScrollView, Text, Pressable, ToastAndroid } from "react-native";
+import { View, Text, Pressable, ToastAndroid } from "react-native";
 import bytes from "bytes";
 import ms from "enhanced-ms";
 import { styles } from "@/styles/admin/settings";
@@ -12,6 +12,7 @@ import { TextInput } from "react-native";
 import Select from "@/components/Select";
 import { formats } from "@/constants/settings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { defaultUploadEmbed, defaultShortenEmbed } from "@/constants/adminSettings";
 
 export default function ServerSettings() {
 	useAuth(true);
@@ -54,23 +55,23 @@ export default function ServerSettings() {
 	const [tasksMetricsInterval, setTasksMetricsInterval] = useState<
 		string
 	>("");
-	const [filesRoute, setFilesRoute] = useState<string | null>(null);
-	const [filesLength, setFilesLength] = useState<number | null>(null);
+	const [filesRoute, setFilesRoute] = useState<string | undefined>(undefined);
+	const [filesLength, setFilesLength] = useState<number | undefined>(undefined);
 	const [filesDefaultFormat, setFilesDefaultFormat] = useState<
-		"random" | "uuid" | "date" | "name" | "gfycat" | null
-	>(null);
+		"random" | "uuid" | "date" | "name" | "gfycat" | undefined
+	>(undefined);
 	const [filesDisabledExtensions, setFilesDisabledExtensions] =
-		useState<Array<string> | null>(null);
-	const [filesMaxFileSize, setFilesMaxFileSize] = useState<string | null>(null);
+		useState<Array<string> | undefined>(undefined);
+	const [filesMaxFileSize, setFilesMaxFileSize] = useState<string | undefined>(undefined);
 	const [filesDefaultExpiration, setFilesDefaultExpiration] = useState<
-		string | null
-	>(null);
+		string | undefined
+	>(undefined);
 	const [filesAssumeMimetypes, setFilesAssumeMimetypes] = useState<
 		boolean
 	>(false);
 	const [filesDefaultDateFormat, setFilesDefaultDateFormat] = useState<
-		string | null
-	>(null);
+		string | undefined
+	>(undefined);
 	const [filesRemoveGpsMetadata, setFilesRemoveGpsMetadata] = useState<
 		boolean
 	>(false);
@@ -98,7 +99,7 @@ export default function ServerSettings() {
 		boolean
 	>(false);
 	const [featuresThumbnailsNumberThreads, setFeaturesThumbnailsNumberThreads] =
-		useState<number | null>(null);
+		useState<number | undefined>(undefined);
 	const [featuresMetricsEnabled, setFeaturesMetricsEnabled] = useState<
 		boolean
 	>(false);
@@ -181,7 +182,7 @@ export default function ServerSettings() {
 		string | null
 	>(null);
 	const [mfaTotpEnabled, setMfaTotpEnabled] = useState<boolean>(false);
-	const [mfaTotpIssuer, setMfaTotpIssuer] = useState<string | null>(null);
+	const [mfaTotpIssuer, setMfaTotpIssuer] = useState<string | undefined>(undefined);
 	const [mfaPasskeys, setMfaPasskeys] = useState<boolean>(false);
 	const [ratelimitEnabled, setRatelimitEnabled] = useState<boolean>(
 		false,
@@ -286,10 +287,10 @@ export default function ServerSettings() {
 			setFilesDisabledExtensions(settings.filesDisabledExtensions);
 			setFilesMaxFileSize(
 				typeof settings.filesMaxFileSize === "number"
-					? bytes(settings.filesMaxFileSize)
+					? bytes(settings.filesMaxFileSize) || undefined
 					: settings.filesMaxFileSize,
 			);
-			setFilesDefaultExpiration(settings.filesDefaultExpiration);
+			setFilesDefaultExpiration(settings.filesDefaultExpiration || undefined);
 			setFilesAssumeMimetypes(settings.filesAssumeMimetypes);
 			setFilesDefaultDateFormat(settings.filesDefaultDateFormat);
 			setFilesRemoveGpsMetadata(settings.filesRemoveGpsMetadata);
@@ -373,79 +374,101 @@ export default function ServerSettings() {
 		}
 	}, [settings]);
 
-	const defaultUploadEmbed: UploadEmbed = {
-		url: false,
-		color: null,
-		title: null,
-		footer: null,
-		thumbnail: false,
-		timestamp: false,
-		description: null,
-		imageOrVideo: false,
-	}
-
-	const defaultShortenEmbed: ShortenEmbed = {
-		url: false,
-		color: null,
-		title: null,
-		footer: null,
-		thumbnail: false,
-		timestamp: false,
-		description: null,
-		imageOrVideo: false,
-	}
-
 	const [saveError, setSaveError] = useState<string | null>(null)
 
 	type SaveCategories = "core" | "chunks" | "tasks" | "mfa" | "features" | "files" | "urlShortener" | "invites" | "ratelimit" | "website" | "oauth" | "pwa" | "httpWebhooks" | "discordWebhook" | "discordOnUploadWebhook" | "discordOnShortenWebhook";
 
 	async function handleSave(category: SaveCategories) {
 		setSaveError(null)
+		let saveSettings: Partial<APISettings> = {}
 
 		switch(category) {
+
 			case "core": {
-				const success = await updateSettings({
-					coreReturnHttpsUrls: coreReturnHttpsUrls,
-					coreDefaultDomain: coreDefaultDomain,
-					coreTempDirectory: coreTempDirectory
-				})
+				saveSettings = {
+					coreReturnHttpsUrls,
+					coreDefaultDomain,
+					coreTempDirectory
+				}
 
-				if (typeof success === "string") setSaveError(success)
-
-				return ToastAndroid.show(
-					"Successfully saved the settings",
-					ToastAndroid.SHORT
-				)
+				break;
 			}
 
 			case "chunks": {
-				const success = await updateSettings({
-					chunksEnabled: chunksEnabled,
-					chunksMax: chunksMax,
-					chunksSize: chunksSize
-				})
+				saveSettings = {
+					chunksEnabled,
+					chunksMax,
+					chunksSize
+				}
 
-				if (typeof success === "string") setSaveError(success)
-
-				return ToastAndroid.show(
-					"Successfully saved the settings",
-					ToastAndroid.SHORT
-				)
+				break;
 			}
 
 			case "tasks": {
-				const success = await updateSettings({
-					
-				})
+				saveSettings = {
+					tasksClearInvitesInterval,
+					tasksDeleteInterval,
+					tasksMaxViewsInterval,
+					tasksMetricsInterval,
+					tasksThumbnailsInterval
+				}
 
-				if (typeof success === "string") setSaveError(success)
+				break;
+			}
 
-				return ToastAndroid.show(
-					"Successfully saved the settings",
-					ToastAndroid.SHORT
-				)
+			case "mfa": {
+				saveSettings = {
+					mfaPasskeys,
+					mfaTotpEnabled,
+					mfaTotpIssuer
+				}
+
+				break;
+			}
+
+			case "features": {
+				saveSettings = {
+					featuresImageCompression,
+					featuresRobotsTxt,
+					featuresHealthcheck,
+					featuresUserRegistration,
+					featuresOauthRegistration,
+					featuresDeleteOnMaxViews,
+					featuresThumbnailsEnabled,
+					featuresThumbnailsNumberThreads,
+					featuresMetricsEnabled,
+					featuresMetricsAdminOnly,
+					featuresMetricsShowUserSpecific
+				}
+
+				break;
+			}
+
+			case "files": {
+				saveSettings = {
+					filesRoute,
+					filesLength,
+					filesAssumeMimetypes,
+					filesRemoveGpsMetadata,
+					filesDefaultFormat,
+					filesDisabledExtensions,
+					filesMaxFileSize,
+					filesDefaultExpiration,
+					filesDefaultDateFormat,
+				}
 			}
 		}
+
+		if (Object.keys(saveSettings).length <= 0) return "Something went wrong...";
+
+		const success = await updateSettings(saveSettings)
+
+		if (typeof success === "string") return setSaveError(success)
+
+		return ToastAndroid.show(
+			"Successfully saved the settings",
+			ToastAndroid.SHORT
+		)
 	}
 
 	return (
@@ -781,6 +804,25 @@ export default function ServerSettings() {
 									/>
 									<Text style={styles.switchText}>
 										Show User Specific Metrics
+									</Text>
+								</View>
+
+								<View style={styles.switchContainer}>
+									<Switch
+										value={featuresThumbnailsEnabled || false}
+										onValueChange={() =>
+											setFeaturesThumbnailsEnabled((prev) => !prev)
+										}
+										thumbColor={
+											featuresThumbnailsEnabled ? "#2e3e6b" : "#222c47"
+										}
+										trackColor={{
+											true: "#21273b",
+											false: "#181c28",
+										}}
+									/>
+									<Text style={styles.switchText}>
+										Enable Thumbnails
 									</Text>
 								</View>
 

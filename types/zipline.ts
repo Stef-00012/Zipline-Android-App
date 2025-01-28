@@ -211,12 +211,12 @@ export interface APISettings {
 	discordOnUploadUsername: string | null;
 	discordOnUploadAvatarUrl: string | null;
 	discordOnUploadContent: string | null;
-	discordOnUploadEmbed: UploadEmbed;
+	discordOnUploadEmbed: UploadEmbed | null;
 	discordOnShortenWebhookUrl: string | null;
 	discordOnShortenUsername: string | null;
 	discordOnShortenAvatarUrl: string | null;
 	discordOnShortenContent: string | null;
-	discordOnShortenEmbed: ShortenEmbed;
+	discordOnShortenEmbed: ShortenEmbed | null;
 	pwaEnabled: boolean;
 	pwaTitle: string;
 	pwaShortName: string;

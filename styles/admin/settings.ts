@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    mainContainer: {
+	mainContainer: {
 		backgroundColor: "#0c101c",
 		flex: 1,
 	},
@@ -9,15 +9,15 @@ export const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scrollView: {
-		flex: 1
+		flex: 1,
 	},
-    settingGroup: {
-        margin: 10,
-        padding: 10,
+	settingGroup: {
+		margin: 10,
+		padding: 10,
 		borderWidth: 4,
 		borderColor: "#222c47",
-		borderRadius: 8
-    },
+		borderRadius: 8,
+	},
 	headerText: {
 		marginTop: 5,
 		marginLeft: 10,
@@ -26,23 +26,23 @@ export const styles = StyleSheet.create({
 		color: "white",
 	},
 	oauthSubSettingText: {
-	    fontSize: 18
+		fontSize: 18,
 	},
 	oauthSubSettingTextColored: {
-	    color: "575DB5"
+		color: "575DB5",
 	},
-    settingSaveButton: {
+	settingSaveButton: {
 		backgroundColor: "#323ea8",
 		padding: 10,
 		marginTop: 10,
 		borderRadius: 6,
 	},
-    settingSaveButtonText: {
+	settingSaveButtonText: {
 		textAlign: "center",
 		fontWeight: "bold",
 		color: "white",
 	},
-    textInput: {
+	textInput: {
 		borderWidth: 2,
 		borderColor: "#222c47",
 		color: "white",
@@ -54,9 +54,9 @@ export const styles = StyleSheet.create({
 	},
 	multilneTextInput: {
 		height: 150,
-		textAlignVertical: "top"
+		textAlignVertical: "top",
 	},
-    switchContainer: {
+	switchContainer: {
 		flexDirection: "row",
 		marginTop: 10,
 	},
@@ -67,16 +67,28 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		textAlignVertical: "center",
 	},
-    subHeaderText: {
+	subHeaderText: {
 		marginLeft: 10,
 		fontSize: 13,
 		fontWeight: "bold",
 		color: "gray",
 	},
-    inputHeader: {
+	inputHeader: {
 		marginTop: 5,
 		fontSize: 18,
 		fontWeight: "bold",
 		color: "white",
 	},
-})
+	loadingContainer: {
+		display: "flex",
+		flex: 1,
+	},
+	loadingText: {
+		fontSize: 40,
+		fontWeight: "bold",
+		margin: "auto",
+		color: "#304270",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+});

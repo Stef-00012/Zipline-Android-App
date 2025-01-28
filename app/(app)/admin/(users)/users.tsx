@@ -438,7 +438,7 @@ export default function Users() {
 							<View>
 								<Text style={styles.mainHeaderText}>Delete {userToDelete.username}?</Text>
 
-								<Text style={styles.deleteWarningText}>Are you sure you want to delete hello? This action cannot be undone.</Text>
+								<Text style={styles.deleteWarningText}>Are you sure you want to delete {userToDelete.username}? This action cannot be undone.</Text>
 
 								<View style={styles.deleteActionButtonsContainer}>
 									<Pressable style={{

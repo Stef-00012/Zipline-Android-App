@@ -31,14 +31,23 @@ export async function getSettings(): Promise<APISettings | string> {
 	}
 }
 
+interface APIIssue {
+	code: string;
+	message: string;
+	path: Array<string>
+}
 // PATCH /api/server/settings
 export async function updateSettings(
 	settings: Partial<APISettings> = {},
-): Promise<APISettings | string> {
+): Promise<APISettings | Array<APIIssue>> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return "Invalid token or URL";
+	if (!url || !token) return [{
+		code: "app",
+		message: "Invalid token or URL",
+		path: []
+	}];
 
 	try {
 		const res = await axios.patch(`${url}/api/server/settings`, settings, {
@@ -52,12 +61,16 @@ export async function updateSettings(
 		const error = e as AxiosError;
 		
 		const data = error.response?.data as {
-			error: string;
+			issues: Array<APIIssue>;
 			statusCode: number;
 		} | undefined;
 
-		if (data) return data.error
+		if (data) return data.issues
 
-		return "Something went wrong..."
+		return [{
+		code: "app",
+		message: "Something went wrong...",
+		path: []
+	}];
 	}
 }

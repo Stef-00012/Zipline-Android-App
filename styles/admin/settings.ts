@@ -25,6 +25,12 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "white",
 	},
+	oauthSubSettingText: {
+	    fontSize: 18
+	},
+	oauthSubSettingTextColored: {
+	    color: "575DB5"
+	},
     settingSaveButton: {
 		backgroundColor: "#323ea8",
 		padding: 10,

@@ -1053,7 +1053,234 @@ export default function ServerSettings() {
 								</Pressable>
 							</View>
 
-							{/* oauth */}
+                            {/* oauth */}
+							<View style={styles.settingGroup}>
+							    <Text style={styles.headerText}>OAuth</Text>
+							    
+							    <View style={styles.switchContainer}>
+									<Switch
+										value={oauthBypassLocalLogin || false}
+										onValueChange={() => setOauthBypassLocalLogin((prev) => !prev)}
+										thumbColor={oauthBypassLocalLogin ? "#2e3e6b" : "#222c47"}
+										trackColor={{
+											true: "#21273b",
+											false: "#181c28",
+										}}
+									/>
+									<Text
+										style={styles.switchText}
+									>
+										Bypass Local Login
+									</Text>
+								</View>
+								
+								<View style={styles.switchContainer}>
+									<Switch
+										value={oauthLoginOnly || false}
+										onValueChange={() => setOauthLoginOnly((prev) => !prev)}
+										thumbColor={oauthLoginOnly ? "#2e3e6b" : "#222c47"}
+										trackColor={{
+											true: "#21273b",
+											false: "#181c28",
+										}}
+									/>
+									<Text
+										style={styles.switchText}
+									>
+										Login Only
+									</Text>
+								</View>
+								
+								<View style={styles.settingGroup}>
+								    <Text style={{
+								        ...styles.oauthSubSettingText,
+								        ...styles.oauthSubSettingTextColored
+								    }}>Discord</Text>
+								
+								    <Text
+    									style={styles.inputHeader}
+    								>
+    									Discord Client ID:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthDiscordClientId(content)}
+    									value={oauthDiscordClientId || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									Discord Client Secret:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthDiscordClientSecret(content)}
+    									value={oauthDiscordClientSecret || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									Discord Redirect URI:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthDiscordRedirectUri(content)}
+    									value={oauthDiscordRedirectUri || ""}
+    								/>
+								</View>
+								
+								<View style={styles.settingGroup}>
+								    <Text style={{
+								        ...styles.oauthSubSettingText,
+								        ...styles.oauthSubSettingTextColored
+								    }}>Google</Text>
+								
+								    <Text
+    									style={styles.inputHeader}
+    								>
+    									Google Client ID:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthGoogleClientId(content)}
+    									value={oauthGoogleClientId || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									Google Client Secret:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthGoogleClientSecret(content)}
+    									value={oauthGoogleClientSecret || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									Google Redirect URI:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthGoogleRedirectUri(content)}
+    									value={oauthGoogleRedirectUri || ""}
+    								/>
+								</View>
+								
+								<View style={styles.settingGroup}>
+								    <Text style={{
+								        ...styles.oauthSubSettingText,
+								        ...styles.oauthSubSettingTextColored
+								    }}>GitHub</Text>
+								
+								    <Text
+    									style={styles.inputHeader}
+    								>
+    									GitHub Client ID:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthGithubClientId(content)}
+    									value={oauthGithubClientId || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									GitHub Client Secret:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthGithubClientSecret(content)}
+    									value={oauthGithubClientSecret || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									GitHub Redirect URI:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthGithubRedirectUri(content)}
+    									value={oauthGithubRedirectUri || ""}
+    								/>
+								</View>
+								
+								<View style={styles.settingGroup}>
+								    <Text style={styles.oauthSubSettingText}>OpenID Connect</Text>
+								
+								    <Text
+    									style={styles.inputHeader}
+    								>
+    									OIDC Client ID:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthOidcClientId(content)}
+    									value={oauthOidcClientId || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									OIDC Client Secret:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthOidcClientSecret(content)}
+    									value={oauthOidcClientSecret || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									OIDC Authorize URL:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthOidcAuthorizeUrl(content)}
+    									value={oauthOidcAuthorizeUrl || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									OIDC Token URL:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthOidcTokenUrl(content)}
+    									value={oauthOidcTokenUrl || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									OIDC Userinfo URL:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthOidcUserinfoUrl(content)}
+    									value={oauthOidcUserinfoUrl || ""}
+    								/>
+    								
+    								<Text
+    									style={styles.inputHeader}
+    								>
+    									OIDC Redirect URL:
+    								</Text>
+    								<TextInput
+    									style={styles.textInput}
+    									onChangeText={(content) => setOauthOidcRedirectUrl(content)}
+    									value={oauthOidcRedirectUrl || ""}
+    								/>
+								</View>
+							</View>
 
 							{/* pwa */}
 							<View style={styles.settingGroup}>

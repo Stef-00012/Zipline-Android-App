@@ -4,7 +4,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
 import { getFileDataURI, timeDifference } from "@/functions/util";
-import { styles } from "@/styles/users/users";
+import { styles } from "@/styles/admin/users";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { createUser, deleteUser, editUser, type EditUserOptions, getUsers } from "@/functions/zipline/users";
@@ -62,7 +62,7 @@ export default function Users() {
 			const settings = await getSettings();
 
 			setUsers(typeof users === "string" ? null : users);
-			setSettings(typeof settings === "string" ? null : users);
+			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 

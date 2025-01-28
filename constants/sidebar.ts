@@ -66,7 +66,7 @@ export const sidebarOptions: Array<SidebarOption> = [
         icon: "cloud-upload",
         adminOnly: false,
         invitesRoute: false,
-        type: "select"
+        type: "select",
         subMenus: [
             {
                 route: "/upload/text",

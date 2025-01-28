@@ -1276,8 +1276,8 @@ export default function ServerSettings() {
     								</Text>
     								<TextInput
     									style={styles.textInput}
-    									onChangeText={(content) => setOauthOidcRedirectUrl(content)}
-    									value={oauthOidcRedirectUrl || ""}
+    									onChangeText={(content) => setOauthOidcRedirectUri(content)}
+    									value={oauthOidcRedirectUri || ""}
     								/>
 								</View>
 							</View>

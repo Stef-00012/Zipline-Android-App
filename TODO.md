@@ -1,5 +1,5 @@
 user settings
-server settings (Discord Webhook Missing)
+server settings (saving)
 handle user menu (top right) => open settings
 app/(app)/metrics
 single file view

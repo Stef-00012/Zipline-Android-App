@@ -17,8 +17,6 @@ export default function ServerSettings() {
 	useAuth(true);
 	useShareIntent();
 
-	console.log('a')
-
 	const [settings, setSettings] = useState<APISettings | null>(null);
 
 	useEffect(() => {

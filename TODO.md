@@ -1,6 +1,5 @@
 user settings
-server settings
-handle both user menu (top right) and hamburger menu (top left) presses
-    - user menu => open settings
+server settings (2 tabs missing)
+handle user menu (top right) => open settings
 app/(app)/metrics
 single file view

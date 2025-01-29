@@ -97,37 +97,3 @@ export function colorHash(str: string) {
 
 	return color;
 }
-
-// biome-ignore lint/suspicious/noExplicitAny: can't know the type of the key
-export function getObjectValue<T extends Record<string, any> = Record<string, any>>(obj: T, path: string): T[keyof T] | undefined {
-	const keys = path.split(".");
-	let result = obj;
-
-	for (const key of keys) {
-		if (result[key] === undefined) {
-			return undefined;
-		}
-
-		result = result[key];
-	}
-
-	return result as T[keyof T];
-}
-
-// biome-ignore lint/suspicious/noExplicitAny: can't know the type of the key
-export function setObjectValue<T extends Record<string, any> = Record<string, any>>(obj: T, path: string, value: any): T {
-	const keys = path.split(".");
-	let result = obj;
-
-	for (let i = 0; i < keys.length - 1; i++) {
-		if (result[keys[i]] === undefined) {
-			(result as Record<string, unknown>)[keys[i]] = {};
-		}
-
-		result = result[keys[i]];
-	}
-
-	(result as Record<string, unknown>)[keys[keys.length - 1]] = value;
-	
-	return result;
-}

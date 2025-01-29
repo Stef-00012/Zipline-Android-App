@@ -1,6 +1,7 @@
 import type { APISettings } from "@/types/zipline";
 import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
+import { settingNames } from "@/constants/adminSettings";
 
 // GET /api/server/settings
 export async function getSettings(): Promise<APISettings | string> {
@@ -39,11 +40,11 @@ interface APIIssue {
 // PATCH /api/server/settings
 export async function updateSettings(
 	settings: Partial<APISettings> = {},
-): Promise<APISettings | string> {
+): Promise<APISettings | Array<string>> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return "Invalid token or URL";
+	if (!url || !token) return ["Invalid token or URL"];
 
 	try {
 		const res = await axios.patch(`${url}/api/server/settings`, settings, {
@@ -61,8 +62,8 @@ export async function updateSettings(
 			statusCode: number;
 		} | undefined;
 
-		if (data) return data.issues.map(issue => `${issue.path.join(".")} - ${issue.message}`).join("\n")
+		if (data) return data.issues.map(issue => `${settingNames[issue.path.join(".") as keyof typeof settingNames] || issue.path.join(".")} - ${issue.message}`)
 
-		return "Something went wrong..."
+		return ["Something went wrong..."]
 	}
 }

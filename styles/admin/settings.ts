@@ -18,12 +18,20 @@ export const styles = StyleSheet.create({
 		borderColor: "#222c47",
 		borderRadius: 8,
 	},
+	header: {
+		paddingVertical: 10
+	},
 	headerText: {
 		marginTop: 5,
 		marginLeft: 10,
 		fontSize: 23,
 		fontWeight: "bold",
 		color: "white",
+	},
+	errorText: {
+		color: "red",
+		fontWeight: "bold",
+		textAlign: "center",
 	},
 	oauthSubSettingText: {
 		fontSize: 18,

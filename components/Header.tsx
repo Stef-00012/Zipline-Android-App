@@ -7,8 +7,11 @@ import type { APISelfUser } from "@/types/zipline";
 import { styles } from "@/styles/components/header";
 import type React from "react";
 import Sidebar from "@/components/Sidebar"
+import { useRouter } from "expo-router";
 
 export default function Header({ children }: PropsWithChildren) {
+	const router = useRouter()
+
 	const [avatar, setAvatar] = useState<string | null>(null);
 	const [user, setUser] = useState<APISelfUser | null>(null);
 	
@@ -50,7 +53,7 @@ export default function Header({ children }: PropsWithChildren) {
 							<View>
                                 <Pressable
                                     onPress={() => {
-                                        console.debug("user menu pressed");
+                                        router.replace("/settings")
                                     }}
                                 >
                                     <View style={styles.userMenuContainer}>

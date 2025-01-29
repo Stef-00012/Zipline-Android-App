@@ -20,7 +20,7 @@ import { useShareIntent } from "@/hooks/useShareIntent";
 import { router } from "expo-router";
 
 export default function Users() {
-	useAuth(true)
+	useAuth("ADMIN")
 	useShareIntent()
 
 	const [users, setUsers] = useState<APIUsersNoIncl | null>(null);

@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Invites() {
-	useAuth(true)
+	useAuth("ADMIN")
 	useShareIntent()
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);

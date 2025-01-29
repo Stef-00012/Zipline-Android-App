@@ -1,21 +1,18 @@
-name: Android App APK Build
+name: Build APK
 
 on:
   push:
-    branches: [main]
     paths:
-        - app/**
-        - assets/**
-        - components/**
-        - constants/**
-        - functions/**
-        - hooks/**
-        - styles/**
-        - types/**
-        - metro.config.js
-        - app.json
-        - eas.json
-        - .github/workflows/apk-build.yml
+      - components/**
+      - constants/**
+      - functions/**
+      - hooks/**
+      - styles/**
+      - types/**
+      - metro.config.js
+      - app.json
+      - eas.json
+      - .github/workflows/apk-build.yml
 
   workflow_dispatch: 
 
@@ -23,29 +20,32 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Check commit message
+        id: check_commit_message
+        run: echo "::set-output name=skip::$(echo '${{ github.event.head_commit.message }}' | grep -q '^\[nobuild\]' && echo true || echo false)"
+
       - name: Setup repo
+        if: steps.check_commit_message.outputs.skip != 'true'
         uses: actions/checkout@v4
-      
-      # - name: Setup node
-      #   uses: actions/setup-node@v4.0.2
-      #   with:
-      #     node-version: 18.x
-      #     cache: 'npm'
 
       - uses: oven-sh/setup-bun@v2
+        if: steps.check_commit_message.outputs.skip != 'true'
         with:
           bun-version: latest
 
       - name: Set up JDK 17
+        if: steps.check_commit_message.outputs.skip != 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Android SDK
+        if: steps.check_commit_message.outputs.skip != 'true'
         uses: android-actions/setup-android@v3
 
       - name: Setup Expo
+        if: steps.check_commit_message.outputs.skip != 'true'
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
@@ -53,12 +53,15 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
+        if: steps.check_commit_message.outputs.skip != 'true'
         run: bun install --frozen-lockfile
 
       - name: Build Android app
+        if: steps.check_commit_message.outputs.skip != 'true'
         run: eas build --clear-cache --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
 
       - name: Upload APK artifact
+        if: steps.check_commit_message.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: app-release

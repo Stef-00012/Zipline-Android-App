@@ -456,6 +456,135 @@ export default function ServerSettings() {
 					filesDefaultExpiration,
 					filesDefaultDateFormat,
 				}
+
+				break;
+			}
+
+			case "urlShortener": {
+				saveSettings = {
+					urlsRoute,
+					urlsLength
+				}
+
+				break;
+			}
+
+			case "invites": {
+				saveSettings = {
+					invitesEnabled,
+					invitesLength
+				}
+
+				break;
+			}
+
+			case "ratelimit": {
+				saveSettings = {
+					ratelimitEnabled,
+					ratelimitMax,
+					ratelimitWindow,
+					ratelimitAdminBypass,
+					ratelimitAllowList
+				}
+
+				break;
+			}
+
+			case "website": {
+				saveSettings = {
+					websiteTitle,
+					websiteTitleLogo,
+					websiteExternalLinks,
+					websiteLoginBackground,
+					websiteLoginBackgroundBlur,
+					websiteDefaultAvatar,
+					websiteTos,
+					websiteThemeDefault,
+					websiteThemeDark,
+					websiteThemeLight
+				}
+
+				break;
+			}
+
+			case "oauth": {
+				saveSettings = {
+					oauthBypassLocalLogin,
+					oauthLoginOnly,
+					oauthDiscordClientId,
+					oauthDiscordClientSecret,
+					oauthDiscordRedirectUri,
+					oauthGoogleClientId,
+					oauthGoogleClientSecret,
+					oauthGoogleRedirectUri,
+					oauthGithubClientId,
+					oauthGithubClientSecret,
+					oauthGithubRedirectUri,
+					oauthOidcClientId,
+					oauthOidcClientSecret,
+					oauthOidcAuthorizeUrl,
+					oauthOidcTokenUrl,
+					oauthOidcUserinfoUrl,
+					oauthOidcRedirectUri
+				}
+
+				break;
+			}
+
+			case "pwa": {
+				saveSettings = {
+					pwaEnabled,
+					pwaTitle,
+					pwaShortName,
+					pwaDescription,
+					pwaThemeColor,
+					pwaBackgroundColor
+				}
+
+				break;
+			}
+
+			case "httpWebhooks": {
+				saveSettings = {
+					httpWebhookOnUpload,
+					httpWebhookOnShorten
+				}
+
+				break;
+			}
+
+			case "discordWebhook": {
+				saveSettings = {
+					discordWebhookUrl,
+					discordUsername,
+					discordAvatarUrl
+				}
+
+				break;
+			}
+
+			case "discordOnShortenWebhook": {
+				saveSettings = {
+					discordOnShortenWebhookUrl,
+					discordOnShortenUsername,
+					discordOnShortenAvatarUrl,
+					discordOnShortenContent,
+					discordOnShortenEmbed
+				}
+
+				break;
+			}
+
+			case "discordOnUploadWebhook": {
+				saveSettings = {
+					discordOnUploadWebhookUrl,
+					discordOnUploadUsername,
+					discordOnUploadAvatarUrl,
+					discordOnUploadContent,
+					discordOnUploadEmbed
+				}
+
+				break;
 			}
 		}
 

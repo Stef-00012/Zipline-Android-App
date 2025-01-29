@@ -98,3 +98,6 @@ export function colorHash(str: string) {
 	return color;
 }
 
+function getNestedValue(object: Record<string, unknown>, path: string) {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}

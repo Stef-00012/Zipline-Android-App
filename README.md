@@ -27,3 +27,11 @@ This is an android app made to manage your [Zipline V4](https://github.com/diced
 3. `eas build --clear-cache --platform android --profile preview`
 
 This will create an apk but won't automatically install
+
+# TODO
+
+[ ] User settings page
+[ ] Metrics page
+[ ] Single file view
+[ ] Fix header not shown after login till restart
+[ ] App update checking + update button

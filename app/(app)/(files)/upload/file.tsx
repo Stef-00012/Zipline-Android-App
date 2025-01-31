@@ -257,7 +257,7 @@ export default function UploadFile({
 				}}>
 					{selectedFiles.map((file) => (
 						<View key={file.uri} style={styles.recentFileContainer}>
-							<Pressable
+							{/* <Pressable
 								onPress={() => {
 									if (uploading) return;
 									setSelectedFiles((alreadySelectedFiles) =>
@@ -266,7 +266,7 @@ export default function UploadFile({
 										),
 									);
 								}}
-							>
+							> */}
 								<FileDisplay
 									uri={file.uri}
 									name={file.name}
@@ -274,8 +274,16 @@ export default function UploadFile({
 									height={200}
 									mimetype={file.mimetype}
 									openable={false}
+									onPress={() => {
+										if (uploading) return;
+										setSelectedFiles((alreadySelectedFiles) =>
+											alreadySelectedFiles.filter(
+												(selectedFile) => selectedFile.uri !== file.uri,
+											),
+										);
+									}}
 								/>
-							</Pressable>
+							{/* </Pressable> */}
 						</View>
 					))}
 				</ScrollView>

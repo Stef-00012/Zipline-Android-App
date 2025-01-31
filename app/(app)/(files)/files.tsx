@@ -26,7 +26,7 @@ export default function Files() {
 		folderId?: string;
 	}>()
 	
-	useAuth(!!searchParams.id)
+	useAuth(searchParams.id ? "ADMIN" : "USER")
 	useShareIntent()
 
 	const [page, setPage] = useState<string>("1");

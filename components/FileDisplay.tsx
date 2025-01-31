@@ -21,6 +21,7 @@ interface Props {
 	originalName?: string | null;
 	openable?: boolean;
 	file?: APIFile;
+	onPress?: () => void | Promise<void>;
 }
 
 export default function FileDisplay({
@@ -34,7 +35,8 @@ export default function FileDisplay({
 	openable = true,
 	autoHeight = false,
 	passwordProtected = false,
-	file
+	file,
+	onPress
 }: Props) {
 	const router = useRouter()
 	const dashUrl = db.get("url") as DashURL | null;
@@ -49,7 +51,7 @@ export default function FileDisplay({
 
 	if (passwordProtected) {
 		return (
-			<Pressable onPress={handlePress}>
+			<Pressable onPress={onPress || onPressDefault}>
 				<View
 					style={{
 						...styles.nonDisplayableFileContainer,
@@ -126,7 +128,7 @@ export default function FileDisplay({
 
 	if (displayableMimetypes.includes(mimetype))
 		return (
-			<Pressable onPress={handlePress}>
+			<Pressable onPress={onPress || onPressDefault}>
 				<Image
 					source={{
 						uri: uri,
@@ -142,7 +144,7 @@ export default function FileDisplay({
 		);
 
 	return (
-		<Pressable onPress={handlePress}>
+		<Pressable onPress={onPress || onPressDefault}>
 			<View
 				style={{
 					...styles.nonDisplayableFileContainer,
@@ -160,7 +162,7 @@ export default function FileDisplay({
 		</Pressable>
 	);
 
-	function handlePress() {
+	function onPressDefault() {
         if (file) router.replace(`${dashUrl}${file.url}` as ExternalPathString)
     }
 }

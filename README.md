@@ -30,8 +30,8 @@ This will create an apk but won't automatically install
 
 # TODO
 
-[ ] User settings page
-[ ] Metrics page
-[ ] Single file view
-[ ] Fix header not shown after login till restart
-[ ] App update checking + update button
+- [ ] User settings page\
+- [ ] Metrics page\
+- [ ] Single file view\
+- [ ] Fix header not shown after login till restart\
+- [ ] App update checking + update button

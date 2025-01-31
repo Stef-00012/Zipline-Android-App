@@ -1,50 +1,29 @@
-# Welcome to your Expo app 👋
+# Zipline Android App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> [!IMPORTANT]
+> iOS is not supported
 
-## Get started
+This is an android app made to manage your [Zipline V4](https://github.com/diced/zipline/tree/v4) (selfhosted) server and also upload files or shorten URLs. You can also share files to the app to upload them.
 
-1. Install dependencies
+# Creating a development build
 
-   ```bash
-   npm install
-   ```
+> [!IMPORTANT]
+> Requires an android device connected to the laptop and ADB
 
-2. Start the app
+1. `bun install`
+2. `bun run prebuild`
+3. `bun run run:android`
 
-   ```bash
-    npx expo start
-   ```
+(this will create a development apk and automatically install in your device)
 
-In the output, you'll find options to open the app in a
+> Building an apk
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+> [!NOTE]
+> add ` --local` flag if you don't have a Expo EAS account or want to build it locally on your PC\
+> add `--output /path/to/file.apk` to save the apk in that path
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1. `bun install`
+2. `bun install --global eas-cli`
+3. `eas build --clear-cache --platform android --profile preview`
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This will create an apk but won't automatically install

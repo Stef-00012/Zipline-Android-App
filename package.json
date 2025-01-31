@@ -7,6 +7,7 @@
     "start:dev": "EDGE_PATH=/home/stef/.local/bin/google-chrome expo start --dev-client",
     "prebuild": "expo prebuild --no-install --clean",
     "run:android": "expo run:android",
+    "run:android:release": "expo run:android --variant release",
     "run:ios": "expo run:ios",
     "run:web": "expo start --web",
     "test": "jest --watchAll",

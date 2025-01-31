@@ -56,6 +56,10 @@ jobs:
         if: steps.check_commit_message.outputs.skip != 'true'
         run: bun install --frozen-lockfile
 
+      # - name: Release Update
+      #   if: steps.check_commit_message.outputs.skip != 'true'
+      #   run: eas update --channel preview --platform android --message "${{ github.event.head_commit.message }}"
+
       - name: Build Android app
         if: steps.check_commit_message.outputs.skip != 'true'
         run: eas build --clear-cache --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk

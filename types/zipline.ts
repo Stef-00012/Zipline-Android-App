@@ -4,6 +4,22 @@ export type DashURL = `http${'s' | ''}://${string}.${string}`;
 
 export type APISelfUser = Omit<APIUser, "avatar">;
 
+export interface APILoginSuccessResponse {
+	user: APIUser;
+	totp?: undefined;
+}
+
+export interface APILoginTotpResponse {
+	totp: true;
+	user?: undefined;
+}
+
+export type APILoginResponse = APILoginSuccessResponse | APILoginTotpResponse
+
+export interface APITokenResponse {
+	token: string
+}
+
 export interface APIUser {
 	id: string;
 	username: string;
@@ -272,6 +288,7 @@ export interface APIURL {
 	views: number;
 	maxViews: number | null;
 	password: string | null;
+	enabled: boolean;
 	userId: string;
 }
 

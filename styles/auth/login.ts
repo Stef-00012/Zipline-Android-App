@@ -17,6 +17,12 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 		margin: "auto",
 	},
+	inputHeader: {
+		marginTop: 5,
+		fontSize: 18,
+		fontWeight: "bold",
+		color: "white",
+	},
 	textInput: {
 		width: "100%",
 		borderWidth: 2,
@@ -35,6 +41,9 @@ export const styles = StyleSheet.create({
 		padding: 10,
 		marginTop: 5,
 		borderRadius: 6,
+	},
+	buttonSecondary: {
+		backgroundColor: "#616060"
 	},
 	buttonText: {
 		textAlign: "center",

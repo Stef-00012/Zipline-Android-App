@@ -29,6 +29,27 @@ export default function Header({ children }: PropsWithChildren) {
 		}
 	}, [avatar, user]);
 
+	useEffect(() => {
+		let interval: NodeJS.Timeout | undefined;
+		if (!user) {
+			interval = setInterval(fetchUser, 5000)
+		}
+
+		if (user && interval) clearInterval(interval);
+
+		return () => {
+			if (interval) clearInterval(interval)
+		}
+	}, [user])
+
+	async function fetchUser() {
+		const avatar = await getCurrentUserAvatar();
+		const user = await getCurrentUser();
+
+		setAvatar(avatar);
+		setUser(typeof user === "string" ? null : user);
+	}
+
 	return (
 		<View style={styles.headerContainer}>
 			{user ? (

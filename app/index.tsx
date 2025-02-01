@@ -34,7 +34,12 @@ export default function Home() {
 	const router = useRouter();
 
 	useFocusEffect(() => {
-		// if (__DEV__) router.replace("/admin/settings");
+		if (__DEV__) {
+			// db.del("url")
+			// db.del("token")
+
+			// router.replace("/admin/settings");
+		}
 	});
 
 	async function handleAuth() {

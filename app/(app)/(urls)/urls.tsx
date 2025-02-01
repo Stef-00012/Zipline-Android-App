@@ -16,6 +16,7 @@ import {
 import Popup from "@/components/Popup";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { Switch } from "@react-native-material/core";
 
 export default function Urls() {
 	useAuth()
@@ -30,6 +31,7 @@ export default function Urls() {
 	const [newUrlVanity, setNewUrlVanity] = useState<string | null>(null);
 	const [newUrlMaxViews, setNewUrlMaxViews] = useState<string | null>(null);
 	const [newUrlPassword, setNewUrlPassword] = useState<string | null>(null);
+	const [newUrlEnabled, setNewUrlEnabled] = useState<boolean>(true);
 
 	const [newUrlError, setNewUrlError] = useState<string>();
 
@@ -39,6 +41,7 @@ export default function Urls() {
 	const [editUrlVanity, setEditUrlVanity] = useState<string | null>(null);
 	const [editUrlMaxViews, setEditUrlMaxViews] = useState<string | null>(null);
 	const [editUrlPassword, setEditUrlPassword] = useState<string | null>(null);
+	const [editUrlEnabled, setEditUrlEnabled] = useState<boolean>(true);
 
 	const [editUrlOriginalVanity, setEditUrlOriginalVanity] = useState<string | null>(null);
 	const [editUrlError, setEditUrlError] = useState<string>();
@@ -63,6 +66,7 @@ export default function Urls() {
 			setEditUrlVanity(urlToEdit.vanity);
 			setEditUrlOriginalVanity(urlToEdit.vanity);
 			setEditUrlMaxViews(urlToEdit.maxViews?.toString() || null);
+			setEditUrlEnabled(urlToEdit.enabled ?? true);
 		}
 	}, [urlToEdit])
 
@@ -75,6 +79,7 @@ export default function Urls() {
 					setNewUrlVanity(null)
 					setNewUrlMaxViews(null)
 					setNewUrlPassword(null)
+					setNewUrlEnabled(true)
 					setNewUrlError(undefined)
 				}}>
 					<View style={styles.popupContent}>
@@ -128,6 +133,23 @@ export default function Urls() {
 							placeholder="myPassword"
 							placeholderTextColor="#222c47"
 						/>
+
+						<View style={styles.switchContainer}>
+							<Switch
+								value={newUrlEnabled}
+								onValueChange={() => setNewUrlEnabled((prev) => !prev)}
+								thumbColor={newUrlEnabled ? "#2e3e6b" : "#222c47"}
+								trackColor={{
+									true: "#21273b",
+									false: "#181c28",
+								}}
+							/>
+							<Text
+								style={styles.switchText}
+							>
+								Enabled
+							</Text>
+						</View>
 		
 						<Pressable
 							style={styles.button}
@@ -140,6 +162,7 @@ export default function Urls() {
 		
 								const urlData: CreateURLParams = {
 									destination: newUrl,
+									enabled: newUrlEnabled ?? true
 								};
 		
 								if (newUrlVanity) urlData.vanity = newUrlVanity;
@@ -157,6 +180,7 @@ export default function Urls() {
 								setNewUrlVanity(null);
 								setNewUrlMaxViews(null);
 								setNewUrlPassword(null);
+								setNewUrlEnabled(true)
 
 								const newUrls = await getURLs()
 
@@ -193,6 +217,7 @@ export default function Urls() {
 					setEditUrlVanity(null)
 					setEditUrlMaxViews(null)
 					setEditUrlPassword(null)
+					setEditUrlEnabled(true)
 					setEditUrlError(undefined)
 				}}>
 					<View style={styles.popupContent}>
@@ -248,6 +273,23 @@ export default function Urls() {
 									placeholder="myPassword"
 									placeholderTextColor="#222c47"
 								/>
+
+								<View style={styles.switchContainer}>
+									<Switch
+										value={editUrlEnabled}
+										onValueChange={() => setEditUrlEnabled((prev) => !prev)}
+										thumbColor={editUrlEnabled ? "#2e3e6b" : "#222c47"}
+										trackColor={{
+											true: "#21273b",
+											false: "#181c28",
+										}}
+									/>
+									<Text
+										style={styles.switchText}
+									>
+										Enabled
+									</Text>
+								</View>
 				
 								<Pressable
 									style={styles.button}
@@ -260,6 +302,7 @@ export default function Urls() {
 				
 										const urlData: EditURLOptions = {
 											destination: editUrlDestination,
+											enabled: editUrlEnabled ?? true
 										};
 				
 										if (editUrlVanity && editUrlVanity !== editUrlOriginalVanity) urlData.vanity = editUrlVanity;
@@ -275,6 +318,7 @@ export default function Urls() {
 										setEditUrlVanity(null);
 										setEditUrlMaxViews(null);
 										setEditUrlPassword(null);
+										setEditUrlEnabled(true)
 
 										const newUrls = await getURLs()
 
@@ -331,9 +375,10 @@ export default function Urls() {
 												"Views",
 												"Max Views",
 												"Created",
+												"Enabled",
 												"Actions",
 											]}
-											widthArr={[80, 100, 200, 100, 100, 130, 130]}
+											widthArr={[80, 100, 200, 100, 100, 130, 50, 130]}
 											style={styles.tableHeader}
 											textStyle={styles.rowText}
 										/>
@@ -398,6 +443,12 @@ export default function Urls() {
 												const maxViews = (
 													<Text style={styles.rowText}>
 														{url.maxViews || "Unlimited"}
+													</Text>
+												);
+
+												const enabled = (
+													<Text style={styles.rowText}>
+														{url.enabled ? "Yes" : "No"}
 													</Text>
 												);
 
@@ -512,9 +563,10 @@ export default function Urls() {
 															views,
 															maxViews,
 															created,
+															enabled,
 															actions,
 														]}
-														widthArr={[80, 100, 200, 100, 100, 130, 130]}
+														widthArr={[80, 100, 200, 100, 100, 130, 50, 130]}
 														style={rowStyle}
 														textStyle={styles.rowText}
 													/>

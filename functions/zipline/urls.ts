@@ -65,13 +65,15 @@ export interface CreateURLParams {
 	vanity?: string;
 	maxViews?: number;
 	password?: string;
+	enabled?: boolean;
 }
 // POST /api/user/urls
 export async function createURL({
 	destination,
 	vanity,
 	maxViews,
-	password
+	password,
+	enabled = true
 }: CreateURLParams): Promise<{
 	url: string;
 } | string> {
@@ -91,6 +93,7 @@ export async function createURL({
 			{
 				destination,
 				vanity,
+				enabled
 			},
 			{
 				headers: {
@@ -149,6 +152,7 @@ export interface EditURLOptions {
 	maxViews?: number;
 	password?: string;
 	vanity?: string;
+	enabled?: boolean;
 }
 // PATCH /api/user/urls/[id]
 export async function editURL(

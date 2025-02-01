@@ -69,6 +69,17 @@ export const styles = StyleSheet.create({
 		borderColor: "#222c47",
 		textAlign: "center",
 	},
+	switchContainer: {
+		flexDirection: "row",
+		marginTop: 10,
+	},
+	switchText: {
+		color: "white",
+		fontSize: 16,
+		marginLeft: 5,
+		fontWeight: "bold",
+		textAlignVertical: "center",
+	},
 	pageButtonTextDisabled: {
 		color: "gray",
 	},

@@ -400,3 +400,7 @@ export interface APIExport {
 }
 
 export type APIExports = Array<APIExport>;
+
+export interface ServerActionResponse {
+	status: string
+}

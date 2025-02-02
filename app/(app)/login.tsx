@@ -3,7 +3,7 @@ import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import * as db from "@/functions/database";
-import { styles } from "@/styles/auth/login";
+import { styles } from "@/styles/login";
 import { useLoginAuth } from "@/hooks/useLoginAuth";
 import React from "react";
 

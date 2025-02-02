@@ -482,7 +482,7 @@ export default function Users() {
 							<View>
 								<Text style={styles.mainHeaderText}>Delete {userToDeleteData.username}'s Data?</Text>
 
-								<Text style={styles.deleteWarningText}>Would you like to delete hello's files and urls? This action cannot be undone.</Text>
+								<Text style={styles.deleteWarningText}>Would you like to delete {userToDeleteData.username}'s files and urls? This action cannot be undone.</Text>
 
 								<Pressable style={{
 									...styles.button,

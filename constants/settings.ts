@@ -1,9 +1,7 @@
 import type { SelectProps } from "@/components/Select";
 
-export const formats: SelectProps["data"] = [
-	{ label: "Random", value: "random" },
-	{ label: "Date", value: "date" },
-	{ label: "UUID", value: "uuid" },
-	{ label: "Use File Name", value: "name" },
-	{ label: "Gfycat-style Name", value: "gfycat" },
+export const alignments: SelectProps["data"] = [
+	{ label: "Left", value: "left" },
+	{ label: "Center", value: "center" },
+	{ label: "Right", value: "right" },
 ];

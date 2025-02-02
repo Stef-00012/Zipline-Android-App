@@ -191,6 +191,11 @@ export async function editUser(
 			},
 		});
 
+		console.debug({
+			options,
+			data: res.data
+		})
+
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
@@ -199,6 +204,8 @@ export async function editUser(
 			error: string;
 			statusCode: number;
 		} | undefined;
+
+		console.error(data)
 
 		if (data) return data.error
 

@@ -10,7 +10,7 @@ import { styles } from "@/styles/admin/settings";
 import { Switch } from "@react-native-material/core";
 import { TextInput } from "react-native";
 import Select from "@/components/Select";
-import { formats } from "@/constants/settings";
+import { formats } from "@/constants/adminSettings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { defaultUploadEmbed, defaultShortenEmbed } from "@/constants/adminSettings";
 
@@ -391,7 +391,6 @@ export default function ServerSettings() {
 		let saveSettings: Partial<APISettings> = {}
 
 		switch(category) {
-
 			case "core": {
 				saveSettings = {
 					coreReturnHttpsUrls,

@@ -7,10 +7,12 @@ import type { APISelfUser } from "@/types/zipline";
 import { styles } from "@/styles/components/header";
 import type React from "react";
 import Sidebar from "@/components/Sidebar"
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
+import UserAvatar from "./UserAvatar";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter()
+	const pathname = usePathname()
 
 	const [avatar, setAvatar] = useState<string | null>(null);
 	const [user, setUser] = useState<APISelfUser | null>(null);
@@ -74,30 +76,10 @@ export default function Header({ children }: PropsWithChildren) {
 							<View>
                                 <Pressable
                                     onPress={() => {
-                                        router.replace("/settings")
+                                        if (pathname !== "/settings") router.replace("/settings")
                                     }}
                                 >
-                                    <View style={styles.userMenuContainer}>
-                                        {avatar ? (
-											<Image
-												source={{ uri: avatar }}
-												width={35}
-												height={35}
-												style={styles.userMenuAvatar}
-											/>
-										) : (
-											<View style={{
-												...styles.userMenuAvatar,
-												...styles.settingsIcon
-											}}>
-												<MaterialIcons size={22} name="settings" color="#fff" />
-											</View>
-										)}
-                                        <Text style={{
-											...styles.userMenuText,
-											...(!avatar && styles.userMenuTextWithSettingsIcon)
-										}}>{user.username}</Text>
-                                    </View>
+                                    <UserAvatar username={user.username} avatar={avatar} />
                                 </Pressable>
                             </View>
 						</Stack>

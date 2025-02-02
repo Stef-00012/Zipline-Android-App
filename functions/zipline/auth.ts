@@ -13,6 +13,7 @@ export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 			headers: {
 				Authorization: token,
 			},
+			timeout: 10000
 		});
 
 		const data: APISelfUser = res.data.user;
@@ -130,4 +131,32 @@ export async function login(username: string, password: string, totpCode?: strin
 	const token = await getToken(cookieRes)
 
 	return token;
+}
+
+export async function getTokenWithToken(): Promise<APITokenResponse | string> {
+	const token = db.get("token");
+	const url = db.get("url");
+
+	if (!url || !token) return "Invalid token or URL";
+
+	try {
+		const res = await axios.get(`${url}/api/user/token`, {
+			headers: {
+				Authorization: token,
+			},
+		});
+
+		return res.data;
+	} catch (e) {
+		const error = e as AxiosError;
+		
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
+	}
 }

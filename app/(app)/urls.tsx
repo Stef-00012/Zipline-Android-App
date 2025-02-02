@@ -5,7 +5,7 @@ import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
 import { createURL, type CreateURLParams, deleteURL, editURL, type EditURLOptions, getURLs } from "@/functions/zipline/urls";
 import { timeDifference } from "@/functions/util";
-import { styles } from "@/styles/urls/urls";
+import { styles } from "@/styles/urls";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";

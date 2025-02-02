@@ -1,4 +1,4 @@
-import type { APIRecentFiles, APISelfUser } from "@/types/zipline";
+import type { APIRecentFiles, APISelfUser, APIUser } from "@/types/zipline";
 import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
 
@@ -80,23 +80,49 @@ export async function getCurrentUserAvatar(): Promise<string | null> {
 	}
 }
 
-type EditCurrentUserOptions = Partial<
+export type EditUserOptions = Partial<
 	Omit<
-		APISelfUser,
-		| "role"
+		APIUser,
 		| "id"
 		| "createdAt"
 		| "updatedAt"
+		| "role"
 		| "oauthProviders"
 		| "totpSecret"
 		| "passkeys"
-		| "quota"
 		| "sessions"
-		| "view"
+		| "quota"
 	> & {
-		view?: Partial<APISelfUser["view"]>;
-		avatar?: string;
-		password?: string;
+		password: string;
 	}
 >;
-export async function editCurrentUser(options: EditCurrentUserOptions = {}) {}
+// PATCH /api/users/[id]
+export async function editCurrentUser(
+	options: EditUserOptions = {},
+): Promise<APIUser | string> {
+	const token = db.get("token");
+	const url = db.get("url");
+
+	if (!url || !token) return "Invalid token or URL";
+
+	try {
+		const res = await axios.patch(`${url}/api/user`, options, {
+			headers: {
+				Authorization: token,
+			},
+		});
+
+		return res.data;
+	} catch (e) {
+		const error = e as AxiosError;
+		
+		const data = error.response?.data as {
+			error: string;
+			statusCode: number;
+		} | undefined;
+
+		if (data) return data.error
+
+		return "Something went wrong..."
+	}
+}

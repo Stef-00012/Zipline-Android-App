@@ -16,7 +16,7 @@ export async function getUserExports(): Promise<APIExports | string> {
 			},
 		});
 
-		return res.data.user;
+		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
 		
@@ -42,17 +42,20 @@ export async function createUserExport(): Promise<{ running: boolean } | string>
 		const res = await axios.post(`${url}/api/user/export`, null, {
 			headers: {
 				Authorization: token,
+				"Content-Type": "application/json",
 			},
 		});
 
 		return res.data.user;
 	} catch (e) {
 		const error = e as AxiosError;
-		
+
 		const data = error.response?.data as {
 			error: string;
 			statusCode: number;
 		} | undefined;
+
+		console.log(data)
 
 		if (data) return data.error
 

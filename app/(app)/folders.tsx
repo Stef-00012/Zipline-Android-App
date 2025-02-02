@@ -4,7 +4,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
 import { timeDifference } from "@/functions/util";
-import { styles } from "@/styles/folders/folders";
+import { styles } from "@/styles/folders";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";

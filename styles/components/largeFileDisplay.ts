@@ -11,13 +11,33 @@ export const styles = StyleSheet.create({
         zIndex: 1,
     },
     popupContainer: {
-        maxHeight: 600,
+        maxHeight: 700,
         width: "90%",
         margin: "auto",
         backgroundColor: "#0c101c",
-        justifyContent: "center",
         alignItems: "center",
         borderRadius: 15,
         padding: 10,
+    },
+    fileHeader: {
+        fontSize: 22,
+        fontWeight: "bold",
+        color: "white",
+        marginBottom: 10,
+    },
+    fileInfoContainer: {
+        flexDirection: "row",
+        marginHorizontal: 10,
+        marginVertical: 5
+    },
+    fileInfoHeader: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "white",
+    },
+    fileInfoText: {
+        fontSize: 14,
+        color: "gray",
+        wordWrap: "break-word",
     },
 })

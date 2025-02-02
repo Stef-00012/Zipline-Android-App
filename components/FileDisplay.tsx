@@ -14,13 +14,14 @@ interface Props {
 	name: string;
 	alt?: string;
 	width: number;
+	file?: APIFile;
 	height?: number;
 	mimetype?: string;
+	openable?: boolean;
+	maxHeight?: number;
 	autoHeight?: boolean;
 	passwordProtected?: boolean;
 	originalName?: string | null;
-	openable?: boolean;
-	file?: APIFile;
 	onPress?: () => void | Promise<void>;
 }
 
@@ -28,14 +29,15 @@ export default function FileDisplay({
 	uri,
 	alt,
 	name,
+	file,
 	mimetype,
+	maxHeight,
 	width = 200,
 	originalName,
 	height = width,
 	openable = true,
 	autoHeight = false,
 	passwordProtected = false,
-	file,
 	onPress
 }: Props) {
 	const router = useRouter()
@@ -114,17 +116,19 @@ export default function FileDisplay({
 
 	const [imageHeight, setImageHeight] = useState<number>(height);
 
-	if (autoHeight) {
-		useEffect(() => {
+	useEffect(() => {
+		if (autoHeight) {
 			(async () => {
 				const size = await NativeImage.getSize(uri);
 
-				const scaledHeight = (width * size.height) / size.width;
+				let scaledHeight = (width * size.height) / size.width;
+
+				if (maxHeight && scaledHeight > maxHeight) scaledHeight = maxHeight;
 
 				setImageHeight(scaledHeight);
 			})();
-		}, [uri, width]);
-	}
+		}
+	}, [uri, width, maxHeight, autoHeight]);
 
 	if (displayableMimetypes.includes(mimetype))
 		return (

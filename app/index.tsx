@@ -9,6 +9,7 @@ import * as db from "@/functions/database";
 import { styles } from "@/styles/home";
 import bytes from "bytes";
 import type {
+	APIFile,
 	APIRecentFiles,
 	APISelfUser,
 	APIUserStats,
@@ -16,6 +17,7 @@ import type {
 } from "@/types/zipline";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { useAuth } from "@/hooks/useAuth";
+import LargeFileDisplay from "@/components/LargeFileDisplay";
 
 export default function Home() {
 	useAuth()
@@ -26,6 +28,8 @@ export default function Home() {
 	const [user, setUser] = useState<APISelfUser | null>(null);
 	const [stats, setStats] = useState<APIUserStats | null>();
 	const [recentFiles, setRecentFiles] = useState<APIRecentFiles | null>();
+
+	const [focusedFile, setFocusedFile] = useState<APIFile | null>(null);
 
 	useEffect(() => {
 		handleAuth();
@@ -54,6 +58,8 @@ export default function Home() {
 
 	return (
 		<View style={styles.mainContainer}>
+			{focusedFile && <LargeFileDisplay file={focusedFile} onClose={() => setFocusedFile(null)} hidden={!focusedFile} />}
+
 			{user && stats && recentFiles ? (
 				<ScrollView>
 					<View>
@@ -68,6 +74,7 @@ export default function Home() {
 										width={200}
 										height={200}
 										passwordProtected={file.password}
+										onPress={() => setFocusedFile(file)}
 									/>
 								</View>
 							))}

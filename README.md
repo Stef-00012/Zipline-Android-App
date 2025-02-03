@@ -34,4 +34,5 @@ This will create an apk but won't automatically install
 - [ ] Single file view
 - [ ] App update checking + update button
 - [ ] Correct "Change Download Folder" not granted message
-- [ ] Move select & checkbox inline styles to @/styles folder
+- [ ] Move same TextInput component to @/components to avoid typing the same styles over and over again
+- [ ] Create a password input with a button to show/hide the password

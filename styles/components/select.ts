@@ -23,6 +23,8 @@ export const styles = StyleSheet.create({
         backgroundColor: "#181c28",
         borderRadius: 8,
         maxHeight: 250,
+        width: '90%',
+        borderRadius: 10
     },
     menuItem: {
         flexDirection: "row",
@@ -43,5 +45,14 @@ export const styles = StyleSheet.create({
     },
     selectedText: {
         color: "white"
+    },
+    selectContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    openSelectContainer: {
+        borderRadius: 10
     }
 })

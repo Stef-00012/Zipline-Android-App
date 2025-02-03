@@ -77,18 +77,16 @@ export default function Select({
                     onRequestClose={() => setIsOpen(false)}
                 >
                     <TouchableOpacity
-                        style={{
-                            flex: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        }}
+                        style={styles.selectContainer}
                         onPress={() => setIsOpen(false)}
                     >
-                        <View style={{ ...styles.select, width: '90%', maxHeight: maxHeight, borderRadius: 10 }}>
+                        <View style={{
+                            ...styles.select,
+                            maxHeight: maxHeight
+                        }}>
                             <FlatList
                                 data={data}
-								style={{borderRadius: 10}}
+								style={styles.openSelectContainer}
                                 keyExtractor={(item, index) => index.toString()}
                                 showsVerticalScrollIndicator={showScrollIndicator}
                                 renderItem={({ item, index }) => (

@@ -1,5 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
+import { styles } from "@/styles/components/checkbox";
 
 interface Props {
     value: boolean;
@@ -8,15 +9,10 @@ interface Props {
 
 export default function CheckBox({ value, onValueChange }: Props) {
     return (
-        <TouchableOpacity onPress={onValueChange} style={{ marginRight: 10 }}>
+        <TouchableOpacity onPress={onValueChange} style={styles.checkboxContainer}>
             <View style={{
-                borderRadius: 6,
-                width: 20,
-                height: 20,
-                borderWidth: 2,
+                ...styles.checkbox,
                 borderColor: value ? "#323ea8" : "#222c47",
-                justifyContent: 'center',
-                alignItems: 'center',
                 backgroundColor: value ? '#323ea8' : 'transparent'
             }}>
                 {value && <MaterialIcons

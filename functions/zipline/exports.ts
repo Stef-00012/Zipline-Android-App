@@ -55,8 +55,6 @@ export async function createUserExport(): Promise<{ running: boolean } | string>
 			statusCode: number;
 		} | undefined;
 
-		console.log(data)
-
 		if (data) return data.error
 
 		return "Something went wrong..."

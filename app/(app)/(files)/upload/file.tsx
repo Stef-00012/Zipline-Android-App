@@ -359,10 +359,10 @@ export default function UploadFile({
 					placeholder="Select Date..."
 					disabled={uploading}
 					onSelect={(selectedDate) => {
-						if (selectedDate.value === "never") return setDeletesAt(undefined);
+						if (selectedDate[0].value === "never") return setDeletesAt(undefined);
 
 						const deletesDate = new Date(
-							Date.now() + (selectedDate.milliseconds as number),
+							Date.now() + (selectedDate[0].milliseconds as number),
 						);
 
 						setDeletesAt(deletesDate);
@@ -388,7 +388,7 @@ export default function UploadFile({
 					disabled={uploading}
 					placeholder="Select Format..."
 					onSelect={(selectedFormat) =>
-						setNameFormat(selectedFormat.value as UploadFileOptions["format"])
+						setNameFormat(selectedFormat[0].value as UploadFileOptions["format"])
 					}
 				/>
 
@@ -463,9 +463,9 @@ export default function UploadFile({
 					placeholder="Select Folder..."
 					onSelect={(selectedFolder) =>
 						setFolder(
-							selectedFolder.value === "noFolder"
+							selectedFolder[0].value === "noFolder"
 								? undefined
-								: selectedFolder.value,
+								: selectedFolder[0].value,
 						)
 					}
 				/>
@@ -591,7 +591,7 @@ export default function UploadFile({
 							const uploadedFile = await uploadFiles(fileData, {
 								compression,
 								expiresAt: deletesAt,
-								filename: fileNameEnabled ? undefined : fileName,
+								filename: fileNameEnabled ? fileName : undefined,
 								folder,
 								format: nameFormat,
 								maxViews,
@@ -602,7 +602,7 @@ export default function UploadFile({
 
 							if (typeof uploadedFile === "string") {
 								fails.push({
-								    error: uploadedFile,
+									error: uploadedFile,
 									uri: file.uri,
 									name: file.name,
 								});

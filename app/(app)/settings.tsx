@@ -13,13 +13,12 @@ import * as Clipboard from "expo-clipboard"
 import { getTokenWithToken } from "@/functions/zipline/auth";
 import * as DocumentPicker from "expo-document-picker"
 import * as FileSystem from "expo-file-system"
-import { getFileDataURI } from "@/functions/util";
+import { convertToBytes, getFileDataURI } from "@/functions/util";
 import UserAvatar from "@/components/UserAvatar";
 import Select from "@/components/Select";
 import { alignments } from "@/constants/settings";
 import { createUserExport, deleteUserExport, getUserExports } from "@/functions/zipline/exports";
 import { Row, Table } from "react-native-table-component";
-import bytes from "bytes";
 import * as db from "@/functions/database";
 import Popup from "@/components/Popup";
 import { clearTempFiles, clearZeroByteFiles, generateThumbnails, getZeroByteFiles, requeryFileSize } from "@/functions/zipline/serverActions";
@@ -670,7 +669,7 @@ export default function UserSettings() {
 									data={alignments}
 									onSelect={(selectedAlignment) =>
 										setViewAlign(
-											selectedAlignment.value as typeof viewAlign,
+											selectedAlignment[0].value as typeof viewAlign,
 										)
 									}
 									placeholder="Select Alignment..."
@@ -838,7 +837,9 @@ export default function UserSettings() {
 
 														const size = (
 															<Text style={styles.rowText}>
-																{bytes(Number.parseInt(zlExport.size))}
+																{convertToBytes(Number.parseInt(zlExport.size), {
+																	unitSeparator: " "
+																})}
 															</Text>
 														);
 

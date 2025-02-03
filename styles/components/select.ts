@@ -9,19 +9,18 @@ export const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: "#222c47",
         color: "white",
-        height: 40,
         padding: 3,
         borderRadius: 6,
         marginTop: 5,
     },
     selectText: {
         flex: 1,
+        textAlignVertical: "center",
         fontSize: 15,
         color: "#222c47",
     },
     select: {
         backgroundColor: "#181c28",
-        borderRadius: 8,
         maxHeight: 250,
         width: '90%',
         borderRadius: 10
@@ -54,5 +53,15 @@ export const styles = StyleSheet.create({
     },
     openSelectContainer: {
         borderRadius: 10
+    },
+    selectedTextContainer: {
+        flex: 1,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
+        margin: -3
+    },
+    selectedItemContainer: {
+        margin: 3
     }
 })

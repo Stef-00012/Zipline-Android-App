@@ -7,7 +7,6 @@ import FileDisplay from "@/components/FileDisplay";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { styles } from "@/styles/home";
-import bytes from "bytes";
 import type {
 	APIFile,
 	APIRecentFiles,
@@ -18,6 +17,7 @@ import type {
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { useAuth } from "@/hooks/useAuth";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
+import { convertToBytes } from "@/functions/util";
 
 export default function Home() {
 	useAuth()
@@ -103,7 +103,7 @@ export default function Home() {
 							<View style={styles.statContainer}>
 								<Text style={styles.subHeaderText}>Storage Used:</Text>
 								<Text style={styles.statText}>
-									{bytes(stats.storageUsed, {
+									{convertToBytes(stats.storageUsed, {
 										unitSeparator: " ",
 									})}
 								</Text>
@@ -112,7 +112,7 @@ export default function Home() {
 							<View style={styles.statContainer}>
 								<Text style={styles.subHeaderText}>Average Storage Used:</Text>
 								<Text style={styles.statText}>
-									{bytes(stats.avgStorageUsed, {
+									{convertToBytes(stats.avgStorageUsed, {
 										unitSeparator: " ",
 									})}
 								</Text>

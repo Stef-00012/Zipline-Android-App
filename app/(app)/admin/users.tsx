@@ -175,7 +175,7 @@ export default function Users() {
 								<Text style={styles.popupHeaderText}>Role:</Text>
 								<Select
 									data={userRoles}
-									onSelect={(selectedRole) => setEditRole(selectedRole.value as Exclude<APIUser["role"], "SUPERADMIN">)}
+									onSelect={(selectedRole) => setEditRole(selectedRole[0].value as Exclude<APIUser["role"], "SUPERADMIN">)}
 									placeholder="Select Role..."
 									defaultValue={userRoles.find(userRole => userRole.value === editRole)}
 								/>
@@ -186,13 +186,13 @@ export default function Users() {
 								<Select
 									data={fileQuotaTypes}
 									onSelect={(selectedQuota) => {
-										if (selectedQuota.value === "NONE") {
+										if (selectedQuota[0].value === "NONE") {
 											setEditMaxBytes(null)
 											setEditMaxFileCount(null)
-											setEditFileQuotaType(selectedQuota.value)
+											setEditFileQuotaType(selectedQuota[0].value as typeof editFileQuotaType)
 										}
 				
-										setEditFileQuotaType(selectedQuota.value as APIUserQuota["filesQuota"])
+										setEditFileQuotaType(selectedQuota[0].value as APIUserQuota["filesQuota"])
 									}}
 									placeholder="Select Quota Type..."
 									defaultValue={fileQuotaTypes.find(userQuota => userQuota.value === editFileQuotaType)}
@@ -381,7 +381,7 @@ export default function Users() {
 						<Text style={styles.popupHeaderText}>Role:</Text>
 						<Select
 							data={userRoles}
-							onSelect={(selectedRole) => setNewUserRole(selectedRole.value as Exclude<APIUser["role"], "SUPERADMIN">)}
+							onSelect={(selectedRole) => setNewUserRole(selectedRole[0].value as Exclude<APIUser["role"], "SUPERADMIN">)}
 							placeholder="Select Role..."
 							defaultValue={userRoles.find(userRole => userRole.value === newUserRole)}
 						/>

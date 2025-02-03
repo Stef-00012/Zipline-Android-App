@@ -324,7 +324,7 @@ export default function UploadText({
 					placeholder="Select File Type..."
 					disabled={uploading}
 					defaultValue={avaibleTextMimetypes.find(mimetype => mimetype.value === "txt")}
-					onSelect={(selectedType) => setFileType(selectedType.value)}
+					onSelect={(selectedType) => setFileType(selectedType[0].value)}
 				/>
 
 				<Text
@@ -340,10 +340,10 @@ export default function UploadText({
 					placeholder="Select Date..."
 					disabled={uploading}
 					onSelect={(selectedDate) => {
-						if (selectedDate.value === "never") return setDeletesAt(undefined);
+						if (selectedDate[0].value === "never") return setDeletesAt(undefined);
 
 						const deletesDate = new Date(
-							Date.now() + (selectedDate.milliseconds as number),
+							Date.now() + (selectedDate[0].milliseconds as number),
 						);
 
 						setDeletesAt(deletesDate);
@@ -369,7 +369,7 @@ export default function UploadText({
 					disabled={uploading}
 					placeholder="Select Format..."
 					onSelect={(selectedFormat) =>
-						setNameFormat(selectedFormat.value as UploadFileOptions["format"])
+						setNameFormat(selectedFormat[0].value as UploadFileOptions["format"])
 					}
 				/>
 
@@ -444,9 +444,9 @@ export default function UploadText({
 					placeholder="Select Folder..."
 					onSelect={(selectedFolder) =>
 						setFolder(
-							selectedFolder.value === "noFolder"
+							selectedFolder[0].value === "noFolder"
 								? undefined
-								: selectedFolder.value,
+								: selectedFolder[0].value,
 						)
 					}
 				/>

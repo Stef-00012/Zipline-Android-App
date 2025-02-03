@@ -1,6 +1,6 @@
 import { styles } from "@/styles/components/select";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React, { useState } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
 import CheckBox from "./CheckBox";
 
@@ -11,12 +11,15 @@ export interface SelectProps {
         [key: string]: string | number | boolean | null;
     }>;
     placeholder: string;
-    onSelect: (selectedItem: SelectProps["data"][0], index: number) => void;
+    onSelect: (selectedItem: SelectProps["data"]) => void;
     showScrollIndicator?: boolean;
     disabled?: boolean;
     defaultValue?: SelectProps["data"][0];
+    defaultValues?: SelectProps["data"];
     maxHeight?: number;
     multiple?: boolean;
+    renderSelectedItem?: (item: SelectProps["data"][0], key: string) => ReactNode | string;
+    renderItem?: (item: SelectProps["data"][0]) => ReactNode;
 }
 
 export default function Select({
@@ -25,14 +28,40 @@ export default function Select({
     showScrollIndicator,
     defaultValue,
     onSelect,
+    defaultValues,
     disabled = false,
     maxHeight = 200,
-    multiple = false
+    multiple = false,
+    renderSelectedItem = (item, key) => <Text key={key} style={{
+        ...styles.selectText,
+        ...styles.selectedText
+    }}>{item.label}</Text>,
+    renderItem = (item) => <Text style={styles.menuItemText}>{item.label}</Text>
 }: SelectProps) {
-    const [selectedItems, setSelectedItems] = useState<SelectProps["data"]>(multiple ? [] : defaultValue ? [defaultValue] : []);
+    const [selectedItems, setSelectedItems] = useState<SelectProps["data"]>(getDefaultValues());
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleSelect = (item: SelectProps["data"][0], index: number) => {
+    /*
+        biome-ignore lint/correctness/useExhaustiveDependencies: this hook has to update the
+        default values when they are changed, and those values are used in the function it uses
+    */
+    useEffect(() => {
+        setSelectedItems(getDefaultValues())
+    }, [defaultValue, defaultValues, multiple]);
+
+    function getDefaultValues(): SelectProps["data"] {
+        if (multiple) {
+            if (defaultValues) return defaultValues
+            if (defaultValue) return [defaultValue]
+            return []
+        }
+        
+        if (defaultValue) return [defaultValue]
+        if (defaultValues?.length) return [defaultValues[0]]
+        return []
+    }
+
+    function handleSelect(item: SelectProps["data"][0], index: number) {
         if (multiple) {
             setSelectedItems(prevItems => {
                 const isSelected = prevItems.some(selectedItem => selectedItem.value === item.value);
@@ -45,23 +74,31 @@ export default function Select({
         } else {
             setSelectedItems([item]);
             setIsOpen(false);
+            onSelect([item]);
         }
-        onSelect(item, index);
     };
 
     return (
         <View>
             <TouchableOpacity
                 style={styles.selectButton}
-                onPress={() => setIsOpen(!isOpen)}
+                onPress={() => {
+                    const open = !isOpen;
+
+                    setIsOpen(open)
+                    if (!open) onSelect(selectedItems);
+                }}
                 disabled={disabled}
             >
-                <Text style={{
-                    ...styles.selectText,
-                    ...(selectedItems.length && styles.selectedText)
-                }}>
-                    {selectedItems.length ? selectedItems.map(item => item.label).join(', ') : placeholder}
-                </Text>
+                <View style={styles.selectedTextContainer}>
+                    {selectedItems.length
+                        ? selectedItems.map((item) => (
+                            <View key={item.value} style={styles.selectedItemContainer}>
+                                {renderSelectedItem(item, item.value)}
+                            </View>
+                        ))
+                        : <Text style={styles.selectText}>{placeholder}</Text>}
+                </View>
                 <MaterialIcons
                     name={isOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"}
                     size={32}
@@ -74,11 +111,17 @@ export default function Select({
                     transparent={true}
                     animationType="fade"
                     visible={isOpen}
-                    onRequestClose={() => setIsOpen(false)}
+                    onRequestClose={() => {
+                        setIsOpen(false)
+                        onSelect(selectedItems);
+                    }}
                 >
                     <TouchableOpacity
                         style={styles.selectContainer}
-                        onPress={() => setIsOpen(false)}
+                        onPress={() => {
+                            setIsOpen(false)
+                            onSelect(selectedItems);
+                        }}
                     >
                         <View style={{
                             ...styles.select,
@@ -86,7 +129,7 @@ export default function Select({
                         }}>
                             <FlatList
                                 data={data}
-								style={styles.openSelectContainer}
+                                style={styles.openSelectContainer}
                                 keyExtractor={(item, index) => index.toString()}
                                 showsVerticalScrollIndicator={showScrollIndicator}
                                 renderItem={({ item, index }) => (
@@ -103,7 +146,7 @@ export default function Select({
                                                 onValueChange={() => handleSelect(item, index)}
                                             />
                                         )}
-                                        <Text style={styles.menuItemText}>{item.label}</Text>
+                                        {renderItem(item)}
                                     </TouchableOpacity>
                                 )}
                             />

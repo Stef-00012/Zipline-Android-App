@@ -4,8 +4,6 @@ import type { APISettings, ExternalLink, ShortenEmbed, UploadEmbed } from "@/typ
 import { useState, useEffect } from "react";
 import { getSettings, updateSettings } from "@/functions/zipline/settings";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
-import bytes from "bytes";
-import ms from "enhanced-ms";
 import { styles } from "@/styles/admin/settings";
 import { Switch } from "@react-native-material/core";
 import { TextInput } from "react-native";
@@ -13,6 +11,7 @@ import Select from "@/components/Select";
 import { formats } from "@/constants/adminSettings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { defaultUploadEmbed, defaultShortenEmbed } from "@/constants/adminSettings";
+import { convertToBytes, convertToTime } from "@/functions/util";
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");
@@ -58,8 +57,8 @@ export default function ServerSettings() {
 	const [filesRoute, setFilesRoute] = useState<string | undefined>(undefined);
 	const [filesLength, setFilesLength] = useState<number | undefined>(undefined);
 	const [filesDefaultFormat, setFilesDefaultFormat] = useState<
-		"random" | "uuid" | "date" | "name" | "gfycat" | undefined
-	>(undefined);
+		"random" | "uuid" | "date" | "name" | "gfycat"
+	>("random");
 	const [filesDisabledExtensions, setFilesDisabledExtensions] =
 		useState<Array<string> | undefined>(undefined);
 	const [filesMaxFileSize, setFilesMaxFileSize] = useState<string | undefined>(undefined);
@@ -249,50 +248,34 @@ export default function ServerSettings() {
 			setCoreDefaultDomain(settings.coreDefaultDomain);
 			setCoreTempDirectory(settings.coreTempDirectory);
 			setChunksEnabled(settings.chunksEnabled);
-			setChunksMax(
-				typeof settings.chunksMax === "number"
-					? bytes(settings.chunksMax) || ""
-					: settings.chunksMax,
-			);
-			setChunksSize(
-				typeof settings.chunksSize === "number"
-					? bytes(settings.chunksSize) || ""
-					: settings.chunksSize,
-			);
-			setTasksDeleteInterval(
-				typeof settings.tasksDeleteInterval === "number"
-					? ms(settings.tasksDeleteInterval) || ""
-					: settings.tasksDeleteInterval,
-			);
-			setTasksClearInvitesInterval(
-				typeof settings.tasksClearInvitesInterval === "number"
-					? ms(settings.tasksClearInvitesInterval) || ""
-					: settings.tasksClearInvitesInterval,
-			);
-			setTasksMaxViewsInterval(
-				typeof settings.tasksMaxViewsInterval === "number"
-					? ms(settings.tasksMaxViewsInterval) || ""
-					: settings.tasksMaxViewsInterval,
-			);
-			setTasksThumbnailsInterval(
-				typeof settings.tasksThumbnailsInterval === "number"
-					? ms(settings.tasksThumbnailsInterval) || ""
-					: settings.tasksThumbnailsInterval,
-			);
-			setTasksMetricsInterval(
-				typeof settings.tasksMetricsInterval === "number"
-					? ms(settings.tasksMetricsInterval) || ""
-					: settings.tasksMetricsInterval,
-			);
+			setChunksMax(convertToBytes(settings.chunksMax, {
+				unitSeparator: " "
+			}) || "");
+			setChunksSize(convertToBytes(settings.chunksSize, {
+				unitSeparator: " "
+			}) || "");
+			setTasksDeleteInterval(convertToTime(settings.tasksDeleteInterval, {
+				shortFormat: true
+			}) || "");
+			setTasksClearInvitesInterval(convertToTime(settings.tasksClearInvitesInterval, {
+				shortFormat: true
+			}) || "");
+			setTasksMaxViewsInterval(convertToTime(settings.tasksMaxViewsInterval, {
+				shortFormat: true
+			}) || "");
+			setTasksThumbnailsInterval(convertToTime(settings.tasksThumbnailsInterval, {
+				shortFormat: true
+			}) || "");
+			setTasksMetricsInterval(convertToTime(settings.tasksMetricsInterval, {
+				shortFormat: true
+			}) || "");
 			setFilesRoute(settings.filesRoute);
 			setFilesLength(settings.filesLength);
 			setFilesDefaultFormat(settings.filesDefaultFormat);
 			setFilesDisabledExtensions(settings.filesDisabledExtensions);
-			setFilesMaxFileSize(
-				typeof settings.filesMaxFileSize === "number"
-					? bytes(settings.filesMaxFileSize) || undefined
-					: settings.filesMaxFileSize,
-			);
+			setFilesMaxFileSize(convertToBytes(settings.filesMaxFileSize, {
+				unitSeparator: " "
+			}) || undefined);
 			setFilesDefaultExpiration(settings.filesDefaultExpiration || undefined);
 			setFilesAssumeMimetypes(settings.filesAssumeMimetypes);
 			setFilesDefaultDateFormat(settings.filesDefaultDateFormat);
@@ -1059,12 +1042,12 @@ export default function ServerSettings() {
 									data={formats}
 									onSelect={(selectedFormat) =>
 										setFilesDefaultFormat(
-											selectedFormat.value as typeof filesDefaultFormat,
+											selectedFormat[0].value as typeof filesDefaultFormat,
 										)
 									}
 									placeholder="Select format..."
 									defaultValue={formats.find(
-										(format) => format.value === "random",
+										(format) => format.value === filesDefaultFormat,
 									)}
 								/>
 

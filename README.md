@@ -30,10 +30,9 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] Correct "Change Download Folder" not granted message
 - [ ] Move same TextInput component to @/components to avoid typing the same styles over and over again
 - [ ] Create a password input with a button to show/hide the password
-- [ ] Single file view (folder, tags, manage)
+- [ ] Single file view (handle delete, edit, add to all pages other than Home)
 - [ ] check for unused styles
 - [ ] Metrics page
 - [ ] App update checking + update button

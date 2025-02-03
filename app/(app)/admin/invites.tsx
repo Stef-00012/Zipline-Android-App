@@ -58,7 +58,7 @@ export default function Invites() {
 							placeholder="Select Date..."
 							data={dates}
 							onSelect={(selectedDate) => {
-								setNewInviteExpires(selectedDate.value);
+								setNewInviteExpires(selectedDate[0].value);
 							}}
 							defaultValue={dates.find(date => date.value === "never")}
 						/>

@@ -1,5 +1,7 @@
 import mimetypesJSON from "@/assets/mimetypes.json";
 import type { Mimetypes } from "@/types/mimetypes";
+import bytes from "bytes";
+import ms, { type FormatOptions } from "enhanced-ms";
 import * as FileSystem from "expo-file-system";
 
 const mimetypes = mimetypesJSON as Mimetypes;
@@ -96,4 +98,26 @@ export function colorHash(str: string) {
 	}
 
 	return color;
+}
+
+export function convertToBytes(value: string | number, options?: bytes.BytesOptions): string | null {
+	if (typeof value === "number") return bytes(value, options);
+	
+	if (/^\d+(\.\d+)?$/.test(value)) {
+		return bytes(Number.parseFloat(value),options);
+	}
+
+
+	return value;
+}
+
+export function convertToTime(value: string | number, options?: FormatOptions): string | null {
+	if (typeof value === "number") return ms(value);
+	
+	if (/^\d+(\.\d+)?$/.test(value)) {
+		return ms(Number.parseFloat(value), options);
+	}
+
+
+	return value;
 }

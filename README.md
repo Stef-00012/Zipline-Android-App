@@ -33,3 +33,5 @@ This will create an apk but won't automatically install
 - [ ] Metrics page
 - [ ] Single file view
 - [ ] App update checking + update button
+- [ ] Correct "Change Download Folder" not granted message
+- [ ] Move select & checkbox inline styles to @/styles folder

@@ -984,7 +984,7 @@ export default function UserSettings() {
 									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
 
 									if (!permissions.granted) return ToastAndroid.show(
-										"The permission to save the file was not granted",
+										"The permission to the folder was not granted",
 										ToastAndroid.SHORT
 									);
 

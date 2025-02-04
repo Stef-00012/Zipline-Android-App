@@ -49,6 +49,9 @@ export const styles = StyleSheet.create({
     buttonSecondary: {
         backgroundColor: "#323244"
     },
+    buttonDanger: {
+        backgroundColor: "#CF4238"
+    },
     buttonText: {
         textAlign: "center",
         fontWeight: "bold",

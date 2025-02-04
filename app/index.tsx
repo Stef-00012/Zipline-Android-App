@@ -58,7 +58,14 @@ export default function Home() {
 
 	return (
 		<View style={styles.mainContainer}>
-			{focusedFile && <LargeFileDisplay file={focusedFile} onClose={() => setFocusedFile(null)} hidden={!focusedFile} />}
+			{focusedFile && <LargeFileDisplay file={focusedFile} onClose={async (refresh) => {
+				setFocusedFile(null)
+
+				if (refresh) {
+					const newRecentFiles = await getRecentFiles();
+					setRecentFiles(typeof newRecentFiles === "string" ? null : newRecentFiles);
+				}
+			}} hidden={!focusedFile} />}
 
 			{user && stats && recentFiles ? (
 				<ScrollView>

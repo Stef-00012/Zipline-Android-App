@@ -200,8 +200,6 @@ export async function editUser(
 			statusCode: number;
 		} | undefined;
 
-		console.error(data)
-
 		if (data) return data.error
 
 		return "Something went wrong..."

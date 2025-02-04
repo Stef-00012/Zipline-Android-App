@@ -43,9 +43,25 @@ export default function FileDisplay({
 	const router = useRouter()
 	const dashUrl = db.get("url") as DashURL | null;
 
+	const [imageHeight, setImageHeight] = useState<number>(height);
+
+	useEffect(() => {
+		if (autoHeight) {
+			(async () => {
+				const size = await NativeImage.getSize(uri);
+
+				let scaledHeight = (width * size.height) / size.width;
+
+				if (maxHeight && scaledHeight > maxHeight) scaledHeight = maxHeight;
+
+				setImageHeight(scaledHeight);
+			})();
+		}
+	}, [uri, width, maxHeight, autoHeight]);
+
 	if (file) {
 		mimetype = file.type;
-		uri = `${dashUrl}/raw/${file.name}`;
+		uri = (mimetype.startsWith("video/") && file.thumbnail) ? file.thumbnail : `${dashUrl}/raw/${file.name}`;
 		name = file.name;
 		originalName = file.originalName;
 		passwordProtected = file.password
@@ -114,23 +130,7 @@ export default function FileDisplay({
 		"image/svg+xml",
 	];
 
-	const [imageHeight, setImageHeight] = useState<number>(height);
-
-	useEffect(() => {
-		if (autoHeight) {
-			(async () => {
-				const size = await NativeImage.getSize(uri);
-
-				let scaledHeight = (width * size.height) / size.width;
-
-				if (maxHeight && scaledHeight > maxHeight) scaledHeight = maxHeight;
-
-				setImageHeight(scaledHeight);
-			})();
-		}
-	}, [uri, width, maxHeight, autoHeight]);
-
-	if (displayableMimetypes.includes(mimetype))
+	if (displayableMimetypes.includes(mimetype) || (mimetype.startsWith("video/") && file?.thumbnail))
 		return (
 			<Pressable onPress={onPress || onPressDefault}>
 				<Image

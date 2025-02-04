@@ -22,8 +22,11 @@ import { Row, Table } from "react-native-table-component";
 import * as db from "@/functions/database";
 import Popup from "@/components/Popup";
 import { clearTempFiles, clearZeroByteFiles, generateThumbnails, getZeroByteFiles, requeryFileSize } from "@/functions/zipline/serverActions";
+import { useRouter } from "expo-router";
 
 export default function UserSettings() {
+	const router = useRouter()
+
 	useAuth();
 	useShareIntent();
 
@@ -977,27 +980,6 @@ export default function UserSettings() {
 										</View>
 									</ScrollView>
 								</View>
-
-								<Pressable style={{
-									...styles.button,
-									...styles.buttonSecondary
-								}} onPress={async () => {
-									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-									if (!permissions.granted) return ToastAndroid.show(
-										"The permission to the folder was not granted",
-										ToastAndroid.SHORT
-									);
-
-									db.set("exportDownloadPath", permissions.directoryUri)
-
-									ToastAndroid.show(
-										"Successfully changed the folder",
-										ToastAndroid.SHORT
-									)
-								}}>
-									<Text style={styles.buttonText}>Change Download Folder</Text>
-								</Pressable>
 							</View>
 
 							{/* Server Actions */}
@@ -1040,6 +1022,65 @@ export default function UserSettings() {
 										<Text style={styles.buttonText}>Generate Thumbnails</Text>
 									</Pressable>
 								</View>
+							</View>
+
+							{/* App Settings */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>App Settings</Text>
+
+								<Pressable style={{
+									...styles.button,
+									...styles.buttonSecondary
+								}} onPress={async () => {
+									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+									if (!permissions.granted) return ToastAndroid.show(
+										"The permission to the folder was not granted",
+										ToastAndroid.SHORT
+									);
+
+									db.set("exportDownloadPath", permissions.directoryUri)
+
+									ToastAndroid.show(
+										"Successfully changed the folder",
+										ToastAndroid.SHORT
+									)
+								}}>
+									<Text style={styles.buttonText}>Change Export Download Folder</Text>
+								</Pressable>
+
+								<Pressable style={{
+									...styles.button,
+									...styles.buttonSecondary
+								}} onPress={async () => {
+									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+									if (!permissions.granted) return ToastAndroid.show(
+										"The permission to the folder was not granted",
+										ToastAndroid.SHORT
+									);
+
+									db.set("fileDownloadPath", permissions.directoryUri)
+
+									ToastAndroid.show(
+										"Successfully changed the folder",
+										ToastAndroid.SHORT
+									)
+								}}>
+									<Text style={styles.buttonText}>Change File Download Folder</Text>
+								</Pressable>
+
+								<Pressable style={{
+									...styles.button,
+									...styles.buttonDanger
+								}} onPress={async () => {
+									await db.del("url")
+									await db.del("token")
+
+									router.replace("/login")
+								}}>
+									<Text style={styles.buttonText}>Logout</Text>
+								</Pressable>
 							</View>
 						</KeyboardAwareScrollView>
 					</View>

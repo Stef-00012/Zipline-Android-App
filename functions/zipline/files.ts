@@ -2,6 +2,7 @@ import type {
 	APIFile,
 	APIFiles,
 	APISettings,
+	APITag,
 	APIUploadFile,
 } from "@/types/zipline";
 import * as FileSystem from "expo-file-system";
@@ -158,12 +159,13 @@ export async function updateFileTags(
 	}
 }
 
-interface EditFileOptions {
+export interface EditFileOptions {
 	originalName?: string;
-	maxViews?: number;
-	password?: string;
+	maxViews?: number | null;
+	password?: string | null;
 	type?: string;
 	favorite?: boolean;
+	tags?: Array<APITag["id"]>
 }
 // PATCH /api/user/files/[id]
 export async function editFile(

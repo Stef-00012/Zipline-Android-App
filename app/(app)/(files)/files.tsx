@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, TextInput, ToastAndroid, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import type { APITags, APIFiles, DashURL } from "@/types/zipline";
+import type { APITags, APIFiles, DashURL, APIFile } from "@/types/zipline";
 import { getFiles, type GetFilesOptions } from "@/functions/zipline/files";
 import FileDisplay from "@/components/FileDisplay";
 import { styles } from "@/styles/files/files";
@@ -16,6 +16,7 @@ import { createTag, deleteTag, editTag, getTags } from "@/functions/zipline/tags
 import Popup from "@/components/Popup";
 import { isLightColor } from "@/functions/color";
 import { colorHash } from "@/functions/util";
+import LargeFileDisplay from "@/components/LargeFileDisplay";
 
 export default function Files() {
 	const router = useRouter();
@@ -59,55 +60,11 @@ export default function Files() {
 	const [name, setName] = useState<string | null>(null);
 	const [isFolder, setisFolder] = useState<boolean>(false)
 
+	const [focusedFile, setFocusedFile] = useState<APIFile | null>(null)
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
 	useEffect(() => {
-		(async () => {
-			const tags = await getTags()
-
-			setTags(typeof tags === "string" ? null : tags)
-
-			if (searchParams.folderId) {
-				const folder = await getFolder(searchParams.folderId)
-
-				if (typeof folder === "string") return router.replace("/+not-found");
-
-				setName(folder.name)
-
-				setisFolder(true)
-				return setFiles({
-					page: folder.files,
-					pages: 1,
-					total: folder.files.length
-				})
-			}
-
-			let fetchPage = page;
-
-			if (searchParams.page && Number.parseInt(searchParams.page) > 0) {
-				fetchPage = searchParams.page;
-
-				setPage(fetchPage);
-			}
-
-			const fetchOptions: GetFilesOptions = {
-				favorite: favorites
-			}
-
-			if (searchParams.id) {
-				const user = await getUser(searchParams.id)
-
-				if (typeof user === "string") return router.replace("/+not-found")
-
-				fetchOptions.id = user.id
-				setName(user.username)
-			}
-
-			const files = await getFiles(fetchPage, fetchOptions);
-
-			if (typeof files !== "string" && (files?.pages || 1) > 1) setAllPageDisabled(false);
-
-			setFiles(typeof files === "string" ? null : files);
-		})();
+		changePage()
 	}, [page, favorites, searchParams.page]);
 
 	const hexRegex = /^#([0-9a-f]{6}|[0-9a-f]{3})$/i
@@ -119,8 +76,64 @@ export default function Files() {
 		}
 	}, [tagToEdit])
 
+	async function changePage() {
+		const tags = await getTags()
+
+		setTags(typeof tags === "string" ? null : tags)
+
+		if (searchParams.folderId) {
+			const folder = await getFolder(searchParams.folderId)
+
+			if (typeof folder === "string") return router.replace("/+not-found");
+
+			setName(folder.name)
+
+			setisFolder(true)
+			return setFiles({
+				page: folder.files,
+				pages: 1,
+				total: folder.files.length
+			})
+		}
+
+		let fetchPage = page;
+
+		if (searchParams.page && Number.parseInt(searchParams.page) > 0) {
+			fetchPage = searchParams.page;
+
+			setPage(fetchPage);
+		}
+
+		const fetchOptions: GetFilesOptions = {
+			favorite: favorites
+		}
+
+		if (searchParams.id) {
+			const user = await getUser(searchParams.id)
+
+			if (typeof user === "string") return router.replace("/+not-found")
+
+			fetchOptions.id = user.id
+			setName(user.username)
+		}
+
+		const files = await getFiles(fetchPage, fetchOptions);
+
+		if (typeof files !== "string" && (files?.pages || 1) > 1) setAllPageDisabled(false);
+
+		setFiles(typeof files === "string" ? null : files);
+	}
+
 	return (
 		<View style={styles.mainContainer}>
+			{focusedFile && <LargeFileDisplay file={focusedFile} onClose={async (refresh) => {
+				setFocusedFile(null)
+
+				if (refresh) {
+					changePage()
+				}
+			}} hidden={!focusedFile} />}
+
 			<View style={styles.mainContainer}>
 				<Popup hidden={!tagsMenuOpen} onClose={() => {
 					setTagsMenuOpen(false)
@@ -464,6 +477,7 @@ export default function Files() {
 										autoHeight
 										passwordProtected={file.password}
 										file={file}
+										onPress={() => setFocusedFile(file)}
 									/>
 								</View>
 							))}

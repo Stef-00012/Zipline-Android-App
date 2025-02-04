@@ -72,8 +72,8 @@ export default function UploadText({
 	const [fileName, setFileName] = useState<UploadFileOptions["filename"]>();
 	const [password, setPassword] = useState<UploadFileOptions["password"]>();
 	const [folder, setFolder] = useState<UploadFileOptions["folder"]>();
-	const [fileType, setFileType] = useState<string>();
-	const [fileExtension, setFileExtension] = useState<string>();
+	const [fileType, setFileType] = useState<string>("text/x-zipline-plain");
+	const [fileExtension, setFileExtension] = useState<string>("txt");
 
 	const [folders, setFolders] = useState<
 		Array<{
@@ -281,7 +281,7 @@ export default function UploadText({
 							const fileURI = newSelectedFiles.uri
 
 							const extension = fileURI.split(".").pop() || "txt"
-							const mimetype = guessMimetype(extension as keyof Mimetypes)
+							const mimetype = avaibleTextMimetypes.find(format => format.value === extension)?.mimetype as string || guessMimetype(extension as keyof Mimetypes)
 
 							const base64 = await FileSystem.readAsStringAsync(fileURI, {
 								encoding: FileSystem.EncodingType.Base64,
@@ -323,8 +323,11 @@ export default function UploadText({
 					data={avaibleTextMimetypes}
 					placeholder="Select File Type..."
 					disabled={uploading}
-					defaultValue={avaibleTextMimetypes.find(mimetype => mimetype.value === "txt")}
-					onSelect={(selectedType) => setFileType(selectedType[0].value)}
+					defaultValue={avaibleTextMimetypes.find(format => format.value === "txt")}
+					onSelect={(selectedType) => {
+						setFileType(selectedType[0].mimetype as string)
+						setFileExtension(selectedType[0].value)
+					}}
 				/>
 
 				<Text

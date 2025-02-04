@@ -15,7 +15,6 @@ export const styles = StyleSheet.create({
         width: "90%",
         margin: "auto",
         backgroundColor: "#0c101c",
-        // alignItems: "center",
         borderRadius: 15,
         padding: 10,
     },
@@ -118,5 +117,71 @@ export const styles = StyleSheet.create({
         width: "100%",
         fontFamily: "monospace",
         textAlignVertical: "top",
-    }
+    },
+    popupContent: {
+        height: "auto",
+        width: "100%"
+    },
+    mainHeaderText: {
+        fontSize: 22,
+        fontWeight: "bold",
+        color: "white",
+    },
+    serverActionWarningText: {
+        marginTop: 10,
+        color: "white"
+    },
+    fileDeleteButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    fileDeleteButtonDanger: {
+        backgroundColor: "#CF4238"
+    },
+    fileDeleteButtonCancel: {
+        backgroundColor: "#181c28"
+    },
+    button: {
+        backgroundColor: "#323ea8",
+        padding: 10,
+        marginTop: 10,
+        borderRadius: 6,
+        justifyContent: "center"
+    },
+    buttonDanger: {
+        backgroundColor: "#CF4238"
+    },
+    buttonText: {
+        textAlign: "center",
+        fontWeight: "bold",
+        color: "white",
+    },
+    popupSubHeaderText: {
+        marginTop: 10,
+        marginLeft: 10,
+		fontSize: 13,
+		fontWeight: "bold",
+		color: "gray",
+    },
+    popupHeaderText: {
+        marginTop: 10,
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "white",
+    },
+    popupHeaderTextDanger: {
+        color: "#CF4238"
+    },
+    textInput: {
+		width: "100%",
+		borderWidth: 2,
+		borderColor: "#222c47",
+		margin: "auto",
+		color: "white",
+		height: 40,
+		paddingHorizontal: 10,
+		fontSize: 15,
+		borderRadius: 6,
+		marginTop: 5,
+	},
 })

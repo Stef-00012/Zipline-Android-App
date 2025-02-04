@@ -30,9 +30,10 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [ ] Move same TextInput component to @/components to avoid typing the same styles over and over again
-- [ ] Create a password input with a button to show/hide the password
+- [ ] Change type for TextInput `type`
+- [x] Move same TextInput component to @/components to avoid typing the same styles over and over again
+- [x] Create a password input with a button to show/hide the password
+- [ ] Replace TextInputs with custom one
 - [ ] check for unused styles
 - [ ] Metrics page
 - [ ] App update checking + update button
-test tmp

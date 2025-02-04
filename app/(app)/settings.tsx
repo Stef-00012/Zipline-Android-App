@@ -23,6 +23,7 @@ import * as db from "@/functions/database";
 import Popup from "@/components/Popup";
 import { clearTempFiles, clearZeroByteFiles, generateThumbnails, getZeroByteFiles, requeryFileSize } from "@/functions/zipline/serverActions";
 import { useRouter } from "expo-router";
+import CustomTextInput from "@/components/TextInput"
 
 export default function UserSettings() {
 	const router = useRouter()
@@ -434,7 +435,7 @@ export default function UserSettings() {
 								<Text style={styles.headerText}>User Info</Text>
                                 <Text style={styles.subHeaderText}>{user.id}</Text>
 
-								<Text style={styles.inputHeader}>Token:</Text>
+								{/*<Text style={styles.inputHeader}>Token:</Text>
 								<View style={styles.inputContainer}>
 									<Pressable style={styles.copyInputContainer} onPress={() => setTokenVisible(true)}>
 										<TextInput
@@ -454,15 +455,40 @@ export default function UserSettings() {
 									}}>
                                         <MaterialIcons name="content-copy" color="white" size={15} />
                                     </Pressable>
-                                </View>
+                                </View>*/}
+                                
+                                <Pressable onPress={() => {
+                                    setTokenVisible(true)
+                                }}>
+                                    <CustomTextInput
+    								    title="Token:"
+    								    showDisabledStyle={false}
+    								    disabled
+    								    disableContext
+    								    onValueChange={(content) => setUsername(content)}
+    								    value={tokenVisible ? token : "[Click to Reveal]"}
+    								    copy
+    								    onCopy={() => {
+    								        Clipboard.setStringAsync(token)
+    								    }}
+    								/>
+                                </Pressable>
 
-								<Text style={styles.inputHeader}>Username:</Text>
+								{/* <Text style={styles.inputHeader}>Username:</Text>
 								<TextInput
 									style={styles.textInput}
 									onChangeText={(content) => setUsername(content)}
 									value={username || ""}
 									placeholderTextColor="#222c47"
 									placeholder="My Cool Username"
+								/> */}
+								
+								<CustomTextInput
+								    title="Username:"
+								    onValueChange={(content) => setUsername(content)}
+								    placeholder="My Cool Username"
+								    value={username || ""}
+								    password
 								/>
 
 								<Text style={styles.inputHeader}>Password:</Text>

@@ -13,11 +13,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 interface Props {
 	value?: string;
 	title?: string;
-	onPasswordToggle: (visibile: boolean) => void | Promise<void>;
-	onCopy: () => void | Promise<void>;
-	onValueChange: (newValue: string) => void | Promise<void>;
+	onPasswordToggle?: (visibile: boolean) => void | Promise<void>;
+	onCopy?: () => void | Promise<void>;
+	onValueChange?: (newValue: string) => void | Promise<void>;
 	disabled?: boolean;
 	disableContext?: boolean;
+	showDisabledStyle?: boolean;
 	password?: boolean;
 	type?:
 		| "default"
@@ -45,12 +46,15 @@ interface Props {
 	>;
 }
 
+const sideButtonSize = 17
+
 export default function ZiplineTextInput({
 	value,
 	onValueChange = () => {},
 	onPasswordToggle = () => {},
 	onCopy = () => {},
 	disabled = false,
+	showDisabledStyle = true,
 	disableContext = false,
 	title,
 	password = false,
@@ -69,7 +73,7 @@ export default function ZiplineTextInput({
 					<Text
 						style={{
 							...styles.inputHeader,
-							...(disabled && styles.inputHeaderDisabled),
+							...((disabled && showDisabledStyle) && styles.inputHeaderDisabled),
 						}}
 					>
 						{title}
@@ -82,7 +86,7 @@ export default function ZiplineTextInput({
 						style={{
 							...styles.textInput,
 							...styles.textInputSideButton,
-							...(disabled && styles.textInputDisabled),
+							...((disabled && showDisabledStyle) && styles.textInputDisabled),
 						}}
 						editable={!disabled}
 						contextMenuHidden={disableContext}
@@ -103,9 +107,9 @@ export default function ZiplineTextInput({
 						}}
 					>
 						<MaterialIcons
-							name={displayPassword ? "visibility" : "visibility-off"}
+							name={displayPassword ? "visibility-off" : "visibility"}
 							color="white"
-							size={15}
+							size={sideButtonSize}
 						/>
 					</Pressable>
 				</View>
@@ -128,7 +132,6 @@ export default function ZiplineTextInput({
 				<View style={styles.inputContainer}>
 					<TextInput
 						{...props}
-						secureTextEntry={true}
 						style={{
 							...styles.textInput,
 							...styles.textInputSideButton,
@@ -152,9 +155,9 @@ export default function ZiplineTextInput({
 						}}
 					>
 						<MaterialIcons
-							name={displayPassword ? "visibility" : "visibility-off"}
+							name="content-copy"
 							color="white"
-							size={15}
+							size={sideButtonSize}
 						/>
 					</Pressable>
 				</View>
@@ -175,7 +178,6 @@ export default function ZiplineTextInput({
 			)}
 			<TextInput
 				{...props}
-				secureTextEntry={true}
 				style={{
 					...styles.textInput,
 					...(disabled && styles.textInputDisabled),

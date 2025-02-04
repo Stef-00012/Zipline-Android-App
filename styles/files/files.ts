@@ -63,6 +63,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		padding: 10,
 		height: 40,
+		width: 70,
 		backgroundColor: "#010124",
 		color: "white",
 		margin: 5,

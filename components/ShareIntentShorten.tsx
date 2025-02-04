@@ -1,14 +1,13 @@
-import { isAuthenticated } from "@/functions/zipline/auth";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View, ToastAndroid } from "react-native";
+import { Pressable, Text, View, ToastAndroid } from "react-native";
 import { createURL, type CreateURLParams } from "@/functions/zipline/urls";
 import * as Clipboard from "expo-clipboard";
 import { styles } from "@/styles/components/shareIntentShorten";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useShareIntentContext } from "expo-share-intent";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import TextInput from "./TextInput";
 
 interface Props {
     defaultUrl: string
@@ -58,48 +57,41 @@ export default function ShareIntentShorten({
 
 				{error && <Text style={styles.errorText}>{error}</Text>}
 
-				<Text style={styles.headerText}>URL:</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => {
+					title="URL:"
+					onValueChange={(content) => {
 						setUrl(content || null);
 					}}
 					value={url || ""}
+					keyboardType="url"
 					placeholder="https://google.com"
-					placeholderTextColor="#222c47"
 				/>
 
-				<Text style={styles.headerText}>Vanity:</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => {
+					title="Vanity:"
+					onValueChange={(content) => {
 						setVanity(content || null);
 					}}
 					value={vanity || ""}
 					placeholder="google"
-					placeholderTextColor="#222c47"
 				/>
 
-				<Text style={styles.headerText}>Max Views:</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => {
+					title="Max Views:"
+					onValueChange={(content) => {
 						setMaxViews(content || null);
 					}}
 					value={maxViews || ""}
 					placeholder="0"
-					placeholderTextColor="#222c47"
 				/>
 
-				<Text style={styles.headerText}>Password:</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => {
+					title="Password:"
+					onValueChange={(content) => {
 						setPassword(content || null);
 					}}
 					value={password || ""}
 					placeholder="myPassword"
-					placeholderTextColor="#222c47"
 				/>
 
 				<Pressable
@@ -146,12 +138,10 @@ export default function ShareIntentShorten({
 
 				{outputUtl && (
 					<View>
-						<Text style={styles.headerText}>Shortened URL:</Text>
 						<TextInput
-							style={styles.textInput}
+							title="Shortened URL:"
 							value={outputUtl}
 							showSoftInputOnFocus={false}
-							placeholderTextColor="#222c47"
 						/>
 					</View>
 				)}

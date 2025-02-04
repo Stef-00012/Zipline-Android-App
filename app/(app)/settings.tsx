@@ -4,8 +4,6 @@ import type { APIExports, APISelfUser, DashURL } from "@/types/zipline";
 import { useState, useEffect } from "react";
 import { View, Text, Pressable, ToastAndroid, ScrollView } from "react-native";
 import { styles } from "@/styles/settings";
-import { Switch } from "@react-native-material/core";
-import { TextInput } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { editCurrentUser, type EditUserOptions, getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -23,7 +21,8 @@ import * as db from "@/functions/database";
 import Popup from "@/components/Popup";
 import { clearTempFiles, clearZeroByteFiles, generateThumbnails, getZeroByteFiles, requeryFileSize } from "@/functions/zipline/serverActions";
 import { useRouter } from "expo-router";
-import CustomTextInput from "@/components/TextInput"
+import TextInput from "@/components/TextInput"
+import Switch from "@/components/Switch";
 
 export default function UserSettings() {
 	const router = useRouter()
@@ -267,35 +266,19 @@ export default function UserSettings() {
 
 						<Text style={styles.serverActionWarningText}>This will requery the size of every file stored within the database. Additionally you can use the options below.</Text>
 
-						<View style={styles.switchContainer}>
-							<Switch
-								value={requerySizeForceUpdate || false}
-								onValueChange={() =>
-									setRequerySizeForceUpdate((prev) => !prev)
-								}
-								thumbColor={requerySizeForceUpdate ? "#2e3e6b" : "#222c47"}
-								trackColor={{
-									true: "#21273b",
-									false: "#181c28",
-								}}
-							/>
-							<Text style={styles.switchText}>Force Update</Text>
-						</View>
+						<Switch
+							title="Force Update"
+							value={requerySizeForceUpdate || false}
+							onValueChange={() => setRequerySizeForceUpdate((prev) => !prev)}
+						/>
 
-						<View style={styles.switchContainer}>
-							<Switch
-								value={requerySizeForceDelete || false}
-								onValueChange={() =>
-									setRequerySizeForceDelete((prev) => !prev)
-								}
-								thumbColor={requerySizeForceDelete ? "#2e3e6b" : "#222c47"}
-								trackColor={{
-									true: "#21273b",
-									false: "#181c28",
-								}}
-							/>
-							<Text style={styles.switchText}>Force Delete</Text>
-						</View>
+						<Switch
+							title="Force Delete"
+							value={requerySizeForceDelete || false}
+							onValueChange={() =>
+								setRequerySizeForceDelete((prev) => !prev)
+							}
+						/>
 
 						<View style={styles.manageServerActionButtonsContainer}>
 							<Pressable style={{
@@ -359,20 +342,13 @@ export default function UserSettings() {
 
 						<Text style={styles.serverActionWarningText}>This will generate thumbnails for all files that do not have a thumbnail set. Additionally you can use the options below.</Text>
 
-						<View style={styles.switchContainer}>
-							<Switch
-								value={generateThumbnailsRerun || false}
-								onValueChange={() =>
-									setGenerateThumbnailsRerun((prev) => !prev)
-								}
-								thumbColor={generateThumbnailsRerun ? "#2e3e6b" : "#222c47"}
-								trackColor={{
-									true: "#21273b",
-									false: "#181c28",
-								}}
-							/>
-							<Text style={styles.switchText}>Re-run</Text>
-						</View>
+						<Switch
+							title="Re-run"
+							value={generateThumbnailsRerun || false}
+							onValueChange={() =>
+								setGenerateThumbnailsRerun((prev) => !prev)
+							}
+						/>
 
 						<View style={styles.manageServerActionButtonsContainer}>
 							<Pressable style={{
@@ -435,71 +411,35 @@ export default function UserSettings() {
 								<Text style={styles.headerText}>User Info</Text>
                                 <Text style={styles.subHeaderText}>{user.id}</Text>
 
-								{/*<Text style={styles.inputHeader}>Token:</Text>
-								<View style={styles.inputContainer}>
-									<Pressable style={styles.copyInputContainer} onPress={() => setTokenVisible(true)}>
-										<TextInput
-											editable={false}
-											pointerEvents="none"
-											style={styles.textInput}
-											value={tokenVisible ? token : "[Click to Reveal]"}
-											placeholderTextColor="#222c47"
-											placeholder="example.com"
-										/>
-									</Pressable>
-                                    <Pressable onPress={() => {
-										Clipboard.setStringAsync(token)
-									}} style={{
-										...styles.button,
-										...styles.copyButton
-									}}>
-                                        <MaterialIcons name="content-copy" color="white" size={15} />
-                                    </Pressable>
-                                </View>*/}
-                                
                                 <Pressable onPress={() => {
                                     setTokenVisible(true)
                                 }}>
-                                    <CustomTextInput
-    								    title="Token:"
-    								    showDisabledStyle={false}
-    								    disabled
-    								    disableContext
-    								    onValueChange={(content) => setUsername(content)}
-    								    value={tokenVisible ? token : "[Click to Reveal]"}
-    								    copy
-    								    onCopy={() => {
-    								        Clipboard.setStringAsync(token)
-    								    }}
-    								/>
+									<TextInput
+										title="Token:"
+										showDisabledStyle={false}
+										disabled
+										disableContext
+										value={tokenVisible ? token : "[Click to Reveal]"}
+										onSideButtonPress={() => {
+											Clipboard.setStringAsync(token)
+										}}
+										sideButtonIcon="content-copy"
+									/>
                                 </Pressable>
-
-								{/* <Text style={styles.inputHeader}>Username:</Text>
-								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setUsername(content)}
-									value={username || ""}
-									placeholderTextColor="#222c47"
-									placeholder="My Cool Username"
-								/> */}
 								
-								<CustomTextInput
-								    title="Username:"
-								    onValueChange={(content) => setUsername(content)}
-								    placeholder="My Cool Username"
-								    value={username || ""}
-								    password
+								<TextInput
+									title="Username:"
+									onValueChange={(content) => setUsername(content)}
+									placeholder="My Cool Username"
+									value={username || ""}
 								/>
 
-								<Text style={styles.inputHeader}>Password:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setPassword(content)}
+									title="Password:"
+									onValueChange={(content) => setPassword(content)}
+									placeholder="myPassword123"
 									value={password || ""}
-									secureTextEntry={true}
-									keyboardType="visible-password"
-									placeholderTextColor="#222c47"
-									placeholder="My Cool Username"
+									password
 								/>
 
 								<Pressable style={styles.button} onPress={() => handleSave("userInfo")}>
@@ -510,7 +450,6 @@ export default function UserSettings() {
 							{/* Avatar */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Avatar</Text>
-                                <Text style={styles.subHeaderText}>{user.id}</Text>
 
 								<Text style={styles.headerText}>Avatar:</Text>
 								<Pressable style={styles.avatarButton} onPress={async () => {
@@ -636,56 +575,30 @@ export default function UserSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Viewing Files</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={viewEnabled || false}
-										onValueChange={() =>
-											setViewEnabled((prev) => !prev)
-										}
-										thumbColor={viewEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Enable View Routes</Text>
-								</View>
+								<Switch
+									title="Enable View Routes"
+									value={viewEnabled || false}
+									onValueChange={() =>
+										setViewEnabled((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										disabled={!viewEnabled}
-										value={viewShowMimetype || false}
-										onValueChange={() =>
-											setViewShowMimetype((prev) => !prev)
-										}
-										thumbColor={viewShowMimetype ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={{
-										...styles.switchText,
-										...(!viewEnabled && styles.inputHeaderDisabled)
-									}}>Show Mimetype</Text>
-								</View>
+								<Switch
+									title="Show Mimetype"
+									disabled={!viewEnabled}
+									value={viewShowMimetype || false}
+									onValueChange={() =>
+										setViewShowMimetype((prev) => !prev)
+									}
+								/>
 
-								<Text style={{
-									...styles.inputHeader,
-									...(!viewEnabled && styles.inputHeaderDisabled)
-								}}>View Content:</Text>
 								<TextInput
-									style={{
-										...styles.textInput,
-										...styles.multilneTextInput,
-										...(!viewEnabled && styles.textInputDisabled)
-									}}
-									editable={viewEnabled}
-									contextMenuHidden={!viewEnabled}
+									title="View Content:"
+									disabled={!viewEnabled}
+									disableContext={!viewEnabled}
 									multiline
-									onChangeText={(content) => setViewContent(content)}
+									onValueChange={(content) => setViewContent(content)}
 									value={viewContent || ""}
-									placeholderTextColor="#222c47"
 									placeholder="This is my file"
 								/>
 
@@ -707,90 +620,48 @@ export default function UserSettings() {
 									)}
 								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										disabled={!(viewEmbed || viewEnabled)}
-										value={viewEmbed || false}
-										onValueChange={() =>
-											setViewEmbed((prev) => !prev)
-										}
-										thumbColor={viewEmbed ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={{
-										...styles.switchText,
-										...(!viewEnabled && styles.inputHeaderDisabled)
-									}}>Embed</Text>
-								</View>
+								<Switch
+									title="Embed"
+									disabled={!viewEmbed || !viewEnabled}
+									value={viewEmbed || false}
+									onValueChange={() =>
+										setViewEmbed((prev) => !prev)
+									}
+								/>
 
-								<Text style={{
-									...styles.inputHeader,
-									...((!viewEmbed || !viewEnabled) && styles.inputHeaderDisabled)
-								}}>Embed Title:</Text>
 								<TextInput
-									style={{
-										...styles.textInput,
-										...((!viewEmbed || !viewEnabled) && styles.textInputDisabled)
-									}}
-									editable={(viewEmbed && viewEnabled)}
-									contextMenuHidden={!(viewEmbed && viewEnabled)}
-									onChangeText={(content) => setViewEmbedTitle(content)}
+									title="Embed Title:"
+									disabled={!viewEmbed || !viewEnabled}
+									disableContext={!viewEmbed || !viewEnabled}
+									onValueChange={(content) => setViewEmbedTitle(content)}
 									value={viewEmbedTitle || ""}
-									placeholderTextColor="#222c47"
 									placeholder="My Cool Title"
 								/>
 
-								<Text style={{
-									...styles.inputHeader,
-									...((!viewEmbed || !viewEnabled) && styles.inputHeaderDisabled)
-								}}>Embed Description:</Text>
 								<TextInput
-									style={{
-										...styles.textInput,
-										...((!viewEmbed || !viewEnabled) && styles.textInputDisabled)
-									}}
-									editable={(viewEmbed && viewEnabled)}
-									contextMenuHidden={!(viewEmbed && viewEnabled)}
-									onChangeText={(content) => setViewEmbedDescription(content)}
+									title="Embed Description:"
+									disabled={!viewEmbed || !viewEnabled}
+									disableContext={!viewEmbed || !viewEnabled}
+									onValueChange={(content) => setViewEmbedDescription(content)}
 									value={viewEmbedDescription || ""}
-									placeholderTextColor="#222c47"
 									placeholder="My Cool Description"
 								/>
 
-								<Text style={{
-									...styles.inputHeader,
-									...((!viewEmbed || !viewEnabled) && styles.inputHeaderDisabled)
-								}}>Embed Site Name:</Text>
 								<TextInput
-									style={{
-										...styles.textInput,
-										...((!viewEmbed || !viewEnabled) && styles.textInputDisabled)
-									}}
-									editable={(viewEmbed && viewEnabled)}
-									contextMenuHidden={!(viewEmbed && viewEnabled)}
-									onChangeText={(content) => setViewEmbedSiteName(content)}
+									title="Embed Site Name:"
+									disableContext={!viewEmbed || !viewEnabled}
+									disabled={!viewEmbed || !viewEnabled}
+									onValueChange={(content) => setViewEmbedSiteName(content)}
 									value={viewEmbedSiteName || ""}
-									placeholderTextColor="#222c47"
 									placeholder="My Cool Site Name"
 								/>
 
-								<Text style={{
-									...styles.inputHeader,
-									...((!viewEmbed || !viewEnabled) && styles.inputHeaderDisabled)
-								}}>Embed Color:</Text>
 								<TextInput
-									style={{
-										...styles.textInput,
-										...((!viewEmbed || !viewEnabled) && styles.textInputDisabled)
-									}}
-									editable={(viewEmbed && viewEnabled)}
-									contextMenuHidden={!(viewEmbed && viewEnabled)}
-									onChangeText={(content) => setViewEmbedColor(content)}
+									title="Embed Color:"
+									disableContext={!viewEmbed || !viewEnabled}
+									disabled={!viewEmbed || !viewEnabled}
+									onValueChange={(content) => setViewEmbedColor(content)}
 									value={viewEmbedColor || ""}
-									placeholderTextColor="#222c47"
 									placeholder="My Cool Color"
 								/>
 

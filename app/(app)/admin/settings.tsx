@@ -5,13 +5,13 @@ import { useState, useEffect } from "react";
 import { getSettings, updateSettings } from "@/functions/zipline/settings";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { styles } from "@/styles/admin/settings";
-import { Switch } from "@react-native-material/core";
-import { TextInput } from "react-native";
 import Select from "@/components/Select";
 import { formats } from "@/constants/adminSettings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { defaultUploadEmbed, defaultShortenEmbed } from "@/constants/adminSettings";
 import { convertToBytes, convertToTime } from "@/functions/util";
+import TextInput from "@/components/TextInput";
+import Switch from "@/components/Switch";
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");
@@ -613,37 +613,26 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Core</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={coreReturnHttpsUrls || false}
-										onValueChange={() =>
-											setCoreReturnHttpsUrls((prev) => !prev)
-										}
-										thumbColor={coreReturnHttpsUrls ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Return HTTPS URLs</Text>
-								</View>
+								<Switch
+									title="Return HTTPS URLs"
+									value={coreReturnHttpsUrls || false}
+									onValueChange={() =>
+										setCoreReturnHttpsUrls((prev) => !prev)
+									}
+								/>
 
-								<Text style={styles.inputHeader}>Default Domain:</Text>
 								<TextInput
+									title="Default Domain:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setCoreDefaultDomain(content)}
+									onValueChange={(content) => setCoreDefaultDomain(content)}
 									value={coreDefaultDomain || ""}
-									placeholderTextColor="#222c47"
 									placeholder="example.com"
 								/>
 
-								<Text style={styles.inputHeader}>Temporary Directory:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setCoreTempDirectory(content)}
+									title="Temporary Directory:"
+									onValueChange={(content) => setCoreTempDirectory(content)}
 									value={coreTempDirectory || ""}
-									placeholderTextColor="#222c47"
 									placeholder="/tmp/zipline"
 								/>
 
@@ -656,34 +645,23 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Chunks</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={chunksEnabled || false}
-										onValueChange={() => setChunksEnabled((prev) => !prev)}
-										thumbColor={chunksEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Enable Chunks</Text>
-								</View>
+								<Switch
+									title="Enable Chunks"
+									value={chunksEnabled || false}
+									onValueChange={() => setChunksEnabled((prev) => !prev)}
+								/>
 
-								<Text style={styles.inputHeader}>Max Chunk Size:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setChunksMax(content)}
+									title="Max Chunk Size:"
+									onValueChange={(content) => setChunksMax(content)}
 									value={chunksMax || ""}
-									placeholderTextColor="#222c47"
 									placeholder="95mb"
 								/>
 
-								<Text style={styles.inputHeader}>Chunk Size:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setChunksSize(content)}
+									title="Chunk Size:"
+									onValueChange={(content) => setChunksSize(content)}
 									value={chunksSize || ""}
-									placeholderTextColor="#222c47"
 									placeholder="25mb"
 								/>
 
@@ -696,43 +674,35 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Tasks</Text>
 
-								<Text style={styles.inputHeader}>Delete Files Interval:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setTasksDeleteInterval(content)}
+									title="Delete Files Interval:"
+									onValueChange={(content) => setTasksDeleteInterval(content)}
 									value={tasksDeleteInterval || ""}
-									placeholderTextColor="#222c47"
 									placeholder="30m"
 								/>
 
-								<Text style={styles.inputHeader}>Clear Invites Interval:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) =>
+									title="Clear Invites Interval:"
+									onValueChange={(content) =>
 										setTasksClearInvitesInterval(content)
 									}
 									value={tasksClearInvitesInterval || ""}
-									placeholderTextColor="#222c47"
 									placeholder="30m"
 								/>
 
-								<Text style={styles.inputHeader}>Max Views Interval:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setTasksMaxViewsInterval(content)}
+									title="Max Views Interval:"
+									onValueChange={(content) => setTasksMaxViewsInterval(content)}
 									value={tasksMaxViewsInterval || ""}
-									placeholderTextColor="#222c47"
 									placeholder="30m"
 								/>
 
-								<Text style={styles.inputHeader}>Thumbnail Interval:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) =>
+									title="Thumbnail Interval:"
+									onValueChange={(content) =>
 										setTasksThumbnailsInterval(content)
 									}
 									value={tasksThumbnailsInterval || ""}
-									placeholderTextColor="#222c47"
 									placeholder="5m"
 								/>
 
@@ -747,38 +717,22 @@ export default function ServerSettings() {
 									Multi-Factor Authentication
 								</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={mfaPasskeys || false}
-										onValueChange={() => setMfaPasskeys((prev) => !prev)}
-										thumbColor={mfaPasskeys ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Passkeys</Text>
-								</View>
+								<Switch
+									title="Passkeys"
+									value={mfaPasskeys || false}
+									onValueChange={() => setMfaPasskeys((prev) => !prev)}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={mfaTotpEnabled || false}
-										onValueChange={() => setMfaTotpEnabled((prev) => !prev)}
-										thumbColor={mfaTotpEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Enable TOTP</Text>
-								</View>
+								<Switch
+									title="Enable TOTP"
+									value={mfaTotpEnabled || false}
+									onValueChange={() => setMfaTotpEnabled((prev) => !prev)}
+								/>
 
-								<Text style={styles.inputHeader}>Issuer:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setMfaTotpIssuer(content)}
+									title="Issuer:"
+									onValueChange={(content) => setMfaTotpIssuer(content)}
 									value={mfaTotpIssuer || ""}
-									placeholderTextColor="#222c47"
 									placeholder="Zipline"
 								/>
 
@@ -791,179 +745,88 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Features</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresImageCompression || false}
-										onValueChange={() =>
-											setFeaturesImageCompression((prev) => !prev)
-										}
-										thumbColor={
-											featuresImageCompression ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Image Compression</Text>
-								</View>
+								<Switch
+									title="Image Compression"
+									value={featuresImageCompression || false}
+									onValueChange={() =>
+										setFeaturesImageCompression((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresRobotsTxt || false}
-										onValueChange={() => setFeaturesRobotsTxt((prev) => !prev)}
-										thumbColor={featuresRobotsTxt ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>/robots.txt</Text>
-								</View>
+								<Switch
+									title="/robots.txt"
+									value={featuresRobotsTxt || false}
+									onValueChange={() => setFeaturesRobotsTxt((prev) => !prev)}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresHealthcheck || false}
-										onValueChange={() =>
-											setFeaturesHealthcheck((prev) => !prev)
-										}
-										thumbColor={featuresHealthcheck ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Healthcheck</Text>
-								</View>
+								<Switch
+									title="Healthcheck"
+									value={featuresHealthcheck || false}
+									onValueChange={() =>
+										setFeaturesHealthcheck((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresUserRegistration || false}
-										onValueChange={() =>
-											setFeaturesUserRegistration((prev) => !prev)
-										}
-										thumbColor={
-											featuresUserRegistration ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>User Registration</Text>
-								</View>
+								<Switch
+									title="User Registration"
+									value={featuresUserRegistration || false}
+									onValueChange={() =>
+										setFeaturesUserRegistration((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresOauthRegistration || false}
-										onValueChange={() =>
-											setFeaturesOauthRegistration((prev) => !prev)
-										}
-										thumbColor={
-											featuresOauthRegistration ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>OAuth Registration</Text>
-								</View>
+								<Switch
+									title="OAuth Registration"
+									value={featuresOauthRegistration || false}
+									onValueChange={() =>
+										setFeaturesOauthRegistration((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresDeleteOnMaxViews || false}
-										onValueChange={() =>
-											setFeaturesDeleteOnMaxViews((prev) => !prev)
-										}
-										thumbColor={
-											featuresDeleteOnMaxViews ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Delete on Max Views</Text>
-								</View>
+								<Switch
+									title="Delete on Max Views"
+									value={featuresDeleteOnMaxViews || false}
+									onValueChange={() =>
+										setFeaturesDeleteOnMaxViews((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresMetricsEnabled || false}
-										onValueChange={() =>
-											setFeaturesMetricsEnabled((prev) => !prev)
-										}
-										thumbColor={featuresMetricsEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Enable Metrics</Text>
-								</View>
+								<Switch
+									title="Enable Metrics"
+									value={featuresMetricsEnabled || false}
+									onValueChange={() =>
+										setFeaturesMetricsEnabled((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresMetricsAdminOnly || false}
-										onValueChange={() =>
-											setFeaturesMetricsAdminOnly((prev) => !prev)
-										}
-										thumbColor={
-											featuresMetricsAdminOnly ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Admin Only Metrics</Text>
-								</View>
+								<Switch
+									title="Admin Only Metrics"
+									value={featuresMetricsAdminOnly || false}
+									onValueChange={() =>
+										setFeaturesMetricsAdminOnly((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresMetricsShowUserSpecific || false}
-										onValueChange={() =>
-											setFeaturesMetricsShowUserSpecific((prev) => !prev)
-										}
-										thumbColor={
-											featuresMetricsShowUserSpecific ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>
-										Show User Specific Metrics
-									</Text>
-								</View>
+								<Switch
+									title="Show User Specific Metrics"
+									value={featuresMetricsShowUserSpecific || false}
+									onValueChange={() =>
+										setFeaturesMetricsShowUserSpecific((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={featuresThumbnailsEnabled || false}
-										onValueChange={() =>
-											setFeaturesThumbnailsEnabled((prev) => !prev)
-										}
-										thumbColor={
-											featuresThumbnailsEnabled ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>
-										Enable Thumbnails
-									</Text>
-								</View>
+								<Switch
+									title="Enable Thumbnails"
+									value={featuresThumbnailsEnabled || false}
+									onValueChange={() =>
+										setFeaturesThumbnailsEnabled((prev) => !prev)
+									}
+								/>
 
-								<Text style={styles.inputHeader}>
-									Thumbnails Number Threads:
-								</Text>
 								<TextInput
+									title="Thumbnails Number Threads:"
 									keyboardType="numeric"
-									style={styles.textInput}
-									onChangeText={(content) =>
+									onValueChange={(content) =>
 										setFeaturesThumbnailsNumberThreads(
 											Math.abs(Number.parseInt(content)),
 										)
@@ -973,7 +836,6 @@ export default function ServerSettings() {
 											? String(featuresThumbnailsNumberThreads) || ""
 											: ""
 									}
-									placeholderTextColor="#222c47"
 									placeholder="4"
 								/>
 
@@ -986,56 +848,38 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Files</Text>
 
-								<Text style={styles.inputHeader}>Route:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setFilesRoute(content)}
+									title="Route:"
+									onValueChange={(content) => setFilesRoute(content)}
 									value={filesRoute || ""}
-									placeholderTextColor="#222c47"
 									placeholder="/u"
 								/>
 
-								<Text style={styles.inputHeader}>Length:</Text>
 								<TextInput
+									title="Length:"
 									keyboardType="numeric"
-									style={styles.textInput}
-									onChangeText={(content) =>
+									onValueChange={(content) =>
 										setFilesLength(Math.abs(Number.parseInt(content)))
 									}
 									value={filesLength ? String(filesLength) || "" : ""}
-									placeholderTextColor="#222c47"
 									placeholder="6"
 								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={filesAssumeMimetypes || false}
-										onValueChange={() =>
-											setFilesAssumeMimetypes((prev) => !prev)
-										}
-										thumbColor={filesAssumeMimetypes ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Assume Mimetypes</Text>
-								</View>
+								<Switch
+									title="Assume Mimetypes"
+									value={filesAssumeMimetypes || false}
+									onValueChange={() =>
+										setFilesAssumeMimetypes((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={filesRemoveGpsMetadata || false}
-										onValueChange={() =>
-											setFilesRemoveGpsMetadata((prev) => !prev)
-										}
-										thumbColor={filesRemoveGpsMetadata ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Remove GPS Metadata</Text>
-								</View>
+								<Switch
+									title="Remove GPS Metadata"
+									value={filesRemoveGpsMetadata || false}
+									onValueChange={() =>
+										setFilesRemoveGpsMetadata((prev) => !prev)
+									}
+								/>
 
 								<Text style={styles.inputHeader}>Default Format:</Text>
 								<Select
@@ -1051,41 +895,33 @@ export default function ServerSettings() {
 									)}
 								/>
 
-								<Text style={styles.inputHeader}>Disabled Extensions:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) =>
+									title="Disabled Extensions:"
+									onValueChange={(content) =>
 										setFilesDisabledExtensions(content.split(", "))
 									}
 									value={filesDisabledExtensions?.join(", ") || ""}
-									placeholderTextColor="#222c47"
 									placeholder="exe, bat, sh"
 								/>
 
-								<Text style={styles.inputHeader}>Max File Size:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setFilesMaxFileSize(content)}
+									title="Max File Size:"
+									onValueChange={(content) => setFilesMaxFileSize(content)}
 									value={filesMaxFileSize || ""}
-									placeholderTextColor="#222c47"
 									placeholder="100mb"
 								/>
 
-								<Text style={styles.inputHeader}>Default Expiration:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setFilesDefaultExpiration(content)}
+									title="Default Expiration:"
+									onValueChange={(content) => setFilesDefaultExpiration(content)}
 									value={filesDefaultExpiration || ""}
-									placeholderTextColor="#222c47"
 									placeholder="30d"
 								/>
 
-								<Text style={styles.inputHeader}>Default Date Format:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setFilesDefaultDateFormat(content)}
+									title="Default Date Format:"
+									onValueChange={(content) => setFilesDefaultDateFormat(content)}
 									value={filesDefaultDateFormat || ""}
-									placeholderTextColor="#222c47"
 									placeholder="YYYY-MM-DD_HH:mm:ss"
 								/>
 
@@ -1098,24 +934,20 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>URL Shortener</Text>
 
-								<Text style={styles.inputHeader}>Route:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setUrlsRoute(content)}
+									title="Route:"
+									onValueChange={(content) => setUrlsRoute(content)}
 									value={urlsRoute || ""}
-									placeholderTextColor="#222c47"
 									placeholder="/go"
 								/>
 
-								<Text style={styles.inputHeader}>Length:</Text>
 								<TextInput
+									title="Length:"
 									keyboardType="numeric"
-									style={styles.textInput}
-									onChangeText={(content) =>
+									onValueChange={(content) =>
 										setUrlsLength(Math.abs(Number.parseInt(content)))
 									}
 									value={urlsLength ? String(urlsLength) || "" : ""}
-									placeholderTextColor="#222c47"
 									placeholder="6"
 								/>
 
@@ -1128,28 +960,19 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Invites</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={invitesEnabled || false}
-										onValueChange={() => setInvitesEnabled((prev) => !prev)}
-										thumbColor={invitesEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Enable Invites</Text>
-								</View>
+								<Switch
+									title="Enable Invites"
+									value={invitesEnabled || false}
+									onValueChange={() => setInvitesEnabled((prev) => !prev)}
+								/>
 
-								<Text style={styles.inputHeader}>Length:</Text>
 								<TextInput
+									title="Length"
 									keyboardType="numeric"
-									style={styles.textInput}
-									onChangeText={(content) =>
+									onValueChange={(content) =>
 										setInvitesLength(Math.abs(Number.parseInt(content)))
 									}
 									value={invitesLength ? String(invitesLength) || "" : ""}
-									placeholderTextColor="#222c47"
 									placeholder="6"
 								/>
 
@@ -1162,66 +985,46 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Ratelimit</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={ratelimitEnabled || false}
-										onValueChange={() => setRatelimitEnabled((prev) => !prev)}
-										thumbColor={ratelimitEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Enable Ratelimit</Text>
-								</View>
+								<Switch
+									title="Enable Ratelimit"
+									value={ratelimitEnabled || false}
+									onValueChange={() => setRatelimitEnabled((prev) => !prev)}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={ratelimitAdminBypass || false}
-										onValueChange={() =>
-											setRatelimitAdminBypass((prev) => !prev)
-										}
-										thumbColor={ratelimitAdminBypass ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Admin Bypass</Text>
-								</View>
+								<Switch
+									title="Admin Bypass"
+									value={ratelimitAdminBypass || false}
+									onValueChange={() =>
+										setRatelimitAdminBypass((prev) => !prev)
+									}
+								/>
 
-								<Text style={styles.inputHeader}>Max Requests:</Text>
 								<TextInput
+									title="Max Requests:"
 									keyboardType="numeric"
-									style={styles.textInput}
-									onChangeText={(content) =>
+									onValueChange={(content) =>
 										setRatelimitMax(Math.abs(Number.parseInt(content)))
 									}
 									value={ratelimitMax ? String(ratelimitMax) || "" : ""}
-									placeholderTextColor="#222c47"
 									placeholder="10"
 								/>
 
-								<Text style={styles.inputHeader}>Window:</Text>
 								<TextInput
+									title="Window:"
 									keyboardType="numeric"
-									style={styles.textInput}
-									onChangeText={(content) =>
+									onValueChange={(content) =>
 										setRatelimitWindow(Math.abs(Number.parseInt(content)))
 									}
 									value={ratelimitWindow ? String(ratelimitWindow) || "" : ""}
-									placeholderTextColor="#222c47"
 									placeholder="60"
 								/>
 
-								<Text style={styles.inputHeader}>Allow List:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) =>
+									title="Allow List:"
+									onValueChange={(content) =>
 										setRatelimitAllowList(content.split(", "))
 									}
 									value={ratelimitAllowList?.join(", ") || ""}
-									placeholderTextColor="#222c47"
 									placeholder="1.1.1.1, 8.8.8.8"
 								/>
 
@@ -1232,109 +1035,80 @@ export default function ServerSettings() {
 
 							{/* Website */}
 							<View style={styles.settingGroup}>
-								<Text style={styles.inputHeader}>Title:</Text>
 								<TextInput
+									title="Title:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteTitle(content)}
+									onValueChange={(content) => setWebsiteTitle(content)}
 									value={websiteTitle || ""}
-									placeholderTextColor="#222c47"
 									placeholder="Zipline"
 								/>
 
-								<Text style={styles.inputHeader}>Title Logo:</Text>
 								<TextInput
+									title="Title Logo:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteTitleLogo(content)}
+									onValueChange={(content) => setWebsiteTitleLogo(content)}
 									value={websiteTitleLogo || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://example.com/logo.png"
 								/>
 
-								<Text style={styles.inputHeader}>External Links:</Text>
 								<TextInput
+									title="External Links:"
 									keyboardType="url"
-									style={{
-										...styles.textInput,
-										...styles.multilneTextInput,
-									}}
+									inputStyle={styles.multilneTextInput}
 									multiline
-									onChangeText={(content) => setWebsiteExternalLinks(content)}
+									onValueChange={(content) => setWebsiteExternalLinks(content)}
 									value={websiteExternalLinks || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://example.com/logo.png"
 								/>
 
-								<Text style={styles.inputHeader}>Login Background:</Text>
 								<TextInput
+									title="Login Background:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteLoginBackground(content)}
+									onValueChange={(content) => setWebsiteLoginBackground(content)}
 									value={websiteLoginBackground || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://example.com/background.png"
 								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={websiteLoginBackgroundBlur || false}
-										onValueChange={() =>
-											setWebsiteLoginBackgroundBlur((prev) => !prev)
-										}
-										thumbColor={
-											websiteLoginBackgroundBlur ? "#2e3e6b" : "#222c47"
-										}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Login Background Blur</Text>
-								</View>
+								<Switch
+									title="Login Background Blur"
+									value={websiteLoginBackgroundBlur || false}
+									onValueChange={() =>
+										setWebsiteLoginBackgroundBlur((prev) => !prev)
+									}
+								/>
 
-								<Text style={styles.inputHeader}>Default Avatar:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteDefaultAvatar(content)}
+									title="Default Avatar:"
+									onValueChange={(content) => setWebsiteDefaultAvatar(content)}
 									value={websiteDefaultAvatar || ""}
-									placeholderTextColor="#222c47"
 									placeholder="/zipline/avatar.png"
 								/>
 
-								<Text style={styles.inputHeader}>Terms of Service:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteTos(content)}
+									title="Terms of Service:"
+									onValueChange={(content) => setWebsiteTos(content)}
 									value={websiteTos || ""}
-									placeholderTextColor="#222c47"
 									placeholder="/zipline/TOS.md"
 								/>
 
-								<Text style={styles.inputHeader}>Default Theme:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteThemeDefault(content)}
+									title="Default Theme:"
+									onValueChange={(content) => setWebsiteThemeDefault(content)}
 									value={websiteThemeDefault || ""}
-									placeholderTextColor="#222c47"
 									placeholder="system"
 								/>
 
-								<Text style={styles.inputHeader}>Dark Theme:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteThemeDark(content)}
+									title="Dark Theme:"
+									onValueChange={(content) => setWebsiteThemeDark(content)}
 									value={websiteThemeDark || ""}
-									placeholderTextColor="#222c47"
 									placeholder="builtin:dark_gray"
 								/>
 
-								<Text style={styles.inputHeader}>Light Theme:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setWebsiteThemeLight(content)}
+									title="Light Theme:"
+									onValueChange={(content) => setWebsiteThemeLight(content)}
 									value={websiteThemeLight || ""}
-									placeholderTextColor="#222c47"
 									placeholder="builtin:light_gray"
 								/>
 
@@ -1347,33 +1121,19 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>OAuth</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={oauthBypassLocalLogin || false}
-										onValueChange={() =>
-											setOauthBypassLocalLogin((prev) => !prev)
-										}
-										thumbColor={oauthBypassLocalLogin ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Bypass Local Login</Text>
-								</View>
+								<Switch
+									title="Bypass Local Login"
+									value={oauthBypassLocalLogin || false}
+									onValueChange={() =>
+										setOauthBypassLocalLogin((prev) => !prev)
+									}
+								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={oauthLoginOnly || false}
-										onValueChange={() => setOauthLoginOnly((prev) => !prev)}
-										thumbColor={oauthLoginOnly ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>Login Only</Text>
-								</View>
+								<Switch
+									title="Login Only"
+									value={oauthLoginOnly || false}
+									onValueChange={() => setOauthLoginOnly((prev) => !prev)}
+								/>
 
 								<View style={styles.settingGroup}>
 									<Text
@@ -1385,26 +1145,23 @@ export default function ServerSettings() {
 										Discord
 									</Text>
 
-									<Text style={styles.inputHeader}>Discord Client ID:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthDiscordClientId(content)}
+										title="Discord Client ID:"
+										onValueChange={(content) => setOauthDiscordClientId(content)}
 										value={oauthDiscordClientId || ""}
 									/>
 
-									<Text style={styles.inputHeader}>Discord Client Secret:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="Discord Client Secret:"
+										onValueChange={(content) =>
 											setOauthDiscordClientSecret(content)
 										}
 										value={oauthDiscordClientSecret || ""}
 									/>
 
-									<Text style={styles.inputHeader}>Discord Redirect URI:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="Discord Redirect URI:"
+										onValueChange={(content) =>
 											setOauthDiscordRedirectUri(content)
 										}
 										value={oauthDiscordRedirectUri || ""}
@@ -1421,26 +1178,23 @@ export default function ServerSettings() {
 										Google
 									</Text>
 
-									<Text style={styles.inputHeader}>Google Client ID:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthGoogleClientId(content)}
+										title="Google Client ID:"
+										onValueChange={(content) => setOauthGoogleClientId(content)}
 										value={oauthGoogleClientId || ""}
 									/>
 
-									<Text style={styles.inputHeader}>Google Client Secret:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="Google Client Secret:"
+										onValueChange={(content) =>
 											setOauthGoogleClientSecret(content)
 										}
 										value={oauthGoogleClientSecret || ""}
 									/>
 
-									<Text style={styles.inputHeader}>Google Redirect URI:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="Google Redirect URI:"
+										onValueChange={(content) =>
 											setOauthGoogleRedirectUri(content)
 										}
 										value={oauthGoogleRedirectUri || ""}
@@ -1457,26 +1211,23 @@ export default function ServerSettings() {
 										GitHub
 									</Text>
 
-									<Text style={styles.inputHeader}>GitHub Client ID:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthGithubClientId(content)}
+										title="GitHub Client ID:"
+										onValueChange={(content) => setOauthGithubClientId(content)}
 										value={oauthGithubClientId || ""}
 									/>
 
-									<Text style={styles.inputHeader}>GitHub Client Secret:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="GitHub Client Secret:"
+										onValueChange={(content) =>
 											setOauthGithubClientSecret(content)
 										}
 										value={oauthGithubClientSecret || ""}
 									/>
 
-									<Text style={styles.inputHeader}>GitHub Redirect URI:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="GitHub Redirect URI:"
+										onValueChange={(content) =>
 											setOauthGithubRedirectUri(content)
 										}
 										value={oauthGithubRedirectUri || ""}
@@ -1486,49 +1237,43 @@ export default function ServerSettings() {
 								<View style={styles.settingGroup}>
 									<Text style={styles.oauthSubSettingText}>OpenID Connect</Text>
 
-									<Text style={styles.inputHeader}>OIDC Client ID:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthOidcClientId(content)}
+										title="OIDC Client ID:"
+										onValueChange={(content) => setOauthOidcClientId(content)}
 										value={oauthOidcClientId || ""}
 									/>
 
-									<Text style={styles.inputHeader}>OIDC Client Secret:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="OIDC Client Secret:"
+										onValueChange={(content) =>
 											setOauthOidcClientSecret(content)
 										}
 										value={oauthOidcClientSecret || ""}
 									/>
 
-									<Text style={styles.inputHeader}>OIDC Authorize URL:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) =>
+										title="OIDC Authorize URL:"
+										onValueChange={(content) =>
 											setOauthOidcAuthorizeUrl(content)
 										}
 										value={oauthOidcAuthorizeUrl || ""}
 									/>
 
-									<Text style={styles.inputHeader}>OIDC Token URL:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthOidcTokenUrl(content)}
+										title="OIDC Token URL:"
+										onValueChange={(content) => setOauthOidcTokenUrl(content)}
 										value={oauthOidcTokenUrl || ""}
 									/>
 
-									<Text style={styles.inputHeader}>OIDC Userinfo URL:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthOidcUserinfoUrl(content)}
+										title="OIDC Userinfo URL:"
+										onValueChange={(content) => setOauthOidcUserinfoUrl(content)}
 										value={oauthOidcUserinfoUrl || ""}
 									/>
 
-									<Text style={styles.inputHeader}>OIDC Redirect URL:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setOauthOidcRedirectUri(content)}
+										title="OIDC Redirect URL:"
+										onValueChange={(content) => setOauthOidcRedirectUri(content)}
 										value={oauthOidcRedirectUri || ""}
 									/>
 								</View>
@@ -1542,61 +1287,44 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>PWA</Text>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={pwaEnabled || false}
-										onValueChange={() => setPwaEnabled((prev) => !prev)}
-										thumbColor={pwaEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text style={styles.switchText}>PWA Enabled</Text>
-								</View>
+								<Switch
+									title="PWA Enabled"
+									value={pwaEnabled || false}
+									onValueChange={() => setPwaEnabled((prev) => !prev)}
+								/>
 
-								<Text style={styles.inputHeader}>Title:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setPwaTitle(content)}
+									title="Title:"
+									onValueChange={(content) => setPwaTitle(content)}
 									value={pwaTitle || ""}
-									placeholderTextColor="#222c47"
 									placeholder="Zipline"
 								/>
 
-								<Text style={styles.inputHeader}>Short Name:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setPwaShortName(content)}
+									title="Short Name:"
+									onValueChange={(content) => setPwaShortName(content)}
 									value={pwaShortName || ""}
-									placeholderTextColor="#222c47"
 									placeholder="Zipline"
 								/>
 
-								<Text style={styles.inputHeader}>Description:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setPwaDescription(content)}
+									title="Description:"
+									onValueChange={(content) => setPwaDescription(content)}
 									value={pwaDescription || ""}
-									placeholderTextColor="#222c47"
 									placeholder="Zipline"
 								/>
 
-								<Text style={styles.inputHeader}>Theme Color:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setPwaThemeColor(content)}
+									title="Theme Color:"
+									onValueChange={(content) => setPwaThemeColor(content)}
 									value={pwaThemeColor || ""}
-									placeholderTextColor="#222c47"
 									placeholder="#000000"
 								/>
 
-								<Text style={styles.inputHeader}>Background Color:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setPwaBackgroundColor(content)}
+									title="Background Color:"
+									onValueChange={(content) => setPwaBackgroundColor(content)}
 									value={pwaBackgroundColor || ""}
-									placeholderTextColor="#222c47"
 									placeholder="#000000"
 								/>
 
@@ -1609,23 +1337,19 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>HTTP Webhooks</Text>
 
-								<Text style={styles.inputHeader}>On Upload:</Text>
 								<TextInput
+									title="On Upload:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setHttpWebhookOnUpload(content)}
+									onValueChange={(content) => setHttpWebhookOnUpload(content)}
 									value={httpWebhookOnUpload || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://example.com/upload"
 								/>
 
-								<Text style={styles.inputHeader}>On Shorten:</Text>
 								<TextInput
+									title="On Shorten:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setHttpWebhookOnShorten(content)}
+									onValueChange={(content) => setHttpWebhookOnShorten(content)}
 									value={httpWebhookOnShorten || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://example.com/shorten"
 								/>
 
@@ -1638,32 +1362,26 @@ export default function ServerSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Discord Webhook</Text>
 
-								<Text style={styles.inputHeader}>Webhook URL:</Text>
 								<TextInput
+									title="Webhook URL:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setDiscordWebhookUrl(content)}
+									onValueChange={(content) => setDiscordWebhookUrl(content)}
 									value={discordWebhookUrl || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://discord.com/api/webhooks/..."
 								/>
 
-								<Text style={styles.inputHeader}>Username:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setDiscordUsername(content)}
+									title="Username:"
+									onValueChange={(content) => setDiscordUsername(content)}
 									value={discordUsername || ""}
-									placeholderTextColor="#222c47"
 									placeholder="Zipline"
 								/>
 
-								<Text style={styles.inputHeader}>Avatar URL:</Text>
 								<TextInput
+									title="Avatar URL:"
 									keyboardType="url"
-									style={styles.textInput}
-									onChangeText={(content) => setDiscordAvatarUrl(content)}
+									onValueChange={(content) => setDiscordAvatarUrl(content)}
 									value={discordAvatarUrl || ""}
-									placeholderTextColor="#222c47"
 									placeholder="https://example.com/avatar.png"
 								/>
 
@@ -1675,170 +1393,122 @@ export default function ServerSettings() {
 								<View style={styles.settingGroup}>
 									<Text style={styles.headerText}>On Upload</Text>
 
-									<Text style={styles.inputHeader}>Webhook URL:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setDiscordOnUploadWebhookUrl(content)}
+										title="Webhook URL:"
+										onValueChange={(content) => setDiscordOnUploadWebhookUrl(content)}
 										value={discordOnUploadWebhookUrl || ""}
-										placeholderTextColor="#222c47"
 										placeholder="https://discord.com/api/webhooks/..."
 									/>
 
-									<Text style={styles.inputHeader}>Username:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setDiscordOnUploadUsername(content)}
+										title="Username:"
+										onValueChange={(content) => setDiscordOnUploadUsername(content)}
 										value={discordOnUploadUsername || ""}
-										placeholderTextColor="#222c47"
 										placeholder="Zipline Uploads"
 									/>
 
-									<Text style={styles.inputHeader}>Avatar URL:</Text>
 									<TextInput
+										title="Avatar URL:"
 										keyboardType="url"
-										style={styles.textInput}
-										onChangeText={(content) => setDiscordOnUploadAvatarUrl(content)}
+										onValueChange={(content) => setDiscordOnUploadAvatarUrl(content)}
 										value={discordOnUploadAvatarUrl || ""}
-										placeholderTextColor="#222c47"
 										placeholder="https://example.com/uploadAvatar.png"
 									/>
 
-									<Text style={styles.inputHeader}>Content:</Text>
 									<TextInput
-										style={{
-											...styles.textInput,
-											...styles.multilneTextInput
-										}}
+										title="Content:"
+										inputStyle={styles.multilneTextInput}
 										multiline
-										onChangeText={(content) => setDiscordOnUploadContent(content)}
+										onValueChange={(content) => setDiscordOnUploadContent(content)}
 										value={discordOnUploadContent || ""}
 									/>
 
-									<View style={styles.switchContainer}>
-										<Switch
-											value={!!discordOnUploadEmbed || false}
-											onValueChange={() => setDiscordOnUploadEmbed((prev) => {
-												if (prev) return null;
-												
-												return originalDiscordOnUploadEmbed || defaultUploadEmbed;
-											})}
-											thumbColor={discordOnUploadEmbed ? "#2e3e6b" : "#222c47"}
-											trackColor={{
-												true: "#21273b",
-												false: "#181c28",
-											}}
-										/>
-										<Text style={styles.switchText}>Embed</Text>
-									</View>
+									<Switch
+										title="Embed"
+										value={!!discordOnUploadEmbed || false}
+										onValueChange={() => setDiscordOnUploadEmbed((prev) => {
+											if (prev) return null;
+											
+											return originalDiscordOnUploadEmbed || defaultUploadEmbed;
+										})}
+									/>
 
 									{/* On Upload Embed */}
 									<View style={{
 										...styles.settingGroup,
 										...(!discordOnUploadEmbed && { display: "none" }),
 									}}>
-										<Text style={styles.inputHeader}>Title:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnUploadEmbed((embed) => ({
+											title="Title:"
+											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
 												...embed,
 												title: content
 											} as UploadEmbed))}
 											value={discordOnUploadEmbed?.title || ""}
 										/>
 
-										<Text style={styles.inputHeader}>Description:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnUploadEmbed((embed) => ({
+											title="Description:"
+											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
 												...embed,
 												description: content
 											} as UploadEmbed))}
 											value={discordOnUploadEmbed?.description || ""}
 										/>
 
-										<Text style={styles.inputHeader}>Footer:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnUploadEmbed((embed) => ({
+											title="Footer:"
+											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
 												...embed,
 												footer: content
 											} as UploadEmbed))}
 											value={discordOnUploadEmbed?.footer || ""}
 										/>
 
-										<Text style={styles.inputHeader}>Color:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnUploadEmbed((embed) => ({
+											title="Color:"
+											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
 												...embed,
 												color: content
 											} as UploadEmbed))}
 											value={discordOnUploadEmbed?.color || ""}
 										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnUploadEmbed?.thumbnail || false}
-												onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-													...embed,
-													thumbnail: !embed?.thumbnail
-												} as UploadEmbed))}
-												thumbColor={discordOnUploadEmbed?.thumbnail ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>Thumbnail</Text>
-										</View>
+										<Switch
+											title="Thumbnail"
+											value={!!discordOnUploadEmbed?.thumbnail || false}
+											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
+												...embed,
+												thumbnail: !embed?.thumbnail
+											} as UploadEmbed))}
+										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnUploadEmbed?.imageOrVideo || false}
-												onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-													...embed,
-													imageOrVideo: !embed?.imageOrVideo
-												} as UploadEmbed))}
-												thumbColor={discordOnUploadEmbed?.imageOrVideo ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>Image/Video</Text>
-										</View>
+										<Switch
+											title="Image/Video"
+											value={!!discordOnUploadEmbed?.imageOrVideo || false}
+											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
+												...embed,
+												imageOrVideo: !embed?.imageOrVideo
+											} as UploadEmbed))}
+										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnUploadEmbed?.timestamp || false}
-												onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-													...embed,
-													timestamp: !embed?.timestamp
-												} as UploadEmbed))}
-												thumbColor={discordOnUploadEmbed?.timestamp ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>Timestamp</Text>
-										</View>
+										<Switch
+											title="Timestamp"
+											value={!!discordOnUploadEmbed?.timestamp || false}
+											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
+												...embed,
+												timestamp: !embed?.timestamp
+											} as UploadEmbed))}
+										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnUploadEmbed?.url || false}
-												onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-													...embed,
-													url: !embed?.url
-												} as UploadEmbed))}
-												thumbColor={discordOnUploadEmbed?.url ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>URL</Text>
-										</View>
+										<Switch
+											title="URL"
+											value={!!discordOnUploadEmbed?.url || false}
+											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
+												...embed,
+												url: !embed?.url
+											} as UploadEmbed))}
+										/>
 									</View>
 
 									<Pressable style={styles.settingSaveButton}  onPress={() => handleSave("discordOnUploadWebhook")}>
@@ -1850,170 +1520,122 @@ export default function ServerSettings() {
 								<View style={styles.settingGroup}>
 									<Text style={styles.headerText}>On Shorten</Text>
 
-									<Text style={styles.inputHeader}>Webhook URL:</Text>
 									<TextInput
+										title="Webhook URL:"
 										keyboardType="url"
-										style={styles.textInput}
-										onChangeText={(content) => setDiscordOnShortenWebhookUrl(content)}
+										onValueChange={(content) => setDiscordOnShortenWebhookUrl(content)}
 										value={discordOnShortenWebhookUrl || ""}
-										placeholderTextColor="#222c47"
 										placeholder="https://discord.com/api/webhooks/..."
 									/>
 
-									<Text style={styles.inputHeader}>Username:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setDiscordOnShortenUsername(content)}
+										title="Username:"
+										onValueChange={(content) => setDiscordOnShortenUsername(content)}
 										value={discordOnShortenUsername || ""}
-										placeholderTextColor="#222c47"
 										placeholder="Zipline Shortens"
 									/>
 
-									<Text style={styles.inputHeader}>Avatar URL:</Text>
 									<TextInput
-										style={styles.textInput}
-										onChangeText={(content) => setDiscordOnShortenAvatarUrl(content)}
+										title="Avatar URL:"
+										onValueChange={(content) => setDiscordOnShortenAvatarUrl(content)}
 										value={discordOnShortenAvatarUrl || ""}
-										placeholderTextColor="#222c47"
 										placeholder="https://example.com/shortenAvatar.png"
 									/>
 
-									<Text style={styles.inputHeader}>Content:</Text>
 									<TextInput
-										style={{
-											...styles.textInput,
-											...styles.multilneTextInput
-										}}
+										title="Content:"
+										inputStyle={styles.multilneTextInput}
 										multiline
-										onChangeText={(content) => setDiscordOnShortenContent(content)}
+										onValueChange={(content) => setDiscordOnShortenContent(content)}
 										value={discordOnShortenContent || ""}
 									/>
 
-									<View style={styles.switchContainer}>
-										<Switch
-											value={!!discordOnShortenEmbed}
-											onValueChange={() => setDiscordOnShortenEmbed((prev) => {
-												if (prev) return null;
-												
-												return originalDiscordOnShortenEmbed || defaultShortenEmbed;
-											})}
-											thumbColor={discordOnShortenEmbed ? "#2e3e6b" : "#222c47"}
-											trackColor={{
-												true: "#21273b",
-												false: "#181c28",
-											}}
-										/>
-										<Text style={styles.switchText}>Embed</Text>
-									</View>
+									<Switch
+										title="Embed"
+										value={!!discordOnShortenEmbed}
+										onValueChange={() => setDiscordOnShortenEmbed((prev) => {
+											if (prev) return null;
+											
+											return originalDiscordOnShortenEmbed || defaultShortenEmbed;
+										})}
+									/>
 
 									{/* On Shorten Embed */}
 									<View style={{
 										...styles.settingGroup,
 										...(!discordOnShortenEmbed && { display: "none" }),
 									}}>
-										<Text style={styles.inputHeader}>Title:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnShortenEmbed((embed) => ({
+											title="Title:"
+											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
 												...embed,
 												title: content
 											} as ShortenEmbed))}
 											value={discordOnShortenEmbed?.title || ""}
 										/>
 
-										<Text style={styles.inputHeader}>Description:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnShortenEmbed((embed) => ({
+											title="Description:"
+											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
 												...embed,
 												description: content
 											} as ShortenEmbed))}
 											value={discordOnShortenEmbed?.description || ""}
 										/>
 
-										<Text style={styles.inputHeader}>Footer:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnShortenEmbed((embed) => ({
+											title="Footer:"
+											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
 												...embed,
 												footer: content
 											} as ShortenEmbed))}
 											value={discordOnShortenEmbed?.footer || ""}
 										/>
 
-										<Text style={styles.inputHeader}>Color:</Text>
 										<TextInput
-											style={styles.textInput}
-											onChangeText={(content) => setDiscordOnShortenEmbed((embed) => ({
+											title="Color:"
+											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
 												...embed,
 												color: content
 											} as ShortenEmbed))}
 											value={discordOnShortenEmbed?.color || ""}
 										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnShortenEmbed?.thumbnail || false}
-												onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-													...embed,
-													thumbnail: !embed?.thumbnail
-												} as ShortenEmbed))}
-												thumbColor={discordOnShortenEmbed?.thumbnail ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>Thumbnail</Text>
-										</View>
+										<Switch
+											title="Thumbnail"
+											value={!!discordOnShortenEmbed?.thumbnail || false}
+											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
+												...embed,
+												thumbnail: !embed?.thumbnail
+											} as ShortenEmbed))}
+										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnShortenEmbed?.imageOrVideo || false}
-												onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-													...embed,
-													imageOrVideo: !embed?.imageOrVideo
-												} as ShortenEmbed))}
-												thumbColor={discordOnShortenEmbed?.imageOrVideo ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>Image/Video</Text>
-										</View>
+										<Switch
+											title="Image/Video"
+											value={!!discordOnShortenEmbed?.imageOrVideo || false}
+											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
+												...embed,
+												imageOrVideo: !embed?.imageOrVideo
+											} as ShortenEmbed))}
+										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnShortenEmbed?.timestamp || false}
-												onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-													...embed,
-													timestamp: !embed?.timestamp
-												} as ShortenEmbed))}
-												thumbColor={discordOnShortenEmbed?.timestamp ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>Timestamp</Text>
-										</View>
+										<Switch
+											title="Timestamp"
+											value={!!discordOnShortenEmbed?.timestamp || false}
+											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
+												...embed,
+												timestamp: !embed?.timestamp
+											} as ShortenEmbed))}
+										/>
 
-										<View style={styles.switchContainer}>
-											<Switch
-												value={!!discordOnShortenEmbed?.url || false}
-												onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-													...embed,
-													url: !embed?.url
-												} as ShortenEmbed))}
-												thumbColor={discordOnShortenEmbed?.url ? "#2e3e6b" : "#222c47"}
-												trackColor={{
-													true: "#21273b",
-													false: "#181c28",
-												}}
-											/>
-											<Text style={styles.switchText}>URL</Text>
-										</View>
+										<Switch
+											title="URL"
+											value={!!discordOnShortenEmbed?.url || false}
+											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
+												...embed,
+												url: !embed?.url
+											} as ShortenEmbed))}
+										/>
 									</View>
 
 									<Pressable style={styles.settingSaveButton} onPress={() => handleSave("discordOnShortenWebhook")}>

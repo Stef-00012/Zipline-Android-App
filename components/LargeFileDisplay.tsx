@@ -1,6 +1,6 @@
 import { styles } from "@/styles/components/largeFileDisplay";
 import type { APIFile, APIFoldersNoIncl, APITags, DashURL } from "@/types/zipline";
-import { type ColorValue, Pressable, Text, TextInput, ToastAndroid, View } from "react-native";
+import { type ColorValue, Pressable, Text, ToastAndroid, View } from "react-native";
 import FileDisplay from "@/components/FileDisplay";
 import * as db from "@/functions/database";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -18,6 +18,7 @@ import * as Clipboard from "expo-clipboard";
 import * as FileSystem from "expo-file-system"
 import Popup from "@/components/Popup";
 import React from "react";
+import TextInput from "./TextInput";
 
 interface Props {
 	file: APIFile;
@@ -150,34 +151,27 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 				<View style={styles.popupContent}>
 					<Text style={styles.mainHeaderText}>Editing "{file.name}"</Text>
 
-					<Text style={styles.popupHeaderText}>Max Views:</Text>
 					<TextInput
-						style={styles.textInput}
-						onChangeText={(content) => {
+						title="Max Views:"
+						onValueChange={(content) => {
 							setEditFileMaxViews(Math.abs(Number.parseInt(content)));
 						}}
 						value={editFileMaxViews ? String(editFileMaxViews) : ""}
 						keyboardType="numeric"
 						placeholder="Unlimited"
-						placeholderTextColor="#222c47"
 					/>
 
-					<Text style={styles.popupHeaderText}>Original Name:</Text>
 					<TextInput
-						style={styles.textInput}
-						onChangeText={(content) => {
+						title="Original Name:"
+						onValueChange={(content) => {
 							setEditFileOriginalName(content);
 						}}
 						value={editFileOriginalName || ""}
 					/>
 
-					<Text style={{
-						...styles.popupHeaderText,
-						...styles.popupHeaderTextDanger
-					}}>Type:</Text>
 					<TextInput
-						style={styles.textInput}
-						onChangeText={(content) => {
+						title="Type:"
+						onValueChange={(content) => {
 							setEditFileType(content);
 						}}
 						value={editFileType || ""}
@@ -210,18 +204,14 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							<Text style={styles.buttonText}>Remove Password</Text>
 						</Pressable>
 					) : (
-						<>
-							<Text style={styles.popupHeaderText}>Password:</Text>
-							<TextInput
-								style={styles.textInput}
-								secureTextEntry={true}
-								keyboardType="visible-password"
-								onChangeText={(content) => {
-									setEditFilePassword(content);
-								}}
-								value={editFilePassword || ""}
-							/>
-						</>
+						<TextInput
+							title="Password:"
+							password
+							onValueChange={(content) => {
+								setEditFilePassword(content);
+							}}
+							value={editFilePassword || ""}
+						/>
 					)}
 
 					<Pressable
@@ -287,8 +277,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 						{fileContent ? (
 							<TextInput
 								multiline
-								editable={false}
-								style={styles.textDisplay}
+								showDisabledStyle={false}
+								disabled
+								inputStyle={styles.textDisplay}
 								value={fileContent}
 							/>
 						) : (

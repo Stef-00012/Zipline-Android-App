@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
+import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APISettings, APIUser, APIUserQuota, APIUsersNoIncl, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
@@ -18,6 +18,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { router } from "expo-router";
+import TextInput from "@/components/TextInput";
 
 export default function Users() {
 	useAuth("ADMIN")
@@ -113,28 +114,23 @@ export default function Users() {
 								showsVerticalScrollIndicator={false}
 								style={styles.editUserScrollView}
 							>
-								<Text style={styles.popupHeaderText}>Username:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Username:"
+									onValueChange={(content) => {
 										setEditUsername((content) || null);
 									}}
 									value={editUsername || ""}
 									placeholder="myUser"
-									placeholderTextColor="#222c47"
 								/>
 				
-								<Text style={styles.popupHeaderText}>Password:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Password:"
+									onValueChange={(content) => {
 										setEditPassword(content || null);
 									}}
 									value={editPassword || ""}
-									secureTextEntry={true}
-									keyboardType="visible-password"
+									password
 									placeholder="google"
-									placeholderTextColor="#222c47"
 								/>
 				
 								<Text style={styles.popupHeaderText}>Avatar:</Text>
@@ -202,46 +198,40 @@ export default function Users() {
 									<View>
 										{editFileQuotaType === "BY_BYTES" && (
 											<View>
-												<Text style={styles.popupHeaderText}>Max Bytes:</Text>
 												<TextInput
-													style={styles.textInput}
-													onChangeText={(content) => {
+													title="Max Bytes:"
+													onValueChange={(content) => {
 														setEditMaxBytes((content) || null);
 													}}
 													value={editMaxBytes || ""}
 													placeholder="2gb"
-													placeholderTextColor="#222c47"
 												/>
 											</View>
 										)}
 				
 										{editFileQuotaType === "BY_FILES" && (
 											<View>
-												<Text style={styles.popupHeaderText}>Max Files:</Text>
 												<TextInput
-													style={styles.textInput}
-													onChangeText={(content) => {
+													title="Max Files:"
+													onValueChange={(content) => {
 														setEditMaxFileCount(Math.abs(Number.parseInt(content)) || null);
 													}}
 													value={editMaxFileCount ? String(editMaxFileCount) : ""}
 													keyboardType="numeric"
 													placeholder="20"
-													placeholderTextColor="#222c47"
 												/>
 											</View>
 										)}
 									</View>
 								)}
 				
-								<Text style={styles.popupHeaderText}>Max URLs:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Max URLs:"
+									onValueChange={(content) => {
 										setEditMaxUrls(Math.abs(Number.parseInt(content)) || null);
 									}}
 									value={editMaxUrls ? String(editMaxUrls) : ""}
 									placeholder="0"
-									placeholderTextColor="#222c47"
 								/>
 							</KeyboardAwareScrollView>
 			
@@ -319,28 +309,23 @@ export default function Users() {
 						<Text style={styles.mainHeaderText}>Create User</Text>
 						{newUserError && <Text style={styles.errorText}>{newUserError}</Text>}
 						
-						<Text style={styles.popupHeaderText}>Username:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Username:"
+							onValueChange={(content) => {
 								setNewUserUsername((content) || null);
 							}}
 							value={newUserUsername || ""}
 							placeholder="myUser"
-							placeholderTextColor="#222c47"
 						/>
 
-						<Text style={styles.popupHeaderText}>Password:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Password:"
+							onValueChange={(content) => {
 								setNewUserPassword(content || null);
 							}}
 							value={newUserPassword || ""}
-							secureTextEntry={true}
-							keyboardType="visible-password"
+							password
 							placeholder="google"
-							placeholderTextColor="#222c47"
 						/>
 
 						<Text style={styles.popupHeaderText}>Avatar:</Text>

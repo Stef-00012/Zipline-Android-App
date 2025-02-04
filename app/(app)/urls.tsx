@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
+import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
@@ -16,7 +16,8 @@ import {
 import Popup from "@/components/Popup";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import { Switch } from "@react-native-material/core";
+import TextInput from "@/components/TextInput";
+import Switch from "@/components/Switch";
 
 export default function Urls() {
 	useAuth()
@@ -86,70 +87,50 @@ export default function Urls() {
 						<Text style={styles.mainHeaderText}>Shorten URL</Text>
 						{newUrlError && <Text style={styles.errorText}>{newUrlError}</Text>}
 
-						<Text style={styles.popupHeaderText}>URL:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="URL:"
+							onValueChange={(content) => {
 								setNewUrl((content as DashURL) || null);
 							}}
 							value={newUrl || ""}
 							keyboardType="url"
 							placeholder="https://google.com"
-							placeholderTextColor="#222c47"
 						/>
-		
-						<Text style={styles.popupHeaderText}>Vanity:</Text>
+
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Vanity:"
+							onValueChange={(content) => {
 								setNewUrlVanity(content || null);
 							}}
 							value={newUrlVanity || ""}
 							placeholder="google"
-							placeholderTextColor="#222c47"
 						/>
 		
-						<Text style={styles.popupHeaderText}>Max Views:</Text>
 						<TextInput
-							style={styles.textInput}
+							title="Max Views:"
 							keyboardType="numeric"
-							onChangeText={(content) => {
+							onValueChange={(content) => {
 								setNewUrlMaxViews(content || null);
 							}}
 							value={newUrlMaxViews || ""}
 							placeholder="0"
-							placeholderTextColor="#222c47"
 						/>
-		
-						<Text style={styles.popupHeaderText}>Password:</Text>
+
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Password:"
+							onValueChange={(content) => {
 								setNewUrlPassword(content || null);
 							}}
 							value={newUrlPassword || ""}
-							secureTextEntry={true}
-							keyboardType="visible-password"
+							password
 							placeholder="myPassword"
-							placeholderTextColor="#222c47"
 						/>
 
-						<View style={styles.switchContainer}>
-							<Switch
-								value={newUrlEnabled}
-								onValueChange={() => setNewUrlEnabled((prev) => !prev)}
-								thumbColor={newUrlEnabled ? "#2e3e6b" : "#222c47"}
-								trackColor={{
-									true: "#21273b",
-									false: "#181c28",
-								}}
-							/>
-							<Text
-								style={styles.switchText}
-							>
-								Enabled
-							</Text>
-						</View>
+						<Switch
+							title="Enabled"
+							value={newUrlEnabled}
+							onValueChange={() => setNewUrlEnabled((prev) => !prev)}
+						/>
 		
 						<Pressable
 							style={styles.button}
@@ -226,70 +207,50 @@ export default function Urls() {
 								<Text style={styles.mainHeaderText}>Edit URL "{urlToEdit.vanity || urlToEdit.code}"</Text>
 								{editUrlError && <Text style={styles.errorText}>{editUrlError}</Text>}
 
-								<Text style={styles.popupHeaderText}>URL:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="URL:"
+									onValueChange={(content) => {
 										setEditUrlDestination((content as DashURL) || null);
 									}}
 									value={editUrlDestination || ""}
 									keyboardType="url"
 									placeholder="https://google.com"
-									placeholderTextColor="#222c47"
 								/>
-				
-								<Text style={styles.popupHeaderText}>Vanity:</Text>
+
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Vanity:"
+									onValueChange={(content) => {
 										setEditUrlVanity(content || null);
 									}}
 									value={editUrlVanity || ""}
 									placeholder="google"
-									placeholderTextColor="#222c47"
 								/>
-				
-								<Text style={styles.popupHeaderText}>Max Views:</Text>
+
 								<TextInput
-									style={styles.textInput}
+									title="Max Views:"
 									keyboardType="numeric"
-									onChangeText={(content) => {
+									onValueChange={(content) => {
 										setEditUrlMaxViews(content || null);
 									}}
 									value={editUrlMaxViews || ""}
 									placeholder="0"
-									placeholderTextColor="#222c47"
 								/>
 				
-								<Text style={styles.popupHeaderText}>Password:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Password:"
+									onValueChange={(content) => {
 										setEditUrlPassword(content || null);
 									}}
 									value={editUrlPassword || ""}
-									secureTextEntry={true}
-									keyboardType="visible-password"
+									password
 									placeholder="myPassword"
-									placeholderTextColor="#222c47"
 								/>
 
-								<View style={styles.switchContainer}>
-									<Switch
-										value={editUrlEnabled}
-										onValueChange={() => setEditUrlEnabled((prev) => !prev)}
-										thumbColor={editUrlEnabled ? "#2e3e6b" : "#222c47"}
-										trackColor={{
-											true: "#21273b",
-											false: "#181c28",
-										}}
-									/>
-									<Text
-										style={styles.switchText}
-									>
-										Enabled
-									</Text>
-								</View>
+								<Switch
+									title="Enabled"
+									value={editUrlEnabled}
+									onValueChange={() => setEditUrlEnabled((prev) => !prev)}
+								/>
 				
 								<Pressable
 									style={styles.button}

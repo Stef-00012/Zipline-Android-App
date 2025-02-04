@@ -1,4 +1,4 @@
-import { Pressable, Text, View, TextInput } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -6,6 +6,7 @@ import * as db from "@/functions/database";
 import { styles } from "@/styles/login";
 import { useLoginAuth } from "@/hooks/useLoginAuth";
 import React from "react";
+import TextInput from "@/components/TextInput";
 
 export default function Login() {
 	const router = useRouter();
@@ -32,92 +33,52 @@ export default function Login() {
 
 				{tokenLogin ? (
 					<>
-						<Text
-							style={styles.inputHeader}
-						>
-							Zipline URL:
-						</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => setInputtedUrl(content)}
+							title="Zipline URL:"
+							onValueChange={(content) => setInputtedUrl(content)}
 							value={inputtedUrl || ""}
 							keyboardType="url"
 							placeholder="https://example.com"
-							placeholderTextColor="#222c47"
 						/>
 
-						<Text
-							style={styles.inputHeader}
-						>
-							Token:
-						</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => setInputtedToken(content)}
-							keyboardType="visible-password"
+							title="Token:"
+							onValueChange={(content) => setInputtedToken(content)}
 							placeholder="myPassword123"
-							secureTextEntry={true}
-							placeholderTextColor="#222c47"
+							password
 						/>
 					</>
 				): (
 					<>
-						<Text
-							style={styles.inputHeader}
-						>
-							Zipline URL:
-						</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => setInputtedUrl(content)}
+							title="Zipline URL:"
+							onValueChange={(content) => setInputtedUrl(content)}
 							value={inputtedUrl || ""}
 							keyboardType="url"
 							placeholder="https://example.com"
-							placeholderTextColor="#222c47"
 						/>
 
-						<Text
-							style={styles.inputHeader}
-						>
-							Username:
-						</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => setInputtedUsername(content)}
+							title="Username:"
+							onValueChange={(content) => setInputtedUsername(content)}
 							placeholder="My Cool Username"
-							placeholderTextColor="#222c47"
 						/>
 
-						<Text
-							style={styles.inputHeader}
-						>
-							Password:
-						</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => setInputtedPassword(content)}
-							keyboardType="visible-password"
+							title="Password:"
+							onValueChange={(content) => setInputtedPassword(content)}
 							placeholder="myPassword123"
-							secureTextEntry={true}
-							placeholderTextColor="#222c47"
+							password
 						/>
 
 						{totpRequired && (
-							<>
-								<Text
-									style={styles.inputHeader}
-								>
-									TOTP:
-								</Text>
-								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => setInputtedTOTP(content)}
-									keyboardType="numeric"
-									placeholder="123456"
-									maxLength={6}
-									placeholderTextColor="#222c47"
-								/>
-							</>
+							<TextInput
+								title="TOTP:"
+								onValueChange={(content) => setInputtedTOTP(content)}
+								keyboardType="numeric"
+								placeholder="123456"
+								maxLength={6}
+							/>
 						)}
 					</>
 				)}

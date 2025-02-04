@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
+import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIInvites, APISettings, APIURLs, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
@@ -14,6 +14,7 @@ import Select from "@/components/Select";
 import { dates } from "@/constants/invites";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import TextInput from "@/components/TextInput";
 
 export default function Invites() {
 	useAuth("ADMIN")
@@ -63,16 +64,14 @@ export default function Invites() {
 							defaultValue={dates.find(date => date.value === "never")}
 						/>
 
-						<Text style={styles.popupHeaderText}>Max Uses:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Max Uses:"
+							onValueChange={(content) => {
 								setNewInviteMaxUses(Math.abs(Number.parseInt(content)) || undefined);
 							}}
 							value={newInviteMaxUses ? String(newInviteMaxUses) : ""}
 							keyboardType="numeric"
 							placeholder="5"
-							placeholderTextColor="#222c47"
 						/>
 
 						<Pressable

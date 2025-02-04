@@ -1,68 +1,64 @@
 import {
 	View,
 	Text,
-	TextInput,
-	type ColorValue,
 	Pressable,
-	type TextInputProps,
+	TextInput as NativeTextInput,
+	type ColorValue,
 } from "react-native";
 import { styles } from "@/styles/components/textInput";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import type { KeyboardType, NativeSyntheticEvent, ReturnKeyTypeOptions, TextInputChangeEventData, TextInputSubmitEditingEventData, TextStyle } from "react-native";
 
 interface Props {
 	value?: string;
 	title?: string;
 	onPasswordToggle?: (visibile: boolean) => void | Promise<void>;
-	onCopy?: () => void | Promise<void>;
 	onValueChange?: (newValue: string) => void | Promise<void>;
 	disabled?: boolean;
 	disableContext?: boolean;
 	showDisabledStyle?: boolean;
+	multiline?: boolean;
 	password?: boolean;
-	type?:
-		| "default"
-		| "number-pad"
-		| "decimal-pad"
-		| "numeric"
-		| "email-address"
-		| "phone-pad"
-		| "url"; // | "visible-password"
+	keyboardType?: KeyboardType // | "visible-password"
 	placeholder?: string;
-	copy?: boolean;
-	buttonColor?: ColorValue;
-	props: Omit<
-		TextInputProps,
-		| "keyboardType"
-		| "value"
-		| "onChangeText"
-		| "placeholder"
-		| "placeholderTextColor"
-		| "disabled"
-		| "contextMenuHidden"
-		| "style"
-		| "secureTextEntry"
-		| "editable"
-	>;
+	sideButtonColor?: ColorValue;
+	sideButtonIconColor?: ColorValue;
+	onSideButtonPress?: () => void | Promise<void>;
+	sideButtonIcon?: keyof typeof MaterialIcons.glyphMap;
+	maxLength?: number;
+	inputStyle?: TextStyle;
+	showSoftInputOnFocus?: boolean;
+	onChange?: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void | Promise<void>;
+	onSubmitEditing?: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | Promise<void>;
+	returnKeyType?: ReturnKeyTypeOptions;
+
 }
 
 const sideButtonSize = 17
 
-export default function ZiplineTextInput({
+export default function TextInput({
 	value,
 	onValueChange = () => {},
 	onPasswordToggle = () => {},
-	onCopy = () => {},
+	onSideButtonPress = () => {},
 	disabled = false,
 	showDisabledStyle = true,
 	disableContext = false,
+	multiline = false,
 	title,
 	password = false,
-	type = "default",
+	keyboardType = "default",
 	placeholder,
-	copy = false,
-	buttonColor,
-	props,
+	sideButtonColor = "#323ea8",
+	sideButtonIcon,
+	sideButtonIconColor = "white",
+	maxLength,
+	inputStyle,
+	showSoftInputOnFocus = true,
+	onChange = () => {},
+	onSubmitEditing = () => {},
+	returnKeyType,
 }: Props) {
 	const [displayPassword, setDisplayPassword] = useState<boolean>(false);
 
@@ -79,14 +75,21 @@ export default function ZiplineTextInput({
 						{title}
 					</Text>
 				)}
-				<View style={styles.inputContainer}>
-					<TextInput
-						{...props}
+				<View style={{
+					...styles.inputContainer,
+				}}>
+					<NativeTextInput
+						showSoftInputOnFocus={showSoftInputOnFocus}
+						multiline={multiline}
 						secureTextEntry={true}
+						onChange={onChange}
+						onSubmitEditing={onSubmitEditing}
+						maxLength={maxLength}
 						style={{
 							...styles.textInput,
 							...styles.textInputSideButton,
 							...((disabled && showDisabledStyle) && styles.textInputDisabled),
+							...inputStyle,
 						}}
 						editable={!disabled}
 						contextMenuHidden={disableContext}
@@ -95,14 +98,16 @@ export default function ZiplineTextInput({
 						keyboardType={displayPassword ? "visible-password" : "default"}
 						placeholder={placeholder}
 						placeholderTextColor="#222c47"
+						returnKeyType={returnKeyType}
 					/>
 					<Pressable
 						style={{
 							...styles.sideButton,
-							...(buttonColor && { backgroundColor: buttonColor }),
+							...(sideButtonColor && { backgroundColor: sideButtonColor }),
 						}}
 						onPress={() => {
 							onPasswordToggle(!displayPassword);
+							onSideButtonPress()
 							setDisplayPassword((prev) => !prev);
 						}}
 					>
@@ -116,47 +121,55 @@ export default function ZiplineTextInput({
 			</View>
 		);
 
-	if (copy)
+	if (onSideButtonPress && sideButtonIcon)
 		return (
 			<View>
 				{title && (
 					<Text
 						style={{
 							...styles.inputHeader,
-							...(disabled && styles.inputHeaderDisabled),
+							...((disabled && showDisabledStyle) && styles.inputHeaderDisabled),
 						}}
 					>
 						{title}
 					</Text>
 				)}
-				<View style={styles.inputContainer}>
-					<TextInput
-						{...props}
+				<View style={{
+					...styles.inputContainer,
+				}}>
+					<NativeTextInput
+						onChange={onChange}
+						onSubmitEditing={onSubmitEditing}
+						showSoftInputOnFocus={showSoftInputOnFocus}
+						multiline={multiline}
+						maxLength={maxLength}
 						style={{
 							...styles.textInput,
 							...styles.textInputSideButton,
-							...(disabled && styles.textInputDisabled),
+							...((disabled && showDisabledStyle) && styles.textInputDisabled),
+							...inputStyle,
 						}}
 						editable={!disabled}
 						contextMenuHidden={disableContext}
 						onChangeText={onValueChange}
 						value={value}
-						keyboardType={type}
+						keyboardType={keyboardType}
 						placeholder={placeholder}
 						placeholderTextColor="#222c47"
+						returnKeyType={returnKeyType}
 					/>
 					<Pressable
 						style={{
 							...styles.sideButton,
-							...(buttonColor && { backgroundColor: buttonColor }),
+							...(sideButtonColor && { backgroundColor: sideButtonColor }),
 						}}
 						onPress={() => {
-							onCopy();
+							onSideButtonPress();
 						}}
 					>
 						<MaterialIcons
-							name="content-copy"
-							color="white"
+							name={sideButtonIcon}
+							color={sideButtonIconColor}
 							size={sideButtonSize}
 						/>
 					</Pressable>
@@ -170,25 +183,31 @@ export default function ZiplineTextInput({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(disabled && styles.inputHeaderDisabled),
+						...((disabled && showDisabledStyle) && styles.inputHeaderDisabled),
 					}}
 				>
 					{title}
 				</Text>
 			)}
-			<TextInput
-				{...props}
+			<NativeTextInput
+				onChange={onChange}
+				onSubmitEditing={onSubmitEditing}
+				showSoftInputOnFocus={showSoftInputOnFocus}
+				multiline={multiline}
+				maxLength={maxLength}
 				style={{
 					...styles.textInput,
-					...(disabled && styles.textInputDisabled),
+					...((disabled && showDisabledStyle) && styles.textInputDisabled),
+					...inputStyle,
 				}}
 				editable={!disabled}
 				contextMenuHidden={disableContext}
 				onChangeText={onValueChange}
 				value={value}
-				keyboardType={type}
+				keyboardType={keyboardType}
 				placeholder={placeholder}
 				placeholderTextColor="#222c47"
+				returnKeyType={returnKeyType}
 			/>
 		</View>
 	);

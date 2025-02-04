@@ -146,17 +146,13 @@ export const styles = StyleSheet.create({
         marginTop: 10,
     },
     mainTextInput: {
-        marginTop: 10,
-        borderStyle: "solid",
-        borderWidth: 2,
-        borderColor: "#222c47",
-        marginHorizontal: 10,
         borderRadius: 15,
         padding: 15,
         height: 220,
-        color: "white",
-        fontFamily: "monospace",
         textAlignVertical: "top",
+    },
+    mainTextInputContainer: {
+        marginHorizontal: 10
     },
     header: {
 		flexDirection: "row",

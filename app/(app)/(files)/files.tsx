@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, TextInput, ToastAndroid, View } from "react-native";
+import { Pressable, ScrollView, Text, ToastAndroid, View, TextInput as NativeTextInput } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { APITags, APIFiles, DashURL, APIFile } from "@/types/zipline";
 import { getFiles, type GetFilesOptions } from "@/functions/zipline/files";
@@ -17,6 +17,7 @@ import Popup from "@/components/Popup";
 import { isLightColor } from "@/functions/color";
 import { colorHash } from "@/functions/util";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
+import TextInput from "@/components/TextInput";
 
 export default function Files() {
 	const router = useRouter();
@@ -234,27 +235,23 @@ export default function Files() {
 						<Text style={styles.mainHeaderText}>Create Tag</Text>
 						{newTagError && <Text style={styles.errorText}>{newTagError}</Text>}
 
-						<Text style={styles.popupHeaderText}>Name:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Name:"
+							onValueChange={(content) => {
 								setNewTagName(content || null);
 							}}
 							value={newTagName || ""}
 							placeholder="myTag"
-							placeholderTextColor="#222c47"
 						/>
 		
-						<Text style={styles.popupHeaderText}>Color:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Color:"
+							onValueChange={(content) => {
 								setNewTagColor(content);
 							}}
 							value={newTagColor || ""}
 							maxLength={7}
 							placeholder="#fa83d0"
-							placeholderTextColor="#222c47"
 						/>
 
 						<View style={styles.manageTagButtonsContainer}>
@@ -322,27 +319,23 @@ export default function Files() {
 
 						{tagToEdit && (
 							<View>
-								<Text style={styles.popupHeaderText}>Name:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Name:"
+									onValueChange={(content) => {
 										setEditTagName(content || null);
 									}}
 									value={editTagName || ""}
 									placeholder="myTag"
-									placeholderTextColor="#222c47"
 								/>
 
-								<Text style={styles.popupHeaderText}>Color:</Text>
 								<TextInput
-									style={styles.textInput}
-									onChangeText={(content) => {
+									title="Color:"
+									onValueChange={(content) => {
 										setEditTagColor(content);
 									}}
 									value={editTagColor || ""}
 									maxLength={7}
 									placeholder="#fa83d0"
-									placeholderTextColor="#222c47"
 								/>
 
 								<View style={styles.manageTagButtonsContainer}>
@@ -552,14 +545,9 @@ export default function Files() {
 						</Pressable>
 
 						<TextInput
-							style={
-								allPageDisabled
-									? {
-											...styles.input,
-											...styles.inputDisabled,
-										}
-									: styles.input
-							}
+							inputStyle={styles.input}
+							disabled={allPageDisabled}
+							disableContext={allPageDisabled}
 							keyboardType="numeric"
 							returnKeyType="done"
 							onChange={(event) => setSelectedPage(event.nativeEvent.text)}

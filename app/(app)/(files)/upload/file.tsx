@@ -3,7 +3,6 @@ import {
 	Pressable,
 	ScrollView,
 	Text,
-	TextInput,
 	View,
 	ToastAndroid,
 } from "react-native";
@@ -17,7 +16,6 @@ import {
 	useRouter,
 } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
-import { Switch } from "@react-native-material/core";
 import { dates, formats } from "@/constants/upload";
 import FileDisplay from "@/components/FileDisplay";
 import * as FileSystem from "expo-file-system";
@@ -32,6 +30,8 @@ import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import Popup from "@/components/Popup";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { useAuth } from "@/hooks/useAuth";
+import TextInput from "@/components/TextInput";
+import Switch from "@/components/Switch";
 
 export interface SelectedFile {
 	name: string;
@@ -392,17 +392,9 @@ export default function UploadFile({
 					}
 				/>
 
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
-					}}
-				>
-					Compression:
-				</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => {
+					title="Compression:"
+					onValueChange={(content) => {
 						let compressionPercentage = Number.parseInt(content);
 
 						if (compressionPercentage > 100) compressionPercentage = 100;
@@ -411,24 +403,15 @@ export default function UploadFile({
 						setCompression(compressionPercentage);
 					}}
 					keyboardType="numeric"
-					editable={!uploading}
-					contextMenuHidden={uploading}
+					disableContext={uploading}
+					disabled={uploading}
 					value={compression ? String(compression) : ""}
 					placeholder="0"
-					placeholderTextColor="#222c47"
 				/>
 
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
-					}}
-				>
-					Max Views:
-				</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => {
+					title="Max Views:"
+					onValueChange={(content) => {
 						let maxViewsAmount = Number.parseInt(content);
 
 						if (maxViewsAmount < 0) maxViewsAmount = 0;
@@ -436,11 +419,10 @@ export default function UploadFile({
 						setMaxViews(maxViewsAmount);
 					}}
 					keyboardType="numeric"
-					editable={!uploading}
-					contextMenuHidden={uploading}
+					disableContext={uploading}
+					disabled={uploading}
 					value={maxViews ? String(maxViews) : ""}
 					placeholder="0"
-					placeholderTextColor="#222c47"
 				/>
 
 				<Text
@@ -470,83 +452,41 @@ export default function UploadFile({
 					}
 				/>
 
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
-					}}
-				>
-					Override Domain:
-				</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => setOverrideDomain(content)}
+					title="Override Domain:"
+					onValueChange={(content) => setOverrideDomain(content)}
 					keyboardType="url"
-					editable={!uploading}
-					contextMenuHidden={uploading}
+					disableContext={uploading}
+					disabled={uploading}
 					value={overrideDomain || ""}
 					placeholder="example.com"
-					placeholderTextColor="#222c47"
 				/>
 
-				<Text
-					style={{
-						...styles.inputHeader,
-						...((!fileNameEnabled || uploading) && styles.inputHeaderDisabled),
-					}}
-				>
-					Override File Name:
-				</Text>
 				<TextInput
-					style={styles.textInput}
-					editable={fileNameEnabled || !uploading}
-					contextMenuHidden={!fileNameEnabled || uploading}
-					onChangeText={(content) => setFileName(content)}
+					title="Override File Name:"
+					disableContext={fileNameEnabled || !uploading}
+					disabled={!fileNameEnabled || uploading}
+					onValueChange={(content) => setFileName(content)}
 					value={fileNameEnabled ? fileName || "" : ""}
 					placeholder="example.png"
-					placeholderTextColor="#222c47"
 				/>
 
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
-					}}
-				>
-					Password:
-				</Text>
 				<TextInput
-					style={styles.textInput}
-					onChangeText={(content) => setPassword(content)}
-					secureTextEntry={true}
-					editable={!uploading}
-					contextMenuHidden={uploading}
-					keyboardType="visible-password"
+					title="Password:"
+					onValueChange={(content) => setPassword(content)}
+					disableContext={uploading}
+					disabled={uploading}
+					password
 					value={password || ""}
 					placeholder="myPassword"
-					placeholderTextColor="#222c47"
 				/>
 
-				<View style={styles.switchContainer}>
-					<Switch
-						value={originalName}
-						disabled={uploading}
-						onValueChange={() => setOriginalName((prev) => !prev)}
-						thumbColor={originalName ? "#2e3e6b" : "#222c47"}
-						trackColor={{
-							true: "#21273b",
-							false: "#181c28",
-						}}
-					/>
-					<Text
-						style={{
-							...styles.switchText,
-							...(uploading && styles.switchTextDisabled),
-						}}
-					>
-						Add Original Name
-					</Text>
-				</View>
+				<Switch
+					title="Add Original Name"
+					value={originalName || false}
+					disabled={uploading}
+					onValueChange={() => setOriginalName((prev) => !prev)}
+				/>
 			</KeyboardAwareScrollView>
 
 			<View>

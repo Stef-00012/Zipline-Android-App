@@ -106,15 +106,9 @@ export const styles = StyleSheet.create({
         backgroundColor: "#e03131"
     },
     textDisplay: {
-        marginTop: 10,
-        borderStyle: "solid",
-        borderWidth: 2,
-        borderColor: "#222c47",
         borderRadius: 15,
         padding: 15,
         height: 220,
-        color: "white",
-        width: "100%",
         fontFamily: "monospace",
         textAlignVertical: "top",
     },

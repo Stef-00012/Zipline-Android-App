@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid, TextInput } from "react-native";
+import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIFolders, APISettings, DashURL } from "@/types/zipline";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
@@ -15,9 +15,10 @@ import {
 } from "expo-router";
 import { createFolder, deleteFolder, editFolder, getFolders } from "@/functions/zipline/folders";
 import Popup from "@/components/Popup";
-import { Switch } from "@react-native-material/core";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import TextInput from "@/components/TextInput";
+import Switch from "@/components/Switch"
 
 export default function Folders() {
 	const router = useRouter();
@@ -59,35 +60,16 @@ export default function Folders() {
 						<Text style={styles.mainHeaderText}>Create Folder</Text>
 						{newFolderError && <Text style={styles.errorText}>{newFolderError}</Text>}
 
-						<Text style={styles.popupHeaderText}>Name:</Text>
 						<TextInput
-							style={styles.textInput}
-							onChangeText={(content) => {
+							title="Name:"
+							onValueChange={(content) => {
 								setNewFolderName(content);
 							}}
 							value={newFolderName || ""}
 							placeholder="myFolder"
-							placeholderTextColor="#222c47"
 						/>
-
-						<View style={styles.switchContainer}>
-							<Switch
-								value={newFolderPublic}
-								onValueChange={() => setNewFolderPublic((prev) => !prev)}
-								thumbColor={newFolderPublic ? "#2e3e6b" : "#222c47"}
-								trackColor={{
-									true: "#21273b",
-									false: "#181c28",
-								}}
-							/>
-							<Text
-								style={{
-									...styles.switchText
-								}}
-							>
-								Public
-							</Text>
-						</View>
+						
+						<Switch onValueChange={() => setNewFolderPublic((prev) => !prev)} value={newFolderPublic} title="Public" />
 
 						<Pressable
 							style={styles.button}

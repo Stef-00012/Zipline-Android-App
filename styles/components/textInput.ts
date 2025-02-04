@@ -6,19 +6,16 @@ export const styles = StyleSheet.create({
         height: 40,
     },
     textInput: {
-		width: "100%",
 		borderWidth: 2,
 		borderColor: "#222c47",
-// 		marginBottom: 5,
-// 		marginTop: 5,
 		color: "white",
-// 		height: 40,
+		height: 40,
 		paddingHorizontal: 10,
 		fontSize: 15,
 		borderRadius: 6,
 	},
     textInputSideButton: {
-		width: "86%",
+		flex: 1
 	},
     inputSideButton: {
         width: 40,
@@ -32,7 +29,6 @@ export const styles = StyleSheet.create({
 		color: "white",
 	},
     sideButton: {
-        backgroundColor: "#323ea8",
         padding: 10,
         marginLeft: 10,
         height: "100%",

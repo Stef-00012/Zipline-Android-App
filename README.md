@@ -35,3 +35,4 @@ This will create an apk but won't automatically install
 - [ ] check for unused styles
 - [ ] Metrics page
 - [ ] App update checking + update button
+test tmp

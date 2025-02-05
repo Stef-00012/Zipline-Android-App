@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
 		fontSize: 40,
 		fontWeight: "bold",
 		margin: "auto",
-		color: "#304270",
+		color: "#cdd6f4",
 		justifyContent: "center",
 		alignItems: "center",
 	},

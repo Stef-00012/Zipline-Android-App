@@ -16,7 +16,7 @@ export default function Temp() {
         }}>
             <View>
                 <Text style={{
-                    color: "#304270",
+                    color: "#cdd6f4",
                     fontSize: 30,
                     fontWeight: "bold",
                     margin: "auto",

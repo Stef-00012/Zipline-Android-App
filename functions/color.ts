@@ -176,3 +176,17 @@ export function isLightColor(color: string, luminanceThreshold = 0.179) {
 
 	return luminance(color) > luminanceThreshold;
 }
+
+export function rgbaToHex(r: number, g: number, b: number, a = 1) {
+	r = Math.min(255, Math.max(0, r));
+    g = Math.min(255, Math.max(0, g));
+    b = Math.min(255, Math.max(0, b));
+    a = Math.min(1, Math.max(0, a));
+	
+	const alpha = a << 24
+	const red = r << 16
+	const green = g << 8
+	const blue = b
+
+    return `#${(alpha + red + green + blue).toString(16).slice(1).toUpperCase()}`;
+}

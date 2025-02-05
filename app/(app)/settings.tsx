@@ -694,7 +694,7 @@ export default function UserSettings() {
 								<View style={styles.exportsContainer}>
 									<ScrollView
 										showsHorizontalScrollIndicator={false}
-										horizontal={true}
+										horizontal
 									>
 										<View>
 											<Table>

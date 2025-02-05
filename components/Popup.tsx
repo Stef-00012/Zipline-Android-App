@@ -1,5 +1,6 @@
 import { styles } from "@/styles/components/popup";
 import { Pressable, type StyleProp, View, type ViewStyle } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 interface Props {
     onClose: () => void;
@@ -28,7 +29,9 @@ export default function Popup({
                 styles.popupContainer,
                 popupStyle
             ]}>
-                {children}
+                <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+                    {children}
+                </KeyboardAwareScrollView>
             </View>
         </Pressable>
     )

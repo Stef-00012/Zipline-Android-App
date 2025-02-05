@@ -137,7 +137,7 @@ export default function Invites() {
 						<View style={{ ...styles.invitesContainer, flex: 1 }}>
 							<ScrollView
 								showsHorizontalScrollIndicator={false}
-								horizontal={true}
+								horizontal
 							>
 								<View>
 									<Table>

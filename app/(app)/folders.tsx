@@ -27,7 +27,6 @@ export default function Folders() {
 	useShareIntent()
 
 	const [folders, setFolders] = useState<APIFolders | null>(null);
-	const [settings, setSettings] = useState<APISettings | null>(null);
 
 	const [createNewFolder, setCreateNewFolder] = useState<boolean>(false);
 
@@ -41,10 +40,8 @@ export default function Folders() {
 	useEffect(() => {
 		(async () => {
 			const folders = await getFolders();
-			const settings = await getSettings();
 
 			setFolders(typeof folders === "string" ? null : folders);
-			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 
@@ -98,7 +95,7 @@ export default function Folders() {
 					</View>
 				</Popup>
 
-				{folders && settings && dashUrl ? (
+				{folders && dashUrl ? (
 					<View style={{ flex: 1 }}>
 						<View style={styles.header}>
 							<Text style={styles.headerText}>Folders</Text>
@@ -121,7 +118,7 @@ export default function Folders() {
 						<View style={{ ...styles.foldersContainer, flex: 1 }}>
 							<ScrollView
 								showsHorizontalScrollIndicator={false}
-								horizontal={true}
+								horizontal
 							>
 								<View>
 									<Table>

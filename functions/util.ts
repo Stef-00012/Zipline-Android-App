@@ -3,6 +3,8 @@ import type { Mimetypes } from "@/types/mimetypes";
 import bytes from "bytes";
 import ms, { type FormatOptions } from "enhanced-ms";
 import * as FileSystem from "expo-file-system";
+import { isLightColor, rgbaToHex, toRgba } from "./color";
+import { namedColors } from "@/constants/colors";
 
 const mimetypes = mimetypesJSON as Mimetypes;
 
@@ -100,24 +102,54 @@ export function colorHash(str: string) {
 	return color;
 }
 
-export function convertToBytes(value: string | number, options?: bytes.BytesOptions): string | null {
+export function convertToBytes(
+	value: string | number,
+	options?: bytes.BytesOptions,
+): string | null {
 	if (typeof value === "number") return bytes(value, options);
-	
-	if (/^\d+(\.\d+)?$/.test(value)) {
-		return bytes(Number.parseFloat(value),options);
-	}
 
+	if (/^\d+(\.\d+)?$/.test(value)) {
+		return bytes(Number.parseFloat(value), options);
+	}
 
 	return value;
 }
 
-export function convertToTime(value: string | number, options?: FormatOptions): string | null {
+export function convertToTime(
+	value: string | number,
+	options?: FormatOptions,
+): string | null {
 	if (typeof value === "number") return ms(value);
-	
+
 	if (/^\d+(\.\d+)?$/.test(value)) {
 		return ms(Number.parseFloat(value), options);
 	}
 
-
 	return value;
+}
+
+export function getRippleColor(color: string, fraction = 0.4) {
+	let hexColor = color;
+
+	if (hexColor in namedColors)
+		hexColor = namedColors[hexColor as keyof typeof namedColors];
+
+	if (!hexColor.startsWith("#")) return color;
+
+	const { r, g, b } = toRgba(hexColor);
+	const lightColor = isLightColor(hexColor);
+
+	if (lightColor) {
+		const newR = Math.max(0, Math.floor(r * (1 - fraction)));
+		const newG = Math.max(0, Math.floor(g * (1 - fraction)));
+		const newB = Math.max(0, Math.floor(b * (1 - fraction)));
+
+		return rgbaToHex(newR, newG, newB);
+	}
+
+	const newR = Math.min(255, Math.floor(r + (255 - r) * fraction));
+	const newG = Math.min(255, Math.floor(g + (255 - g) * fraction));
+	const newB = Math.min(255, Math.floor(b + (255 - b) * fraction));
+
+	return rgbaToHex(newR, newG, newB);
 }

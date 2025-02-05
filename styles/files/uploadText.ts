@@ -152,7 +152,8 @@ export const styles = StyleSheet.create({
         textAlignVertical: "top",
     },
     mainTextInputContainer: {
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        marginTop: 10,
     },
     header: {
 		flexDirection: "row",

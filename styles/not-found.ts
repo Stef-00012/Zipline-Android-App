@@ -9,13 +9,13 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	code: {
-		color: "#304270",
+		color: "#cdd6f4",
 		fontSize: 90,
 		fontWeight: "bold",
 		margin: "auto",
 	},
 	text: {
-		color: "#304270",
+		color: "#cdd6f4",
 		fontSize: 30,
 		fontWeight: "bold",
 		margin: "auto",

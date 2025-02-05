@@ -65,6 +65,7 @@ export default function Files() {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
 	useEffect(() => {
+		setFiles(null)
 		changePage()
 	}, [page, favorites, searchParams.page]);
 
@@ -400,58 +401,59 @@ export default function Files() {
 					</View>
 				</Popup>
 
-				{files && (
-					<View style={styles.header}>
-						<Text style={styles.headerText}>{name ? isFolder ? `Files in ${name}` : `${name}'s Files` : "Files"}</Text>
-						
-						{!isFolder && (
-							<View style={styles.headerButtons}>
-								<Pressable
-									style={styles.headerButton}
-									onPress={() => {
-										setFavorites((prev) => !prev);
-									}}
-								>
-									<MaterialIcons
-										name={favorites ? "star" : "star-border"}
-										size={30}
-										color={favorites ? styles.headerStarButtonActive.color : styles.headerButton.color}
-									/>
-								</Pressable>
+				<View style={styles.header}>
+					<Text style={styles.headerText}>{name ? isFolder ? `Files in ${name}` : `${name}'s Files` : "Files"}</Text>
+					
+					{!isFolder && (
+						<View style={styles.headerButtons}>
+							<Pressable
+								disabled={!files}
+								style={styles.headerButton}
+								onPress={() => {
+									setFavorites((prev) => !prev);
+								}}
+							>
+								<MaterialIcons
+									name={favorites ? "star" : "star-border"}
+									size={30}
+									color={favorites ? styles.headerStarButtonActive.color : styles.headerButton.color}
+								/>
+							</Pressable>
 
-								{!name && (
-									<>
-										<Pressable
-											style={styles.headerButton}
-											onPress={() => {
-												setTagsMenuOpen(true)
-											}}
-										>
-											<MaterialIcons
-												name="sell"
-												size={30}
-												color={styles.headerButton.color}
-											/>
-										</Pressable>
+							{!name && (
+								<>
+									<Pressable
+										disabled={!files}
+										style={styles.headerButton}
+										onPress={() => {
+											setTagsMenuOpen(true)
+										}}
+									>
+										<MaterialIcons
+											name="sell"
+											size={30}
+											color={styles.headerButton.color}
+										/>
+									</Pressable>
 
-										<Pressable
-											style={styles.headerButton}
-											onPress={() => {
-												router.replace("/upload/file")
-											}}
-										>
-											<MaterialIcons
-												name="upload-file"
-												size={30}
-												color={styles.headerButton.color}
-											/>
-										</Pressable>
-									</>
-								)}
-							</View>
-						)}
-					</View>
-				)}
+									<Pressable
+										disabled={!files}
+										style={styles.headerButton}
+										onPress={() => {
+											router.replace("/upload/file")
+										}}
+									>
+										<MaterialIcons
+											name="upload-file"
+											size={30}
+											color={styles.headerButton.color}
+										/>
+									</Pressable>
+								</>
+							)}
+						</View>
+					)}
+				</View>
 
 				<ScrollView
 					showsVerticalScrollIndicator={false}

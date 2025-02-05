@@ -42,7 +42,7 @@ export default function Home() {
 			// db.del("url")
 			// db.del("token")
 
-			// router.replace("/admin/settings");
+			router.replace("/test");
 		}
 	});
 

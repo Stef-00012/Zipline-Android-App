@@ -108,7 +108,7 @@ export default function Select({
 
             {isOpen && (
                 <Modal
-                    transparent={true}
+                    transparent
                     animationType="fade"
                     visible={isOpen}
                     onRequestClose={() => {

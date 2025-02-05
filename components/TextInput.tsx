@@ -81,7 +81,7 @@ export default function TextInput({
 					<NativeTextInput
 						showSoftInputOnFocus={showSoftInputOnFocus}
 						multiline={multiline}
-						secureTextEntry={true}
+						secureTextEntry
 						onChange={onChange}
 						onSubmitEditing={onSubmitEditing}
 						maxLength={maxLength}

@@ -390,7 +390,7 @@ export default function UploadText({
 					}}
 					keyboardType="numeric"
 					disableContext={!uploading}
-					disabled={!uploading}
+					disabled={uploading}
 					value={compression ? String(compression) : ""}
 					placeholder="0"
 				/>
@@ -405,7 +405,7 @@ export default function UploadText({
 						setMaxViews(maxViewsAmount);
 					}}
 					keyboardType="numeric"
-					disabled={!uploading}
+					disabled={uploading}
 					disableContext={!uploading}
 					value={maxViews ? String(maxViews) : ""}
 					placeholder="0"
@@ -442,7 +442,7 @@ export default function UploadText({
 					title="Override Domain:"
 					onValueChange={(content) => setOverrideDomain(content)}
 					keyboardType="url"
-					disabled={!uploading}
+					disabled={uploading}
 					disableContext={!uploading}
 					value={overrideDomain || ""}
 					placeholder="example.com"
@@ -450,7 +450,7 @@ export default function UploadText({
 
 				<TextInput
 					title="Override File Name:"
-					disabled={!uploading}
+					disabled={uploading}
 					disableContext={!uploading}
 					onValueChange={(content) => setFileName(content)}
 					value={fileName || ""}
@@ -460,7 +460,7 @@ export default function UploadText({
 				<TextInput
 					title="Password:"
 					onValueChange={(content) => setPassword(content)}
-					disabled={!uploading}
+					disabled={uploading}
 					disableContext={!uploading}
 					password
 					value={password || ""}

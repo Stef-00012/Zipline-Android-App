@@ -557,7 +557,7 @@ export default function Users() {
 						<View style={{ ...styles.usersContainer, flex: 1 }}>
 							<ScrollView
 								showsHorizontalScrollIndicator={false}
-								horizontal={true}
+								horizontal
 							>
 								<View>
 									<Table>

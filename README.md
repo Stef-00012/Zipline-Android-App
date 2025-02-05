@@ -30,6 +30,8 @@ This will create an apk but won't automatically install
 
 # TODO
 
+- [ ] Check for internet connection
+- [ ] Fix keyboard covering inputs
 - [ ] Move same Pressable component to @/components/Button to avoid typing the same styles over and over again
 - [ ] Metrics page
 - [ ] check for unused styles

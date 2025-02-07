@@ -111,6 +111,7 @@ export const styles = StyleSheet.create({
     },
     uploadedFileContainer: {
         flexDirection: "row",
+		alignItems: "center"
     },
     uploadedFileButton: {
         padding: 10,

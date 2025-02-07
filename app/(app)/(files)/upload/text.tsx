@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
+import Button from "@/components/Button";
 
 interface SelectedFile {
 	name: string;
@@ -148,9 +149,10 @@ export default function UploadText({
 							>
 								{uploadedFile.url}
 							</Link>
-
-							<Pressable
-								style={styles.uploadedFileButton}
+							
+							<Button
+								icon="content-copy"
+								color="#323ea8"
 								onPress={async () => {
 									const saved = await Clipboard.setStringAsync(
 										uploadedFile.url,
@@ -167,26 +169,31 @@ export default function UploadText({
 										ToastAndroid.SHORT,
 									);
 								}}
-							>
-								<MaterialIcons
-									name="content-copy"
-									size={16}
-									color="white"
-								/>
-							</Pressable>
-
-							<Pressable
-								style={styles.uploadedFileButton}
+								iconSize={20}
+								width={32}
+								height={32}
+								padding={6}
+								margin={{
+								    left: 5,
+								    right: 5
+								}}
+							/>
+							
+							<Button
+								icon="open-in-new"
+								color="#323ea8"
 								onPress={() => {
 									router.replace(uploadedFile.url as ExternalPathString);
 								}}
-							>
-								<MaterialIcons
-									name="open-in-new"
-									size={16}
-									color="white"
-								/>
-							</Pressable>
+								iconSize={20}
+								width={32}
+								height={32}
+								padding={6}
+								margin={{
+								    left: 5,
+								    right: 5
+								}}
+							/>
 						</View>
 						</ScrollView>
 					</View>
@@ -217,18 +224,19 @@ export default function UploadText({
 					<Text style={styles.headerText}>Upload Text</Text>
 
 					<View style={styles.headerButtons}>
-						<Pressable
-							style={styles.headerButton}
+						<Button 
 							onPress={() => {
 								router.replace("/files")
 							}}
-						>
-							<MaterialIcons
-								name="folder-open"
-								size={30}
-								color={styles.headerButton.color}
-							/>
-						</Pressable>
+							icon="folder-open"
+							color="transparent"
+							iconColor="#2d3f70"
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+						/>
 					</View>
 				</View>
 
@@ -249,14 +257,10 @@ export default function UploadText({
 
 			{showFileSelector && (
 				<View>
-					<Pressable
-						style={{
-							...styles.button,
-							...styles.selectFilesButton,
-							...(uploading && styles.buttonDisabled),
-						}}
-						disabled={uploading}
-						onPress={async () => {
+				    <Button
+				        width="90%"
+				        disabled={uploading}
+				        onPress={async () => {
 							const output = await DocumentPicker.getDocumentAsync({
 								type: [
 									"text/*",
@@ -295,16 +299,15 @@ export default function UploadText({
 							setFileType(mimetype)
 							setFileExtension(extension)
 						}}
-					>
-						<Text
-							style={{
-								...styles.buttonText,
-								...(uploading && styles.buttonTextDisabled),
-							}}
-						>
-							Select file
-						</Text>
-					</Pressable>
+						text="Select File"
+						color={uploading ? "#373d79" : "#323ea8"}
+						textColor={uploading ? "gray" : "white"}
+						margin={{
+						    left: "auto",
+						    right: "auto",
+						    top: 10
+						}}
+				    />
 				</View>
 			)}
 
@@ -476,14 +479,10 @@ export default function UploadText({
 			</KeyboardAwareScrollView>
 
 			<View>
-				<Pressable
-					disabled={uploading || uploadButtonDisabled}
-					style={{
-						...styles.button,
-						...styles.uploadButton,
-						...(uploadButtonDisabled && styles.buttonDisabled),
-					}}
-					onPress={async () => {
+			    <Button
+			        width="90%"
+			        disabled={uploading || uploadButtonDisabled}
+			        onPress={async () => {
 						setUploading(true);
 
 						const extension = fileExtension || "txt"
@@ -524,17 +523,15 @@ export default function UploadText({
 
 						afterUploadCleanup();
 					}}
-				>
-					<Text
-						style={{
-							...styles.buttonText,
-							...((uploadButtonDisabled || uploading) &&
-								styles.buttonTextDisabled),
-						}}
-					>
-						{uploading ? "Uploading" : "Upload File(s)"}
-					</Text>
-				</Pressable>
+					text={uploading ? "Uploading..." : "Upload File"}
+					color={(uploading || uploadButtonDisabled) ? "#373d79" : "#323ea8"}
+					textColor={(uploading || uploadButtonDisabled) ? "gray" : "white"}
+					margin={{
+					    left: "auto",
+					    right: "auto",
+					    top: 10
+					}}
+			    />
 			</View>
 		</View>
 	);

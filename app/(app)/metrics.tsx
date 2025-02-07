@@ -1,10 +1,16 @@
+import Button from "@/components/Button";
+import Popup from "@/components/Popup";
 import { getStats } from "@/functions/zipline/stats";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/metrics";
 import type { APIStats } from "@/types/zipline";
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
+import DatePicker from "@/components/DatePicker";
+import { add } from "date-fns";
+import type { DateType } from "react-native-ui-datepicker";
 
 export default function Metrics() {
     useAuth()
@@ -21,24 +27,73 @@ export default function Metrics() {
         })()
     }, [])
 
+    const [datePickerOpen, setDatePickerOpen] = useState(false)
+
+    const [range, setRange] = useState<{
+        startDate: DateType;
+        endDate: DateType;
+    }>({
+        startDate: add(new Date(), {
+            weeks: -1
+        }),
+        endDate: new Date()
+    });
+
+    
+    // MAIN:
+
+    return <Redirect href="/temp_wip" />
+
     return (
-        <Redirect href="/temp_wip" />
+        <View style={styles.mainContainer}>
+            <View style={styles.mainContainer}>
+                <DatePicker
+                    open={datePickerOpen}
+                    onClose={() => {
+                        setDatePickerOpen(false)
+                        console.log("close")
+                    }}
+                    onChange={(params) => {
+                        setRange(params)
+
+                        if (params.endDate && params.startDate) {
+                            // setDatePickerOpen(false)
+
+                            // handle date change
+                        }
+                        console.log("params", params)
+                    }}
+                    mode="range"
+                    startDate={range.startDate}
+                    endDate={range.endDate}
+                    maxDate={new Date()}
+                />
+
+                <Button
+                    onPress={() => {
+                        setDatePickerOpen(true)
+                    }}
+                    text="test"
+                    color="blue"
+                />
+            </View>
+        </View>
     )
 
-    // return (
-    //     <View>
-    //         <View
-	// 			style={{
-	// 				flex: 1,
-	// 			}}
-	// 		>
-    //             {/* ___________________________________________________________
-    //                 |    elements   |         charts         |  date picker   |
-    //                 | @mantine/core |    @mantine/charts     | @mantine/dates |
-    //                 |               | react-native-chart-kit |                |
-    //                 -----------------------------------------------------------
-    //             */}
-    //         </View>
-    //     </View>
-    // )
+    /* return (
+        <View>
+            <View
+				style={{
+					flex: 1,
+				}}
+			>
+                {   ___________________________________________________________
+                    |    elements   |         charts         |  date picker   |
+                    | @mantine/core |    @mantine/charts     | @mantine/dates |
+                    |               | react-native-chart-kit |                |
+                    -----------------------------------------------------------
+                }
+            </View>
+        </View>
+    ) */
 }

@@ -7,8 +7,9 @@ import {
 } from "react-native";
 import { styles } from "@/styles/components/textInput";
 import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import type { MaterialIcons } from "@expo/vector-icons";
 import type { KeyboardType, NativeSyntheticEvent, ReturnKeyTypeOptions, TextInputChangeEventData, TextInputSubmitEditingEventData, TextStyle } from "react-native";
+import Button from "./Button";
 
 interface Props {
 	value?: string;
@@ -20,7 +21,7 @@ interface Props {
 	showDisabledStyle?: boolean;
 	multiline?: boolean;
 	password?: boolean;
-	keyboardType?: KeyboardType // | "visible-password"
+	keyboardType?: KeyboardType;
 	placeholder?: string;
 	sideButtonColor?: ColorValue;
 	sideButtonIconColor?: ColorValue;
@@ -32,10 +33,7 @@ interface Props {
 	onChange?: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void | Promise<void>;
 	onSubmitEditing?: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | Promise<void>;
 	returnKeyType?: ReturnKeyTypeOptions;
-
 }
-
-const sideButtonSize = 17
 
 export default function TextInput({
 	value,
@@ -100,23 +98,18 @@ export default function TextInput({
 						placeholderTextColor="#222c47"
 						returnKeyType={returnKeyType}
 					/>
-					<Pressable
-						style={{
-							...styles.sideButton,
-							...(sideButtonColor && { backgroundColor: sideButtonColor }),
-						}}
+					<Button
 						onPress={() => {
 							onPasswordToggle(!displayPassword);
 							onSideButtonPress()
 							setDisplayPassword((prev) => !prev);
 						}}
-					>
-						<MaterialIcons
-							name={displayPassword ? "visibility-off" : "visibility"}
-							color="white"
-							size={sideButtonSize}
-						/>
-					</Pressable>
+						icon={displayPassword ? "visibility-off" : "visibility"}
+						color={sideButtonColor}
+						margin={{
+							left: 10
+						}}
+					/>
 				</View>
 			</View>
 		);
@@ -158,21 +151,17 @@ export default function TextInput({
 						placeholderTextColor="#222c47"
 						returnKeyType={returnKeyType}
 					/>
-					<Pressable
-						style={{
-							...styles.sideButton,
-							...(sideButtonColor && { backgroundColor: sideButtonColor }),
-						}}
+					<Button
 						onPress={() => {
 							onSideButtonPress();
 						}}
-					>
-						<MaterialIcons
-							name={sideButtonIcon}
-							color={sideButtonIconColor}
-							size={sideButtonSize}
-						/>
-					</Pressable>
+						icon={sideButtonIcon}
+						iconColor={sideButtonIconColor}
+						color={sideButtonColor}
+						margin={{
+							left: 10
+						}}
+					/>
 				</View>
 			</View>
 		);

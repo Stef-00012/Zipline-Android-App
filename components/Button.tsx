@@ -1,7 +1,7 @@
 import { getRippleColor } from "@/functions/util";
 import { styles } from "@/styles/components/button";
 import { MaterialIcons } from "@expo/vector-icons";
-import { type ColorValue, type DimensionValue, Pressable, Text } from "react-native";
+import { type AnimatableNumericValue, type ColorValue, type DimensionValue, Pressable, Text } from "react-native";
 
 interface Props {
     onPress: () => unknown | Promise<unknown>;
@@ -15,6 +15,7 @@ interface Props {
     iconColor?: ColorValue;
     borderWidth?: number;
     borderColor?: ColorValue;
+    borderRadius?: string | AnimatableNumericValue;
     iconSize?: number;
     padding?: number;
     rippleColor?: ColorValue;
@@ -24,7 +25,10 @@ interface Props {
         left?: DimensionValue;
         right?: DimensionValue;
     },
-    flex?: number
+    flex?: number;
+    position?: "left" | "center" | "right";
+    bold?: boolean;
+    open?: boolean;
 }
 
 export default function Button({
@@ -43,8 +47,18 @@ export default function Button({
     padding = 10,
     margin = {},
     rippleColor,
-    flex
+    flex,
+    borderRadius,
+    position,
+    bold = true,
+    open
 }: Props) {
+    const flexPositions: { [key in "left" | "center" | "right"]: "center" | "flex-start" | "flex-end" } = {
+        center: "center",
+        left: "flex-start",
+        right: "flex-end"
+    }
+
     return (
         <Pressable
             onPress={onPress}
@@ -55,16 +69,18 @@ export default function Button({
             style={{
                 ...styles.button,
                 width: width,
-                ...(height && { height: height }),
                 backgroundColor: color,
                 borderWidth: borderWidth,
                 borderColor: borderColor,
                 padding: padding - borderWidth,
-                ...(margin.left && { marginLeft: margin.left }),
-                ...(margin.right && { marginRight: margin.right }),
-                ...(margin.top && { marginTop: margin.top }),
-                ...(margin.bottom && { marginBottom: margin.bottom }),
-                ...(flex && { flex })
+                justifyContent: flexPositions[position || "center"],
+                marginLeft: margin.left,
+                marginRight: margin.right,
+                marginTop: margin.top,
+                marginBottom: margin.bottom,
+                flex,
+                ...((!Number.isNaN(Number(height))) && { height }),
+                ...((!Number.isNaN(Number(borderRadius))) && { borderRadius }),
             }}
         >
             {icon && (
@@ -78,8 +94,12 @@ export default function Button({
                 <Text style={{
                     ...styles.buttonText,
                     color: textColor,
+                    fontWeight: bold ? "bold" : "normal",
                     ...(icon && { marginLeft: 5 })
                 }}>{text}</Text>
+            )}
+            {typeof open === "boolean" && (
+                <MaterialIcons name={open ? "expand-more" : "expand-less"} size={20} color="white" />
             )}
         </Pressable>
     )

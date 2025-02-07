@@ -4,8 +4,6 @@ import { useRouter } from "expo-router";
 export default function Temp() {
     const router = useRouter();
 
-    console.log("a")
-
     return (
         <View style={{
             flex: 1,

@@ -19,6 +19,7 @@ import * as FileSystem from "expo-file-system"
 import Popup from "@/components/Popup";
 import React from "react";
 import TextInput from "./TextInput";
+import Button from "./Button";
 
 interface Props {
 	file: APIFile;
@@ -91,49 +92,53 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 					<Text style={styles.serverActionWarningText}>Are you sure you want to delete {file.name}? This action cannot be undone.</Text>
 
 					<View style={styles.fileDeleteButtonsContainer}>
-						<Pressable style={{
-							...styles.button,
-							...styles.fileDeleteButtonCancel,
-							marginRight: 10
-						}} onPress={() => {
-							setDeleteFilePopup(false)
-							setTempHidden(false)
-						}}>
-							<Text style={styles.buttonText}>Cancel</Text>
-						</Pressable>
-
-						<Pressable style={{
-							...styles.button,
-							...styles.fileDeleteButtonDanger,
-							marginRight: 10
-						}} onPress={async () => {
-							const fileId = file.id
-
-							const success = await deleteFile(fileId)
-
-							if (typeof success === "string") {
-								ToastAndroid.show(
-									`Error: ${success}`,
-									ToastAndroid.SHORT
-								)
-
+					<Button
+							color="#181c28"
+							text="Cancel"
+							onPress={() => {
 								setDeleteFilePopup(false)
 								setTempHidden(false)
+							}}
+							margin={{
+								top: 10,
+								right: 10
+							}}
+						/>
 
-								return;
-							}
-
-							setDeleteFilePopup(false)
-							setTempHidden(false)
-							onClose(true)
-
-							ToastAndroid.show(
-								`Successfully deleted the file ${file.name}`,
-								ToastAndroid.SHORT
-							)
-						}}>
-							<Text style={styles.buttonText}>Delete {file.name}</Text>
-						</Pressable>
+						<Button
+							color="#CF4238"
+							text={`Delete ${file.name}`}
+							onPress={async () => {
+								const fileId = file.id
+	
+								const success = await deleteFile(fileId)
+	
+								if (typeof success === "string") {
+									ToastAndroid.show(
+										`Error: ${success}`,
+										ToastAndroid.SHORT
+									)
+	
+									setDeleteFilePopup(false)
+									setTempHidden(false)
+	
+									return;
+								}
+	
+								setDeleteFilePopup(false)
+								setTempHidden(false)
+								onClose(true)
+	
+								ToastAndroid.show(
+									`Successfully deleted the file ${file.name}`,
+									ToastAndroid.SHORT
+								)
+							}}
+							margin={{
+								top: 10,
+								right: 10
+							}}
+						/>
 					</View>
 				</View>
 
@@ -178,31 +183,35 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 					/>
 
 					{filePassword ? (
-						<Pressable style={{
-							...styles.button,
-							...styles.buttonDanger
-						}} onPress={() => {
-							const fileId = file.id
+						<Button
+							color="#CF4238"
+							text="Remove Password"
+							onPress={() => {
+								const fileId = file.id
 
-							const success = editFile(fileId, {
-								password: null
-							})
+								const success = editFile(fileId, {
+									password: null
+								})
 
-							if (typeof success === "string") return ToastAndroid.show(
-								`Error: ${success}`,
-								ToastAndroid.SHORT
-							)
+								if (typeof success === "string") return ToastAndroid.show(
+									`Error: ${success}`,
+									ToastAndroid.SHORT
+								)
 
-							setFilePassword(false)
-							file.password = false
+								setEditFilePassword(null)
 
-							ToastAndroid.show(
-								"Successfully removed the password",
-								ToastAndroid.SHORT
-							)
-						}}>
-							<Text style={styles.buttonText}>Remove Password</Text>
-						</Pressable>
+								setFilePassword(false)
+								file.password = false
+
+								ToastAndroid.show(
+									"Successfully removed the password",
+									ToastAndroid.SHORT
+								)
+							}}
+							margin={{
+								top: 10
+							}}
+						/>
 					) : (
 						<TextInput
 							title="Password:"
@@ -214,8 +223,10 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 						/>
 					)}
 
-					<Pressable
-						style={styles.button}
+					<Button
+						color="#323ea8"
+						text="Save Changes"
+						icon="save"
 						onPress={async () => {
 							const fileId = file.id
 
@@ -254,10 +265,11 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								`Successfully edited the file ${file.name}`,
 								ToastAndroid.SHORT
 							)
-						}}	
-					>
-						<Text style={styles.buttonText}>Save Changes</Text>
-					</Pressable>
+						}}
+						margin={{
+							top: 10
+						}}
+					/>
 				</View>
 			</Popup>
 
@@ -413,29 +425,34 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 
 						<Text style={styles.fileInfoHeader}>Folder</Text>
 						{fileFolderId ? (
-							<Pressable style={styles.removeFolderButton} onPress={async () => {
-								if (!fileFolderId) return;
-
-								const folderId = fileFolderId
-								const fileId = file.id
-
-								const success = removeFileFromFolder(folderId, fileId)
-
-								if (typeof success === "string") return ToastAndroid.show(
-									`Error: ${success}`,
-									ToastAndroid.SHORT
-								)
-
-								setFileFolderId(null)
-								file.folderId = null
-
-								ToastAndroid.show(
-									"Successfully removed the file from the folder",
-									ToastAndroid.SHORT
-								)
-							}}>
-								<Text style={styles.removeFolderButtonText}>Remove from folder "{folders.find(folder => folder.id === file.folderId)?.name}"</Text>
-							</Pressable>
+							<Button
+								color="#e03131"
+								text={`Remove from folder "${folders.find(folder => folder.id === file.folderId)?.name}"`}
+								onPress={async () => {
+									if (!fileFolderId) return;
+	
+									const folderId = fileFolderId
+									const fileId = file.id
+	
+									const success = removeFileFromFolder(folderId, fileId)
+	
+									if (typeof success === "string") return ToastAndroid.show(
+										`Error: ${success}`,
+										ToastAndroid.SHORT
+									)
+	
+									setFileFolderId(null)
+									file.folderId = null
+	
+									ToastAndroid.show(
+										"Successfully removed the file from the folder",
+										ToastAndroid.SHORT
+									)
+								}}
+								margin={{
+									top: 5
+								}}
+							/>
 						) : (
 							<Select
 								placeholder="Add to Folder..."
@@ -474,127 +491,171 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 						<Text style={styles.subHeaderText}>{file.id}</Text>
 
 						<View style={styles.actionButtonsContainer}>
-							<Pressable style={{
-								...styles.actionButton,
-								...styles.actionButtonEdit
-							}} onPress={() => {
-								setEditFilePopup(true)
-								setTempHidden(true)
-							}}>
-								<MaterialIcons name="edit" size={20} color="white"  />
-							</Pressable>
+							<Button
+								icon="edit"
+								color="#e8590c"
+								onPress={() => {
+									setEditFilePopup(true)
+									setTempHidden(true)
+								}}
+								iconSize={20}
+								width={30}
+								height={30}
+								padding={5}
+								margin={{
+									left: 5,
+									right: 5
+								}}
+							/>
 
-							<Pressable style={{
-								...styles.actionButton,
-								...styles.actionButtonDelete
-							}} onPress={() => {
-								setDeleteFilePopup(true)
-								setTempHidden(true)
-							}}>
-								<MaterialIcons name="delete" size={20} color="white"  />
-							</Pressable>
+							<Button
+								icon="delete"
+								color="#e03131"
+								onPress={() => {
+									setDeleteFilePopup(true)
+									setTempHidden(true)
+								}}
+								iconSize={20}
+								width={30}
+								height={30}
+								padding={5}
+								margin={{
+									left: 5,
+									right: 5
+								}}
+							/>
 
-							<Pressable style={{
-								...styles.actionButton,
-								...(fileFavorite && styles.actionButtonFavorite)
-							}} onPress={async () => {
-								const success = editFile(file.id, {
-									favorite: !file.favorite
-								})
-
-								if (typeof success === "string") return ToastAndroid.show(
-									`Error: ${success}`,
-									ToastAndroid.SHORT
-								)
-
-								file.favorite = !fileFavorite
-								setFileFavorite((prev) => !prev)
-
-								ToastAndroid.show(
-									`Successfully ${fileFavorite ? "removed from" : "added to"} favorites`,
-									ToastAndroid.SHORT
-								)
-							}}>
-								<MaterialIcons name={fileFavorite ? "star" : "star-outline"} size={20} color="white"  />
-							</Pressable>
-
-							<Pressable style={{
-								...styles.actionButton,
-								...styles.actionButtonOpen
-							}} onPress={() => {
-								router.replace(`${dashUrl}${file.url}` as ExternalPathString)
-							}}>
-								<MaterialIcons name="open-in-new" size={20} color="white"  />
-							</Pressable>
-
-							<Pressable style={{
-								...styles.actionButton
-							}} onPress={async () => {
-								const url = `${dashUrl}${file.url}`
-
-								const success = await Clipboard.setStringAsync(url)
-
-								if (!success) return ToastAndroid.show(
-									"Failed to copy the URL",
-									ToastAndroid.SHORT
-								)
-
-								ToastAndroid.show(
-									"Copied URL to clipboard",
-									ToastAndroid.SHORT
-								)
-							}}>
-								<MaterialIcons name="content-copy" size={20} color="white"  />
-							</Pressable>
-
-							<Pressable style={{
-								...styles.actionButton
-							}} onPress={async () => {
-								const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`
-
-								let savedFileDownloadUri = db.get("fileDownloadPath")
-
-								if (!savedFileDownloadUri) {
-									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-									if (!permissions.granted) return ToastAndroid.show(
-										"The permission to save the file was not granted",
+							<Button
+								icon={fileFavorite ? "star" : "star-outline"}
+								color={fileFavorite ? "#f08c00" : "#343a40"}
+								onPress={async () => {
+									const success = editFile(file.id, {
+										favorite: !file.favorite
+									})
+	
+									if (typeof success === "string") return ToastAndroid.show(
+										`Error: ${success}`,
 										ToastAndroid.SHORT
-									);
+									)
+	
+									file.favorite = !fileFavorite
+									setFileFavorite((prev) => !prev)
+	
+									ToastAndroid.show(
+										`Successfully ${fileFavorite ? "removed from" : "added to"} favorites`,
+										ToastAndroid.SHORT
+									)
+								}}
+								iconSize={20}
+								width={30}
+								height={30}
+								padding={5}
+								margin={{
+									left: 5,
+									right: 5
+								}}
+							/>
 
-									db.set("fileDownloadPath", permissions.directoryUri)
-									savedFileDownloadUri = permissions.directoryUri
-								}
+							<Button
+								icon="open-in-new"
+								color="#323ea8"
+								onPress={() => {
+									router.replace(`${dashUrl}${file.url}` as ExternalPathString)
+								}}
+								iconSize={20}
+								width={30}
+								height={30}
+								padding={5}
+								margin={{
+									left: 5,
+									right: 5
+								}}
+							/>
 
-								ToastAndroid.show(
-									"Downloading...",
-									ToastAndroid.SHORT
-								)
+							<Button
+								icon="content-copy"
+								color="#343a40"
+								onPress={async () => {
+									const url = `${dashUrl}${file.url}`
+	
+									const success = await Clipboard.setStringAsync(url)
+	
+									if (!success) return ToastAndroid.show(
+										"Failed to copy the URL",
+										ToastAndroid.SHORT
+									)
+	
+									ToastAndroid.show(
+										"Copied URL to clipboard",
+										ToastAndroid.SHORT
+									)
+								}}
+								iconSize={20}
+								width={30}
+								height={30}
+								padding={5}
+								margin={{
+									left: 5,
+									right: 5
+								}}
+							/>
 
-								const saveUri = await FileSystem.StorageAccessFramework.createFileAsync(savedFileDownloadUri, file.name, file.type)
-
-								const downloadResult = await FileSystem.downloadAsync(downloadUrl, `${FileSystem.cacheDirectory}/${file.name}`)
-
-								if (!downloadResult.uri) return ToastAndroid.show(
-									"Something went wrong while downloading the file",
-									ToastAndroid.SHORT
-								)
-
-								const base64File = await FileSystem.readAsStringAsync(downloadResult.uri, {
-									encoding: FileSystem.EncodingType.Base64
-								})
-
-								await FileSystem.writeAsStringAsync(saveUri, base64File, {
-									encoding: FileSystem.EncodingType.Base64
-								})
-
-								ToastAndroid.show(
-									"Successfully downloaded the file",
-									ToastAndroid.SHORT
-								)
-							}}>
-								<MaterialIcons name="file-download" size={20} color="white"  />
-							</Pressable>
+							<Button
+								icon="file-download"
+								color="#343a40"
+								onPress={async () => {
+									const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`
+	
+									let savedFileDownloadUri = db.get("fileDownloadPath")
+	
+									if (!savedFileDownloadUri) {
+										const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+	
+										if (!permissions.granted) return ToastAndroid.show(
+											"The permission to save the file was not granted",
+											ToastAndroid.SHORT
+										);
+	
+										db.set("fileDownloadPath", permissions.directoryUri)
+										savedFileDownloadUri = permissions.directoryUri
+									}
+	
+									ToastAndroid.show(
+										"Downloading...",
+										ToastAndroid.SHORT
+									)
+	
+									const saveUri = await FileSystem.StorageAccessFramework.createFileAsync(savedFileDownloadUri, file.name, file.type)
+	
+									const downloadResult = await FileSystem.downloadAsync(downloadUrl, `${FileSystem.cacheDirectory}/${file.name}`)
+	
+									if (!downloadResult.uri) return ToastAndroid.show(
+										"Something went wrong while downloading the file",
+										ToastAndroid.SHORT
+									)
+	
+									const base64File = await FileSystem.readAsStringAsync(downloadResult.uri, {
+										encoding: FileSystem.EncodingType.Base64
+									})
+	
+									await FileSystem.writeAsStringAsync(saveUri, base64File, {
+										encoding: FileSystem.EncodingType.Base64
+									})
+	
+									ToastAndroid.show(
+										"Successfully downloaded the file",
+										ToastAndroid.SHORT
+									)
+								}}
+								iconSize={20}
+								width={30}
+								height={30}
+								padding={5}
+								margin={{
+									left: 5,
+									right: 5
+								}}
+							/>
 						</View>
 					</KeyboardAwareScrollView>
 				</View>

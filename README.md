@@ -30,9 +30,6 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] Check for internet connection
-- [x] Fix keyboard covering inputs (`Animated.View` + `useAnimatedKeyboard`)
-- [ ] Move same Pressable component to @/components/Button to avoid typing the same styles over and over again
 - [ ] Metrics page
 - [ ] check for unused styles
 - [ ] App update checking + update button

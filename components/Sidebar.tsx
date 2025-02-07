@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/functions/zipline/user";
 import { type SidebarOption, sidebarOptions } from "@/constants/sidebar"
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router"
+import Button from "./Button";
 
 interface Props {
     open: boolean;
@@ -77,22 +78,24 @@ export default function Sidebar({ open = false, paddingTop = 0, setOpen }: Props
             const route = option.route as RelativePathString
 
             return (
-                <Pressable key={route} onPress={() => {
-                    setOpen(false)
-
-                    if (isActive) return;
-
-                    router.replace(route)
-                }} style={{
-                    ...styles.sidebarOption,
-                    ...(isActive && styles.sidebarOptionActive)
-                }}>
-                    <MaterialIcons name={option.icon} size={20} color={isActive ? styles.sidebarOptionTextActive.color : styles.sidebarOptionText.color} />
-                    <Text style={{
-                        ...styles.sidebarOptionText,
-                        ...(isActive && styles.sidebarOptionTextActive)
-                    }}>{option.name}</Text>
-                </Pressable>
+                <Button
+                    key={route}
+                    borderRadius={0}
+                    icon={option.icon}
+                    onPress={() => {
+                        setOpen(false)
+    
+                        if (isActive) return;
+    
+                        router.replace(route)
+                    }}
+                    color={isActive ? "#14192F" : "transparent"}
+                    textColor={isActive ? "#6D71B1" : "white"}
+                    text={option.name}
+                    position="left"
+                    rippleColor={isActive ? undefined : "#283557"}
+                    bold={false}
+                />
             )
         }
         
@@ -101,16 +104,19 @@ export default function Sidebar({ open = false, paddingTop = 0, setOpen }: Props
 
             return (
                 <View key={option.name}>
-                    <Pressable onPress={() => setOpenStates((prev) => {
-                        return {
+                    <Button
+                        onPress={() => setOpenStates((prev) => ({
                             ...prev,
                             [option.name]: !prev[option.name]
-                        }
-                    })} style={styles.sidebarOption}>
-                        <MaterialIcons name={option.icon} size={20} color={styles.sidebarOptionText.color} />
-                        <Text style={styles.sidebarOptionText}>{option.name}</Text>
-                        <MaterialIcons name={open ? "expand-more" : "expand-less"} size={20} color={styles.sidebarOptionText.color} />
-                    </Pressable>
+                        }))}
+                        color="transparent"
+                        icon={option.icon}
+                        text={option.name}
+                        position="left"
+                        rippleColor="#283557"
+                        bold={false}
+                        open={open}
+                    />
                     {open && (
                         <View style={{ paddingLeft: 20 }}>
                             {option.subMenus.map(renderSidebarOptions)}

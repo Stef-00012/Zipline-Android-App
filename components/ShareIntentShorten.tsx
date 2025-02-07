@@ -8,6 +8,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import TextInput from "./TextInput";
+import Button from "./Button";
 
 interface Props {
     defaultUrl: string
@@ -38,20 +39,21 @@ export default function ShareIntentShorten({
 					<Text style={styles.mainHeaderText}>Shorten URL</Text>
 
 					<View style={styles.headerButtons}>
-						<Pressable
-							style={styles.headerButton}
+						<Button
 							onPress={() => {
 								resetShareIntent();
 
 								router.replace("/urls")
 							}}
-						>
-							<MaterialIcons
-								name="link"
-								size={30}
-								color={styles.headerButton.color}
-							/>
-						</Pressable>
+							icon="link"
+							color="transparent"
+							iconColor="#2d3f70"
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+						/>
 					</View>
 				</View>
 
@@ -94,8 +96,9 @@ export default function ShareIntentShorten({
 					placeholder="myPassword"
 				/>
 
-				<Pressable
-					style={styles.button}
+				<Button
+					color="#323ea8"
+					text="Shorten"
 					onPress={async () => {
 						setError(undefined);
 						setOutputUrl(null);
@@ -132,9 +135,10 @@ export default function ShareIntentShorten({
 
 						setOutputUrl(shortenedUrlData.url);
 					}}
-				>
-					<Text style={styles.buttonText}>Shorten</Text>
-				</Pressable>
+					margin={{
+						top: 15
+					}}
+				/>
 
 				{outputUtl && (
 					<View>

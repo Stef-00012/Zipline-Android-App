@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
+import Button from "@/components/Button";
 
 export default function Urls() {
 	useAuth()
@@ -131,9 +132,13 @@ export default function Urls() {
 							value={newUrlEnabled}
 							onValueChange={() => setNewUrlEnabled((prev) => !prev)}
 						/>
-		
-						<Pressable
-							style={styles.button}
+
+						<Button
+							color="#323ea8"
+							text="Shorten"
+							margin={{
+								top: 5
+							}}
 							onPress={async () => {
 								setNewUrlError(undefined);
 		
@@ -180,9 +185,7 @@ export default function Urls() {
 									ToastAndroid.SHORT,
 								);
 							}}
-						>
-							<Text style={styles.buttonText}>Shorten</Text>
-						</Pressable>
+						/>
 
 						<Text
 							style={styles.popupSubHeaderText}
@@ -251,9 +254,13 @@ export default function Urls() {
 									value={editUrlEnabled}
 									onValueChange={() => setEditUrlEnabled((prev) => !prev)}
 								/>
-				
-								<Pressable
-									style={styles.button}
+
+								<Button
+									color="#323ea8"
+									text="Edit"
+									margin={{
+										top: 5
+									}}
 									onPress={async () => {
 										setEditUrlError(undefined);
 				
@@ -287,9 +294,7 @@ export default function Urls() {
 
 										setUrlToEdit(null);
 									}}
-								>
-									<Text style={styles.buttonText}>Edit</Text>
-								</Pressable>
+								/>
 
 								<Text
 									style={styles.popupSubHeaderText}
@@ -306,18 +311,19 @@ export default function Urls() {
 						<View style={styles.header}>
 							<Text style={styles.headerText}>URLs</Text>
 							<View style={styles.headerButtons}>
-								<Pressable
-									style={styles.headerButton}
+								<Button 
 									onPress={() => {
 										setCreateNewUrl(true);
 									}}
-								>
-									<MaterialIcons
-										name="add-link"
-										size={30}
-										color={styles.headerButton.color}
-									/>
-								</Pressable>
+									icon="add-link"
+									color="transparent"
+									iconColor="#2d3f70"
+									borderColor="#222c47"
+									borderWidth={2}
+									iconSize={30}
+									padding={4}
+									rippleColor="#283557"
+								/>
 							</View>
 						</View>
 
@@ -424,8 +430,9 @@ export default function Urls() {
 
 												const actions = (
 													<View style={styles.actionsContainer}>
-														<Pressable
-															style={styles.actionButton}
+														<Button
+															icon="content-copy"
+															color="#323ea8"
 															onPress={async () => {
 																const urlDest = url.vanity
 																	? `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}`
@@ -445,32 +452,27 @@ export default function Urls() {
 																	ToastAndroid.SHORT,
 																);
 															}}
-														>
-															<MaterialIcons
-																name="content-copy"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 
-														<Pressable
-															style={styles.actionButton}
+														<Button
+															icon="edit"
+															color="#323ea8"
 															onPress={() => {
 																setUrlToEdit(url)
 															}}
-														>
-															<MaterialIcons
-																name="edit"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 
-														<Pressable
-															style={{
-																...styles.actionButton,
-																...styles.actionButtonDanger,
-															}}
+														<Button
+															icon="delete"
+															color="#CF4238"
 															onPress={async () => {
 																const urlId = url.id;
 
@@ -490,13 +492,11 @@ export default function Urls() {
                                                                     ToastAndroid.SHORT
                                                                 )
 															}}
-														>
-															<MaterialIcons
-																name="delete"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 													</View>
 												);
 

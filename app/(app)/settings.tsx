@@ -23,6 +23,7 @@ import { clearTempFiles, clearZeroByteFiles, generateThumbnails, getZeroByteFile
 import { useRouter } from "expo-router";
 import TextInput from "@/components/TextInput"
 import Switch from "@/components/Switch";
+import Button from "@/components/Button";
 
 export default function UserSettings() {
 	const router = useRouter()
@@ -161,39 +162,43 @@ export default function UserSettings() {
 						<Text style={styles.serverActionWarningText}>This will delete {zeroByteFiles} files from the database and datasource.</Text>
 
 						<View style={styles.manageServerActionButtonsContainer}>
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonCancel,
-								marginRight: 10
-							}} onPress={() => {
-								setClearZeroByteFilesPopupOpen(false)
-							}}>
-								<Text style={styles.buttonText}>Cancel</Text>
-							</Pressable>
-
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonDanger,
-								marginRight: 10
-							}} onPress={async () => {
-								const success = await clearZeroByteFiles()
-
-								if (typeof success === "string") {
-									setSaveError(success)
+							<Button
+								onPress={() => {
 									setClearZeroByteFilesPopupOpen(false)
+								}}
+								text="Cancel"
+								color="#181c28"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+							/>
 
-									return;
-								}
-
-								setClearZeroByteFilesPopupOpen(false)
-
-								ToastAndroid.show(
-									success.status,
-									ToastAndroid.SHORT
-								)
-							}}>
-								<Text style={styles.buttonText}>Yes, Delete</Text>
-							</Pressable>
+							<Button
+								color="#CF4238"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+								text="Yes, Delete"
+								onPress={async () => {
+									const success = await clearZeroByteFiles()
+	
+									if (typeof success === "string") {
+										setSaveError(success)
+										setClearZeroByteFilesPopupOpen(false)
+	
+										return;
+									}
+	
+									setClearZeroByteFilesPopupOpen(false)
+	
+									ToastAndroid.show(
+										success.status,
+										ToastAndroid.SHORT
+									)
+								}}
+							/>
 						</View>
 					</View>
 
@@ -213,39 +218,43 @@ export default function UserSettings() {
 						<Text style={styles.serverActionWarningText}>This will delete temporary files stored within the temporary directory (defined in the configuration). This should not cause harm unless there are files that are being processed still.</Text>
 
 						<View style={styles.manageServerActionButtonsContainer}>
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonCancel,
-								marginRight: 10
-							}} onPress={() => {
-								setClearTempFilesPopupOpen(false)
-							}}>
-								<Text style={styles.buttonText}>Cancel</Text>
-							</Pressable>
-
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonDanger,
-								marginRight: 10
-							}} onPress={async () => {
-								const success = await clearTempFiles()
-
-								if (typeof success === "string") {
-									setSaveError(success)
+						<Button
+								onPress={() => {
 									setClearTempFilesPopupOpen(false)
+								}}
+								text="Cancel"
+								color="#181c28"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+							/>
 
-									return;
-								}
-
-								setClearTempFilesPopupOpen(false)
-
-								ToastAndroid.show(
-									success.status,
-									ToastAndroid.SHORT
-								)
-							}}>
-								<Text style={styles.buttonText}>Yes, Delete</Text>
-							</Pressable>
+							<Button
+								color="#CF4238"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+								text="Yes, Delete"
+								onPress={async () => {
+									const success = await clearTempFiles()
+	
+									if (typeof success === "string") {
+										setSaveError(success)
+										setClearTempFilesPopupOpen(false)
+	
+										return;
+									}
+	
+									setClearTempFilesPopupOpen(false)
+	
+									ToastAndroid.show(
+										success.status,
+										ToastAndroid.SHORT
+									)
+								}}
+							/>
 						</View>
 					</View>
 
@@ -281,48 +290,52 @@ export default function UserSettings() {
 						/>
 
 						<View style={styles.manageServerActionButtonsContainer}>
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonCancel,
-								marginRight: 10
-							}} onPress={() => {
-								setRequerySizeOfFilesPopupOpen(false)
-								setRequerySizeForceDelete(false)
-								setRequerySizeForceUpdate(false)
-							}}>
-								<Text style={styles.buttonText}>Cancel</Text>
-							</Pressable>
-
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonDanger,
-								marginRight: 10
-							}} onPress={async () => {
-								const success = await requeryFileSize({
-									forceDelete: requerySizeForceDelete,
-									forceUpdate: requerySizeForceUpdate
-								})
-
-								if (typeof success === "string") {
-									setSaveError(success)
+							<Button
+								onPress={() => {
 									setRequerySizeOfFilesPopupOpen(false)
 									setRequerySizeForceDelete(false)
 									setRequerySizeForceUpdate(false)
+								}}
+								text="Cancel"
+								color="#181c28"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+							/>
 
-									return;
-								}
-
-								setRequerySizeOfFilesPopupOpen(false)
-								setRequerySizeForceDelete(false)
-								setRequerySizeForceUpdate(false)
-
-								ToastAndroid.show(
-									success.status,
-									ToastAndroid.SHORT
-								)
-							}}>
-								<Text style={styles.buttonText}>Requery</Text>
-							</Pressable>
+							<Button
+								color="#CF4238"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+								text="Requery"
+								onPress={async () => {
+									const success = await requeryFileSize({
+										forceDelete: requerySizeForceDelete,
+										forceUpdate: requerySizeForceUpdate
+									})
+	
+									if (typeof success === "string") {
+										setSaveError(success)
+										setRequerySizeOfFilesPopupOpen(false)
+										setRequerySizeForceDelete(false)
+										setRequerySizeForceUpdate(false)
+	
+										return;
+									}
+	
+									setRequerySizeOfFilesPopupOpen(false)
+									setRequerySizeForceDelete(false)
+									setRequerySizeForceUpdate(false)
+	
+									ToastAndroid.show(
+										success.status,
+										ToastAndroid.SHORT
+									)
+								}}
+							/>
 						</View>
 					</View>
 
@@ -351,42 +364,46 @@ export default function UserSettings() {
 						/>
 
 						<View style={styles.manageServerActionButtonsContainer}>
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonCancel,
-								marginRight: 10
-							}} onPress={() => {
-								setGenerateThumbnailsPopupOpen(false)
-								setGenerateThumbnailsRerun(false)
-							}}>
-								<Text style={styles.buttonText}>Cancel</Text>
-							</Pressable>
+						<Button
+								onPress={() => {
+									setGenerateThumbnailsPopupOpen(false)
+									setGenerateThumbnailsRerun(false)
+								}}
+								text="Cancel"
+								color="#181c28"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+							/>
 
-							<Pressable style={{
-								...styles.button,
-								...styles.manageServerActionButtonDanger,
-								marginRight: 10
-							}} onPress={async () => {
-								const success = await generateThumbnails(generateThumbnailsRerun)
+							<Button
+								color="#CF4238"
+								margin={{
+									right: 10,
+									top: 10,
+								}}
+								text="Generate"
+								onPress={async () => {
+									const success = await generateThumbnails(generateThumbnailsRerun)
 
-								if (typeof success === "string") {
-									setSaveError(success)
+									if (typeof success === "string") {
+										setSaveError(success)
+										setGenerateThumbnailsPopupOpen(false)
+										setGenerateThumbnailsRerun(false)
+
+										return;
+									}
+
 									setGenerateThumbnailsPopupOpen(false)
 									setGenerateThumbnailsRerun(false)
 
-									return;
-								}
-
-								setGenerateThumbnailsPopupOpen(false)
-								setGenerateThumbnailsRerun(false)
-
-								ToastAndroid.show(
-									success.status,
-									ToastAndroid.LONG
-								)
-							}}>
-								<Text style={styles.buttonText}>Generate</Text>
-							</Pressable>
+									ToastAndroid.show(
+										success.status,
+										ToastAndroid.LONG
+									)
+								}}
+							/>
 						</View>
 					</View>
 
@@ -442,49 +459,62 @@ export default function UserSettings() {
 									password
 								/>
 
-								<Pressable style={styles.button} onPress={() => handleSave("userInfo")}>
-									<Text style={styles.buttonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("userInfo")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Avatar */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Avatar</Text>
 
-								<Text style={styles.headerText}>Avatar:</Text>
-								<Pressable style={styles.avatarButton} onPress={async () => {
-									const output = await DocumentPicker.getDocumentAsync({
-										type: [
-											"image/png",
-											"image/jpeg",
-											"image/jpg"
-										],
-										copyToCacheDirectory: true,
-									});
-		
-									if (output.canceled || !output.assets) {
-										setAvatar(undefined)
-										setAvatarName(null)
-		
-										return;
-									};
-		
-									const fileURI = output.assets[0].uri
-		
-									const fileInfo = await FileSystem.getInfoAsync(fileURI)
-		
-									if (!fileInfo.exists) return;
-		
-									const avatarDataURI = await getFileDataURI(fileURI)
-		
-									setAvatar(avatarDataURI || undefined)
-									
-									const filename = fileURI.split('/').pop() || "avatar.png"
-		
-									setAvatarName(filename)
-								}}>
-									<Text style={styles.avatarButtonText}>{avatar ? avatarName : "Select an Avatar..."}</Text>
-								</Pressable>
+								<Button
+									color="transparent"
+									borderWidth={2}
+									borderColor="#222c47"
+									margin={{
+										top: 5
+									}}
+									rippleColor="gray"
+									text={avatar ? avatarName as string : "Select an Avatar..."}
+									onPress={async () => {
+										const output = await DocumentPicker.getDocumentAsync({
+											type: [
+												"image/png",
+												"image/jpeg",
+												"image/jpg"
+											],
+											copyToCacheDirectory: true,
+										});
+			
+										if (output.canceled || !output.assets) {
+											setAvatar(undefined)
+											setAvatarName(null)
+			
+											return;
+										};
+			
+										const fileURI = output.assets[0].uri
+			
+										const fileInfo = await FileSystem.getInfoAsync(fileURI)
+			
+										if (!fileInfo.exists) return;
+			
+										const avatarDataURI = await getFileDataURI(fileURI)
+			
+										setAvatar(avatarDataURI || undefined)
+										
+										const filename = fileURI.split('/').pop() || "avatar.png"
+			
+										setAvatarName(filename)
+									}}
+								/>
 
 								<View style={styles.avatarPreviewContainer}>
 									<Text style={styles.avatarPreviewHeader}>Avatar Preview</Text>
@@ -493,27 +523,38 @@ export default function UserSettings() {
 
 								<View style={styles.avatarButtonsContainer}>
 									{avatar && (
-										<Pressable
-											style={{
-												...styles.button,
-												...styles.manageAvatarButton,
-												...styles.cancelAvatarButton
+										<Button
+											text="Cancel"
+											color="transparent"
+											textColor="white"
+											height="auto"
+											width="28.33%"
+											margin={{
+												left: "2.5%",
+												right: "2.5%",
+												top: 10
 											}}
+											rippleColor="gray"
+											borderWidth={2}
+											borderColor="#ff8787"
 											onPress={() => {
 												setAvatar(undefined)
 												setAvatarName(null)
 											}}
-										>
-											<Text style={styles.buttonText}>Cancel</Text>
-										</Pressable>
+										/>
 									)}
 		
 									{currentAvatar && (
-										<Pressable
-											style={{
-												...styles.button,
-												...styles.manageAvatarButton,
-												...styles.removeAvatarButton
+										<Button
+											text="Remove Avatar"
+											color="#e03131"
+											textColor="white"
+											height="auto"
+											width="28.33%"
+											margin={{
+												left: "2.5%",
+												right: "2.5%",
+												top: 10
 											}}
 											onPress={async () => {
 												const success = await editCurrentUser({
@@ -533,17 +574,21 @@ export default function UserSettings() {
 													ToastAndroid.SHORT
 												)
 											}}
-										>
-											<Text style={styles.buttonText}>Remove Avatar</Text>
-										</Pressable>
+										/>
 									)}
 
-									<Pressable
-										style={{
-											...styles.button,
-											...styles.manageAvatarButton,
-											...(!avatar && styles.saveAvatarButtonDisabled)
+									<Button
+										text="Save"
+										color={avatar ? "#323ea8" : "#181c28"}
+										textColor={avatar ? "white" : "gray"}
+										height="auto"
+										width="28.33%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10
 										}}
+										disabled={!avatar}
 										onPress={async () => {
 											const success = await editCurrentUser({
 												avatar: avatar
@@ -562,12 +607,7 @@ export default function UserSettings() {
 												ToastAndroid.SHORT
 											)
 										}}
-									>
-										<Text style={{
-											...styles.buttonText,
-											...(!avatar && styles.saveAvatarButtonTextDisabled)
-										}}>Save</Text>
-									</Pressable>
+									/>
 								</View>
 							</View>
 
@@ -665,31 +705,42 @@ export default function UserSettings() {
 									placeholder="My Cool Color"
 								/>
 
-								<Pressable style={styles.button} onPress={() => handleSave("viewingFiles")}>
-									<Text style={styles.buttonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("viewingFiles")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Export Files */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Export Files</Text>
 
-								<Pressable style={styles.button} onPress={async () => {
-									const success = await createUserExport()
-
-									if (typeof success === "string") return setSaveError(success);
-
-									const newExports = await getUserExports()
-
-									setExports(typeof newExports === "string" ? null : newExports)
-
-									ToastAndroid.show(
-										"Successfully started creating the export",
-										ToastAndroid.SHORT
-									)
-								}}>
-									<Text style={styles.buttonText}>New Export</Text>
-								</Pressable>
+								<Button
+									onPress={async () => {
+										const success = await createUserExport()
+	
+										if (typeof success === "string") return setSaveError(success);
+	
+										const newExports = await getUserExports()
+	
+										setExports(typeof newExports === "string" ? null : newExports)
+	
+										ToastAndroid.show(
+											"Successfully started creating the export",
+											ToastAndroid.SHORT
+										)
+									}}
+									color="#323ea8"
+									text="New Export"
+									margin={{
+										top: 10,
+									}}
+								/>
 
 								<View style={styles.exportsContainer}>
 									<ScrollView
@@ -745,11 +796,9 @@ export default function UserSettings() {
 
 														const actions = (
 															<View style={styles.actionsContainer}>
-																<Pressable
-																	style={{
-																		...styles.actionButton,
-																		...styles.actionButtonDanger
-																	}}
+																<Button
+																	icon="delete"
+																	color="#CF4238"
 																	onPress={async () => {
 																		setSaveError(null)
 
@@ -768,19 +817,16 @@ export default function UserSettings() {
 																			ToastAndroid.SHORT,
 																		);
 																	}}
-																>
-																	<MaterialIcons
-																		name="delete"
-																		size={20}
-																		color={"white"}
-																	/>
-																</Pressable>
-		
-																<Pressable
-																	style={{
-																		...styles.actionButton,
-																		...(!zlExport.completed && styles.actionButtonDisabled)
-																	}}
+																	iconSize={20}
+																	width={32}
+																	height={32}
+																	padding={6}
+																/>
+
+																<Button
+																	icon="download"
+																	color={zlExport.completed ? "#323ea8" : "#181c28"}
+																	iconColor={zlExport.completed ? "white" : "gray"}
 																	disabled={!zlExport.completed}
 																	onPress={async () => {
 																		const exportId = zlExport.id;
@@ -832,13 +878,11 @@ export default function UserSettings() {
 																			ToastAndroid.SHORT
 																		)
 																	}}
-																>
-																	<MaterialIcons
-																		name="download"
-																		size={20}
-																		color={"white"}
-																	/>
-																</Pressable>
+																	iconSize={20}
+																	width={32}
+																	height={32}
+																	padding={6}
+																/>
 															</View>
 														);
 		
@@ -884,40 +928,60 @@ export default function UserSettings() {
 								<Text style={styles.headerText}>Server Actions</Text>
 
 								<View style={styles.serverActionButtonRow}>
-									<Pressable style={{
-										...styles.button,
-										...styles.serverActionButton
-									}} onPress={async () => {
-										setClearZeroByteFilesPopupOpen(true)
+									<Button
+										onPress={async () => {
+											setClearZeroByteFilesPopupOpen(true)
+	
+											const zeroByteFiles = await getZeroByteFiles()
+											setZeroByteFiles(typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length)
+										}}
+										color="#323ea8"
+										text="Clear Zero Byte Files"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
 
-										const zeroByteFiles = await getZeroByteFiles()
-										setZeroByteFiles(typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length)
-									}}>
-										<Text style={styles.buttonText}>Clear Zero Byte Files</Text>
-									</Pressable>
-
-									<Pressable style={{
-										...styles.button,
-										...styles.serverActionButton
-									}} onPress={() => setClearTempFilesPopupOpen(true)}>
-										<Text style={styles.buttonText}>Clear Temp Files</Text>
-									</Pressable>
+									<Button
+										onPress={() => setClearTempFilesPopupOpen(true)}
+										color="#323ea8"
+										text="Clear Temp Files"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
 								</View>
 
 								<View style={styles.serverActionButtonRow}>
-									<Pressable style={{
-										...styles.button,
-										...styles.serverActionButton
-									}} onPress={() => setRequerySizeOfFilesPopupOpen(true)}>
-										<Text style={styles.buttonText}>Requery Size of Files</Text>
-									</Pressable>
+									<Button
+										onPress={() => setRequerySizeOfFilesPopupOpen(true)}
+										color="#323ea8"
+										text="Requery Size of Files"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
 
-									<Pressable style={{
-										...styles.button,
-										...styles.serverActionButton
-									}} onPress={() => setGenerateThumbnailsPopupOpen(true)}>
-										<Text style={styles.buttonText}>Generate Thumbnails</Text>
-									</Pressable>
+									<Button
+										onPress={() => setGenerateThumbnailsPopupOpen(true)}
+										color="#323ea8"
+										text="Generate Thumbnails"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
 								</View>
 							</View>
 
@@ -925,59 +989,65 @@ export default function UserSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>App Settings</Text>
 
-								<Pressable style={{
-									...styles.button,
-									...styles.buttonSecondary
-								}} onPress={async () => {
-									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+								<Button
+									onPress={async () => {
+										const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+	
+										if (!permissions.granted) return ToastAndroid.show(
+											"The permission to the folder was not granted",
+											ToastAndroid.SHORT
+										);
+	
+										db.set("exportDownloadPath", permissions.directoryUri)
+	
+										ToastAndroid.show(
+											"Successfully changed the folder",
+											ToastAndroid.SHORT
+										)
+									}}
+									color="#323244"
+									text="Change Export Download Folder"
+									margin={{
+										top: 10,
+									}}
+								/>
 
-									if (!permissions.granted) return ToastAndroid.show(
-										"The permission to the folder was not granted",
-										ToastAndroid.SHORT
-									);
+								<Button
+									onPress={async () => {
+										const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+	
+										if (!permissions.granted) return ToastAndroid.show(
+											"The permission to the folder was not granted",
+											ToastAndroid.SHORT
+										);
+	
+										db.set("fileDownloadPath", permissions.directoryUri)
+	
+										ToastAndroid.show(
+											"Successfully changed the folder",
+											ToastAndroid.SHORT
+										)
+									}}
+									color="#323244"
+									text="Change File Download Folder"
+									margin={{
+										top: 10,
+									}}
+								/>
 
-									db.set("exportDownloadPath", permissions.directoryUri)
-
-									ToastAndroid.show(
-										"Successfully changed the folder",
-										ToastAndroid.SHORT
-									)
-								}}>
-									<Text style={styles.buttonText}>Change Export Download Folder</Text>
-								</Pressable>
-
-								<Pressable style={{
-									...styles.button,
-									...styles.buttonSecondary
-								}} onPress={async () => {
-									const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-									if (!permissions.granted) return ToastAndroid.show(
-										"The permission to the folder was not granted",
-										ToastAndroid.SHORT
-									);
-
-									db.set("fileDownloadPath", permissions.directoryUri)
-
-									ToastAndroid.show(
-										"Successfully changed the folder",
-										ToastAndroid.SHORT
-									)
-								}}>
-									<Text style={styles.buttonText}>Change File Download Folder</Text>
-								</Pressable>
-
-								<Pressable style={{
-									...styles.button,
-									...styles.buttonDanger
-								}} onPress={async () => {
-									await db.del("url")
-									await db.del("token")
-
-									router.replace("/login")
-								}}>
-									<Text style={styles.buttonText}>Logout</Text>
-								</Pressable>
+								<Button
+									onPress={async () => {
+										await db.del("url")
+										await db.del("token")
+	
+										router.replace("/login")
+									}}
+									color="#CF4238"
+									text="Logout"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 						</KeyboardAwareScrollView>
 					</View>

@@ -7,6 +7,7 @@ import { styles } from "@/styles/login";
 import { useLoginAuth } from "@/hooks/useLoginAuth";
 import React from "react";
 import TextInput from "@/components/TextInput";
+import Button from "@/components/Button";
 
 export default function Login() {
 	const router = useRouter();
@@ -83,18 +84,16 @@ export default function Login() {
 					</>
 				)}
 
-				<Pressable
-					style={{
-						...styles.button,
-						...styles.buttonSecondary,
-					}}
+				<Button
 					onPress={() => setTokenLogin((prev) => !prev)}
-				>
-					<Text style={styles.buttonText}>Use {tokenLogin ? "Password" : "Token"} Login</Text>
-				</Pressable>
+					color="#616060"
+					text={`Use ${tokenLogin ? "Password" : "Token"} Login`}
+					margin={{
+						top: 5
+					}}
+				/>
 
-				<Pressable
-					style={styles.button}
+				<Button
 					onPress={async () => {
                         setError(undefined)
 
@@ -136,9 +135,12 @@ export default function Login() {
 
 						return router.replace("/");
 					}}
-				>
-					<Text style={styles.buttonText}>Login</Text>
-				</Pressable>
+					text="Login"
+					color="#323ea8"
+					margin={{
+						top: 5
+					}}
+				/>
 			</View>
 		</View>
 	);

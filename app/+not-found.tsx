@@ -14,22 +14,15 @@ export default function NotFoundScreen() {
 
 				<Text style={styles.text}>This page does not exist.</Text>
 
-				<Button onPress={() => {
-						// router.replace({
-						// 	pathname: "/",
-						// });
-					}} text="Head to the Dashboard" color="#323ea8" />
-
-				{/* <Pressable
-					style={styles.button}
+				<Button
 					onPress={() => {
 						router.replace({
 							pathname: "/",
 						});
 					}}
-				>
-					<Text style={styles.buttonText}>Head to the Dashboard</Text>
-				</Pressable> */}
+					text="Head to the Dashboard"
+					color="#323ea8"
+				/>
 			</View>
 		</View>
 	);

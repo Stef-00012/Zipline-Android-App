@@ -18,6 +18,7 @@ import { isLightColor } from "@/functions/color";
 import { colorHash } from "@/functions/util";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import TextInput from "@/components/TextInput";
+import Button from "@/components/Button";
 
 export default function Files() {
 	const router = useRouter();
@@ -145,19 +146,20 @@ export default function Files() {
 							<Text style={styles.headerText}>Tags</Text>
 
 							<View style={styles.headerButtons}>
-								<Pressable
-									style={styles.headerButton}
+								<Button
 									onPress={() => {
 										setCreateNewTag(true)
 										setTagsMenuOpen(false)
 									}}
-								>
-									<MaterialIcons
-										name="add"
-										size={30}
-										color={styles.headerButton.color}
-									/>
-								</Pressable>
+									icon="add"
+									color="transparent"
+									iconColor="#2d3f70"
+									borderColor="#222c47"
+									borderWidth={2}
+									iconSize={30}
+									padding={4}
+									rippleColor="#283557"
+								/>
 							</View>
 						</View>
 
@@ -174,47 +176,54 @@ export default function Files() {
 									</View>
 
 									<View style={styles.tagButtonContainer}>
-										<Pressable style={styles.tagButton}>
-											<MaterialIcons
-												name="edit"
-												size={20}
-												color={"white"}
-												onPress={() => {
-													setTagToEdit(tag)
-													setTagsMenuOpen(false)
-												}}
-											/>
-										</Pressable>
+										<Button
+											icon="edit"
+											color="#323ea8"
+											onPress={() => {
+												setTagToEdit(tag)
+												setTagsMenuOpen(false)
+											}}
+											iconSize={20}
+											width={32}
+											height={32}
+											padding={6}
+											margin={{
+												left: 5,
+												right: 5
+											}}
+										/>
 
-										<Pressable style={{
-											...styles.tagButton,
-											...styles.tagButtonDanger
-										}}>
-											<MaterialIcons
-												name="delete"
-												size={20}
-												color={"white"}
-												onPress={async () => {
-													const tagId = tag.id
+										<Button
+											icon="delete"
+											color="#CF4238"
+											onPress={async () => {
+												const tagId = tag.id
 
-													const success = await deleteTag(tagId)
+												const success = await deleteTag(tagId)
 
-													if (typeof success === "string") return ToastAndroid.show(
-														`Failed to delete the tag "${tag.name}"`,
-														ToastAndroid.SHORT
-													)
+												if (typeof success === "string") return ToastAndroid.show(
+													`Failed to delete the tag "${tag.name}"`,
+													ToastAndroid.SHORT
+												)
 
-													const newTags = tags.filter(tg => tag.id !== tg.id)
+												const newTags = tags.filter(tg => tag.id !== tg.id)
 
-													setTags(newTags)
+												setTags(newTags)
 
-													ToastAndroid.show(
-														`Deleted the tag "${tag.name}"`,
-														ToastAndroid.SHORT
-													)
-												}}
-											/>
-										</Pressable>
+												ToastAndroid.show(
+													`Deleted the tag "${tag.name}"`,
+													ToastAndroid.SHORT
+												)
+											}}
+											iconSize={20}
+											width={32}
+											height={32}
+											padding={6}
+											margin={{
+												left: 5,
+												right: 5
+											}}
+										/>
 									</View>
 								</View>
 							))}
@@ -256,26 +265,25 @@ export default function Files() {
 						/>
 
 						<View style={styles.manageTagButtonsContainer}>
-							<Pressable
-								style={{
-									...styles.button,
-									...styles.manageTagButton,
-									...styles.guessButton
-								}}
+							<Button
+								color="#616060"
+								text="Guess Color"
 								onPress={async () => {
 									const guess = colorHash(newTagName || "")
 
 									setNewTagColor(guess)
 								}}
-							>
-								<Text style={styles.buttonText}>Guess Color</Text>
-							</Pressable>
-
-							<Pressable
-								style={{
-									...styles.button,
-									...styles.manageTagButton
+								width="45%"
+								margin={{
+									left: "2.5%",
+									right: "2.5%",
+									top: 15
 								}}
+							/>
+
+							<Button
+								color="#323ea8"
+								text="Create"
 								onPress={async () => {
 									setNewTagError(null);
 			
@@ -297,9 +305,13 @@ export default function Files() {
 									setCreateNewTag(false);
 									setTagsMenuOpen(true)
 								}}
-							>
-								<Text style={styles.buttonText}>Create</Text>
-							</Pressable>
+								width="45%"
+								margin={{
+									left: "2.5%",
+									right: "2.5%",
+									top: 15
+								}}
+							/>
 						</View>
 
 						<Text
@@ -340,26 +352,25 @@ export default function Files() {
 								/>
 
 								<View style={styles.manageTagButtonsContainer}>
-									<Pressable
-										style={{
-											...styles.button,
-											...styles.manageTagButton,
-											...styles.guessButton
-										}}
+									<Button
+										color="#616060"
+										text="Guess Color"
 										onPress={async () => {
 											const guess = colorHash(editTagName || "")
 
 											setEditTagColor(guess)
 										}}
-									>
-										<Text style={styles.buttonText}>Guess Color</Text>
-									</Pressable>
-
-									<Pressable
-										style={{
-											...styles.button,
-											...styles.manageTagButton
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 15
 										}}
+									/>
+
+									<Button
+										color="#323ea8"
+										text="Create"
 										onPress={async () => {
 											setEditTagError(null);
 
@@ -386,9 +397,13 @@ export default function Files() {
 											setTagToEdit(null);
 											setTagsMenuOpen(true)
 										}}
-									>
-										<Text style={styles.buttonText}>Edit</Text>
-									</Pressable>
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 15
+										}}
+									/>
 								</View>
 
 								<Text
@@ -406,49 +421,64 @@ export default function Files() {
 					
 					{!isFolder && (
 						<View style={styles.headerButtons}>
-							<Pressable
-								disabled={!files}
-								style={styles.headerButton}
+							<Button 
 								onPress={() => {
 									setFavorites((prev) => !prev);
 								}}
-							>
-								<MaterialIcons
-									name={favorites ? "star" : "star-border"}
-									size={30}
-									color={favorites ? styles.headerStarButtonActive.color : styles.headerButton.color}
-								/>
-							</Pressable>
+								icon={favorites ? "star" : "star-border"}
+								color="transparent"
+								iconColor={favorites ? "#f1d01f" : "#2d3f70"}
+								borderColor="#222c47"
+								borderWidth={2}
+								iconSize={30}
+								padding={4}
+								rippleColor="#283557"
+								disabled={!files}
+								margin={{
+									left: 2,
+									right: 2
+								}}
+							/>
 
 							{!name && (
 								<>
-									<Pressable
-										disabled={!files}
-										style={styles.headerButton}
+									<Button 
 										onPress={() => {
 											setTagsMenuOpen(true)
 										}}
-									>
-										<MaterialIcons
-											name="sell"
-											size={30}
-											color={styles.headerButton.color}
-										/>
-									</Pressable>
-
-									<Pressable
+										icon="sell"
+										color="transparent"
+										iconColor="#2d3f70"
+										borderColor="#222c47"
+										borderWidth={2}
+										iconSize={30}
 										disabled={!files}
-										style={styles.headerButton}
+										padding={4}
+										rippleColor="#283557"
+										margin={{
+											left: 2,
+											right: 2
+										}}
+									/>
+
+									<Button 
 										onPress={() => {
 											router.replace("/upload/file")
 										}}
-									>
-										<MaterialIcons
-											name="upload-file"
-											size={30}
-											color={styles.headerButton.color}
-										/>
-									</Pressable>
+										icon="upload-file"
+										color="transparent"
+										iconColor="#2d3f70"
+										borderColor="#222c47"
+										borderWidth={2}
+										iconSize={30}
+										disabled={!files}
+										padding={4}
+										rippleColor="#283557"
+										margin={{
+											left: 2,
+											right: 2
+										}}
+									/>
 								</>
 							)}
 						</View>
@@ -486,9 +516,7 @@ export default function Files() {
 
 				{!isFolder && (
 					<View style={styles.pagesContainer}>
-						<Pressable
-							style={styles.pageButton}
-							disabled={prevPageDisabled || allPageDisabled}
+						<Button 
 							onPress={() => {
 								setNextPageDisabled(false);
 
@@ -504,24 +532,21 @@ export default function Files() {
 								setPage(newPage);
 								setSelectedPage(newPage);
 							}}
-						>
-							<Text
-								style={
-									allPageDisabled || prevPageDisabled
-										? {
-												...styles.pageButtonText,
-												...styles.pageButtonTextDisabled,
-											}
-										: styles.pageButtonText
-								}
-							>
-								PREV
-							</Text>
-						</Pressable>
-
-						<Pressable
-							style={styles.pageButton}
+							text="PREV"
+							color="transparent"
+							textColor={(allPageDisabled || prevPageDisabled) ? "gray" : "white"}
+							borderColor="#222c47"
+							borderWidth={2}
+							rippleColor="#283557"
+							flex={1}
 							disabled={allPageDisabled || prevPageDisabled}
+							margin={{
+								left: 5,
+								right: 5
+							}}
+						/>
+
+						<Button 
 							onPress={() => {
 								setPrevPageDisabled(true);
 								setNextPageDisabled(false);
@@ -531,20 +556,19 @@ export default function Files() {
 								setPage(newPage);
 								setSelectedPage(newPage);
 							}}
-						>
-							<Text
-								style={
-									allPageDisabled || prevPageDisabled
-										? {
-												...styles.pageButtonText,
-												...styles.pageButtonTextDisabled,
-											}
-										: styles.pageButtonText
-								}
-							>
-								1
-							</Text>
-						</Pressable>
+							text="1"
+							color="transparent"
+							textColor={(allPageDisabled || prevPageDisabled) ? "gray" : "white"}
+							borderColor="#222c47"
+							borderWidth={2}
+							rippleColor="#283557"
+							flex={1}
+							disabled={allPageDisabled || prevPageDisabled}
+							margin={{
+								left: 5,
+								right: 5
+							}}
+						/>
 
 						<TextInput
 							inputStyle={styles.input}
@@ -576,9 +600,7 @@ export default function Files() {
 							value={selectedPage}
 						/>
 
-						<Pressable
-							style={styles.pageButton}
-							disabled={allPageDisabled || nextPageDisabled}
+						<Button 
 							onPress={() => {
 								setNextPageDisabled(true);
 								setPrevPageDisabled(false);
@@ -588,24 +610,21 @@ export default function Files() {
 								setPage(newPage);
 								setSelectedPage(newPage);
 							}}
-						>
-							<Text
-								style={
-									allPageDisabled || nextPageDisabled
-										? {
-												...styles.pageButtonText,
-												...styles.pageButtonTextDisabled,
-											}
-										: styles.pageButtonText
-								}
-							>
-								{files?.pages || "..."}
-							</Text>
-						</Pressable>
-
-						<Pressable
-							style={styles.pageButton}
+							text={files?.pages ? String(files?.pages) : "..."}
+							color="transparent"
+							textColor={(nextPageDisabled || allPageDisabled) ? "gray" : "white"}
+							borderColor="#222c47"
+							borderWidth={2}
+							rippleColor="#283557"
+							flex={1}
 							disabled={nextPageDisabled || allPageDisabled}
+							margin={{
+								left: 5,
+								right: 5
+							}}
+						/>
+
+						<Button 
 							onPress={() => {
 								setPrevPageDisabled(false);
 
@@ -618,20 +637,19 @@ export default function Files() {
 								setPage(newPage);
 								setSelectedPage(newPage);
 							}}
-						>
-							<Text
-								style={
-									allPageDisabled || nextPageDisabled
-										? {
-												...styles.pageButtonText,
-												...styles.pageButtonTextDisabled,
-											}
-										: styles.pageButtonText
-								}
-							>
-								NEXT
-							</Text>
-						</Pressable>
+							text="NEXT"
+							color="transparent"
+							textColor={(nextPageDisabled || allPageDisabled) ? "gray" : "white"}
+							borderColor="#222c47"
+							borderWidth={2}
+							rippleColor="#283557"
+							flex={1}
+							disabled={nextPageDisabled || allPageDisabled}
+							margin={{
+								left: 5,
+								right: 5
+							}}
+						/>
 					</View>
 				)}
 			</View>

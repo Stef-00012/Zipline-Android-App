@@ -8,23 +8,25 @@ import { styles } from "@/styles/folders";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
+import { type ExternalPathString, Link, useRouter } from "expo-router";
 import {
-	type ExternalPathString,
-	Link,
-	useRouter,
-} from "expo-router";
-import { createFolder, deleteFolder, editFolder, getFolders } from "@/functions/zipline/folders";
+	createFolder,
+	deleteFolder,
+	editFolder,
+	getFolders,
+} from "@/functions/zipline/folders";
 import Popup from "@/components/Popup";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import TextInput from "@/components/TextInput";
-import Switch from "@/components/Switch"
+import Switch from "@/components/Switch";
+import Button from "@/components/Button";
 
 export default function Folders() {
 	const router = useRouter();
 
-	useAuth()
-	useShareIntent()
+	useAuth();
+	useShareIntent();
 
 	const [folders, setFolders] = useState<APIFolders | null>(null);
 
@@ -48,14 +50,19 @@ export default function Folders() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
-				<Popup hidden={!createNewFolder} onClose={() => {
-					setCreateNewFolder(false)
-					setNewFolderName(null)
-					setNewFolderPublic(false)
-				}}>
+				<Popup
+					hidden={!createNewFolder}
+					onClose={() => {
+						setCreateNewFolder(false);
+						setNewFolderName(null);
+						setNewFolderPublic(false);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Create Folder</Text>
-						{newFolderError && <Text style={styles.errorText}>{newFolderError}</Text>}
+						{newFolderError && (
+							<Text style={styles.errorText}>{newFolderError}</Text>
+						)}
 
 						<TextInput
 							title="Name:"
@@ -65,33 +72,40 @@ export default function Folders() {
 							value={newFolderName || ""}
 							placeholder="myFolder"
 						/>
-						
-						<Switch onValueChange={() => setNewFolderPublic((prev) => !prev)} value={newFolderPublic} title="Public" />
 
-						<Pressable
-							style={styles.button}
+						<Switch
+							onValueChange={() => setNewFolderPublic((prev) => !prev)}
+							value={newFolderPublic}
+							title="Public"
+						/>
+
+						<Button
 							onPress={async () => {
-								setNewFolderError(null)
+								setNewFolderError(null);
 
-								if (!newFolderName || newFolderName.length <= 0) return setNewFolderError("Please insert a folder name");
+								if (!newFolderName || newFolderName.length <= 0)
+									return setNewFolderError("Please insert a folder name");
 
-								const createdFolder = await createFolder(newFolderName, newFolderPublic);
-		
+								const createdFolder = await createFolder(
+									newFolderName,
+									newFolderPublic,
+								);
+
 								if (typeof createdFolder === "string")
 									return setNewFolderError(createdFolder);
 
 								setNewFolderName(null);
 								setNewFolderPublic(false);
 
-								const newFolders = await getFolders()
+								const newFolders = await getFolders();
 
-								setFolders(typeof newFolders === "string" ? null : newFolders)
+								setFolders(typeof newFolders === "string" ? null : newFolders);
 
 								setCreateNewFolder(false);
 							}}
-						>
-							<Text style={styles.buttonText}>Create</Text>
-						</Pressable>
+							text="Create"
+							color="#323ea8"
+						/>
 					</View>
 				</Popup>
 
@@ -100,35 +114,28 @@ export default function Folders() {
 						<View style={styles.header}>
 							<Text style={styles.headerText}>Folders</Text>
 							<View style={styles.headerButtons}>
-								<Pressable
-									style={styles.headerButton}
+								<Button 
 									onPress={() => {
-										setCreateNewFolder(true)
+										setCreateNewFolder(true);
 									}}
-								>
-									<MaterialIcons
-										name="create-new-folder"
-										size={30}
-										color={styles.headerButton.color}
-									/>
-								</Pressable>
+									icon="create-new-folder"
+									color="transparent"
+									iconColor="#2d3f70"
+									borderColor="#222c47"
+									borderWidth={2}
+									iconSize={30}
+									padding={4}
+									rippleColor="#283557"
+								/>
 							</View>
 						</View>
 
 						<View style={{ ...styles.foldersContainer, flex: 1 }}>
-							<ScrollView
-								showsHorizontalScrollIndicator={false}
-								horizontal
-							>
+							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 								<View>
 									<Table>
 										<Row
-											data={[
-												"Name",
-												"Public",
-												"Created",
-												"Actions",
-											]}
+											data={["Name", "Public", "Created", "Actions"]}
 											widthArr={[80, 50, 130, 150]}
 											style={styles.tableHeader}
 											textStyle={styles.rowText}
@@ -154,19 +161,13 @@ export default function Folders() {
 														{folder.name}
 													</Link>
 												) : (
-                                                    <Text
-														key={folder.id}
-														style={styles.rowText}
-													>
+													<Text key={folder.id} style={styles.rowText}>
 														{folder.name}
 													</Text>
-                                                )
+												);
 
 												const isPublic = (
-													<Text
-														key={folder.id}
-														style={styles.rowText}
-													>
+													<Text key={folder.id} style={styles.rowText}>
 														{folder.public ? "Yes" : "No"}
 													</Text>
 												);
@@ -182,29 +183,26 @@ export default function Folders() {
 
 												const actions = (
 													<View style={styles.actionsContainer}>
-                                                        <Pressable
-															style={styles.actionButton}
+														<Button
+															icon="folder-open"
+															color="#323ea8"
 															onPress={() => {
 																const folderId = folder.id;
 
-																router.replace(`/files?folderId=${folderId}`)
+																router.replace(`/files?folderId=${folderId}`);
 															}}
-														>
-															<MaterialIcons
-																name="folder-open"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 
-														<Pressable
-															style={{
-                                                                ...styles.actionButton,
-                                                                ...(!folder.public && styles.actionButtonDisabled)
-                                                            }}
-                                                            disabled={!folder.public}
+														<Button
+															icon="content-copy"
+															color={folder.public ? "#323ea8" : "#181c28"}
+															iconColor={folder.public ? "white" : "#2a3952"}
 															onPress={async () => {
-																const urlDest = `${dashUrl}/folder/${folder.id}`
+																const urlDest = `${dashUrl}/folder/${folder.id}`;
 
 																const saved =
 																	await Clipboard.setStringAsync(urlDest);
@@ -220,80 +218,80 @@ export default function Folders() {
 																	ToastAndroid.SHORT,
 																);
 															}}
-														>
-															<MaterialIcons
-																name="content-copy"
-																size={20}
-																color={folder.public ? "white" : "#2a3952"}
-															/>
-														</Pressable>
+															disabled={!folder.public}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 
-														<Pressable
-															style={{
-                                                                ...styles.actionButton,
-                                                                ...(!folder.public && styles.actionButtonPrivate)
-                                                            }}
+														<Button
 															onPress={async () => {
 																const folderId = folder.id;
 
-																const success = await editFolder(folderId, !folder.public);
+																const success = await editFolder(
+																	folderId,
+																	!folder.public,
+																);
 
-                                                                if (typeof success === "string") return ToastAndroid.show(
-                                                                    `Failed to update the folder "${folder.name}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
-                                                                    
-                                                                ToastAndroid.show(
-                                                                    `Updated the folder "${folder.name}"'s visibility`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																if (typeof success === "string")
+																	return ToastAndroid.show(
+																		`Failed to update the folder "${folder.name}"`,
+																		ToastAndroid.SHORT,
+																	);
 
-                                                                const folderIndex = folders.findIndex((fold) => folder.id === fold.id)
+																ToastAndroid.show(
+																	`Updated the folder "${folder.name}"'s visibility`,
+																	ToastAndroid.SHORT,
+																);
 
-                                                                const newFolders = [...folders];
-                                                                newFolders[folderIndex].public = !folder.public;
+																const folderIndex = folders.findIndex(
+																	(fold) => folder.id === fold.id,
+																);
 
-                                                                setFolders(newFolders);
+																const newFolders = [...folders];
+																newFolders[folderIndex].public = !folder.public;
+
+																setFolders(newFolders);
 															}}
-														>
-															<MaterialIcons
-																name={folder.public ? "lock-open" : "lock"}
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															color={folder.public ? "#323ea8": "#343a40"}
+															icon={folder.public ? "lock-open" : "lock"}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 
-														<Pressable
-															style={{
-																...styles.actionButton,
-																...styles.actionButtonDanger,
-															}}
+														<Button
 															onPress={async () => {
 																const folderId = folder.id;
 
 																const success = await deleteFolder(folderId);
 
-                                                                if (typeof success === "string") return ToastAndroid.show(
-                                                                    `Failed to delete the folder "${folder.name}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																if (typeof success === "string")
+																	return ToastAndroid.show(
+																		`Failed to delete the folder "${folder.name}"`,
+																		ToastAndroid.SHORT,
+																	);
 
-                                                                const newFolders = folders.filter((fold) => fold.id !== folder.id)
+																const newFolders = folders.filter(
+																	(fold) => fold.id !== folder.id,
+																);
 
-                                                                setFolders(newFolders)
+																setFolders(newFolders);
 
-                                                                ToastAndroid.show(
-                                                                    `Deleted the folder "${folder.name}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																ToastAndroid.show(
+																	`Deleted the folder "${folder.name}"`,
+																	ToastAndroid.SHORT,
+																);
 															}}
-														>
-															<MaterialIcons
-																name="delete"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															color="#CF4238"
+															icon="delete"
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 													</View>
 												);
 
@@ -314,12 +312,7 @@ export default function Folders() {
 												return (
 													<Row
 														key={folder.id}
-														data={[
-															name,
-															isPublic,
-															created,
-															actions,
-														]}
+														data={[name, isPublic, created, actions]}
 														widthArr={[80, 50, 130, 150]}
 														style={rowStyle}
 														textStyle={styles.rowText}

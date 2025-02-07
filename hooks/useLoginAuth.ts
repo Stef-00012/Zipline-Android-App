@@ -5,10 +5,18 @@ export const useLoginAuth = () => {
     const router = useRouter()
 
     useFocusEffect(() => {
-        (async () => {
-            const authenticated = await isAuthenticated();
+        loginAuth()
 
-            if (authenticated) return router.replace("/");
-        })();
+        const interval = setInterval(loginAuth, 5000)
+
+        return () => {
+            clearInterval(interval)
+        }
     });
+
+    async function loginAuth() {
+        const authenticated = await isAuthenticated();
+
+        if (authenticated) return router.replace("/");
+    }
 }

@@ -649,11 +649,13 @@ export default function UserSettings() {
 								<Select
 									disabled={!viewEnabled}
 									data={alignments}
-									onSelect={(selectedAlignment) =>
+									onSelect={(selectedAlignment) => {
+										if (selectedAlignment.length <= 0) return;
+
 										setViewAlign(
 											selectedAlignment[0].value as typeof viewAlign,
 										)
-									}
+									}}
 									placeholder="Select Alignment..."
 									defaultValue={alignments.find(
 										(format) => format.value === "left",

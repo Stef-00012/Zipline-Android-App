@@ -448,6 +448,8 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 									value: file.folderId
 								} : undefined}
 								onSelect={async (selectedFolder) => {
+									if (selectedFolder.length <= 0) return;
+
 									const folderId = selectedFolder[0].value
 									const fileId = file.id
 

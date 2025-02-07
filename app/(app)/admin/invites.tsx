@@ -15,6 +15,7 @@ import { dates } from "@/constants/invites";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import TextInput from "@/components/TextInput";
+import Button from "@/components/Button";
 
 export default function Invites() {
 	useAuth("ADMIN")
@@ -59,6 +60,8 @@ export default function Invites() {
 							placeholder="Select Date..."
 							data={dates}
 							onSelect={(selectedDate) => {
+								if (selectedDate.length <= 0) return;
+
 								setNewInviteExpires(selectedDate[0].value);
 							}}
 							defaultValue={dates.find(date => date.value === "never")}
@@ -74,8 +77,7 @@ export default function Invites() {
 							placeholder="5"
 						/>
 
-						<Pressable
-							style={styles.button}
+						<Button
 							onPress={async () => {
 								setNewInviteError(null)
 
@@ -108,9 +110,12 @@ export default function Invites() {
 									ToastAndroid.SHORT,
 								);
 							}}
-						>
-							<Text style={styles.buttonText}>Create</Text>
-						</Pressable>
+							text="Create"
+							color="#323ea8"
+							margin={{
+								top: 15
+							}}
+						/>
 					</View>
 				</Popup>
 
@@ -119,18 +124,19 @@ export default function Invites() {
 						<View style={styles.header}>
 							<Text style={styles.headerText}>Invites</Text>
 							<View style={styles.headerButtons}>
-								<Pressable
-									style={styles.headerButton}
+								<Button 
 									onPress={() => {
 										setCreateNewInvite(true)
 									}}
-								>
-									<MaterialIcons
-										name="add"
-										size={30}
-										color={styles.headerButton.color}
-									/>
-								</Pressable>
+									icon="add"
+									color="transparent"
+									iconColor="#2d3f70"
+									borderColor="#222c47"
+									borderWidth={2}
+									iconSize={30}
+									padding={4}
+									rippleColor="#283557"
+								/>
 							</View>
 						</View>
 
@@ -227,8 +233,9 @@ export default function Invites() {
 
 												const actions = (
 													<View style={styles.actionsContainer}>
-														<Pressable
-															style={styles.actionButton}
+														<Button
+															icon="content-copy"
+															color="#323ea8"
 															onPress={async () => {
 																const urlDest = `${dashUrl}/invite/${invite.code}`
 
@@ -246,19 +253,15 @@ export default function Invites() {
 																	ToastAndroid.SHORT,
 																);
 															}}
-														>
-															<MaterialIcons
-																name="content-copy"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 
-														<Pressable
-															style={{
-																...styles.actionButton,
-																...styles.actionButtonDanger,
-															}}
+														<Button
+															icon="delete"
+															color="#CF4238"
 															onPress={async () => {
 																const inviteId = invite.id;
 
@@ -278,13 +281,11 @@ export default function Invites() {
                                                                     ToastAndroid.SHORT
                                                                 )
 															}}
-														>
-															<MaterialIcons
-																name="delete"
-																size={20}
-																color={"white"}
-															/>
-														</Pressable>
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
 													</View>
 												);
 

@@ -12,6 +12,7 @@ import { defaultUploadEmbed, defaultShortenEmbed } from "@/constants/adminSettin
 import { convertToBytes, convertToTime } from "@/functions/util";
 import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
+import Button from "@/components/Button";
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");
@@ -636,9 +637,15 @@ export default function ServerSettings() {
 									placeholder="/tmp/zipline"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("core")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("core")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Chunks */}
@@ -665,9 +672,15 @@ export default function ServerSettings() {
 									placeholder="25mb"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("chunks")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("chunks")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Tasks */}
@@ -706,9 +719,15 @@ export default function ServerSettings() {
 									placeholder="5m"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("tasks")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("tasks")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* MFA */}
@@ -736,9 +755,15 @@ export default function ServerSettings() {
 									placeholder="Zipline"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("mfa")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("mfa")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Features */}
@@ -839,9 +864,15 @@ export default function ServerSettings() {
 									placeholder="4"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("features")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("features")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Files */}
@@ -884,11 +915,13 @@ export default function ServerSettings() {
 								<Text style={styles.inputHeader}>Default Format:</Text>
 								<Select
 									data={formats}
-									onSelect={(selectedFormat) =>
+									onSelect={(selectedFormat) => {
+										if (selectedFormat.length <= 0) return;
+
 										setFilesDefaultFormat(
 											selectedFormat[0].value as typeof filesDefaultFormat,
 										)
-									}
+									}}
 									placeholder="Select format..."
 									defaultValue={formats.find(
 										(format) => format.value === filesDefaultFormat,
@@ -925,9 +958,15 @@ export default function ServerSettings() {
 									placeholder="YYYY-MM-DD_HH:mm:ss"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("files")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("files")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Url Shortener */}
@@ -951,9 +990,15 @@ export default function ServerSettings() {
 									placeholder="6"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("urlShortener")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("urlShortener")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Invites */}
@@ -976,9 +1021,15 @@ export default function ServerSettings() {
 									placeholder="6"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("invites")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("invites")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Ratelimit */}
@@ -1028,9 +1079,15 @@ export default function ServerSettings() {
 									placeholder="1.1.1.1, 8.8.8.8"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("ratelimit")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("ratelimit")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Website */}
@@ -1112,9 +1169,15 @@ export default function ServerSettings() {
 									placeholder="builtin:light_gray"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("website")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("website")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* OAuth */}
@@ -1278,9 +1341,15 @@ export default function ServerSettings() {
 									/>
 								</View>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("oauth")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("oauth")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* PWA */}
@@ -1328,9 +1397,15 @@ export default function ServerSettings() {
 									placeholder="#000000"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("pwa")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("pwa")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* HTTP Webhooks */}
@@ -1353,9 +1428,15 @@ export default function ServerSettings() {
 									placeholder="https://example.com/shorten"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("httpWebhooks")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("httpWebhooks")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 							</View>
 
 							{/* Discord Webhook */}
@@ -1385,9 +1466,15 @@ export default function ServerSettings() {
 									placeholder="https://example.com/avatar.png"
 								/>
 
-								<Pressable style={styles.settingSaveButton} onPress={() => handleSave("discordWebhook")}>
-									<Text style={styles.settingSaveButtonText}>Save</Text>
-								</Pressable>
+								<Button
+									onPress={() => handleSave("discordWebhook")}
+									color="#323ea8"
+									text="Save"
+									icon="save"
+									margin={{
+										top: 10,
+									}}
+								/>
 
 								{/* On Upload */}
 								<View style={styles.settingGroup}>
@@ -1511,9 +1598,15 @@ export default function ServerSettings() {
 										/>
 									</View>
 
-									<Pressable style={styles.settingSaveButton}  onPress={() => handleSave("discordOnUploadWebhook")}>
-										<Text style={styles.settingSaveButtonText}>Save</Text>
-									</Pressable>
+									<Button
+										onPress={() => handleSave("discordOnUploadWebhook")}
+										color="#323ea8"
+										text="Save"
+										icon="save"
+										margin={{
+											top: 10,
+										}}
+									/>
 								</View>
 
 								{/* On Shorten */}
@@ -1638,9 +1731,15 @@ export default function ServerSettings() {
 										/>
 									</View>
 
-									<Pressable style={styles.settingSaveButton} onPress={() => handleSave("discordOnShortenWebhook")}>
-										<Text style={styles.settingSaveButtonText}>Save</Text>
-									</Pressable>
+									<Button
+										onPress={() => handleSave("discordOnShortenWebhook")}
+										color="#323ea8"
+										text="Save"
+										icon="save"
+										margin={{
+											top: 10,
+										}}
+									/>
 								</View>
 							</View>
 						</KeyboardAwareScrollView>

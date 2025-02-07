@@ -22,7 +22,12 @@ jobs:
     steps:
       - name: Check commit message
         id: check_commit_message
-        run: echo "::set-output name=skip::$(echo '${{ github.event.head_commit.message }}' | grep -q '^\[nobuild\]' && echo true || echo false)"
+        run: |
+          if echo "${{ github.event.head_commit.message }}" | grep -q '^\[nobuild\]'; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup repo
         if: steps.check_commit_message.outputs.skip != 'true'

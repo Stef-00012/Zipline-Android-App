@@ -9,8 +9,11 @@ on:
       - hooks/**
       - styles/**
       - types/**
+      - assets/**
       - metro.config.js
-      - app.json
+      - babel.config.js
+      - app.config.ts
+      - package.json
       - eas.json
       - .github/workflows/apk-build.yml
 

@@ -30,4 +30,4 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [ ] App update checking + update button
+- [ ] App update checking + update button (maybe, idk)

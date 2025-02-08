@@ -1,27 +1,16 @@
 import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
-import {
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-	ToastAndroid,
-} from "react-native";
+import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { guessExtension, guessMimetype } from "@/functions/util";
 import { getSettings } from "@/functions/zipline/settings";
 import type { APIUploadResponse } from "@/types/zipline";
 import { getFolders } from "@/functions/zipline/folders";
-import {
-	type ExternalPathString,
-	Link,
-	useRouter,
-} from "expo-router";
+import { type ExternalPathString, Link, useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 import { avaibleTextMimetypes, dates, formats } from "@/constants/upload";
 import * as FileSystem from "expo-file-system";
 import { styles } from "@/styles/files/uploadText";
 import { useEffect, useState } from "react";
 import Select from "@/components/Select";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { Mimetypes } from "@/types/mimetypes";
 import * as Clipboard from "expo-clipboard";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -49,16 +38,15 @@ interface Props {
 export default function UploadText({
 	showFileSelector = true,
 	defaultText,
-	fromShareIntent = false
+	fromShareIntent = false,
 }: Props) {
 	const router = useRouter();
 
-	useAuth()
-	useShareIntent(fromShareIntent)
+	useAuth();
+	useShareIntent(fromShareIntent);
 
-	const [uploadedFile, setUploadedFile] = useState<
-		APIUploadResponse["files"][0]
-	>();
+	const [uploadedFile, setUploadedFile] =
+		useState<APIUploadResponse["files"][0]>();
 	const [failedUpload, setFailedUpload] = useState<boolean>(false);
 
 	const [overrideDomain, setOverrideDomain] =
@@ -89,11 +77,11 @@ export default function UploadText({
 		useState<boolean>(true);
 	const [uploading, setUploading] = useState<boolean>(false);
 
-    const [text, setText] = useState<string>(defaultText || "");
+	const [text, setText] = useState<string>(defaultText || "");
 
 	useEffect(() => {
 		setUploadButtonDisabled(text.length === 0);
-	}, [text])
+	}, [text]);
 
 	const isKeyboardOpen = useDetectKeyboardOpen(false);
 
@@ -121,80 +109,83 @@ export default function UploadText({
 		setUploading(false);
 		setUploadButtonDisabled(true);
 
-		setFolder(undefined)
-		setMaxViews(undefined)
-		setFileName(undefined)
-		setPassword(undefined)
-		setOriginalName(false)
-		setDeletesAt(undefined)
-		setNameFormat(undefined)
-		setCompression(undefined)
-		setOverrideDomain(undefined)
+		setFolder(undefined);
+		setMaxViews(undefined);
+		setFileName(undefined);
+		setPassword(undefined);
+		setOriginalName(false);
+		setDeletesAt(undefined);
+		setNameFormat(undefined);
+		setCompression(undefined);
+		setOverrideDomain(undefined);
 	}
 
 	return (
 		<View style={styles.mainContainer}>
-			<Popup onClose={() => {
-				setUploadedFile(undefined);
-				setFailedUpload(false);
-			}} hidden={!(uploadedFile || failedUpload)}>
+			<Popup
+				onClose={() => {
+					setUploadedFile(undefined);
+					setFailedUpload(false);
+				}}
+				hidden={!(uploadedFile || failedUpload)}
+			>
 				{uploadedFile && (
 					<View>
 						<Text style={styles.headerText}>Uploaded Files</Text>
 						<ScrollView style={styles.popupScrollView}>
-						<View key={uploadedFile.id} style={styles.uploadedFileContainer}>
-							<Link
-								href={uploadedFile.url as ExternalPathString}
-								style={styles.uploadedFileUrl}
-							>
-								{uploadedFile.url}
-							</Link>
-							
-							<Button
-								icon="content-copy"
-								color="#323ea8"
-								onPress={async () => {
-									const saved = await Clipboard.setStringAsync(
-										uploadedFile.url,
-									);
+							<View key={uploadedFile.id} style={styles.uploadedFileContainer}>
+								<Link
+									href={uploadedFile.url as ExternalPathString}
+									style={styles.uploadedFileUrl}
+								>
+									{uploadedFile.url}
+								</Link>
 
-									if (saved)
-										return ToastAndroid.show(
-											"URL copied to clipboard",
-											ToastAndroid.SHORT,
+								<Button
+									icon="content-copy"
+									color="#323ea8"
+									onPress={async () => {
+										const saved = await Clipboard.setStringAsync(
+											uploadedFile.url,
 										);
 
-									ToastAndroid.show(
-										"Failed to copy the URL",
-										ToastAndroid.SHORT,
-									);
-								}}
-								iconSize={20}
-								width={32}
-								height={32}
-								padding={6}
-								margin={{
-								    left: 5,
-								    right: 5
-								}}
-							/>
-							
-							<Button
-								icon="open-in-new"
-								color="#323ea8"
-								onPress={() => {
-									router.replace(uploadedFile.url as ExternalPathString);
-								}}
-								iconSize={20}
-								width={32}
-								height={32}
-								padding={6}
-								margin={{
-								    left: 5,
-								    right: 5
-								}}
-							/>
-						</View>
+										if (saved)
+											return ToastAndroid.show(
+												"URL copied to clipboard",
+												ToastAndroid.SHORT,
+											);
+
+										ToastAndroid.show(
+											"Failed to copy the URL",
+											ToastAndroid.SHORT,
+										);
+									}}
+									iconSize={20}
+									width={32}
+									height={32}
+									padding={6}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+
+								<Button
+									icon="open-in-new"
+									color="#323ea8"
+									onPress={() => {
+										router.replace(uploadedFile.url as ExternalPathString);
+									}}
+									iconSize={20}
+									width={32}
+									height={32}
+									padding={6}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+							</View>
 						</ScrollView>
 					</View>
 				)}
@@ -204,7 +195,9 @@ export default function UploadText({
 						<Text style={styles.headerText}>Failed Files</Text>
 
 						<ScrollView style={styles.popupScrollView}>
-							<Text style={styles.failedFileText}>The text failed to upload</Text>
+							<Text style={styles.failedFileText}>
+								The text failed to upload
+							</Text>
 						</ScrollView>
 					</View>
 				)}
@@ -224,9 +217,9 @@ export default function UploadText({
 					<Text style={styles.headerText}>Upload Text</Text>
 
 					<View style={styles.headerButtons}>
-						<Button 
+						<Button
 							onPress={() => {
-								router.replace("/files")
+								router.replace("/files");
 							}}
 							icon="folder-open"
 							color="transparent"
@@ -247,7 +240,7 @@ export default function UploadText({
 						disabled={uploading}
 						inputStyle={{
 							...styles.mainTextInput,
-							...(isKeyboardOpen && { height: 100 })
+							...(isKeyboardOpen && { height: 100 }),
 						}}
 						value={text}
 						onValueChange={(text) => setText(text)}
@@ -257,10 +250,10 @@ export default function UploadText({
 
 			{showFileSelector && (
 				<View>
-				    <Button
-				        width="90%"
-				        disabled={uploading}
-				        onPress={async () => {
+					<Button
+						width="90%"
+						disabled={uploading}
+						onPress={async () => {
 							const output = await DocumentPicker.getDocumentAsync({
 								type: [
 									"text/*",
@@ -284,30 +277,34 @@ export default function UploadText({
 
 							const newSelectedFiles: SelectedFile = output.assets[0];
 
-							const fileURI = newSelectedFiles.uri
+							const fileURI = newSelectedFiles.uri;
 
-							const extension = fileURI.split(".").pop() || "txt"
-							const mimetype = avaibleTextMimetypes.find(format => format.value === extension)?.mimetype as string || guessMimetype(extension as keyof Mimetypes)
+							const extension = fileURI.split(".").pop() || "txt";
+							const mimetype =
+								(avaibleTextMimetypes.find(
+									(format) => format.value === extension,
+								)?.mimetype as string) ||
+								guessMimetype(extension as keyof Mimetypes);
 
 							const base64 = await FileSystem.readAsStringAsync(fileURI, {
 								encoding: FileSystem.EncodingType.Base64,
-							})
-							
-							const decoded = atob(base64)
+							});
 
-							setText(decoded)
-							setFileType(mimetype)
-							setFileExtension(extension)
+							const decoded = atob(base64);
+
+							setText(decoded);
+							setFileType(mimetype);
+							setFileExtension(extension);
 						}}
 						text="Select File"
 						color={uploading ? "#373d79" : "#323ea8"}
 						textColor={uploading ? "gray" : "white"}
 						margin={{
-						    left: "auto",
-						    right: "auto",
-						    top: 10
+							left: "auto",
+							right: "auto",
+							top: 10,
 						}}
-				    />
+					/>
 				</View>
 			)}
 
@@ -328,12 +325,14 @@ export default function UploadText({
 					data={avaibleTextMimetypes}
 					placeholder="Select File Type..."
 					disabled={uploading}
-					defaultValue={avaibleTextMimetypes.find(format => format.value === "txt")}
+					defaultValue={avaibleTextMimetypes.find(
+						(format) => format.value === "txt",
+					)}
 					onSelect={(selectedType) => {
 						if (selectedType.length <= 0) return;
 
-						setFileType(selectedType[0].mimetype as string)
-						setFileExtension(selectedType[0].value)
+						setFileType(selectedType[0].mimetype as string);
+						setFileExtension(selectedType[0].value);
 					}}
 				/>
 
@@ -352,7 +351,8 @@ export default function UploadText({
 					onSelect={(selectedDate) => {
 						if (selectedDate.length <= 0) return;
 
-						if (selectedDate[0].value === "never") return setDeletesAt(undefined);
+						if (selectedDate[0].value === "never")
+							return setDeletesAt(undefined);
 
 						const deletesDate = new Date(
 							Date.now() + (selectedDate[0].milliseconds as number),
@@ -383,7 +383,9 @@ export default function UploadText({
 					onSelect={(selectedFormat) => {
 						if (selectedFormat.length <= 0) return;
 
-						setNameFormat(selectedFormat[0].value as UploadFileOptions["format"])
+						setNameFormat(
+							selectedFormat[0].value as UploadFileOptions["format"],
+						);
 					}}
 				/>
 
@@ -445,7 +447,7 @@ export default function UploadText({
 							selectedFolder[0].value === "noFolder"
 								? undefined
 								: selectedFolder[0].value,
-						)
+						);
 					}}
 				/>
 
@@ -487,21 +489,24 @@ export default function UploadText({
 			</KeyboardAwareScrollView>
 
 			<View>
-			    <Button
-			        width="90%"
-			        disabled={uploading || uploadButtonDisabled}
-			        onPress={async () => {
+				<Button
+					width="90%"
+					disabled={uploading || uploadButtonDisabled}
+					onPress={async () => {
 						setUploading(true);
 
-						const extension = fileExtension || "txt"
+						const extension = fileExtension || "txt";
 
-						const mimetype = fileType || guessExtension(extension as Mimetypes[keyof Mimetypes]) || "text/plain"
+						const mimetype =
+							fileType ||
+							guessExtension(extension as Mimetypes[keyof Mimetypes]) ||
+							"text/plain";
 
-						const fileURI = `${FileSystem.cacheDirectory}/uploadText.${extension}`
+						const fileURI = `${FileSystem.cacheDirectory}/uploadText.${extension}`;
 
 						await FileSystem.writeAsStringAsync(fileURI, text, {
 							encoding: FileSystem.EncodingType.UTF8,
-						})
+						});
 
 						const fileData = {
 							uri: fileURI,
@@ -521,10 +526,10 @@ export default function UploadText({
 						});
 
 						if (typeof uploadedFiles === "string") {
-							return setFailedUpload(true)
+							return setFailedUpload(true);
 						}
 
-						const upload = uploadedFiles[0]
+						const upload = uploadedFiles[0];
 
 						setUploadedFile(upload);
 						setFailedUpload(false);
@@ -532,14 +537,14 @@ export default function UploadText({
 						afterUploadCleanup();
 					}}
 					text={uploading ? "Uploading..." : "Upload File"}
-					color={(uploading || uploadButtonDisabled) ? "#373d79" : "#323ea8"}
-					textColor={(uploading || uploadButtonDisabled) ? "gray" : "white"}
+					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
+					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
-					    left: "auto",
-					    right: "auto",
-					    top: 10
+						left: "auto",
+						right: "auto",
+						top: 10,
 					}}
-			    />
+				/>
 			</View>
 		</View>
 	);

@@ -1,26 +1,23 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View, ToastAndroid } from "react-native";
+import { Text, View, ToastAndroid } from "react-native";
 import { createURL, type CreateURLParams } from "@/functions/zipline/urls";
 import * as Clipboard from "expo-clipboard";
 import { styles } from "@/styles/components/shareIntentShorten";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import TextInput from "./TextInput";
 import Button from "./Button";
 
 interface Props {
-    defaultUrl: string
+	defaultUrl: string;
 }
 
-export default function ShareIntentShorten({
-    defaultUrl
-}: Props) {
+export default function ShareIntentShorten({ defaultUrl }: Props) {
 	const router = useRouter();
 
-	useAuth()
-	const resetShareIntent = useShareIntent(true)
+	useAuth();
+	const resetShareIntent = useShareIntent(true);
 
 	const [url, setUrl] = useState<string | null>(defaultUrl);
 	const [vanity, setVanity] = useState<string | null>(null);
@@ -43,7 +40,7 @@ export default function ShareIntentShorten({
 							onPress={() => {
 								resetShareIntent();
 
-								router.replace("/urls")
+								router.replace("/urls");
 							}}
 							icon="link"
 							color="transparent"
@@ -136,7 +133,7 @@ export default function ShareIntentShorten({
 						setOutputUrl(shortenedUrlData.url);
 					}}
 					margin={{
-						top: 15
+						top: 15,
 					}}
 				/>
 

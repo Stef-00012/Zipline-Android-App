@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    mainContainer: {
+	mainContainer: {
 		backgroundColor: "#0c101c",
 		flex: 1,
 	},
@@ -18,22 +18,22 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	headerText: {
-        marginTop: 5,
-        marginLeft: 10,
-        fontSize: 32,
-        fontWeight: "bold",
-        color: "white",
-    },
+		marginTop: 5,
+		marginLeft: 10,
+		fontSize: 32,
+		fontWeight: "bold",
+		color: "white",
+	},
 	header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+	},
 	dateRangeText: {
 		color: "gray",
 		textAlignVertical: "center",
 		fontSize: 12,
-		marginTop: 10
+		marginTop: 10,
 	},
 	scrollView: {
 		marginTop: 15,
@@ -75,49 +75,49 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 	},
 	pieChartContainer: {
-		marginHorizontal: "auto"
+		marginHorizontal: "auto",
 	},
 	chartTitle: {
-        fontSize: 23,
-        fontWeight: "bold",
-        color: "white",
+		fontSize: 23,
+		fontWeight: "bold",
+		color: "white",
 		marginBottom: 5,
-    },
+	},
 	chartXAxisLabelText: {
-		color: "gray"
+		color: "gray",
 	},
 	chartYAxisTextStyle: {
 		color: "gray",
 	},
 	tableHeader: {
-        height: 50,
-        backgroundColor: "#0c101c",
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-    },
+		height: 50,
+		backgroundColor: "#0c101c",
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+	},
 	rowText: {
-        color: "white",
-        textAlign: "center",
-    },
+		color: "white",
+		textAlign: "center",
+	},
 	headerRow: {
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	tableVerticalScroll: {
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
+	},
 	row: {
-        backgroundColor: "#0c101c",
-        padding: 8,
-        borderTopWidth: 1,
-        borderTopColor: "",
-        borderBottomWidth: 1,
-        borderBottomColor: "",
-    },
-    lastRow: {
-        borderBottomWidth: 0,
-    },
-    firstRow: {
-        borderTopWidth: 0,
-    },
+		backgroundColor: "#0c101c",
+		padding: 8,
+		borderTopWidth: 1,
+		borderTopColor: "",
+		borderBottomWidth: 1,
+		borderBottomColor: "",
+	},
+	lastRow: {
+		borderBottomWidth: 0,
+	},
+	firstRow: {
+		borderTopWidth: 0,
+	},
 });

@@ -1,14 +1,20 @@
 import {
 	View,
 	Text,
-	Pressable,
 	TextInput as NativeTextInput,
 	type ColorValue,
 } from "react-native";
 import { styles } from "@/styles/components/textInput";
 import { useState } from "react";
 import type { MaterialIcons } from "@expo/vector-icons";
-import type { KeyboardType, NativeSyntheticEvent, ReturnKeyTypeOptions, TextInputChangeEventData, TextInputSubmitEditingEventData, TextStyle } from "react-native";
+import type {
+	KeyboardType,
+	NativeSyntheticEvent,
+	ReturnKeyTypeOptions,
+	TextInputChangeEventData,
+	TextInputSubmitEditingEventData,
+	TextStyle,
+} from "react-native";
 import Button from "./Button";
 
 interface Props {
@@ -30,8 +36,12 @@ interface Props {
 	maxLength?: number;
 	inputStyle?: TextStyle;
 	showSoftInputOnFocus?: boolean;
-	onChange?: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void | Promise<void>;
-	onSubmitEditing?: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | Promise<void>;
+	onChange?: (
+		event: NativeSyntheticEvent<TextInputChangeEventData>,
+	) => void | Promise<void>;
+	onSubmitEditing?: (
+		event: NativeSyntheticEvent<TextInputSubmitEditingEventData>,
+	) => void | Promise<void>;
 	returnKeyType?: ReturnKeyTypeOptions;
 }
 
@@ -67,15 +77,17 @@ export default function TextInput({
 					<Text
 						style={{
 							...styles.inputHeader,
-							...((disabled && showDisabledStyle) && styles.inputHeaderDisabled),
+							...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
 						}}
 					>
 						{title}
 					</Text>
 				)}
-				<View style={{
-					...styles.inputContainer,
-				}}>
+				<View
+					style={{
+						...styles.inputContainer,
+					}}
+				>
 					<NativeTextInput
 						showSoftInputOnFocus={showSoftInputOnFocus}
 						multiline={multiline}
@@ -86,7 +98,7 @@ export default function TextInput({
 						style={{
 							...styles.textInput,
 							...styles.textInputSideButton,
-							...((disabled && showDisabledStyle) && styles.textInputDisabled),
+							...(disabled && showDisabledStyle && styles.textInputDisabled),
 							...inputStyle,
 						}}
 						editable={!disabled}
@@ -101,13 +113,13 @@ export default function TextInput({
 					<Button
 						onPress={() => {
 							onPasswordToggle(!displayPassword);
-							onSideButtonPress()
+							onSideButtonPress();
 							setDisplayPassword((prev) => !prev);
 						}}
 						icon={displayPassword ? "visibility-off" : "visibility"}
 						color={sideButtonColor}
 						margin={{
-							left: 10
+							left: 10,
 						}}
 					/>
 				</View>
@@ -121,15 +133,17 @@ export default function TextInput({
 					<Text
 						style={{
 							...styles.inputHeader,
-							...((disabled && showDisabledStyle) && styles.inputHeaderDisabled),
+							...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
 						}}
 					>
 						{title}
 					</Text>
 				)}
-				<View style={{
-					...styles.inputContainer,
-				}}>
+				<View
+					style={{
+						...styles.inputContainer,
+					}}
+				>
 					<NativeTextInput
 						onChange={onChange}
 						onSubmitEditing={onSubmitEditing}
@@ -139,7 +153,7 @@ export default function TextInput({
 						style={{
 							...styles.textInput,
 							...styles.textInputSideButton,
-							...((disabled && showDisabledStyle) && styles.textInputDisabled),
+							...(disabled && showDisabledStyle && styles.textInputDisabled),
 							...inputStyle,
 						}}
 						editable={!disabled}
@@ -159,7 +173,7 @@ export default function TextInput({
 						iconColor={sideButtonIconColor}
 						color={sideButtonColor}
 						margin={{
-							left: 10
+							left: 10,
 						}}
 					/>
 				</View>
@@ -172,7 +186,7 @@ export default function TextInput({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...((disabled && showDisabledStyle) && styles.inputHeaderDisabled),
+						...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
 					}}
 				>
 					{title}
@@ -186,7 +200,7 @@ export default function TextInput({
 				maxLength={maxLength}
 				style={{
 					...styles.textInput,
-					...((disabled && showDisabledStyle) && styles.textInputDisabled),
+					...(disabled && showDisabledStyle && styles.textInputDisabled),
 					...inputStyle,
 				}}
 				editable={!disabled}

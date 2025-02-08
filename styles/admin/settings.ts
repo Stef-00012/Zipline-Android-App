@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 8,
 	},
 	header: {
-		paddingVertical: 10
+		paddingVertical: 10,
 	},
 	headerText: {
 		marginTop: 5,
@@ -39,48 +39,10 @@ export const styles = StyleSheet.create({
 	oauthSubSettingTextColored: {
 		color: "575DB5",
 	},
-	settingSaveButton: {
-		backgroundColor: "#323ea8",
-		padding: 10,
-		marginTop: 10,
-		borderRadius: 6,
-	},
-	settingSaveButtonText: {
-		textAlign: "center",
-		fontWeight: "bold",
-		color: "white",
-	},
-	textInput: {
-		borderWidth: 2,
-		borderColor: "#222c47",
-		color: "white",
-		height: 40,
-		paddingHorizontal: 10,
-		fontSize: 15,
-		borderRadius: 6,
-		marginTop: 5,
-	},
 	multilneTextInput: {
 		height: 150,
 		textAlignVertical: "top",
-		fontFamily: "monospace"
-	},
-	switchContainer: {
-		flexDirection: "row",
-		marginTop: 10,
-	},
-	switchText: {
-		color: "white",
-		fontSize: 16,
-		marginLeft: 5,
-		fontWeight: "bold",
-		textAlignVertical: "center",
-	},
-	subHeaderText: {
-		marginLeft: 10,
-		fontSize: 13,
-		fontWeight: "bold",
-		color: "gray",
+		fontFamily: "monospace",
 	},
 	inputHeader: {
 		marginTop: 5,

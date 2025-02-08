@@ -19,15 +19,17 @@ export async function getCurrentUser(): Promise<APISelfUser | string> {
 		return res.data.user;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -48,15 +50,17 @@ export async function getRecentFiles(): Promise<APIRecentFiles | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -115,14 +119,16 @@ export async function editCurrentUser(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }

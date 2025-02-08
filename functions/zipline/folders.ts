@@ -25,15 +25,17 @@ export async function getFolders<T extends boolean | undefined = undefined>(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -54,15 +56,17 @@ export async function getFolder(id: string): Promise<APIFolder | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -93,15 +97,17 @@ export async function createFolder(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -131,15 +137,17 @@ export async function editFolder(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -163,15 +171,17 @@ export async function deleteFolder(id: string): Promise<APIFolder | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -199,15 +209,17 @@ export async function removeFileFromFolder(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -237,14 +249,16 @@ export async function addFileToFolder(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }

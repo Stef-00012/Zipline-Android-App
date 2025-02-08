@@ -1,18 +1,21 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
+import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
-import { createURL, type CreateURLParams, deleteURL, editURL, type EditURLOptions, getURLs } from "@/functions/zipline/urls";
+import {
+	createURL,
+	type CreateURLParams,
+	deleteURL,
+	editURL,
+	type EditURLOptions,
+	getURLs,
+} from "@/functions/zipline/urls";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/urls";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
-import {
-	type ExternalPathString,
-	Link,
-} from "expo-router";
+import { type ExternalPathString, Link } from "expo-router";
 import Popup from "@/components/Popup";
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
@@ -21,8 +24,8 @@ import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 
 export default function Urls() {
-	useAuth()
-	useShareIntent()
+	useAuth();
+	useShareIntent();
 
 	const [urls, setUrls] = useState<APIURLs | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);
@@ -39,13 +42,17 @@ export default function Urls() {
 
 	const [urlToEdit, setUrlToEdit] = useState<APIURLs[0] | null>(null);
 
-	const [editUrlDestination, setEditUrlDestination] = useState<string | null>(null);
+	const [editUrlDestination, setEditUrlDestination] = useState<string | null>(
+		null,
+	);
 	const [editUrlVanity, setEditUrlVanity] = useState<string | null>(null);
 	const [editUrlMaxViews, setEditUrlMaxViews] = useState<string | null>(null);
 	const [editUrlPassword, setEditUrlPassword] = useState<string | null>(null);
 	const [editUrlEnabled, setEditUrlEnabled] = useState<boolean>(true);
 
-	const [editUrlOriginalVanity, setEditUrlOriginalVanity] = useState<string | null>(null);
+	const [editUrlOriginalVanity, setEditUrlOriginalVanity] = useState<
+		string | null
+	>(null);
 	const [editUrlError, setEditUrlError] = useState<string>();
 
 	const dashUrl = db.get("url") as DashURL | null;
@@ -70,20 +77,23 @@ export default function Urls() {
 			setEditUrlMaxViews(urlToEdit.maxViews?.toString() || null);
 			setEditUrlEnabled(urlToEdit.enabled ?? true);
 		}
-	}, [urlToEdit])
+	}, [urlToEdit]);
 
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
-				<Popup hidden={!createNewUrl} onClose={() => {
-					setCreateNewUrl(false)
-					setNewUrl(null)
-					setNewUrlVanity(null)
-					setNewUrlMaxViews(null)
-					setNewUrlPassword(null)
-					setNewUrlEnabled(true)
-					setNewUrlError(undefined)
-				}}>
+				<Popup
+					hidden={!createNewUrl}
+					onClose={() => {
+						setCreateNewUrl(false);
+						setNewUrl(null);
+						setNewUrlVanity(null);
+						setNewUrlMaxViews(null);
+						setNewUrlPassword(null);
+						setNewUrlEnabled(true);
+						setNewUrlError(undefined);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Shorten URL</Text>
 						{newUrlError && <Text style={styles.errorText}>{newUrlError}</Text>}
@@ -106,7 +116,7 @@ export default function Urls() {
 							value={newUrlVanity || ""}
 							placeholder="google"
 						/>
-		
+
 						<TextInput
 							title="Max Views:"
 							keyboardType="numeric"
@@ -137,43 +147,46 @@ export default function Urls() {
 							color="#323ea8"
 							text="Shorten"
 							margin={{
-								top: 5
+								top: 5,
 							}}
 							onPress={async () => {
 								setNewUrlError(undefined);
-		
+
 								if (!newUrl) return setNewUrlError("Please insert a URL");
 								if (!urlRegex.test(newUrl))
 									return setNewUrlError("Please insert a valid URL");
-		
+
 								const urlData: CreateURLParams = {
 									destination: newUrl,
-									enabled: newUrlEnabled ?? true
+									enabled: newUrlEnabled ?? true,
 								};
-		
+
 								if (newUrlVanity) urlData.vanity = newUrlVanity;
-								if (newUrlMaxViews) urlData.maxViews = Number.parseInt(newUrlMaxViews);
+								if (newUrlMaxViews)
+									urlData.maxViews = Number.parseInt(newUrlMaxViews);
 								if (newUrlPassword) urlData.password = newUrlPassword;
-		
+
 								const shortenedUrlData = await createURL(urlData);
-		
+
 								if (typeof shortenedUrlData === "string")
 									return setNewUrlError(shortenedUrlData);
-		
-								const saved = await Clipboard.setStringAsync(shortenedUrlData.url);
-		
+
+								const saved = await Clipboard.setStringAsync(
+									shortenedUrlData.url,
+								);
+
 								setNewUrl(null);
 								setNewUrlVanity(null);
 								setNewUrlMaxViews(null);
 								setNewUrlPassword(null);
-								setNewUrlEnabled(true)
+								setNewUrlEnabled(true);
 
-								const newUrls = await getURLs()
+								const newUrls = await getURLs();
 
-								setUrls(typeof newUrls === "string" ? null : newUrls)
+								setUrls(typeof newUrls === "string" ? null : newUrls);
 
 								setCreateNewUrl(false);
-		
+
 								if (saved)
 									return ToastAndroid.show(
 										"Shortened URL copied to clipboard",
@@ -187,28 +200,33 @@ export default function Urls() {
 							}}
 						/>
 
-						<Text
-							style={styles.popupSubHeaderText}
-						>
+						<Text style={styles.popupSubHeaderText}>
 							Press outside to close this popup
 						</Text>
 					</View>
 				</Popup>
 
-				<Popup hidden={!urlToEdit} onClose={() => {
-					setUrlToEdit(null)
-					setEditUrlDestination(null)
-					setEditUrlVanity(null)
-					setEditUrlMaxViews(null)
-					setEditUrlPassword(null)
-					setEditUrlEnabled(true)
-					setEditUrlError(undefined)
-				}}>
+				<Popup
+					hidden={!urlToEdit}
+					onClose={() => {
+						setUrlToEdit(null);
+						setEditUrlDestination(null);
+						setEditUrlVanity(null);
+						setEditUrlMaxViews(null);
+						setEditUrlPassword(null);
+						setEditUrlEnabled(true);
+						setEditUrlError(undefined);
+					}}
+				>
 					<View style={styles.popupContent}>
 						{urlToEdit && (
 							<View>
-								<Text style={styles.mainHeaderText}>Edit URL "{urlToEdit.vanity || urlToEdit.code}"</Text>
-								{editUrlError && <Text style={styles.errorText}>{editUrlError}</Text>}
+								<Text style={styles.mainHeaderText}>
+									Edit URL "{urlToEdit.vanity || urlToEdit.code}"
+								</Text>
+								{editUrlError && (
+									<Text style={styles.errorText}>{editUrlError}</Text>
+								)}
 
 								<TextInput
 									title="URL:"
@@ -238,7 +256,7 @@ export default function Urls() {
 									value={editUrlMaxViews || ""}
 									placeholder="0"
 								/>
-				
+
 								<TextInput
 									title="Password:"
 									onValueChange={(content) => {
@@ -259,22 +277,28 @@ export default function Urls() {
 									color="#323ea8"
 									text="Edit"
 									margin={{
-										top: 5
+										top: 5,
 									}}
 									onPress={async () => {
 										setEditUrlError(undefined);
-				
-										if (!editUrlDestination) return setEditUrlError("Please insert a URL");
+
+										if (!editUrlDestination)
+											return setEditUrlError("Please insert a URL");
 										if (!urlRegex.test(editUrlDestination))
 											return setEditUrlError("Please insert a valid URL");
-				
+
 										const urlData: EditURLOptions = {
 											destination: editUrlDestination,
-											enabled: editUrlEnabled ?? true
+											enabled: editUrlEnabled ?? true,
 										};
-				
-										if (editUrlVanity && editUrlVanity !== editUrlOriginalVanity) urlData.vanity = editUrlVanity;
-										if (editUrlMaxViews) urlData.maxViews = Number.parseInt(editUrlMaxViews);
+
+										if (
+											editUrlVanity &&
+											editUrlVanity !== editUrlOriginalVanity
+										)
+											urlData.vanity = editUrlVanity;
+										if (editUrlMaxViews)
+											urlData.maxViews = Number.parseInt(editUrlMaxViews);
 										if (editUrlPassword) urlData.password = editUrlPassword;
 
 										const editedUrlData = await editURL(urlToEdit.id, urlData);
@@ -286,19 +310,17 @@ export default function Urls() {
 										setEditUrlVanity(null);
 										setEditUrlMaxViews(null);
 										setEditUrlPassword(null);
-										setEditUrlEnabled(true)
+										setEditUrlEnabled(true);
 
-										const newUrls = await getURLs()
+										const newUrls = await getURLs();
 
-										setUrls(typeof newUrls === "string" ? null : newUrls)
+										setUrls(typeof newUrls === "string" ? null : newUrls);
 
 										setUrlToEdit(null);
 									}}
 								/>
 
-								<Text
-									style={styles.popupSubHeaderText}
-								>
+								<Text style={styles.popupSubHeaderText}>
 									Press outside to close this popup
 								</Text>
 							</View>
@@ -311,7 +333,7 @@ export default function Urls() {
 						<View style={styles.header}>
 							<Text style={styles.headerText}>URLs</Text>
 							<View style={styles.headerButtons}>
-								<Button 
+								<Button
 									onPress={() => {
 										setCreateNewUrl(true);
 									}}
@@ -328,10 +350,7 @@ export default function Urls() {
 						</View>
 
 						<View style={{ ...styles.urlsContainer, flex: 1 }}>
-							<ScrollView
-								showsHorizontalScrollIndicator={false}
-								horizontal
-							>
+							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 								<View>
 									<Table>
 										<Row
@@ -349,7 +368,7 @@ export default function Urls() {
 											style={styles.tableHeader}
 											textStyle={{
 												...styles.rowText,
-												...styles.headerRow
+												...styles.headerRow,
 											}}
 										/>
 									</Table>
@@ -465,7 +484,7 @@ export default function Urls() {
 															icon="edit"
 															color="#323ea8"
 															onPress={() => {
-																setUrlToEdit(url)
+																setUrlToEdit(url);
 															}}
 															iconSize={20}
 															width={32}
@@ -481,19 +500,22 @@ export default function Urls() {
 
 																const success = await deleteURL(urlId);
 
-																if (typeof success === "string") return ToastAndroid.show(
-                                                                    `Failed to delete the url "${url.vanity || url.code}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																if (typeof success === "string")
+																	return ToastAndroid.show(
+																		`Failed to delete the url "${url.vanity || url.code}"`,
+																		ToastAndroid.SHORT,
+																	);
 
-																const newUrls = urls.filter(uri => url.id !== uri.id)
+																const newUrls = urls.filter(
+																	(uri) => url.id !== uri.id,
+																);
 
-																setUrls(newUrls)
+																setUrls(newUrls);
 
-                                                                ToastAndroid.show(
-                                                                    `Deleted the url "${url.vanity || url.code}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																ToastAndroid.show(
+																	`Deleted the url "${url.vanity || url.code}"`,
+																	ToastAndroid.SHORT,
+																);
 															}}
 															iconSize={20}
 															width={32}

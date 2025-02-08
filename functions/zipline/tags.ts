@@ -19,15 +19,17 @@ export async function getTags(): Promise<APITags | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -58,15 +60,17 @@ export async function createTag(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -87,15 +91,17 @@ export async function deleteTag(id: string): Promise<APITag | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -126,14 +132,16 @@ export async function editTag(id: string, options: EditTagOptions = {}) {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }

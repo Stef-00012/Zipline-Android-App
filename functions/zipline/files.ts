@@ -14,7 +14,10 @@ export interface GetFilesOptions {
 	favorite?: boolean;
 }
 // GET /api/user/files
-export async function getFiles(page: string, options: GetFilesOptions = {}): Promise<APIFiles | string> {
+export async function getFiles(
+	page: string,
+	options: GetFilesOptions = {},
+): Promise<APIFiles | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -37,15 +40,17 @@ export async function getFiles(page: string, options: GetFilesOptions = {}): Pro
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -66,15 +71,17 @@ export async function getFile(id: string): Promise<APIFile | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -95,15 +102,17 @@ export async function deleteFile(id: string): Promise<APIFile | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -119,7 +128,7 @@ export async function updateFileTags(
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return "Invalid token or URL"
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const file = await getFile(id);
@@ -147,15 +156,17 @@ export async function updateFileTags(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -165,7 +176,7 @@ export interface EditFileOptions {
 	password?: string | null;
 	type?: string;
 	favorite?: boolean;
-	tags?: Array<APITag["id"]>
+	tags?: Array<APITag["id"]>;
 }
 // PATCH /api/user/files/[id]
 export async function editFile(
@@ -175,7 +186,7 @@ export async function editFile(
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return "Invalid token or URL"
+	if (!url || !token) return "Invalid token or URL";
 
 	try {
 		const res = await axios.patch(`${url}/api/user/files/${id}`, options, {
@@ -187,15 +198,17 @@ export async function editFile(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -214,15 +227,15 @@ export interface UploadFileOptions {
 // POST /api/upload
 export async function uploadFiles(
 	file: {
-		uri: string,
-		mimetype: string
+		uri: string;
+		mimetype: string;
 	},
 	options: UploadFileOptions = {},
 ): Promise<Array<APIUploadFile> | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return "Invalid token or URL"
+	if (!url || !token) return "Invalid token or URL";
 
 	const headers: {
 		[key: string]: string;
@@ -253,19 +266,21 @@ export async function uploadFiles(
 			httpMethod: "POST",
 			fieldName: "file",
 			mimeType: file.mimetype,
-		})
-	
+		});
+
 		return JSON.parse(res.body)?.files || [];
-	} catch(e) {
+	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }

@@ -1,14 +1,22 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import type { APISettings, ExternalLink, ShortenEmbed, UploadEmbed } from "@/types/zipline";
+import type {
+	APISettings,
+	ExternalLink,
+	ShortenEmbed,
+	UploadEmbed,
+} from "@/types/zipline";
 import { useState, useEffect } from "react";
 import { getSettings, updateSettings } from "@/functions/zipline/settings";
-import { View, Text, Pressable, ToastAndroid } from "react-native";
+import { View, Text, ToastAndroid } from "react-native";
 import { styles } from "@/styles/admin/settings";
 import Select from "@/components/Select";
 import { formats } from "@/constants/adminSettings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { defaultUploadEmbed, defaultShortenEmbed } from "@/constants/adminSettings";
+import {
+	defaultUploadEmbed,
+	defaultShortenEmbed,
+} from "@/constants/adminSettings";
 import { convertToBytes, convertToTime } from "@/functions/util";
 import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
@@ -28,114 +36,100 @@ export default function ServerSettings() {
 		})();
 	}, []);
 
-	const [coreReturnHttpsUrls, setCoreReturnHttpsUrls] = useState<
-		boolean
-	>(false);
+	const [coreReturnHttpsUrls, setCoreReturnHttpsUrls] =
+		useState<boolean>(false);
 	const [coreDefaultDomain, setCoreDefaultDomain] = useState<string | null>(
 		null,
 	);
-	const [coreTempDirectory, setCoreTempDirectory] = useState<string>(
-		"",
-	);
+	const [coreTempDirectory, setCoreTempDirectory] = useState<string>("");
 	const [chunksEnabled, setChunksEnabled] = useState<boolean>(false);
 	const [chunksMax, setChunksMax] = useState<string>("");
 	const [chunksSize, setChunksSize] = useState<string>("");
-	const [tasksDeleteInterval, setTasksDeleteInterval] = useState<string>(
-		"",
-	);
-	const [tasksClearInvitesInterval, setTasksClearInvitesInterval] = useState<
-		string
-	>("");
-	const [tasksMaxViewsInterval, setTasksMaxViewsInterval] = useState<
-		string
-	>("");
-	const [tasksThumbnailsInterval, setTasksThumbnailsInterval] = useState<
-		string
-	>("");
-	const [tasksMetricsInterval, setTasksMetricsInterval] = useState<
-		string
-	>("");
+	const [tasksDeleteInterval, setTasksDeleteInterval] = useState<string>("");
+	const [tasksClearInvitesInterval, setTasksClearInvitesInterval] =
+		useState<string>("");
+	const [tasksMaxViewsInterval, setTasksMaxViewsInterval] =
+		useState<string>("");
+	const [tasksThumbnailsInterval, setTasksThumbnailsInterval] =
+		useState<string>("");
+	const [tasksMetricsInterval, setTasksMetricsInterval] = useState<string>("");
 	const [filesRoute, setFilesRoute] = useState<string | undefined>(undefined);
 	const [filesLength, setFilesLength] = useState<number | undefined>(undefined);
 	const [filesDefaultFormat, setFilesDefaultFormat] = useState<
 		"random" | "uuid" | "date" | "name" | "gfycat"
 	>("random");
-	const [filesDisabledExtensions, setFilesDisabledExtensions] =
-		useState<Array<string> | undefined>(undefined);
-	const [filesMaxFileSize, setFilesMaxFileSize] = useState<string | undefined>(undefined);
+	const [filesDisabledExtensions, setFilesDisabledExtensions] = useState<
+		Array<string> | undefined
+	>(undefined);
+	const [filesMaxFileSize, setFilesMaxFileSize] = useState<string | undefined>(
+		undefined,
+	);
 	const [filesDefaultExpiration, setFilesDefaultExpiration] = useState<
 		string | undefined
 	>(undefined);
-	const [filesAssumeMimetypes, setFilesAssumeMimetypes] = useState<
-		boolean
-	>(false);
+	const [filesAssumeMimetypes, setFilesAssumeMimetypes] =
+		useState<boolean>(false);
 	const [filesDefaultDateFormat, setFilesDefaultDateFormat] = useState<
 		string | undefined
 	>(undefined);
-	const [filesRemoveGpsMetadata, setFilesRemoveGpsMetadata] = useState<
-		boolean
-	>(false);
+	const [filesRemoveGpsMetadata, setFilesRemoveGpsMetadata] =
+		useState<boolean>(false);
 	const [urlsRoute, setUrlsRoute] = useState<string | undefined>(undefined);
 	const [urlsLength, setUrlsLength] = useState<number | undefined>(undefined);
-	const [featuresImageCompression, setFeaturesImageCompression] = useState<
-		boolean
-	>(false);
-	const [featuresRobotsTxt, setFeaturesRobotsTxt] = useState<boolean>(
-		false,
-	);
-	const [featuresHealthcheck, setFeaturesHealthcheck] = useState<
-		boolean
-	>(false);
-	const [featuresUserRegistration, setFeaturesUserRegistration] = useState<
-		boolean
-	>(false);
-	const [featuresOauthRegistration, setFeaturesOauthRegistration] = useState<
-		boolean
-	>(false);
-	const [featuresDeleteOnMaxViews, setFeaturesDeleteOnMaxViews] = useState<
-		boolean
-	>(false);
-	const [featuresThumbnailsEnabled, setFeaturesThumbnailsEnabled] = useState<
-		boolean
-	>(false);
+	const [featuresImageCompression, setFeaturesImageCompression] =
+		useState<boolean>(false);
+	const [featuresRobotsTxt, setFeaturesRobotsTxt] = useState<boolean>(false);
+	const [featuresHealthcheck, setFeaturesHealthcheck] =
+		useState<boolean>(false);
+	const [featuresUserRegistration, setFeaturesUserRegistration] =
+		useState<boolean>(false);
+	const [featuresOauthRegistration, setFeaturesOauthRegistration] =
+		useState<boolean>(false);
+	const [featuresDeleteOnMaxViews, setFeaturesDeleteOnMaxViews] =
+		useState<boolean>(false);
+	const [featuresThumbnailsEnabled, setFeaturesThumbnailsEnabled] =
+		useState<boolean>(false);
 	const [featuresThumbnailsNumberThreads, setFeaturesThumbnailsNumberThreads] =
 		useState<number | undefined>(undefined);
-	const [featuresMetricsEnabled, setFeaturesMetricsEnabled] = useState<
-		boolean
-	>(false);
-	const [featuresMetricsAdminOnly, setFeaturesMetricsAdminOnly] = useState<
-		boolean
-	>(false);
+	const [featuresMetricsEnabled, setFeaturesMetricsEnabled] =
+		useState<boolean>(false);
+	const [featuresMetricsAdminOnly, setFeaturesMetricsAdminOnly] =
+		useState<boolean>(false);
 	const [featuresMetricsShowUserSpecific, setFeaturesMetricsShowUserSpecific] =
 		useState<boolean>(false);
 	const [invitesEnabled, setInvitesEnabled] = useState<boolean>(false);
-	const [invitesLength, setInvitesLength] = useState<number | undefined>(undefined);
-	const [websiteTitle, setWebsiteTitle] = useState<string | undefined>(undefined);
+	const [invitesLength, setInvitesLength] = useState<number | undefined>(
+		undefined,
+	);
+	const [websiteTitle, setWebsiteTitle] = useState<string | undefined>(
+		undefined,
+	);
 	const [websiteTitleLogo, setWebsiteTitleLogo] = useState<string | null>(null);
 	const [websiteExternalLinks, setWebsiteExternalLinks] = useState<
 		string | undefined
 	>(undefined);
-	const [originalWebsiteExternalLinks, setOriginalWebsiteExternalLinks] = useState<Array<ExternalLink> | undefined>(undefined)
+	const [originalWebsiteExternalLinks, setOriginalWebsiteExternalLinks] =
+		useState<Array<ExternalLink> | undefined>(undefined);
 	const [websiteLoginBackground, setWebsiteLoginBackground] = useState<
 		string | null
 	>(null);
-	const [websiteLoginBackgroundBlur, setWebsiteLoginBackgroundBlur] = useState<
-		boolean
-	>(false);
+	const [websiteLoginBackgroundBlur, setWebsiteLoginBackgroundBlur] =
+		useState<boolean>(false);
 	const [websiteDefaultAvatar, setWebsiteDefaultAvatar] = useState<
 		string | null
 	>(null);
 	const [websiteTos, setWebsiteTos] = useState<string | null>(null);
-	const [websiteThemeDefault, setWebsiteThemeDefault] = useState<string | undefined>(
+	const [websiteThemeDefault, setWebsiteThemeDefault] = useState<
+		string | undefined
+	>(undefined);
+	const [websiteThemeDark, setWebsiteThemeDark] = useState<string | undefined>(
 		undefined,
 	);
-	const [websiteThemeDark, setWebsiteThemeDark] = useState<string | undefined>(undefined);
-	const [websiteThemeLight, setWebsiteThemeLight] = useState<string | undefined>(
-		undefined,
-	);
-	const [oauthBypassLocalLogin, setOauthBypassLocalLogin] = useState<
-		boolean
-	>(false);
+	const [websiteThemeLight, setWebsiteThemeLight] = useState<
+		string | undefined
+	>(undefined);
+	const [oauthBypassLocalLogin, setOauthBypassLocalLogin] =
+		useState<boolean>(false);
 	const [oauthLoginOnly, setOauthLoginOnly] = useState<boolean>(false);
 	const [oauthDiscordClientId, setOauthDiscordClientId] = useState<
 		string | null
@@ -183,18 +177,20 @@ export default function ServerSettings() {
 		string | null
 	>(null);
 	const [mfaTotpEnabled, setMfaTotpEnabled] = useState<boolean>(false);
-	const [mfaTotpIssuer, setMfaTotpIssuer] = useState<string | undefined>(undefined);
-	const [mfaPasskeys, setMfaPasskeys] = useState<boolean>(false);
-	const [ratelimitEnabled, setRatelimitEnabled] = useState<boolean>(
-		false,
+	const [mfaTotpIssuer, setMfaTotpIssuer] = useState<string | undefined>(
+		undefined,
 	);
-	const [ratelimitMax, setRatelimitMax] = useState<number | undefined>(undefined);
+	const [mfaPasskeys, setMfaPasskeys] = useState<boolean>(false);
+	const [ratelimitEnabled, setRatelimitEnabled] = useState<boolean>(false);
+	const [ratelimitMax, setRatelimitMax] = useState<number | undefined>(
+		undefined,
+	);
 	const [ratelimitWindow, setRatelimitWindow] = useState<number | null>(null);
-	const [ratelimitAdminBypass, setRatelimitAdminBypass] = useState<
-		boolean
-	>(false);
-	const [ratelimitAllowList, setRatelimitAllowList] =
-		useState<Array<string> | undefined>(undefined);
+	const [ratelimitAdminBypass, setRatelimitAdminBypass] =
+		useState<boolean>(false);
+	const [ratelimitAllowList, setRatelimitAllowList] = useState<
+		Array<string> | undefined
+	>(undefined);
 	const [httpWebhookOnUpload, setHttpWebhookOnUpload] = useState<string | null>(
 		null,
 	);
@@ -218,8 +214,10 @@ export default function ServerSettings() {
 	const [discordOnUploadContent, setDiscordOnUploadContent] = useState<
 		string | null
 	>(null);
-	const [discordOnUploadEmbed, setDiscordOnUploadEmbed] = useState<UploadEmbed | null>(null);
-	const [originalDiscordOnUploadEmbed, setOriginalDiscordOnUploadEmbed] = useState<UploadEmbed | null>(null);
+	const [discordOnUploadEmbed, setDiscordOnUploadEmbed] =
+		useState<UploadEmbed | null>(null);
+	const [originalDiscordOnUploadEmbed, setOriginalDiscordOnUploadEmbed] =
+		useState<UploadEmbed | null>(null);
 	const [discordOnShortenWebhookUrl, setDiscordOnShortenWebhookUrl] = useState<
 		string | null
 	>(null);
@@ -232,16 +230,24 @@ export default function ServerSettings() {
 	const [discordOnShortenContent, setDiscordOnShortenContent] = useState<
 		string | null
 	>(null);
-	const [discordOnShortenEmbed, setDiscordOnShortenEmbed] = useState<ShortenEmbed | null>(null);
-	const [originalDiscordOnShortenEmbed, setOriginalDiscordOnShortenEmbed] = useState<ShortenEmbed | null>(null);
+	const [discordOnShortenEmbed, setDiscordOnShortenEmbed] =
+		useState<ShortenEmbed | null>(null);
+	const [originalDiscordOnShortenEmbed, setOriginalDiscordOnShortenEmbed] =
+		useState<ShortenEmbed | null>(null);
 	const [pwaEnabled, setPwaEnabled] = useState<boolean>(false);
 	const [pwaTitle, setPwaTitle] = useState<string | undefined>(undefined);
-	const [pwaShortName, setPwaShortName] = useState<string | undefined>(undefined);
-	const [pwaDescription, setPwaDescription] = useState<string | undefined>(undefined);
-	const [pwaThemeColor, setPwaThemeColor] = useState<string | undefined>(undefined);
-	const [pwaBackgroundColor, setPwaBackgroundColor] = useState<string | undefined>(
+	const [pwaShortName, setPwaShortName] = useState<string | undefined>(
 		undefined,
 	);
+	const [pwaDescription, setPwaDescription] = useState<string | undefined>(
+		undefined,
+	);
+	const [pwaThemeColor, setPwaThemeColor] = useState<string | undefined>(
+		undefined,
+	);
+	const [pwaBackgroundColor, setPwaBackgroundColor] = useState<
+		string | undefined
+	>(undefined);
 
 	useEffect(() => {
 		if (settings) {
@@ -249,34 +255,50 @@ export default function ServerSettings() {
 			setCoreDefaultDomain(settings.coreDefaultDomain);
 			setCoreTempDirectory(settings.coreTempDirectory);
 			setChunksEnabled(settings.chunksEnabled);
-			setChunksMax(convertToBytes(settings.chunksMax, {
-				unitSeparator: " "
-			}) || "");
-			setChunksSize(convertToBytes(settings.chunksSize, {
-				unitSeparator: " "
-			}) || "");
-			setTasksDeleteInterval(convertToTime(settings.tasksDeleteInterval, {
-				shortFormat: true
-			}) || "");
-			setTasksClearInvitesInterval(convertToTime(settings.tasksClearInvitesInterval, {
-				shortFormat: true
-			}) || "");
-			setTasksMaxViewsInterval(convertToTime(settings.tasksMaxViewsInterval, {
-				shortFormat: true
-			}) || "");
-			setTasksThumbnailsInterval(convertToTime(settings.tasksThumbnailsInterval, {
-				shortFormat: true
-			}) || "");
-			setTasksMetricsInterval(convertToTime(settings.tasksMetricsInterval, {
-				shortFormat: true
-			}) || "");
+			setChunksMax(
+				convertToBytes(settings.chunksMax, {
+					unitSeparator: " ",
+				}) || "",
+			);
+			setChunksSize(
+				convertToBytes(settings.chunksSize, {
+					unitSeparator: " ",
+				}) || "",
+			);
+			setTasksDeleteInterval(
+				convertToTime(settings.tasksDeleteInterval, {
+					shortFormat: true,
+				}) || "",
+			);
+			setTasksClearInvitesInterval(
+				convertToTime(settings.tasksClearInvitesInterval, {
+					shortFormat: true,
+				}) || "",
+			);
+			setTasksMaxViewsInterval(
+				convertToTime(settings.tasksMaxViewsInterval, {
+					shortFormat: true,
+				}) || "",
+			);
+			setTasksThumbnailsInterval(
+				convertToTime(settings.tasksThumbnailsInterval, {
+					shortFormat: true,
+				}) || "",
+			);
+			setTasksMetricsInterval(
+				convertToTime(settings.tasksMetricsInterval, {
+					shortFormat: true,
+				}) || "",
+			);
 			setFilesRoute(settings.filesRoute);
 			setFilesLength(settings.filesLength);
 			setFilesDefaultFormat(settings.filesDefaultFormat);
 			setFilesDisabledExtensions(settings.filesDisabledExtensions);
-			setFilesMaxFileSize(convertToBytes(settings.filesMaxFileSize, {
-				unitSeparator: " "
-			}) || undefined);
+			setFilesMaxFileSize(
+				convertToBytes(settings.filesMaxFileSize, {
+					unitSeparator: " ",
+				}) || undefined,
+			);
 			setFilesDefaultExpiration(settings.filesDefaultExpiration || undefined);
 			setFilesAssumeMimetypes(settings.filesAssumeMimetypes);
 			setFilesDefaultDateFormat(settings.filesDefaultDateFormat);
@@ -305,9 +327,7 @@ export default function ServerSettings() {
 			setWebsiteExternalLinks(
 				JSON.stringify(settings.websiteExternalLinks, null, 4),
 			);
-			setOriginalWebsiteExternalLinks(
-				settings.websiteExternalLinks,
-			);
+			setOriginalWebsiteExternalLinks(settings.websiteExternalLinks);
 			setWebsiteLoginBackground(settings.websiteLoginBackground);
 			setWebsiteLoginBackgroundBlur(settings.websiteLoginBackgroundBlur);
 			setWebsiteDefaultAvatar(settings.websiteDefaultAvatar);
@@ -366,21 +386,37 @@ export default function ServerSettings() {
 		}
 	}, [settings]);
 
-	const [saveError, setSaveError] = useState<Array<string> | null>(null)
+	const [saveError, setSaveError] = useState<Array<string> | null>(null);
 
-	type SaveCategories = "core" | "chunks" | "tasks" | "mfa" | "features" | "files" | "urlShortener" | "invites" | "ratelimit" | "website" | "oauth" | "pwa" | "httpWebhooks" | "discordWebhook" | "discordOnUploadWebhook" | "discordOnShortenWebhook";
+	type SaveCategories =
+		| "core"
+		| "chunks"
+		| "tasks"
+		| "mfa"
+		| "features"
+		| "files"
+		| "urlShortener"
+		| "invites"
+		| "ratelimit"
+		| "website"
+		| "oauth"
+		| "pwa"
+		| "httpWebhooks"
+		| "discordWebhook"
+		| "discordOnUploadWebhook"
+		| "discordOnShortenWebhook";
 
 	async function handleSave(category: SaveCategories) {
-		setSaveError(null)
-		let saveSettings: Partial<APISettings> = {}
+		setSaveError(null);
+		let saveSettings: Partial<APISettings> = {};
 
-		switch(category) {
+		switch (category) {
 			case "core": {
 				saveSettings = {
 					coreReturnHttpsUrls,
 					coreDefaultDomain,
-					coreTempDirectory
-				}
+					coreTempDirectory,
+				};
 
 				break;
 			}
@@ -389,8 +425,8 @@ export default function ServerSettings() {
 				saveSettings = {
 					chunksEnabled,
 					chunksMax,
-					chunksSize
-				}
+					chunksSize,
+				};
 
 				break;
 			}
@@ -401,8 +437,8 @@ export default function ServerSettings() {
 					tasksDeleteInterval,
 					tasksMaxViewsInterval,
 					tasksMetricsInterval,
-					tasksThumbnailsInterval
-				}
+					tasksThumbnailsInterval,
+				};
 
 				break;
 			}
@@ -411,8 +447,8 @@ export default function ServerSettings() {
 				saveSettings = {
 					mfaPasskeys,
 					mfaTotpEnabled,
-					mfaTotpIssuer
-				}
+					mfaTotpIssuer,
+				};
 
 				break;
 			}
@@ -429,8 +465,8 @@ export default function ServerSettings() {
 					featuresThumbnailsNumberThreads,
 					featuresMetricsEnabled,
 					featuresMetricsAdminOnly,
-					featuresMetricsShowUserSpecific
-				}
+					featuresMetricsShowUserSpecific,
+				};
 
 				break;
 			}
@@ -446,7 +482,7 @@ export default function ServerSettings() {
 					filesMaxFileSize,
 					filesDefaultExpiration,
 					filesDefaultDateFormat,
-				}
+				};
 
 				break;
 			}
@@ -454,8 +490,8 @@ export default function ServerSettings() {
 			case "urlShortener": {
 				saveSettings = {
 					urlsRoute,
-					urlsLength
-				}
+					urlsLength,
+				};
 
 				break;
 			}
@@ -463,8 +499,8 @@ export default function ServerSettings() {
 			case "invites": {
 				saveSettings = {
 					invitesEnabled,
-					invitesLength
-				}
+					invitesLength,
+				};
 
 				break;
 			}
@@ -475,8 +511,8 @@ export default function ServerSettings() {
 					ratelimitMax,
 					ratelimitWindow,
 					ratelimitAdminBypass,
-					ratelimitAllowList
-				}
+					ratelimitAllowList,
+				};
 
 				break;
 			}
@@ -491,12 +527,14 @@ export default function ServerSettings() {
 					websiteTos,
 					websiteThemeDefault,
 					websiteThemeDark,
-					websiteThemeLight
-				}
+					websiteThemeLight,
+				};
 
 				try {
-					saveSettings.websiteExternalLinks = JSON.parse(websiteExternalLinks || "")
-				} catch(e) {}
+					saveSettings.websiteExternalLinks = JSON.parse(
+						websiteExternalLinks || "",
+					);
+				} catch (e) {}
 
 				break;
 			}
@@ -519,8 +557,8 @@ export default function ServerSettings() {
 					oauthOidcAuthorizeUrl,
 					oauthOidcTokenUrl,
 					oauthOidcUserinfoUrl,
-					oauthOidcRedirectUri
-				}
+					oauthOidcRedirectUri,
+				};
 
 				break;
 			}
@@ -532,8 +570,8 @@ export default function ServerSettings() {
 					pwaShortName,
 					pwaDescription,
 					pwaThemeColor,
-					pwaBackgroundColor
-				}
+					pwaBackgroundColor,
+				};
 
 				break;
 			}
@@ -541,8 +579,8 @@ export default function ServerSettings() {
 			case "httpWebhooks": {
 				saveSettings = {
 					httpWebhookOnUpload,
-					httpWebhookOnShorten
-				}
+					httpWebhookOnShorten,
+				};
 
 				break;
 			}
@@ -551,8 +589,8 @@ export default function ServerSettings() {
 				saveSettings = {
 					discordWebhookUrl,
 					discordUsername,
-					discordAvatarUrl
-				}
+					discordAvatarUrl,
+				};
 
 				break;
 			}
@@ -563,8 +601,8 @@ export default function ServerSettings() {
 					discordOnShortenUsername,
 					discordOnShortenAvatarUrl,
 					discordOnShortenContent,
-					discordOnShortenEmbed
-				}
+					discordOnShortenEmbed,
+				};
 
 				break;
 			}
@@ -575,8 +613,8 @@ export default function ServerSettings() {
 					discordOnUploadUsername,
 					discordOnUploadAvatarUrl,
 					discordOnUploadContent,
-					discordOnUploadEmbed
-				}
+					discordOnUploadEmbed,
+				};
 
 				break;
 			}
@@ -584,14 +622,14 @@ export default function ServerSettings() {
 
 		if (Object.keys(saveSettings).length <= 0) return "Something went wrong...";
 
-		const success = await updateSettings(saveSettings)
+		const success = await updateSettings(saveSettings);
 
-		if (Array.isArray(success)) return setSaveError(success)
+		if (Array.isArray(success)) return setSaveError(success);
 
 		return ToastAndroid.show(
 			"Successfully saved the settings",
-			ToastAndroid.SHORT
-		)
+			ToastAndroid.SHORT,
+		);
 	}
 
 	return (
@@ -604,7 +642,11 @@ export default function ServerSettings() {
 
 							{saveError && (
 								<View>
-									{saveError.map((error) => <Text style={styles.errorText} key={error}>{error}</Text>)}
+									{saveError.map((error) => (
+										<Text style={styles.errorText} key={error}>
+											{error}
+										</Text>
+									))}
 								</View>
 							)}
 						</View>
@@ -617,9 +659,7 @@ export default function ServerSettings() {
 								<Switch
 									title="Return HTTPS URLs"
 									value={coreReturnHttpsUrls || false}
-									onValueChange={() =>
-										setCoreReturnHttpsUrls((prev) => !prev)
-									}
+									onValueChange={() => setCoreReturnHttpsUrls((prev) => !prev)}
 								/>
 
 								<TextInput
@@ -787,9 +827,7 @@ export default function ServerSettings() {
 								<Switch
 									title="Healthcheck"
 									value={featuresHealthcheck || false}
-									onValueChange={() =>
-										setFeaturesHealthcheck((prev) => !prev)
-									}
+									onValueChange={() => setFeaturesHealthcheck((prev) => !prev)}
 								/>
 
 								<Switch
@@ -899,9 +937,7 @@ export default function ServerSettings() {
 								<Switch
 									title="Assume Mimetypes"
 									value={filesAssumeMimetypes || false}
-									onValueChange={() =>
-										setFilesAssumeMimetypes((prev) => !prev)
-									}
+									onValueChange={() => setFilesAssumeMimetypes((prev) => !prev)}
 								/>
 
 								<Switch
@@ -920,7 +956,7 @@ export default function ServerSettings() {
 
 										setFilesDefaultFormat(
 											selectedFormat[0].value as typeof filesDefaultFormat,
-										)
+										);
 									}}
 									placeholder="Select format..."
 									defaultValue={formats.find(
@@ -946,14 +982,18 @@ export default function ServerSettings() {
 
 								<TextInput
 									title="Default Expiration:"
-									onValueChange={(content) => setFilesDefaultExpiration(content)}
+									onValueChange={(content) =>
+										setFilesDefaultExpiration(content)
+									}
 									value={filesDefaultExpiration || ""}
 									placeholder="30d"
 								/>
 
 								<TextInput
 									title="Default Date Format:"
-									onValueChange={(content) => setFilesDefaultDateFormat(content)}
+									onValueChange={(content) =>
+										setFilesDefaultDateFormat(content)
+									}
 									value={filesDefaultDateFormat || ""}
 									placeholder="YYYY-MM-DD_HH:mm:ss"
 								/>
@@ -1045,9 +1085,7 @@ export default function ServerSettings() {
 								<Switch
 									title="Admin Bypass"
 									value={ratelimitAdminBypass || false}
-									onValueChange={() =>
-										setRatelimitAdminBypass((prev) => !prev)
-									}
+									onValueChange={() => setRatelimitAdminBypass((prev) => !prev)}
 								/>
 
 								<TextInput
@@ -1121,7 +1159,9 @@ export default function ServerSettings() {
 								<TextInput
 									title="Login Background:"
 									keyboardType="url"
-									onValueChange={(content) => setWebsiteLoginBackground(content)}
+									onValueChange={(content) =>
+										setWebsiteLoginBackground(content)
+									}
 									value={websiteLoginBackground || ""}
 									placeholder="https://example.com/background.png"
 								/>
@@ -1210,7 +1250,9 @@ export default function ServerSettings() {
 
 									<TextInput
 										title="Discord Client ID:"
-										onValueChange={(content) => setOauthDiscordClientId(content)}
+										onValueChange={(content) =>
+											setOauthDiscordClientId(content)
+										}
 										value={oauthDiscordClientId || ""}
 									/>
 
@@ -1330,13 +1372,17 @@ export default function ServerSettings() {
 
 									<TextInput
 										title="OIDC Userinfo URL:"
-										onValueChange={(content) => setOauthOidcUserinfoUrl(content)}
+										onValueChange={(content) =>
+											setOauthOidcUserinfoUrl(content)
+										}
 										value={oauthOidcUserinfoUrl || ""}
 									/>
 
 									<TextInput
 										title="OIDC Redirect URL:"
-										onValueChange={(content) => setOauthOidcRedirectUri(content)}
+										onValueChange={(content) =>
+											setOauthOidcRedirectUri(content)
+										}
 										value={oauthOidcRedirectUri || ""}
 									/>
 								</View>
@@ -1482,14 +1528,18 @@ export default function ServerSettings() {
 
 									<TextInput
 										title="Webhook URL:"
-										onValueChange={(content) => setDiscordOnUploadWebhookUrl(content)}
+										onValueChange={(content) =>
+											setDiscordOnUploadWebhookUrl(content)
+										}
 										value={discordOnUploadWebhookUrl || ""}
 										placeholder="https://discord.com/api/webhooks/..."
 									/>
 
 									<TextInput
 										title="Username:"
-										onValueChange={(content) => setDiscordOnUploadUsername(content)}
+										onValueChange={(content) =>
+											setDiscordOnUploadUsername(content)
+										}
 										value={discordOnUploadUsername || ""}
 										placeholder="Zipline Uploads"
 									/>
@@ -1497,7 +1547,9 @@ export default function ServerSettings() {
 									<TextInput
 										title="Avatar URL:"
 										keyboardType="url"
-										onValueChange={(content) => setDiscordOnUploadAvatarUrl(content)}
+										onValueChange={(content) =>
+											setDiscordOnUploadAvatarUrl(content)
+										}
 										value={discordOnUploadAvatarUrl || ""}
 										placeholder="https://example.com/uploadAvatar.png"
 									/>
@@ -1506,95 +1558,143 @@ export default function ServerSettings() {
 										title="Content:"
 										inputStyle={styles.multilneTextInput}
 										multiline
-										onValueChange={(content) => setDiscordOnUploadContent(content)}
+										onValueChange={(content) =>
+											setDiscordOnUploadContent(content)
+										}
 										value={discordOnUploadContent || ""}
 									/>
 
 									<Switch
 										title="Embed"
 										value={!!discordOnUploadEmbed || false}
-										onValueChange={() => setDiscordOnUploadEmbed((prev) => {
-											if (prev) return null;
-											
-											return originalDiscordOnUploadEmbed || defaultUploadEmbed;
-										})}
+										onValueChange={() =>
+											setDiscordOnUploadEmbed((prev) => {
+												if (prev) return null;
+
+												return (
+													originalDiscordOnUploadEmbed || defaultUploadEmbed
+												);
+											})
+										}
 									/>
 
 									{/* On Upload Embed */}
-									<View style={{
-										...styles.settingGroup,
-										...(!discordOnUploadEmbed && { display: "none" }),
-									}}>
+									<View
+										style={{
+											...styles.settingGroup,
+											...(!discordOnUploadEmbed && { display: "none" }),
+										}}
+									>
 										<TextInput
 											title="Title:"
-											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												title: content
-											} as UploadEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															title: content,
+														}) as UploadEmbed,
+												)
+											}
 											value={discordOnUploadEmbed?.title || ""}
 										/>
 
 										<TextInput
 											title="Description:"
-											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												description: content
-											} as UploadEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															description: content,
+														}) as UploadEmbed,
+												)
+											}
 											value={discordOnUploadEmbed?.description || ""}
 										/>
 
 										<TextInput
 											title="Footer:"
-											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												footer: content
-											} as UploadEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															footer: content,
+														}) as UploadEmbed,
+												)
+											}
 											value={discordOnUploadEmbed?.footer || ""}
 										/>
 
 										<TextInput
 											title="Color:"
-											onValueChange={(content) => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												color: content
-											} as UploadEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															color: content,
+														}) as UploadEmbed,
+												)
+											}
 											value={discordOnUploadEmbed?.color || ""}
 										/>
 
 										<Switch
 											title="Thumbnail"
 											value={!!discordOnUploadEmbed?.thumbnail || false}
-											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												thumbnail: !embed?.thumbnail
-											} as UploadEmbed))}
+											onValueChange={() =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															thumbnail: !embed?.thumbnail,
+														}) as UploadEmbed,
+												)
+											}
 										/>
 
 										<Switch
 											title="Image/Video"
 											value={!!discordOnUploadEmbed?.imageOrVideo || false}
-											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												imageOrVideo: !embed?.imageOrVideo
-											} as UploadEmbed))}
+											onValueChange={() =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															imageOrVideo: !embed?.imageOrVideo,
+														}) as UploadEmbed,
+												)
+											}
 										/>
 
 										<Switch
 											title="Timestamp"
 											value={!!discordOnUploadEmbed?.timestamp || false}
-											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												timestamp: !embed?.timestamp
-											} as UploadEmbed))}
+											onValueChange={() =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															timestamp: !embed?.timestamp,
+														}) as UploadEmbed,
+												)
+											}
 										/>
 
 										<Switch
 											title="URL"
 											value={!!discordOnUploadEmbed?.url || false}
-											onValueChange={() => setDiscordOnUploadEmbed((embed) => ({
-												...embed,
-												url: !embed?.url
-											} as UploadEmbed))}
+											onValueChange={() =>
+												setDiscordOnUploadEmbed(
+													(embed) =>
+														({
+															...embed,
+															url: !embed?.url,
+														}) as UploadEmbed,
+												)
+											}
 										/>
 									</View>
 
@@ -1616,21 +1716,27 @@ export default function ServerSettings() {
 									<TextInput
 										title="Webhook URL:"
 										keyboardType="url"
-										onValueChange={(content) => setDiscordOnShortenWebhookUrl(content)}
+										onValueChange={(content) =>
+											setDiscordOnShortenWebhookUrl(content)
+										}
 										value={discordOnShortenWebhookUrl || ""}
 										placeholder="https://discord.com/api/webhooks/..."
 									/>
 
 									<TextInput
 										title="Username:"
-										onValueChange={(content) => setDiscordOnShortenUsername(content)}
+										onValueChange={(content) =>
+											setDiscordOnShortenUsername(content)
+										}
 										value={discordOnShortenUsername || ""}
 										placeholder="Zipline Shortens"
 									/>
 
 									<TextInput
 										title="Avatar URL:"
-										onValueChange={(content) => setDiscordOnShortenAvatarUrl(content)}
+										onValueChange={(content) =>
+											setDiscordOnShortenAvatarUrl(content)
+										}
 										value={discordOnShortenAvatarUrl || ""}
 										placeholder="https://example.com/shortenAvatar.png"
 									/>
@@ -1639,95 +1745,143 @@ export default function ServerSettings() {
 										title="Content:"
 										inputStyle={styles.multilneTextInput}
 										multiline
-										onValueChange={(content) => setDiscordOnShortenContent(content)}
+										onValueChange={(content) =>
+											setDiscordOnShortenContent(content)
+										}
 										value={discordOnShortenContent || ""}
 									/>
 
 									<Switch
 										title="Embed"
 										value={!!discordOnShortenEmbed}
-										onValueChange={() => setDiscordOnShortenEmbed((prev) => {
-											if (prev) return null;
-											
-											return originalDiscordOnShortenEmbed || defaultShortenEmbed;
-										})}
+										onValueChange={() =>
+											setDiscordOnShortenEmbed((prev) => {
+												if (prev) return null;
+
+												return (
+													originalDiscordOnShortenEmbed || defaultShortenEmbed
+												);
+											})
+										}
 									/>
 
 									{/* On Shorten Embed */}
-									<View style={{
-										...styles.settingGroup,
-										...(!discordOnShortenEmbed && { display: "none" }),
-									}}>
+									<View
+										style={{
+											...styles.settingGroup,
+											...(!discordOnShortenEmbed && { display: "none" }),
+										}}
+									>
 										<TextInput
 											title="Title:"
-											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												title: content
-											} as ShortenEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															title: content,
+														}) as ShortenEmbed,
+												)
+											}
 											value={discordOnShortenEmbed?.title || ""}
 										/>
 
 										<TextInput
 											title="Description:"
-											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												description: content
-											} as ShortenEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															description: content,
+														}) as ShortenEmbed,
+												)
+											}
 											value={discordOnShortenEmbed?.description || ""}
 										/>
 
 										<TextInput
 											title="Footer:"
-											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												footer: content
-											} as ShortenEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															footer: content,
+														}) as ShortenEmbed,
+												)
+											}
 											value={discordOnShortenEmbed?.footer || ""}
 										/>
 
 										<TextInput
 											title="Color:"
-											onValueChange={(content) => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												color: content
-											} as ShortenEmbed))}
+											onValueChange={(content) =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															color: content,
+														}) as ShortenEmbed,
+												)
+											}
 											value={discordOnShortenEmbed?.color || ""}
 										/>
 
 										<Switch
 											title="Thumbnail"
 											value={!!discordOnShortenEmbed?.thumbnail || false}
-											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												thumbnail: !embed?.thumbnail
-											} as ShortenEmbed))}
+											onValueChange={() =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															thumbnail: !embed?.thumbnail,
+														}) as ShortenEmbed,
+												)
+											}
 										/>
 
 										<Switch
 											title="Image/Video"
 											value={!!discordOnShortenEmbed?.imageOrVideo || false}
-											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												imageOrVideo: !embed?.imageOrVideo
-											} as ShortenEmbed))}
+											onValueChange={() =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															imageOrVideo: !embed?.imageOrVideo,
+														}) as ShortenEmbed,
+												)
+											}
 										/>
 
 										<Switch
 											title="Timestamp"
 											value={!!discordOnShortenEmbed?.timestamp || false}
-											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												timestamp: !embed?.timestamp
-											} as ShortenEmbed))}
+											onValueChange={() =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															timestamp: !embed?.timestamp,
+														}) as ShortenEmbed,
+												)
+											}
 										/>
 
 										<Switch
 											title="URL"
 											value={!!discordOnShortenEmbed?.url || false}
-											onValueChange={() => setDiscordOnShortenEmbed((embed) => ({
-												...embed,
-												url: !embed?.url
-											} as ShortenEmbed))}
+											onValueChange={() =>
+												setDiscordOnShortenEmbed(
+													(embed) =>
+														({
+															...embed,
+															url: !embed?.url,
+														}) as ShortenEmbed,
+												)
+											}
 										/>
 									</View>
 

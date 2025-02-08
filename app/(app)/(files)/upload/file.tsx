@@ -1,20 +1,10 @@
 import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
-import {
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-	ToastAndroid,
-} from "react-native";
+import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { guessExtension } from "@/functions/util";
 import { getSettings } from "@/functions/zipline/settings";
 import type { APIUploadResponse } from "@/types/zipline";
 import { getFolders } from "@/functions/zipline/folders";
-import {
-	type ExternalPathString,
-	Link,
-	useRouter,
-} from "expo-router";
+import { type ExternalPathString, Link, useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 import { dates, formats } from "@/constants/upload";
 import FileDisplay from "@/components/FileDisplay";
@@ -22,7 +12,6 @@ import * as FileSystem from "expo-file-system";
 import { styles } from "@/styles/files/uploadFile";
 import { useEffect, useState } from "react";
 import Select from "@/components/Select";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { Mimetypes } from "@/types/mimetypes";
 import * as Clipboard from "expo-clipboard";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -50,14 +39,16 @@ interface Props {
 export default function UploadFile({
 	showFileSelector = true,
 	defaultFiles,
-	fromShareIntent = false
+	fromShareIntent = false,
 }: Props) {
 	const router = useRouter();
-	
-	useAuth()
-	useShareIntent(fromShareIntent)
 
-	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>(defaultFiles || []);
+	useAuth();
+	useShareIntent(fromShareIntent);
+
+	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>(
+		defaultFiles || [],
+	);
 	const [uploadedFiles, setUploadedFiles] = useState<
 		APIUploadResponse["files"]
 	>([]);
@@ -92,7 +83,9 @@ export default function UploadFile({
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
-	const [fileNameEnabled, setFileNameEnabled] = useState<boolean>(defaultFiles ? defaultFiles.length <= 1 : true);
+	const [fileNameEnabled, setFileNameEnabled] = useState<boolean>(
+		defaultFiles ? defaultFiles.length <= 1 : true,
+	);
 	const [uploading, setUploading] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -100,7 +93,7 @@ export default function UploadFile({
 			const folders = await getFolders(true);
 			const settings = await getSettings();
 
-			if ( typeof settings !== "string") {
+			if (typeof settings !== "string") {
 				setDefaultFormat(settings.filesDefaultFormat);
 			}
 
@@ -119,30 +112,33 @@ export default function UploadFile({
 		setUploading(false);
 		setSelectedFiles([]);
 
-		setFolder(undefined)
-		setMaxViews(undefined)
-		setFileName(undefined)
-		setPassword(undefined)
-		setOriginalName(false)
-		setDeletesAt(undefined)
-		setNameFormat(undefined)
-		setCompression(undefined)
-		setOverrideDomain(undefined)
+		setFolder(undefined);
+		setMaxViews(undefined);
+		setFileName(undefined);
+		setPassword(undefined);
+		setOriginalName(false);
+		setDeletesAt(undefined);
+		setNameFormat(undefined);
+		setCompression(undefined);
+		setOverrideDomain(undefined);
 	}
 
 	useEffect(() => {
 		setUploadButtonDisabled(selectedFiles.length === 0);
 		setFileNameEnabled(selectedFiles.length <= 1);
-	}, [selectedFiles])
+	}, [selectedFiles]);
 
-	const iskeyboardOpen = useDetectKeyboardOpen(false)
+	const iskeyboardOpen = useDetectKeyboardOpen(false);
 
 	return (
 		<View style={styles.mainContainer}>
-			<Popup onClose={() => {
-				setUploadedFiles([]);
-				setFailedUploads([]);
-			}} hidden={!(uploadedFiles.length > 0 || failedUploads.length > 0)}>
+			<Popup
+				onClose={() => {
+					setUploadedFiles([]);
+					setFailedUploads([]);
+				}}
+				hidden={!(uploadedFiles.length > 0 || failedUploads.length > 0)}
+			>
 				{uploadedFiles.length > 0 && (
 					<View>
 						<Text style={styles.headerText}>Uploaded Files</Text>
@@ -155,14 +151,12 @@ export default function UploadFile({
 									>
 										{file.url}
 									</Link>
-									
+
 									<Button
 										icon="content-copy"
 										color="#323ea8"
 										onPress={async () => {
-											const saved = await Clipboard.setStringAsync(
-												file.url,
-											);
+											const saved = await Clipboard.setStringAsync(file.url);
 
 											if (saved)
 												return ToastAndroid.show(
@@ -180,8 +174,8 @@ export default function UploadFile({
 										height={32}
 										padding={6}
 										margin={{
-										    left: 5,
-										    right: 5
+											left: 5,
+											right: 5,
 										}}
 									/>
 
@@ -196,8 +190,8 @@ export default function UploadFile({
 										height={32}
 										padding={6}
 										margin={{
-										    left: 5,
-										    right: 5
+											left: 5,
+											right: 5,
 										}}
 									/>
 								</View>
@@ -243,9 +237,9 @@ export default function UploadFile({
 					</View>
 
 					<View style={styles.headerButtons}>
-					    <Button 
+						<Button
 							onPress={() => {
-								router.replace("/files")
+								router.replace("/files");
 							}}
 							icon="folder-open"
 							color="transparent"
@@ -259,10 +253,13 @@ export default function UploadFile({
 					</View>
 				</View>
 
-				<ScrollView horizontal style={{
-					...styles.scrollView,
-					...(iskeyboardOpen && styles.scrollViewKeyboardOpen)
-				}}>
+				<ScrollView
+					horizontal
+					style={{
+						...styles.scrollView,
+						...(iskeyboardOpen && styles.scrollViewKeyboardOpen),
+					}}
+				>
 					{selectedFiles.map((file) => (
 						<View key={file.uri} style={styles.recentFileContainer}>
 							<FileDisplay
@@ -288,10 +285,10 @@ export default function UploadFile({
 
 			{showFileSelector && (
 				<View>
-				    <Button
-				        width="90%"
-				        disabled={uploading}
-				        onPress={async () => {
+					<Button
+						width="90%"
+						disabled={uploading}
+						onPress={async () => {
 							const output = await DocumentPicker.getDocumentAsync({
 								type: "*/*",
 								multiple: true,
@@ -325,11 +322,11 @@ export default function UploadFile({
 						color={uploading ? "#373d79" : "#323ea8"}
 						textColor={uploading ? "gray" : "white"}
 						margin={{
-						    left: "auto",
-						    right: "auto",
-						    top: 10
+							left: "auto",
+							right: "auto",
+							top: 10,
 						}}
-				    />
+					/>
 				</View>
 			)}
 
@@ -353,7 +350,8 @@ export default function UploadFile({
 					onSelect={(selectedDate) => {
 						if (selectedDate.length <= 0) return;
 
-						if (selectedDate[0].value === "never") return setDeletesAt(undefined);
+						if (selectedDate[0].value === "never")
+							return setDeletesAt(undefined);
 
 						const deletesDate = new Date(
 							Date.now() + (selectedDate[0].milliseconds as number),
@@ -384,7 +382,9 @@ export default function UploadFile({
 					onSelect={(selectedFormat) => {
 						if (selectedFormat.length <= 0) return;
 
-						setNameFormat(selectedFormat[0].value as UploadFileOptions["format"])
+						setNameFormat(
+							selectedFormat[0].value as UploadFileOptions["format"],
+						);
 					}}
 				/>
 
@@ -446,7 +446,7 @@ export default function UploadFile({
 							selectedFolder[0].value === "noFolder"
 								? undefined
 								: selectedFolder[0].value,
-						)
+						);
 					}}
 				/>
 
@@ -488,10 +488,10 @@ export default function UploadFile({
 			</KeyboardAwareScrollView>
 
 			<View>
-			    <Button
-			        width="90%"
-			        disabled={uploading || uploadButtonDisabled}
-			        onPress={async () => {
+				<Button
+					width="90%"
+					disabled={uploading || uploadButtonDisabled}
+					onPress={async () => {
 						setUploading(true);
 
 						const successful = [];
@@ -553,14 +553,14 @@ export default function UploadFile({
 						afterUploadCleanup();
 					}}
 					text={uploading ? "Uploading..." : "Upload File(s)"}
-					color={(uploading || uploadButtonDisabled) ? "#373d79" : "#323ea8"}
-					textColor={(uploading || uploadButtonDisabled) ? "gray" : "white"}
+					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
+					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
-					    left: "auto",
-					    right: "auto",
-					    top: 10
+						left: "auto",
+						right: "auto",
+						top: 10,
 					}}
-			    />
+				/>
 			</View>
 		</View>
 	);

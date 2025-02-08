@@ -29,46 +29,10 @@ export const styles = StyleSheet.create({
 		height: 220,
 	},
 	scrollViewKeyboardOpen: {
-		display: "none"
+		display: "none",
 	},
 	recentFileContainer: {
 		marginHorizontal: 10,
-	},
-	selectFilesButton: {
-		width: "90%",
-		margin: "auto",
-	},
-	button: {
-		backgroundColor: "#323ea8",
-		padding: 10,
-		marginTop: 10,
-		borderRadius: 6,
-	},
-	uploadButton: {
-		width: "90%",
-		margin: "auto",
-		marginBottom: 10,
-	},
-	buttonDisabled: {
-		backgroundColor: "#373d79",
-	},
-	buttonText: {
-		textAlign: "center",
-		fontWeight: "bold",
-		color: "white",
-	},
-	buttonTextDisabled: {
-		color: "gray",
-	},
-	textInput: {
-		borderWidth: 2,
-		borderColor: "#222c47",
-		color: "white",
-		height: 40,
-		paddingHorizontal: 10,
-		fontSize: 15,
-		borderRadius: 6,
-		marginTop: 5,
 	},
 	inputHeader: {
 		marginTop: 5,
@@ -85,61 +49,8 @@ export const styles = StyleSheet.create({
 		marginTop: 20,
 		marginBottom: 5,
 	},
-	switchContainer: {
-		flexDirection: "row",
-		marginTop: 10,
-	},
-	switchText: {
-		color: "white",
-		fontSize: 16,
-		marginLeft: 5,
-		fontWeight: "bold",
-		textAlignVertical: "center",
-	},
-	switchTextDisabled: {
-		color: "gray",
-	},
-	select: {
-		borderWidth: 2,
-		borderColor: "#222c47",
-		color: "white",
-		height: 40,
-		padding: 3,
-		borderRadius: 6,
-		marginTop: 5,
-		textAlign: "center",
-	},
-	popupContainerOverlay: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
-		zIndex: 1,
-	},
-	popupContainer: {
-		maxHeight: 600,
-		width: "90%",
-		margin: "auto",
-		backgroundColor: "#0c101c",
-		justifyContent: "center",
-		alignItems: "center",
-		borderRadius: 15,
-		padding: 10,
-	},
 	uploadedFileContainer: {
 		flexDirection: "row",
-		alignItems: "center"
-	},
-	uploadedFileButton: {
-		padding: 10,
-		backgroundColor: "#323ea8",
-		borderWidth: 2,
-		borderRadius: 10,
-		margin: 5,
-		width: 40,
-		height: 40,
 		alignItems: "center",
 	},
 	uploadedFileUrl: {
@@ -151,17 +62,10 @@ export const styles = StyleSheet.create({
 		textAlign: "center",
 		color: "white",
 	},
-	popupHeaderText: {
-		marginTop: 5,
-		marginLeft: 10,
-		fontSize: 18,
-		fontWeight: "bold",
-		color: "white",
-	},
 	popupScrollView: {
 		flexGrow: 0,
 		flexShrink: 1,
-		maxHeight: 400
+		maxHeight: 400,
 	},
 	popupSubHeaderText: {
 		marginTop: 10,
@@ -176,12 +80,5 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-around",
 		paddingTop: 10,
 		paddingRight: 10,
-	},
-	headerButton: {
-		borderWidth: 2,
-		borderRadius: 7,
-		borderColor: "#222c47",
-		marginHorizontal: 2,
-		color: "#2d3f70",
 	},
 });

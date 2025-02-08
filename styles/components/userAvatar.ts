@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    userMenuContainer: {
+	userMenuContainer: {
 		flexWrap: "wrap",
 		flexDirection: "row",
 		marginRight: 5,
@@ -17,9 +17,9 @@ export const styles = StyleSheet.create({
 		fontSize: 18,
 	},
 	userMenuTextWithSettingsIcon: {
-		marginLeft: 0
+		marginLeft: 0,
 	},
-    settingsIcon: {
+	settingsIcon: {
 		width: 38,
 		height: 38,
 		justifyContent: "center",

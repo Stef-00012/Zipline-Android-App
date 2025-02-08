@@ -1,7 +1,5 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
-import type { APIFolders, APISettings, DashURL } from "@/types/zipline";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { getSettings } from "@/functions/zipline/settings";
+import { ScrollView, Text, View, ToastAndroid } from "react-native";
+import type { APIFolders, DashURL } from "@/types/zipline";
 import { Row, Table } from "react-native-table-component";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/folders";
@@ -114,7 +112,7 @@ export default function Folders() {
 						<View style={styles.header}>
 							<Text style={styles.headerText}>Folders</Text>
 							<View style={styles.headerButtons}>
-								<Button 
+								<Button
 									onPress={() => {
 										setCreateNewFolder(true);
 									}}
@@ -140,7 +138,7 @@ export default function Folders() {
 											style={styles.tableHeader}
 											textStyle={{
 												...styles.rowText,
-												...styles.headerRow
+												...styles.headerRow,
 											}}
 										/>
 									</Table>
@@ -257,7 +255,7 @@ export default function Folders() {
 
 																setFolders(newFolders);
 															}}
-															color={folder.public ? "#323ea8": "#343a40"}
+															color={folder.public ? "#323ea8" : "#343a40"}
 															icon={folder.public ? "lock-open" : "lock"}
 															iconSize={20}
 															width={32}

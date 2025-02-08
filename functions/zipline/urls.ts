@@ -19,15 +19,17 @@ export async function getURLs(): Promise<APIURLs | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -48,15 +50,17 @@ export async function getURL(id: string): Promise<APIURL | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -73,10 +77,13 @@ export async function createURL({
 	vanity,
 	maxViews,
 	password,
-	enabled = true
-}: CreateURLParams): Promise<{
-	url: string;
-} | string> {
+	enabled = true,
+}: CreateURLParams): Promise<
+	| {
+			url: string;
+	  }
+	| string
+> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -93,7 +100,7 @@ export async function createURL({
 			{
 				destination,
 				vanity,
-				enabled
+				enabled,
 			},
 			{
 				headers: {
@@ -106,15 +113,17 @@ export async function createURL({
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -135,15 +144,17 @@ export async function deleteURL(id: string): Promise<APIURL | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -174,14 +185,16 @@ export async function editURL(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }

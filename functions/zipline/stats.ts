@@ -3,16 +3,16 @@ import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
 
 export interface StatsProps {
-	from?: string,
-	to?: string,
-	all?: boolean
+	from?: string;
+	to?: string;
+	all?: boolean;
 }
 
 // GET /api/stats
 export async function getStats({
 	from,
 	to,
-	all = false
+	all = false,
 }: StatsProps): Promise<APIStats | string> {
 	const token = db.get("token");
 	const url = db.get("url");
@@ -35,15 +35,17 @@ export async function getStats({
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -64,21 +66,21 @@ export async function getUserStats(): Promise<APIUserStats | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
-export function getChartFiles(stats: APIStats) {
-
-}
+export function getChartFiles(stats: APIStats) {}
 
 export function filterStats(data: APIStats, amount = 100) {
 	data.sort(

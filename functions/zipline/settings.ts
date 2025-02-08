@@ -20,22 +20,24 @@ export async function getSettings(): Promise<APISettings | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
 interface APIIssue {
 	code: string;
 	message: string;
-	path: Array<string>
+	path: Array<string>;
 }
 // PATCH /api/server/settings
 export async function updateSettings(
@@ -56,14 +58,20 @@ export async function updateSettings(
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			issues: Array<APIIssue>;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.issues.map(issue => `${settingNames[issue.path.join(".") as keyof typeof settingNames] || issue.path.join(".")} - ${issue.message}`)
+		const data = error.response?.data as
+			| {
+					issues: Array<APIIssue>;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return ["Something went wrong..."]
+		if (data)
+			return data.issues.map(
+				(issue) =>
+					`${settingNames[issue.path.join(".") as keyof typeof settingNames] || issue.path.join(".")} - ${issue.message}`,
+			);
+
+		return ["Something went wrong..."];
 	}
 }

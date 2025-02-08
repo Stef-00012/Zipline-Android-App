@@ -38,9 +38,9 @@ export default function FileDisplay({
 	openable = true,
 	autoHeight = false,
 	passwordProtected = false,
-	onPress
+	onPress,
 }: Props) {
-	const router = useRouter()
+	const router = useRouter();
 	const dashUrl = db.get("url") as DashURL | null;
 
 	const [imageHeight, setImageHeight] = useState<number>(height);
@@ -61,10 +61,13 @@ export default function FileDisplay({
 
 	if (file) {
 		mimetype = file.type;
-		uri = (mimetype.startsWith("video/") && file.thumbnail) ? file.thumbnail : `${dashUrl}/raw/${file.name}`;
+		uri =
+			mimetype.startsWith("video/") && file.thumbnail
+				? file.thumbnail
+				: `${dashUrl}/raw/${file.name}`;
 		name = file.name;
 		originalName = file.originalName;
-		passwordProtected = file.password
+		passwordProtected = file.password;
 	}
 
 	if (passwordProtected) {
@@ -78,14 +81,13 @@ export default function FileDisplay({
 					}}
 				>
 					<MaterialIcons name="lock" size={60} color={"white"} />
-					<Text
-						style={styles.nonDisplayableFileText}
-					>
-						{openable ? "Click to view password " : ""}{originalName || name}
+					<Text style={styles.nonDisplayableFileText}>
+						{openable ? "Click to view password " : ""}
+						{originalName || name}
 					</Text>
 				</View>
 			</Pressable>
-		)
+		);
 	}
 
 	if (!mimetype) {
@@ -130,7 +132,10 @@ export default function FileDisplay({
 		"image/svg+xml",
 	];
 
-	if (displayableMimetypes.includes(mimetype) || (mimetype.startsWith("video/") && file?.thumbnail))
+	if (
+		displayableMimetypes.includes(mimetype) ||
+		(mimetype.startsWith("video/") && file?.thumbnail)
+	)
 		return (
 			<Pressable onPress={onPress || onPressDefault}>
 				<Image
@@ -157,16 +162,15 @@ export default function FileDisplay({
 				}}
 			>
 				<MaterialIcons name="description" size={60} color={"white"} />
-				<Text
-					style={styles.nonDisplayableFileText}
-				>
-					{openable ? "Click to view " : ""}{originalName || name}
+				<Text style={styles.nonDisplayableFileText}>
+					{openable ? "Click to view " : ""}
+					{originalName || name}
 				</Text>
 			</View>
 		</Pressable>
 	);
 
 	function onPressDefault() {
-        if (file) router.replace(`${dashUrl}${file.url}` as ExternalPathString)
-    }
+		if (file) router.replace(`${dashUrl}${file.url}` as ExternalPathString);
+	}
 }

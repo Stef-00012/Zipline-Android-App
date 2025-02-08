@@ -5,118 +5,155 @@ import { useState, useEffect } from "react";
 import { View, Text, Pressable, ToastAndroid, ScrollView } from "react-native";
 import { styles } from "@/styles/settings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { editCurrentUser, type EditUserOptions, getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard"
+import {
+	editCurrentUser,
+	type EditUserOptions,
+	getCurrentUser,
+	getCurrentUserAvatar,
+} from "@/functions/zipline/user";
+import * as Clipboard from "expo-clipboard";
 import { getTokenWithToken } from "@/functions/zipline/auth";
-import * as DocumentPicker from "expo-document-picker"
-import * as FileSystem from "expo-file-system"
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import { convertToBytes, getFileDataURI } from "@/functions/util";
 import UserAvatar from "@/components/UserAvatar";
 import Select from "@/components/Select";
 import { alignments } from "@/constants/settings";
-import { createUserExport, deleteUserExport, getUserExports } from "@/functions/zipline/exports";
+import {
+	createUserExport,
+	deleteUserExport,
+	getUserExports,
+} from "@/functions/zipline/exports";
 import { Row, Table } from "react-native-table-component";
 import * as db from "@/functions/database";
 import Popup from "@/components/Popup";
-import { clearTempFiles, clearZeroByteFiles, generateThumbnails, getZeroByteFiles, requeryFileSize } from "@/functions/zipline/serverActions";
+import {
+	clearTempFiles,
+	clearZeroByteFiles,
+	generateThumbnails,
+	getZeroByteFiles,
+	requeryFileSize,
+} from "@/functions/zipline/serverActions";
 import { useRouter } from "expo-router";
-import TextInput from "@/components/TextInput"
+import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 
 export default function UserSettings() {
-	const router = useRouter()
+	const router = useRouter();
 
 	useAuth();
 	useShareIntent();
 
 	const [user, setUser] = useState<APISelfUser | null>(null);
 	const [token, setToken] = useState<string | null>(null);
-	const [currentAvatar, setCurrentAvatar] = useState<string | undefined>(undefined)
-	const [exports, setExports] = useState<APIExports | null>([])
-	const [zeroByteFiles, setZeroByteFiles] = useState<number>(0)
-	
-	const [tokenVisible, setTokenVisible] = useState<boolean>(false)
+	const [currentAvatar, setCurrentAvatar] = useState<string | undefined>(
+		undefined,
+	);
+	const [exports, setExports] = useState<APIExports | null>([]);
+	const [zeroByteFiles, setZeroByteFiles] = useState<number>(0);
 
-	const [currentUsername, setCurrentUsername] = useState<string | undefined>(undefined)
-	const [username, setUsername] = useState<string | undefined>(undefined)
-	const [password, setPassword] = useState<string | undefined>(undefined)
-	const [avatar, setAvatar] = useState<string | undefined>(undefined)
-	const [avatarName, setAvatarName] = useState<string | null>(null)
+	const [tokenVisible, setTokenVisible] = useState<boolean>(false);
+
+	const [currentUsername, setCurrentUsername] = useState<string | undefined>(
+		undefined,
+	);
+	const [username, setUsername] = useState<string | undefined>(undefined);
+	const [password, setPassword] = useState<string | undefined>(undefined);
+	const [avatar, setAvatar] = useState<string | undefined>(undefined);
+	const [avatarName, setAvatarName] = useState<string | null>(null);
 
 	const [viewEnabled, setViewEnabled] = useState<boolean>(false);
-	const [viewAlign, setViewAlign] = useState<"left" | "center" | "right">("left");
+	const [viewAlign, setViewAlign] = useState<"left" | "center" | "right">(
+		"left",
+	);
 	const [viewShowMimetype, setViewShowMimetype] = useState<boolean>(false);
 	const [viewContent, setViewContent] = useState<string | undefined>(undefined);
 	const [viewEmbed, setViewEmbed] = useState<boolean>(false);
-	const [viewEmbedTitle, setViewEmbedTitle] = useState<string | undefined>(undefined);
-	const [viewEmbedDescription, setViewEmbedDescription] = useState<string | undefined>(undefined);
-	const [viewEmbedColor, setViewEmbedColor] = useState<string | undefined>(undefined);
-	const [viewEmbedSiteName, setViewEmbedSiteName] = useState<string | undefined>(undefined);
+	const [viewEmbedTitle, setViewEmbedTitle] = useState<string | undefined>(
+		undefined,
+	);
+	const [viewEmbedDescription, setViewEmbedDescription] = useState<
+		string | undefined
+	>(undefined);
+	const [viewEmbedColor, setViewEmbedColor] = useState<string | undefined>(
+		undefined,
+	);
+	const [viewEmbedSiteName, setViewEmbedSiteName] = useState<
+		string | undefined
+	>(undefined);
 
-	const [clearZeroByteFilesPopupOpen, setClearZeroByteFilesPopupOpen] = useState<boolean>(false);
-	const [clearTempFilesPopupOpen, setClearTempFilesPopupOpen] = useState<boolean>(false);
-	const [requerySizeOfFilesPopupOpen, setRequerySizeOfFilesPopupOpen] = useState<boolean>(false);
-	const [generateThumbnailsPopupOpen, setGenerateThumbnailsPopupOpen] = useState<boolean>(false);
+	const [clearZeroByteFilesPopupOpen, setClearZeroByteFilesPopupOpen] =
+		useState<boolean>(false);
+	const [clearTempFilesPopupOpen, setClearTempFilesPopupOpen] =
+		useState<boolean>(false);
+	const [requerySizeOfFilesPopupOpen, setRequerySizeOfFilesPopupOpen] =
+		useState<boolean>(false);
+	const [generateThumbnailsPopupOpen, setGenerateThumbnailsPopupOpen] =
+		useState<boolean>(false);
 
-	const [requerySizeForceUpdate, setRequerySizeForceUpdate] = useState<boolean>(false);
-	const [requerySizeForceDelete, setRequerySizeForceDelete] = useState<boolean>(false);
+	const [requerySizeForceUpdate, setRequerySizeForceUpdate] =
+		useState<boolean>(false);
+	const [requerySizeForceDelete, setRequerySizeForceDelete] =
+		useState<boolean>(false);
 
-	const [generateThumbnailsRerun, setGenerateThumbnailsRerun] = useState<boolean>(false);
+	const [generateThumbnailsRerun, setGenerateThumbnailsRerun] =
+		useState<boolean>(false);
 
-	const url = db.get("url") as DashURL
+	const url = db.get("url") as DashURL;
 
 	useEffect(() => {
 		(async () => {
 			const user = await getCurrentUser();
-			const token = await getTokenWithToken()
-			const avatar = await getCurrentUserAvatar()
-			const exports = await getUserExports()
-			const zeroByteFiles = await getZeroByteFiles()
+			const token = await getTokenWithToken();
+			const avatar = await getCurrentUserAvatar();
+			const exports = await getUserExports();
+			const zeroByteFiles = await getZeroByteFiles();
 
 			setUser(typeof user === "string" ? null : user);
-			setToken(typeof token === "string" ? null : token.token)
-			setCurrentAvatar(avatar || undefined)
-			setExports(typeof exports === "string" ? null : exports)
-			setZeroByteFiles(typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length)
+			setToken(typeof token === "string" ? null : token.token);
+			setCurrentAvatar(avatar || undefined);
+			setExports(typeof exports === "string" ? null : exports);
+			setZeroByteFiles(
+				typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length,
+			);
 		})();
 	}, []);
 
 	useEffect(() => {
 		if (user) {
-			setUsername(user.username)
-			setCurrentUsername(user.username)
+			setUsername(user.username);
+			setCurrentUsername(user.username);
 
-			setViewEnabled(user.view.enabled || false)
-			setViewShowMimetype(user.view.showMimetype || false)
-			setViewContent(user.view.content)
-			setViewAlign(user.view.align || "left")
-			setViewEmbed(user.view.embed || false)
-			setViewEmbedTitle(user.view.embedTitle)
-			setViewEmbedDescription(user.view.embedDescription)
-			setViewEmbedSiteName(user.view.embedSiteName)
-			setViewEmbedColor(user.view.embedColor)
+			setViewEnabled(user.view.enabled || false);
+			setViewShowMimetype(user.view.showMimetype || false);
+			setViewContent(user.view.content);
+			setViewAlign(user.view.align || "left");
+			setViewEmbed(user.view.embed || false);
+			setViewEmbedTitle(user.view.embedTitle);
+			setViewEmbedDescription(user.view.embedDescription);
+			setViewEmbedSiteName(user.view.embedSiteName);
+			setViewEmbedColor(user.view.embedColor);
 		}
 	}, [user]);
 
-	const [saveError, setSaveError] = useState<string | null>(null)
+	const [saveError, setSaveError] = useState<string | null>(null);
 
-	type SaveCategories = "userInfo" | "viewingFiles"
+	type SaveCategories = "userInfo" | "viewingFiles";
 
 	async function handleSave(category: SaveCategories) {
-		setSaveError(null)
-		let saveSettings: Partial<EditUserOptions> = {}
+		setSaveError(null);
+		let saveSettings: Partial<EditUserOptions> = {};
 
-		switch(category) {
-            case "userInfo": {
+		switch (category) {
+			case "userInfo": {
 				saveSettings = {
 					password,
-				}
+				};
 
-				if (username !== currentUsername) saveSettings.username = username
+				if (username !== currentUsername) saveSettings.username = username;
 
-				setPassword(undefined)
+				setPassword(undefined);
 
 				break;
 			}
@@ -133,38 +170,44 @@ export default function UserSettings() {
 						embedSiteName: viewEmbedSiteName,
 						embedTitle: viewEmbedTitle,
 						showMimetype: viewShowMimetype,
-					}
-				}
+					},
+				};
 			}
 		}
 
 		if (Object.keys(saveSettings).length <= 0) return "Something went wrong...";
 
-		const success = await editCurrentUser(saveSettings)
+		const success = await editCurrentUser(saveSettings);
 
-		if (typeof success === "string") return setSaveError(success)
+		if (typeof success === "string") return setSaveError(success);
 
 		return ToastAndroid.show(
 			"Successfully saved the settings",
-			ToastAndroid.SHORT
-		)
+			ToastAndroid.SHORT,
+		);
 	}
 
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
-				<Popup hidden={!clearZeroByteFilesPopupOpen} onClose={() => {
-					setClearZeroByteFilesPopupOpen(false)
-				}}>
+				<Popup
+					hidden={!clearZeroByteFilesPopupOpen}
+					onClose={() => {
+						setClearZeroByteFilesPopupOpen(false);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Are you sure?</Text>
 
-						<Text style={styles.serverActionWarningText}>This will delete {zeroByteFiles} files from the database and datasource.</Text>
+						<Text style={styles.serverActionWarningText}>
+							This will delete {zeroByteFiles} files from the database and
+							datasource.
+						</Text>
 
 						<View style={styles.manageServerActionButtonsContainer}>
 							<Button
 								onPress={() => {
-									setClearZeroByteFilesPopupOpen(false)
+									setClearZeroByteFilesPopupOpen(false);
 								}}
 								text="Cancel"
 								color="#181c28"
@@ -182,45 +225,47 @@ export default function UserSettings() {
 								}}
 								text="Yes, Delete"
 								onPress={async () => {
-									const success = await clearZeroByteFiles()
-	
+									const success = await clearZeroByteFiles();
+
 									if (typeof success === "string") {
-										setSaveError(success)
-										setClearZeroByteFilesPopupOpen(false)
-	
+										setSaveError(success);
+										setClearZeroByteFilesPopupOpen(false);
+
 										return;
 									}
-	
-									setClearZeroByteFilesPopupOpen(false)
-	
-									ToastAndroid.show(
-										success.status,
-										ToastAndroid.SHORT
-									)
+
+									setClearZeroByteFilesPopupOpen(false);
+
+									ToastAndroid.show(success.status, ToastAndroid.SHORT);
 								}}
 							/>
 						</View>
 					</View>
 
-					<Text
-						style={styles.popupSubHeaderText}
-					>
+					<Text style={styles.popupSubHeaderText}>
 						Press outside to close this popup
 					</Text>
 				</Popup>
 
-				<Popup hidden={!clearTempFilesPopupOpen} onClose={() => {
-					setClearTempFilesPopupOpen(false)
-				}}>
+				<Popup
+					hidden={!clearTempFilesPopupOpen}
+					onClose={() => {
+						setClearTempFilesPopupOpen(false);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Are you sure?</Text>
 
-						<Text style={styles.serverActionWarningText}>This will delete temporary files stored within the temporary directory (defined in the configuration). This should not cause harm unless there are files that are being processed still.</Text>
+						<Text style={styles.serverActionWarningText}>
+							This will delete temporary files stored within the temporary
+							directory (defined in the configuration). This should not cause
+							harm unless there are files that are being processed still.
+						</Text>
 
 						<View style={styles.manageServerActionButtonsContainer}>
-						<Button
+							<Button
 								onPress={() => {
-									setClearTempFilesPopupOpen(false)
+									setClearTempFilesPopupOpen(false);
 								}}
 								text="Cancel"
 								color="#181c28"
@@ -238,42 +283,43 @@ export default function UserSettings() {
 								}}
 								text="Yes, Delete"
 								onPress={async () => {
-									const success = await clearTempFiles()
-	
+									const success = await clearTempFiles();
+
 									if (typeof success === "string") {
-										setSaveError(success)
-										setClearTempFilesPopupOpen(false)
-	
+										setSaveError(success);
+										setClearTempFilesPopupOpen(false);
+
 										return;
 									}
-	
-									setClearTempFilesPopupOpen(false)
-	
-									ToastAndroid.show(
-										success.status,
-										ToastAndroid.SHORT
-									)
+
+									setClearTempFilesPopupOpen(false);
+
+									ToastAndroid.show(success.status, ToastAndroid.SHORT);
 								}}
 							/>
 						</View>
 					</View>
 
-					<Text
-						style={styles.popupSubHeaderText}
-					>
+					<Text style={styles.popupSubHeaderText}>
 						Press outside to close this popup
 					</Text>
 				</Popup>
 
-				<Popup hidden={!requerySizeOfFilesPopupOpen} onClose={() => {
-					setRequerySizeOfFilesPopupOpen(false)
-					setRequerySizeForceDelete(false)
-					setRequerySizeForceUpdate(false)
-				}}>
+				<Popup
+					hidden={!requerySizeOfFilesPopupOpen}
+					onClose={() => {
+						setRequerySizeOfFilesPopupOpen(false);
+						setRequerySizeForceDelete(false);
+						setRequerySizeForceUpdate(false);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Are you sure?</Text>
 
-						<Text style={styles.serverActionWarningText}>This will requery the size of every file stored within the database. Additionally you can use the options below.</Text>
+						<Text style={styles.serverActionWarningText}>
+							This will requery the size of every file stored within the
+							database. Additionally you can use the options below.
+						</Text>
 
 						<Switch
 							title="Force Update"
@@ -284,17 +330,15 @@ export default function UserSettings() {
 						<Switch
 							title="Force Delete"
 							value={requerySizeForceDelete || false}
-							onValueChange={() =>
-								setRequerySizeForceDelete((prev) => !prev)
-							}
+							onValueChange={() => setRequerySizeForceDelete((prev) => !prev)}
 						/>
 
 						<View style={styles.manageServerActionButtonsContainer}>
 							<Button
 								onPress={() => {
-									setRequerySizeOfFilesPopupOpen(false)
-									setRequerySizeForceDelete(false)
-									setRequerySizeForceUpdate(false)
+									setRequerySizeOfFilesPopupOpen(false);
+									setRequerySizeForceDelete(false);
+									setRequerySizeForceUpdate(false);
 								}}
 								text="Cancel"
 								color="#181c28"
@@ -314,60 +358,59 @@ export default function UserSettings() {
 								onPress={async () => {
 									const success = await requeryFileSize({
 										forceDelete: requerySizeForceDelete,
-										forceUpdate: requerySizeForceUpdate
-									})
-	
+										forceUpdate: requerySizeForceUpdate,
+									});
+
 									if (typeof success === "string") {
-										setSaveError(success)
-										setRequerySizeOfFilesPopupOpen(false)
-										setRequerySizeForceDelete(false)
-										setRequerySizeForceUpdate(false)
-	
+										setSaveError(success);
+										setRequerySizeOfFilesPopupOpen(false);
+										setRequerySizeForceDelete(false);
+										setRequerySizeForceUpdate(false);
+
 										return;
 									}
-	
-									setRequerySizeOfFilesPopupOpen(false)
-									setRequerySizeForceDelete(false)
-									setRequerySizeForceUpdate(false)
-	
-									ToastAndroid.show(
-										success.status,
-										ToastAndroid.SHORT
-									)
+
+									setRequerySizeOfFilesPopupOpen(false);
+									setRequerySizeForceDelete(false);
+									setRequerySizeForceUpdate(false);
+
+									ToastAndroid.show(success.status, ToastAndroid.SHORT);
 								}}
 							/>
 						</View>
 					</View>
 
-					<Text
-						style={styles.popupSubHeaderText}
-					>
+					<Text style={styles.popupSubHeaderText}>
 						Press outside to close this popup
 					</Text>
 				</Popup>
 
-				<Popup hidden={!generateThumbnailsPopupOpen} onClose={() => {
-					setGenerateThumbnailsPopupOpen(false)
-					setGenerateThumbnailsRerun(false)
-				}}>
+				<Popup
+					hidden={!generateThumbnailsPopupOpen}
+					onClose={() => {
+						setGenerateThumbnailsPopupOpen(false);
+						setGenerateThumbnailsRerun(false);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Are you sure?</Text>
 
-						<Text style={styles.serverActionWarningText}>This will generate thumbnails for all files that do not have a thumbnail set. Additionally you can use the options below.</Text>
+						<Text style={styles.serverActionWarningText}>
+							This will generate thumbnails for all files that do not have a
+							thumbnail set. Additionally you can use the options below.
+						</Text>
 
 						<Switch
 							title="Re-run"
 							value={generateThumbnailsRerun || false}
-							onValueChange={() =>
-								setGenerateThumbnailsRerun((prev) => !prev)
-							}
+							onValueChange={() => setGenerateThumbnailsRerun((prev) => !prev)}
 						/>
 
 						<View style={styles.manageServerActionButtonsContainer}>
-						<Button
+							<Button
 								onPress={() => {
-									setGenerateThumbnailsPopupOpen(false)
-									setGenerateThumbnailsRerun(false)
+									setGenerateThumbnailsPopupOpen(false);
+									setGenerateThumbnailsRerun(false);
 								}}
 								text="Cancel"
 								color="#181c28"
@@ -385,52 +428,55 @@ export default function UserSettings() {
 								}}
 								text="Generate"
 								onPress={async () => {
-									const success = await generateThumbnails(generateThumbnailsRerun)
+									const success = await generateThumbnails(
+										generateThumbnailsRerun,
+									);
 
 									if (typeof success === "string") {
-										setSaveError(success)
-										setGenerateThumbnailsPopupOpen(false)
-										setGenerateThumbnailsRerun(false)
+										setSaveError(success);
+										setGenerateThumbnailsPopupOpen(false);
+										setGenerateThumbnailsRerun(false);
 
 										return;
 									}
 
-									setGenerateThumbnailsPopupOpen(false)
-									setGenerateThumbnailsRerun(false)
+									setGenerateThumbnailsPopupOpen(false);
+									setGenerateThumbnailsRerun(false);
 
-									ToastAndroid.show(
-										success.status,
-										ToastAndroid.LONG
-									)
+									ToastAndroid.show(success.status, ToastAndroid.LONG);
 								}}
 							/>
 						</View>
 					</View>
 
-					<Text
-						style={styles.popupSubHeaderText}
-					>
+					<Text style={styles.popupSubHeaderText}>
 						Press outside to close this popup
 					</Text>
 				</Popup>
 
-				{(user && token && exports) ? (
+				{user && token && exports ? (
 					<View style={styles.settingsContainer}>
 						<View style={styles.header}>
 							<Text style={styles.headerText}>User Settings</Text>
 
-							{saveError && <Text style={styles.errorText} key={saveError}>{saveError}</Text>}
+							{saveError && (
+								<Text style={styles.errorText} key={saveError}>
+									{saveError}
+								</Text>
+							)}
 						</View>
 
 						<KeyboardAwareScrollView style={styles.scrollView}>
 							{/* User Info */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>User Info</Text>
-                                <Text style={styles.subHeaderText}>{user.id}</Text>
+								<Text style={styles.subHeaderText}>{user.id}</Text>
 
-                                <Pressable onPress={() => {
-                                    setTokenVisible(true)
-                                }}>
+								<Pressable
+									onPress={() => {
+										setTokenVisible(true);
+									}}
+								>
 									<TextInput
 										title="Token:"
 										showDisabledStyle={false}
@@ -438,12 +484,12 @@ export default function UserSettings() {
 										disableContext
 										value={tokenVisible ? token : "[Click to Reveal]"}
 										onSideButtonPress={() => {
-											Clipboard.setStringAsync(token)
+											Clipboard.setStringAsync(token);
 										}}
 										sideButtonIcon="content-copy"
 									/>
-                                </Pressable>
-								
+								</Pressable>
+
 								<TextInput
 									title="Username:"
 									onValueChange={(content) => setUsername(content)}
@@ -479,46 +525,45 @@ export default function UserSettings() {
 									borderWidth={2}
 									borderColor="#222c47"
 									margin={{
-										top: 5
+										top: 5,
 									}}
 									rippleColor="gray"
-									text={avatar ? avatarName as string : "Select an Avatar..."}
+									text={avatar ? (avatarName as string) : "Select an Avatar..."}
 									onPress={async () => {
 										const output = await DocumentPicker.getDocumentAsync({
-											type: [
-												"image/png",
-												"image/jpeg",
-												"image/jpg"
-											],
+											type: ["image/png", "image/jpeg", "image/jpg"],
 											copyToCacheDirectory: true,
 										});
-			
+
 										if (output.canceled || !output.assets) {
-											setAvatar(undefined)
-											setAvatarName(null)
-			
+											setAvatar(undefined);
+											setAvatarName(null);
+
 											return;
-										};
-			
-										const fileURI = output.assets[0].uri
-			
-										const fileInfo = await FileSystem.getInfoAsync(fileURI)
-			
+										}
+
+										const fileURI = output.assets[0].uri;
+
+										const fileInfo = await FileSystem.getInfoAsync(fileURI);
+
 										if (!fileInfo.exists) return;
-			
-										const avatarDataURI = await getFileDataURI(fileURI)
-			
-										setAvatar(avatarDataURI || undefined)
-										
-										const filename = fileURI.split('/').pop() || "avatar.png"
-			
-										setAvatarName(filename)
+
+										const avatarDataURI = await getFileDataURI(fileURI);
+
+										setAvatar(avatarDataURI || undefined);
+
+										const filename = fileURI.split("/").pop() || "avatar.png";
+
+										setAvatarName(filename);
 									}}
 								/>
 
 								<View style={styles.avatarPreviewContainer}>
 									<Text style={styles.avatarPreviewHeader}>Avatar Preview</Text>
-									<UserAvatar username={user.username} avatar={avatar || currentAvatar} />
+									<UserAvatar
+										username={user.username}
+										avatar={avatar || currentAvatar}
+									/>
 								</View>
 
 								<View style={styles.avatarButtonsContainer}>
@@ -532,18 +577,18 @@ export default function UserSettings() {
 											margin={{
 												left: "2.5%",
 												right: "2.5%",
-												top: 10
+												top: 10,
 											}}
 											rippleColor="gray"
 											borderWidth={2}
 											borderColor="#ff8787"
 											onPress={() => {
-												setAvatar(undefined)
-												setAvatarName(null)
+												setAvatar(undefined);
+												setAvatarName(null);
 											}}
 										/>
 									)}
-		
+
 									{currentAvatar && (
 										<Button
 											text="Remove Avatar"
@@ -554,25 +599,26 @@ export default function UserSettings() {
 											margin={{
 												left: "2.5%",
 												right: "2.5%",
-												top: 10
+												top: 10,
 											}}
 											onPress={async () => {
 												const success = await editCurrentUser({
-													avatar: null
-												})
+													avatar: null,
+												});
 
-												if (typeof success === "string") return setSaveError(success);
+												if (typeof success === "string")
+													return setSaveError(success);
 
-												const newUserAvatar = await getCurrentUserAvatar()
+												const newUserAvatar = await getCurrentUserAvatar();
 
-												setCurrentAvatar(newUserAvatar || undefined)
-												setAvatar(undefined)
-												setAvatarName(null)
+												setCurrentAvatar(newUserAvatar || undefined);
+												setAvatar(undefined);
+												setAvatarName(null);
 
 												ToastAndroid.show(
 													"Successfully removed the avatar",
-													ToastAndroid.SHORT
-												)
+													ToastAndroid.SHORT,
+												);
 											}}
 										/>
 									)}
@@ -586,26 +632,27 @@ export default function UserSettings() {
 										margin={{
 											left: "2.5%",
 											right: "2.5%",
-											top: 10
+											top: 10,
 										}}
 										disabled={!avatar}
 										onPress={async () => {
 											const success = await editCurrentUser({
-												avatar: avatar
-											})
+												avatar: avatar,
+											});
 
-											if (typeof success === "string") return setSaveError(success);
+											if (typeof success === "string")
+												return setSaveError(success);
 
-											const newUserAvatar = await getCurrentUserAvatar()
+											const newUserAvatar = await getCurrentUserAvatar();
 
-											setCurrentAvatar(newUserAvatar || undefined)
-											setAvatar(undefined)
-											setAvatarName(null)
+											setCurrentAvatar(newUserAvatar || undefined);
+											setAvatar(undefined);
+											setAvatarName(null);
 
 											ToastAndroid.show(
 												"Successfully saved the avatar",
-												ToastAndroid.SHORT
-											)
+												ToastAndroid.SHORT,
+											);
 										}}
 									/>
 								</View>
@@ -618,18 +665,14 @@ export default function UserSettings() {
 								<Switch
 									title="Enable View Routes"
 									value={viewEnabled || false}
-									onValueChange={() =>
-										setViewEnabled((prev) => !prev)
-									}
+									onValueChange={() => setViewEnabled((prev) => !prev)}
 								/>
 
 								<Switch
 									title="Show Mimetype"
 									disabled={!viewEnabled}
 									value={viewShowMimetype || false}
-									onValueChange={() =>
-										setViewShowMimetype((prev) => !prev)
-									}
+									onValueChange={() => setViewShowMimetype((prev) => !prev)}
 								/>
 
 								<TextInput
@@ -642,10 +685,14 @@ export default function UserSettings() {
 									placeholder="This is my file"
 								/>
 
-								<Text style={{
-									...styles.inputHeader,
-									...(!viewEnabled && styles.inputHeaderDisabled)
-								}}>View Content Alignment:</Text>
+								<Text
+									style={{
+										...styles.inputHeader,
+										...(!viewEnabled && styles.inputHeaderDisabled),
+									}}
+								>
+									View Content Alignment:
+								</Text>
 								<Select
 									disabled={!viewEnabled}
 									data={alignments}
@@ -654,7 +701,7 @@ export default function UserSettings() {
 
 										setViewAlign(
 											selectedAlignment[0].value as typeof viewAlign,
-										)
+										);
 									}}
 									placeholder="Select Alignment..."
 									defaultValue={alignments.find(
@@ -666,9 +713,7 @@ export default function UserSettings() {
 									title="Embed"
 									disabled={!viewEmbed || !viewEnabled}
 									value={viewEmbed || false}
-									onValueChange={() =>
-										setViewEmbed((prev) => !prev)
-									}
+									onValueChange={() => setViewEmbed((prev) => !prev)}
 								/>
 
 								<TextInput
@@ -724,18 +769,21 @@ export default function UserSettings() {
 
 								<Button
 									onPress={async () => {
-										const success = await createUserExport()
-	
-										if (typeof success === "string") return setSaveError(success);
-	
-										const newExports = await getUserExports()
-	
-										setExports(typeof newExports === "string" ? null : newExports)
-	
+										const success = await createUserExport();
+
+										if (typeof success === "string")
+											return setSaveError(success);
+
+										const newExports = await getUserExports();
+
+										setExports(
+											typeof newExports === "string" ? null : newExports,
+										);
+
 										ToastAndroid.show(
 											"Successfully started creating the export",
-											ToastAndroid.SHORT
-										)
+											ToastAndroid.SHORT,
+										);
 									}}
 									color="#323ea8"
 									text="New Export"
@@ -745,10 +793,7 @@ export default function UserSettings() {
 								/>
 
 								<View style={styles.exportsContainer}>
-									<ScrollView
-										showsHorizontalScrollIndicator={false}
-										horizontal
-									>
+									<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 										<View>
 											<Table>
 												<Row
@@ -763,7 +808,7 @@ export default function UserSettings() {
 													style={styles.tableHeader}
 													textStyle={{
 														...styles.rowText,
-														...styles.headerRow
+														...styles.headerRow,
 													}}
 												/>
 											</Table>
@@ -774,17 +819,15 @@ export default function UserSettings() {
 												<Table>
 													{exports.map((zlExport, index) => {
 														const id = (
-															<Text style={styles.rowText}>
-																{zlExport.id}
-															</Text>
+															<Text style={styles.rowText}>{zlExport.id}</Text>
 														);
-		
+
 														const startedOn = (
 															<Text style={styles.rowText}>
 																{new Date(zlExport.createdAt).toLocaleString()}
 															</Text>
 														);
-		
+
 														const files = (
 															<Text style={styles.rowText}>
 																{zlExport.files}
@@ -793,9 +836,12 @@ export default function UserSettings() {
 
 														const size = (
 															<Text style={styles.rowText}>
-																{convertToBytes(Number.parseInt(zlExport.size), {
-																	unitSeparator: " "
-																})}
+																{convertToBytes(
+																	Number.parseInt(zlExport.size),
+																	{
+																		unitSeparator: " ",
+																	},
+																)}
 															</Text>
 														);
 
@@ -805,18 +851,24 @@ export default function UserSettings() {
 																	icon="delete"
 																	color="#CF4238"
 																	onPress={async () => {
-																		setSaveError(null)
+																		setSaveError(null);
 
 																		const exportId = zlExport.id;
 
-																		const success = await deleteUserExport(exportId)
-		
-																		if (typeof success === "string") return setSaveError(success)
+																		const success =
+																			await deleteUserExport(exportId);
 
-																		const newExports = await getUserExports()
+																		if (typeof success === "string")
+																			return setSaveError(success);
 
-																		setExports(typeof newExports === "string" ? null : newExports)
-		
+																		const newExports = await getUserExports();
+
+																		setExports(
+																			typeof newExports === "string"
+																				? null
+																				: newExports,
+																		);
+
 																		return ToastAndroid.show(
 																			"Successfully deleted the export",
 																			ToastAndroid.SHORT,
@@ -830,58 +882,90 @@ export default function UserSettings() {
 
 																<Button
 																	icon="download"
-																	color={zlExport.completed ? "#323ea8" : "#181c28"}
-																	iconColor={zlExport.completed ? "white" : "gray"}
+																	color={
+																		zlExport.completed ? "#323ea8" : "#181c28"
+																	}
+																	iconColor={
+																		zlExport.completed ? "white" : "gray"
+																	}
 																	disabled={!zlExport.completed}
 																	onPress={async () => {
 																		const exportId = zlExport.id;
 
-																		const downloadUrl = `${url}/api/user/export?id=${exportId}`
+																		const downloadUrl = `${url}/api/user/export?id=${exportId}`;
 
-																		let savedExportDownloadUri = db.get("exportDownloadPath")
+																		let savedExportDownloadUri =
+																			db.get("exportDownloadPath");
 
 																		if (!savedExportDownloadUri) {
-																			const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+																			const permissions =
+																				await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
 
-																			if (!permissions.granted) return ToastAndroid.show(
-																				"The permission to save the file was not granted",
-																				ToastAndroid.SHORT
+																			if (!permissions.granted)
+																				return ToastAndroid.show(
+																					"The permission to save the file was not granted",
+																					ToastAndroid.SHORT,
+																				);
+
+																			db.set(
+																				"exportDownloadPath",
+																				permissions.directoryUri,
 																			);
-
-																			db.set("exportDownloadPath", permissions.directoryUri)
-																			savedExportDownloadUri = permissions.directoryUri
+																			savedExportDownloadUri =
+																				permissions.directoryUri;
 																		}
 
 																		ToastAndroid.show(
 																			"Downloading...",
-																			ToastAndroid.SHORT
-																		)
+																			ToastAndroid.SHORT,
+																		);
 
-																		const saveUri = await FileSystem.StorageAccessFramework.createFileAsync(savedExportDownloadUri, zlExport.path, 'application/zip')
+																		const saveUri =
+																			await FileSystem.StorageAccessFramework.createFileAsync(
+																				savedExportDownloadUri,
+																				zlExport.path,
+																				"application/zip",
+																			);
 
-																		const downloadResult = await FileSystem.downloadAsync(downloadUrl, `${FileSystem.cacheDirectory}/${zlExport.path}`, {
-																			headers: {
-																				Authorization: token
+																		const downloadResult =
+																			await FileSystem.downloadAsync(
+																				downloadUrl,
+																				`${FileSystem.cacheDirectory}/${zlExport.path}`,
+																				{
+																					headers: {
+																						Authorization: token,
+																					},
+																				},
+																			);
+
+																		if (!downloadResult.uri)
+																			return ToastAndroid.show(
+																				"Something went wrong while downloading the file",
+																				ToastAndroid.SHORT,
+																			);
+
+																		const base64Export =
+																			await FileSystem.readAsStringAsync(
+																				downloadResult.uri,
+																				{
+																					encoding:
+																						FileSystem.EncodingType.Base64,
+																				},
+																			);
+
+																		await FileSystem.writeAsStringAsync(
+																			saveUri,
+																			base64Export,
+																			{
+																				encoding:
+																					FileSystem.EncodingType.Base64,
 																			},
-																		})
-
-																		if (!downloadResult.uri) return ToastAndroid.show(
-																			"Something went wrong while downloading the file",
-																			ToastAndroid.SHORT
-																		)
-
-																		const base64Export = await FileSystem.readAsStringAsync(downloadResult.uri, {
-																			encoding: FileSystem.EncodingType.Base64
-																		})
-
-																		await FileSystem.writeAsStringAsync(saveUri, base64Export, {
-																			encoding: FileSystem.EncodingType.Base64
-																		})
+																		);
 
 																		ToastAndroid.show(
 																			"Successfully downloaded the export",
-																			ToastAndroid.SHORT
-																		)
+																			ToastAndroid.SHORT,
+																		);
 																	}}
 																	iconSize={20}
 																	width={32}
@@ -890,31 +974,25 @@ export default function UserSettings() {
 																/>
 															</View>
 														);
-		
+
 														let rowStyle = styles.row;
-		
+
 														if (index === 0)
 															rowStyle = {
 																...styles.row,
 																...styles.firstRow,
 															};
-		
+
 														if (index === exports.length - 1)
 															rowStyle = {
 																...styles.row,
 																...styles.lastRow,
 															};
-		
+
 														return (
 															<Row
 																key={zlExport.id}
-																data={[
-																	id,
-																	startedOn,
-																	files,
-																	size,
-																	actions,
-																]}
+																data={[id, startedOn, files, size, actions]}
 																widthArr={[150, 130, 50, 70, 90]}
 																style={rowStyle}
 																textStyle={styles.rowText}
@@ -935,10 +1013,14 @@ export default function UserSettings() {
 								<View style={styles.serverActionButtonRow}>
 									<Button
 										onPress={async () => {
-											setClearZeroByteFilesPopupOpen(true)
-	
-											const zeroByteFiles = await getZeroByteFiles()
-											setZeroByteFiles(typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length)
+											setClearZeroByteFilesPopupOpen(true);
+
+											const zeroByteFiles = await getZeroByteFiles();
+											setZeroByteFiles(
+												typeof zeroByteFiles === "string"
+													? 0
+													: zeroByteFiles.files.length,
+											);
 										}}
 										color="#323ea8"
 										text="Clear Zero Byte Files"
@@ -996,19 +1078,21 @@ export default function UserSettings() {
 
 								<Button
 									onPress={async () => {
-										const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-	
-										if (!permissions.granted) return ToastAndroid.show(
-											"The permission to the folder was not granted",
-											ToastAndroid.SHORT
-										);
-	
-										db.set("exportDownloadPath", permissions.directoryUri)
-	
+										const permissions =
+											await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+										if (!permissions.granted)
+											return ToastAndroid.show(
+												"The permission to the folder was not granted",
+												ToastAndroid.SHORT,
+											);
+
+										db.set("exportDownloadPath", permissions.directoryUri);
+
 										ToastAndroid.show(
 											"Successfully changed the folder",
-											ToastAndroid.SHORT
-										)
+											ToastAndroid.SHORT,
+										);
 									}}
 									color="#323244"
 									text="Change Export Download Folder"
@@ -1019,19 +1103,21 @@ export default function UserSettings() {
 
 								<Button
 									onPress={async () => {
-										const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-	
-										if (!permissions.granted) return ToastAndroid.show(
-											"The permission to the folder was not granted",
-											ToastAndroid.SHORT
-										);
-	
-										db.set("fileDownloadPath", permissions.directoryUri)
-	
+										const permissions =
+											await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+										if (!permissions.granted)
+											return ToastAndroid.show(
+												"The permission to the folder was not granted",
+												ToastAndroid.SHORT,
+											);
+
+										db.set("fileDownloadPath", permissions.directoryUri);
+
 										ToastAndroid.show(
 											"Successfully changed the folder",
-											ToastAndroid.SHORT
-										)
+											ToastAndroid.SHORT,
+										);
 									}}
 									color="#323244"
 									text="Change File Download Folder"
@@ -1042,10 +1128,10 @@ export default function UserSettings() {
 
 								<Button
 									onPress={async () => {
-										await db.del("url")
-										await db.del("token")
-	
-										router.replace("/login")
+										await db.del("url");
+										await db.del("token");
+
+										router.replace("/login");
 									}}
 									color="#CF4238"
 									text="Logout"

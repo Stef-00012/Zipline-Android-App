@@ -1,6 +1,9 @@
-import { Pressable, ScrollView, Text, View, ToastAndroid } from "react-native";
-import type { APIInvites, APISettings, APIURLs, DashURL } from "@/types/zipline";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { ScrollView, Text, View, ToastAndroid } from "react-native";
+import type {
+	APIInvites,
+	APISettings,
+	DashURL,
+} from "@/types/zipline";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-table-component";
 import { timeDifference } from "@/functions/util";
@@ -8,7 +11,11 @@ import { styles } from "@/styles/admin/invites";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
-import { createInvite, deleteInvite, getInvites } from "@/functions/zipline/invites";
+import {
+	createInvite,
+	deleteInvite,
+	getInvites,
+} from "@/functions/zipline/invites";
 import Popup from "@/components/Popup";
 import Select from "@/components/Select";
 import { dates } from "@/constants/invites";
@@ -18,8 +25,8 @@ import TextInput from "@/components/TextInput";
 import Button from "@/components/Button";
 
 export default function Invites() {
-	useAuth("ADMIN")
-	useShareIntent()
+	useAuth("ADMIN");
+	useShareIntent();
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);
@@ -46,14 +53,19 @@ export default function Invites() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
-				<Popup hidden={!createNewInvite} onClose={() => {
-					setCreateNewInvite(false)
-					setNewInviteExpires("never")
-					setNewInviteMaxUses(undefined)
-				}}>
+				<Popup
+					hidden={!createNewInvite}
+					onClose={() => {
+						setCreateNewInvite(false);
+						setNewInviteExpires("never");
+						setNewInviteMaxUses(undefined);
+					}}
+				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Create Invite</Text>
-						{newInviteError && <Text style={styles.errorText}>{newInviteError}</Text>}
+						{newInviteError && (
+							<Text style={styles.errorText}>{newInviteError}</Text>
+						)}
 
 						<Text style={styles.popupHeaderText}>Expires At:</Text>
 						<Select
@@ -64,13 +76,15 @@ export default function Invites() {
 
 								setNewInviteExpires(selectedDate[0].value);
 							}}
-							defaultValue={dates.find(date => date.value === "never")}
+							defaultValue={dates.find((date) => date.value === "never")}
 						/>
 
 						<TextInput
 							title="Max Uses:"
 							onValueChange={(content) => {
-								setNewInviteMaxUses(Math.abs(Number.parseInt(content)) || undefined);
+								setNewInviteMaxUses(
+									Math.abs(Number.parseInt(content)) || undefined,
+								);
 							}}
 							value={newInviteMaxUses ? String(newInviteMaxUses) : ""}
 							keyboardType="numeric"
@@ -79,26 +93,29 @@ export default function Invites() {
 
 						<Button
 							onPress={async () => {
-								setNewInviteError(null)
+								setNewInviteError(null);
 
-								const createdInvite = await createInvite(newInviteExpires, newInviteMaxUses);
-		
+								const createdInvite = await createInvite(
+									newInviteExpires,
+									newInviteMaxUses,
+								);
+
 								if (typeof createdInvite === "string")
 									return setNewInviteError(createdInvite);
 
-								const urlDest = `${dashUrl}/invite/${createdInvite.code}`
-		
+								const urlDest = `${dashUrl}/invite/${createdInvite.code}`;
+
 								const saved = await Clipboard.setStringAsync(urlDest);
-		
+
 								setNewInviteExpires("never");
 								setNewInviteMaxUses(undefined);
 
-								const newInvites = await getInvites()
+								const newInvites = await getInvites();
 
-								setInvites(typeof newInvites === "string" ? null : newInvites)
+								setInvites(typeof newInvites === "string" ? null : newInvites);
 
 								setCreateNewInvite(false);
-		
+
 								if (saved)
 									return ToastAndroid.show(
 										"Invite URL copied to clipboard",
@@ -113,7 +130,7 @@ export default function Invites() {
 							text="Create"
 							color="#323ea8"
 							margin={{
-								top: 15
+								top: 15,
 							}}
 						/>
 					</View>
@@ -124,9 +141,9 @@ export default function Invites() {
 						<View style={styles.header}>
 							<Text style={styles.headerText}>Invites</Text>
 							<View style={styles.headerButtons}>
-								<Button 
+								<Button
 									onPress={() => {
-										setCreateNewInvite(true)
+										setCreateNewInvite(true);
 									}}
 									icon="add"
 									color="transparent"
@@ -141,10 +158,7 @@ export default function Invites() {
 						</View>
 
 						<View style={{ ...styles.invitesContainer, flex: 1 }}>
-							<ScrollView
-								showsHorizontalScrollIndicator={false}
-								horizontal
-							>
+							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 								<View>
 									<Table>
 										<Row
@@ -155,14 +169,14 @@ export default function Invites() {
 												"Last Updated",
 												"Expires",
 												"Max Uses",
-                                                "Uses",
+												"Uses",
 												"Actions",
 											]}
 											widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
 											style={styles.tableHeader}
 											textStyle={{
 												...styles.rowText,
-												...styles.headerRow
+												...styles.headerRow,
 											}}
 										/>
 									</Table>
@@ -173,24 +187,18 @@ export default function Invites() {
 										<Table>
 											{invites.map((invite, index) => {
 												const code = (
-													<Text
-														key={invite.id}
-														style={styles.rowText}
-													>
+													<Text key={invite.id} style={styles.rowText}>
 														{invite.code}
 													</Text>
 												);
 
 												const createdBy = (
-													<Text
-														key={invite.id}
-														style={styles.rowText}
-													>
+													<Text key={invite.id} style={styles.rowText}>
 														{invite.inviter.username}
 													</Text>
 												);
 
-                                                const created = (
+												const created = (
 													<Text style={styles.rowText}>
 														{timeDifference(
 															new Date(),
@@ -199,7 +207,7 @@ export default function Invites() {
 													</Text>
 												);
 
-                                                const lastUpdated = (
+												const lastUpdated = (
 													<Text style={styles.rowText}>
 														{timeDifference(
 															new Date(),
@@ -208,21 +216,18 @@ export default function Invites() {
 													</Text>
 												);
 
-                                                const expires = invite.expiresAt ? (
+												const expires = invite.expiresAt ? (
 													<Text style={styles.rowText}>
 														{timeDifference(
-                                                            new Date(),
-                                                            new Date(invite.expiresAt),
+															new Date(),
+															new Date(invite.expiresAt),
 														)}
 													</Text>
 												) : (
-                                                    <Text
-														key={invite.id}
-														style={styles.rowText}
-													>
+													<Text key={invite.id} style={styles.rowText}>
 														Never
 													</Text>
-                                                );
+												);
 
 												const uses = (
 													<Text style={styles.rowText}>{invite.uses}</Text>
@@ -240,7 +245,7 @@ export default function Invites() {
 															icon="content-copy"
 															color="#323ea8"
 															onPress={async () => {
-																const urlDest = `${dashUrl}/invite/${invite.code}`
+																const urlDest = `${dashUrl}/invite/${invite.code}`;
 
 																const saved =
 																	await Clipboard.setStringAsync(urlDest);
@@ -270,19 +275,22 @@ export default function Invites() {
 
 																const success = await deleteInvite(inviteId);
 
-																if (typeof success === "string") return ToastAndroid.show(
-                                                                    `Failed to delete the invite "${invite.code}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																if (typeof success === "string")
+																	return ToastAndroid.show(
+																		`Failed to delete the invite "${invite.code}"`,
+																		ToastAndroid.SHORT,
+																	);
 
-																const newInvites = invites.filter(inv => inv.id !== invite.id)
+																const newInvites = invites.filter(
+																	(inv) => inv.id !== invite.id,
+																);
 
-																setInvites(newInvites)
+																setInvites(newInvites);
 
-                                                                ToastAndroid.show(
-                                                                    `Deleted the invite "${invite.code}"`,
-                                                                    ToastAndroid.SHORT
-                                                                )
+																ToastAndroid.show(
+																	`Deleted the invite "${invite.code}"`,
+																	ToastAndroid.SHORT,
+																);
 															}}
 															iconSize={20}
 															width={32}
@@ -317,7 +325,7 @@ export default function Invites() {
 															expires,
 															maxUses,
 															uses,
-                                                            actions
+															actions,
 														]}
 														widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
 														style={rowStyle}

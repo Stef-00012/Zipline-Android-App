@@ -22,17 +22,4 @@ export const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	button: {
-		color: "white",
-		backgroundColor: "#323ea8",
-		padding: 10,
-		borderRadius: 10,
-		marginTop: 15
-	},
-	buttonText: {
-		textAlign: "center",
-		fontWeight: "bold",
-		color: "white",
-		fontSize: 16,
-	},
 });

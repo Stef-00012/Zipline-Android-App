@@ -19,19 +19,24 @@ export async function getInvites(): Promise<APIInvites | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
-export async function createInvite(expiresAt?: string, maxUses?: number): Promise<APIInvite | string> {
+export async function createInvite(
+	expiresAt?: string,
+	maxUses?: number,
+): Promise<APIInvite | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -48,21 +53,23 @@ export async function createInvite(expiresAt?: string, maxUses?: number): Promis
 				headers: {
 					Authorization: token,
 				},
-			}
+			},
 		);
 
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
@@ -73,26 +80,25 @@ export async function deleteInvite(code: string): Promise<APIInvite | string> {
 	if (!url || !token) return "Invalid token or URL";
 
 	try {
-		const res = await axios.delete(
-			`${url}/api/auth/invites/${code}`,
-			{
-				headers: {
-					Authorization: token,
-				},
-			}
-		);
+		const res = await axios.delete(`${url}/api/auth/invites/${code}`, {
+			headers: {
+				Authorization: token,
+			},
+		});
 
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
-} 
+}

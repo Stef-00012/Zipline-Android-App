@@ -1,6 +1,6 @@
 import type { Mimetypes } from "@/types/mimetypes";
 
-export type DashURL = `http${'s' | ''}://${string}.${string}`;
+export type DashURL = `http${"s" | ""}://${string}.${string}`;
 
 export type APISelfUser = Omit<APIUser, "avatar">;
 
@@ -14,10 +14,10 @@ export interface APILoginTotpResponse {
 	user?: undefined;
 }
 
-export type APILoginResponse = APILoginSuccessResponse | APILoginTotpResponse
+export type APILoginResponse = APILoginSuccessResponse | APILoginTotpResponse;
 
 export interface APITokenResponse {
-	token: string
+	token: string;
 }
 
 export interface APIUser {
@@ -144,7 +144,7 @@ export interface APIUploadFile {
 export interface APIUploadResponse {
 	files: Array<APIUploadFile>;
 	partialSuccess: boolean;
-	assumedMimetypes: Array<string | null | APIUploadFile>
+	assumedMimetypes: Array<string | null | APIUploadFile>;
 }
 
 export interface APISettings {
@@ -261,11 +261,7 @@ export type ShortenEmbed = UploadEmbed;
 
 export type APIUserNoIncl = Omit<
 	APIUser,
-	| "view"
-	| "oauthProviders"
-	| "totpSecret"
-	| "passkeys"
-	| "sessions"
+	"view" | "oauthProviders" | "totpSecret" | "passkeys" | "sessions"
 > & {
 	passkeys: [];
 	totpSecret: null;
@@ -404,5 +400,5 @@ export interface APIExport {
 export type APIExports = Array<APIExport>;
 
 export interface ServerActionResponse {
-	status: string
+	status: string;
 }

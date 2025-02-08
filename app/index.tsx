@@ -1,7 +1,7 @@
 import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
 import { Table, Row, Rows } from "react-native-table-component";
 import { getUserStats } from "@/functions/zipline/stats";
-import { useFocusEffect, useRouter } from "expo-router";
+// import { useFocusEffect, useRouter } from "expo-router";
 import { Text, View, ScrollView } from "react-native";
 import FileDisplay from "@/components/FileDisplay";
 import { useEffect, useState } from "react";
@@ -20,8 +20,8 @@ import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { convertToBytes } from "@/functions/util";
 
 export default function Home() {
-	useAuth()
-	useShareIntent()
+	useAuth();
+	useShareIntent();
 
 	const url = db.get("url") as DashURL | null;
 
@@ -34,17 +34,17 @@ export default function Home() {
 	useEffect(() => {
 		handleAuth();
 	}, []);
-	
-	const router = useRouter();
 
-	useFocusEffect(() => {
-		if (__DEV__) {
-			// db.del("url")
-			// db.del("token")
+	// const router = useRouter();
 
-			// router.replace("/metrics");
-		}
-	});
+	// useFocusEffect(() => {
+	// 	if (__DEV__) {
+	// 		// db.del("url")
+	// 		// db.del("token")
+
+	// 		// router.replace("/metrics");
+	// 	}
+	// });
 
 	async function handleAuth() {
 		const user = await getCurrentUser();
@@ -58,14 +58,22 @@ export default function Home() {
 
 	return (
 		<View style={styles.mainContainer}>
-			{focusedFile && <LargeFileDisplay file={focusedFile} onClose={async (refresh) => {
-				setFocusedFile(null)
+			{focusedFile && (
+				<LargeFileDisplay
+					file={focusedFile}
+					onClose={async (refresh) => {
+						setFocusedFile(null);
 
-				if (refresh) {
-					const newRecentFiles = await getRecentFiles();
-					setRecentFiles(typeof newRecentFiles === "string" ? null : newRecentFiles);
-				}
-			}} hidden={!focusedFile} />}
+						if (refresh) {
+							const newRecentFiles = await getRecentFiles();
+							setRecentFiles(
+								typeof newRecentFiles === "string" ? null : newRecentFiles,
+							);
+						}
+					}}
+					hidden={!focusedFile}
+				/>
+			)}
 
 			{user && stats && recentFiles ? (
 				<ScrollView>

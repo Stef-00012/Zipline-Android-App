@@ -23,18 +23,18 @@ export const defaultShortenEmbed: ShortenEmbed = {
 	imageOrVideo: false,
 };
 
-export type SettingPath<T extends keyof APISettings = keyof APISettings> = T extends 'discordOnUploadEmbed'
-	? T | `${T}.${keyof UploadEmbed}`
-	: T extends "discordOnShortenEmbed"
-		? T | `${T}.${keyof ShortenEmbed}`
-		: T;
+export type SettingPath<T extends keyof APISettings = keyof APISettings> =
+	T extends "discordOnUploadEmbed"
+		? T | `${T}.${keyof UploadEmbed}`
+		: T extends "discordOnShortenEmbed"
+			? T | `${T}.${keyof ShortenEmbed}`
+			: T;
 
 export const settingNames: Partial<Record<SettingPath, string>> = {
 	coreDefaultDomain: "Default Domain",
 	coreReturnHttpsUrls: "Return HTTPS URLs",
 	coreTempDirectory: "Temporary Directory",
 
-	
 	chunksEnabled: "Enable Chunks",
 	chunksMax: "Max Chunks Size",
 	chunksSize: "Chunks Size",
@@ -44,11 +44,11 @@ export const settingNames: Partial<Record<SettingPath, string>> = {
 	tasksMaxViewsInterval: "Max Views Interval",
 	tasksThumbnailsInterval: "Thumbnail Interval",
 	tasksMetricsInterval: "Metrics Interval",
-	
+
 	mfaPasskeys: "Passkeys",
 	mfaTotpEnabled: "Enable TOTP",
 	mfaTotpIssuer: "Issuer",
-	
+
 	featuresImageCompression: "Image Compression",
 	featuresRobotsTxt: "/robots.txt",
 	featuresHealthcheck: "Healthcheck",

@@ -2,23 +2,21 @@ import { isAuthenticated } from "@/functions/zipline/auth";
 import { useFocusEffect, useRouter } from "expo-router";
 
 export const useLoginAuth = () => {
-    const router = useRouter()
+	const router = useRouter();
 
-    useFocusEffect(() => {
-        loginAuth()
+	useFocusEffect(() => {
+		loginAuth();
 
-        const interval = setInterval(loginAuth, 5000)
+		const interval = setInterval(loginAuth, 5000);
 
-        return () => {
-            clearInterval(interval)
-        }
-    });
+		return () => {
+			clearInterval(interval);
+		};
+	});
 
-    async function loginAuth() {
-        console.debug("useLoginAuth")
+	async function loginAuth() {
+		const authenticated = await isAuthenticated();
 
-        const authenticated = await isAuthenticated();
-
-        if (authenticated) return router.replace("/");
-    }
-}
+		if (authenticated) return router.replace("/");
+	}
+};

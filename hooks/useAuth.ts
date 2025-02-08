@@ -4,20 +4,18 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { roles } from "@/constants/auth";
 
 export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
-    const router = useRouter()
-    const minimumPosition = roles[minimumRole];
+	const router = useRouter();
+	const minimumPosition = roles[minimumRole];
 
-    useFocusEffect(() => {
-        (async () => {
-            console.debug("useAuth")
+	useFocusEffect(() => {
+		(async () => {
+			const authenticated = await isAuthenticated();
 
-            const authenticated = await isAuthenticated();
+			if (!authenticated) return router.replace("/login");
 
-            if (!authenticated) return router.replace("/login");
-            
-            const userPosition = roles[authenticated];
+			const userPosition = roles[authenticated];
 
-            if (userPosition < minimumPosition) return router.replace("/")
-        })();
-    });
-}
+			if (userPosition < minimumPosition) return router.replace("/");
+		})();
+	});
+};

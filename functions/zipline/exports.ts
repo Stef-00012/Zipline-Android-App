@@ -19,20 +19,24 @@ export async function getUserExports(): Promise<APIExports | string> {
 		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }
 
 // POST /api/user/export
-export async function createUserExport(): Promise<{ running: boolean } | string> {
+export async function createUserExport(): Promise<
+	{ running: boolean } | string
+> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -50,14 +54,16 @@ export async function createUserExport(): Promise<{ running: boolean } | string>
 	} catch (e) {
 		const error = e as AxiosError;
 
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		if (data) return data.error
+		if (data) return data.error;
 
-		return "Something went wrong..."
+		return "Something went wrong...";
 	}
 }
 
@@ -80,14 +86,16 @@ export async function deleteUserExport(
 		return res.data.user;
 	} catch (e) {
 		const error = e as AxiosError;
-		
-		const data = error.response?.data as {
-			error: string;
-			statusCode: number;
-		} | undefined;
 
-		if (data) return data.error
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
 
-		return "Something went wrong..."
+		if (data) return data.error;
+
+		return "Something went wrong...";
 	}
 }

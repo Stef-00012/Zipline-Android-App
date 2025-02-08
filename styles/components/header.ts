@@ -19,44 +19,7 @@ export const styles = StyleSheet.create({
 		borderBottomColor: "#222c47",
 		height: 70,
 	},
-
 	headerLeft: {
 		flexDirection: "column",
 	},
-
-	text: {
-		fontFamily: "Arimo-Nerd-Font",
-		color: "#fff",
-	},
-
-	settings: {
-		width: 30,
-		height: 30,
-		marginRight: 10,
-	},
-
-	settingsIcon: {
-		width: 38,
-		height: 38,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	userMenuContainer: {
-		flexWrap: "wrap",
-		flexDirection: "row",
-		marginRight: 5,
-	},
-	userMenuAvatar: {
-		borderRadius: 8,
-	},
-	userMenuText: {
-		color: "white",
-		fontWeight: "bold",
-		marginLeft: 10,
-		marginTop: 5,
-		fontSize: 18,
-	},
-	userMenuTextWithSettingsIcon: {
-		marginLeft: 0
-	}
 });

@@ -1,6 +1,17 @@
 import { styles } from "@/styles/components/largeFileDisplay";
-import type { APIFile, APIFoldersNoIncl, APITags, DashURL } from "@/types/zipline";
-import { type ColorValue, Pressable, Text, ToastAndroid, View } from "react-native";
+import type {
+	APIFile,
+	APIFoldersNoIncl,
+	APITags,
+	DashURL,
+} from "@/types/zipline";
+import {
+	type ColorValue,
+	Pressable,
+	Text,
+	ToastAndroid,
+	View,
+} from "react-native";
 import FileDisplay from "@/components/FileDisplay";
 import * as db from "@/functions/database";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -10,12 +21,20 @@ import { convertToBytes } from "@/functions/util";
 import { useEffect, useState } from "react";
 import { getTags } from "@/functions/zipline/tags";
 import { isLightColor } from "@/functions/color";
-import { addFileToFolder, getFolders, removeFileFromFolder } from "@/functions/zipline/folders";
+import {
+	addFileToFolder,
+	getFolders,
+	removeFileFromFolder,
+} from "@/functions/zipline/folders";
 import axios from "axios";
-import { deleteFile, editFile, type EditFileOptions } from "@/functions/zipline/files";
+import {
+	deleteFile,
+	editFile,
+	type EditFileOptions,
+} from "@/functions/zipline/files";
 import { type ExternalPathString, useRouter } from "expo-router";
 import * as Clipboard from "expo-clipboard";
-import * as FileSystem from "expo-file-system"
+import * as FileSystem from "expo-file-system";
 import Popup from "@/components/Popup";
 import React from "react";
 import TextInput from "./TextInput";
@@ -27,81 +46,96 @@ interface Props {
 	onClose: (refresh?: boolean) => void | Promise<void>;
 }
 
-// WIP
 export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
-	const router = useRouter()
+	const router = useRouter();
 
 	const dashUrl = db.get("url") as DashURL | null;
 
 	const [tags, setTags] = useState<APITags>([]);
 	const [folders, setFolders] = useState<APIFoldersNoIncl>([]);
 
-	const [fileContent, setFileContent] = useState<string | null>(null)
+	const [fileContent, setFileContent] = useState<string | null>(null);
 
-	const [filePassword, setFilePassword] = useState<boolean>(file.password)
-	const [fileMaxViews, setFileMaxViews] = useState<number | null>(file.maxViews)
-	const [fileOriginalName, setFileOriginalName] = useState<string | null>(file.originalName)
-	const [fileType, setFileType] = useState<string>(file.type)
-	const [fileFolderId, setFileFolderId] = useState<string | null>(file.folderId)
-	const [fileFavorite, setFileFavorite] = useState<boolean>(file.favorite)
-	
-	const [tempHidden, setTempHidden] = useState<boolean>(false)
+	const [filePassword, setFilePassword] = useState<boolean>(file.password);
+	const [fileMaxViews, setFileMaxViews] = useState<number | null>(
+		file.maxViews,
+	);
+	const [fileOriginalName, setFileOriginalName] = useState<string | null>(
+		file.originalName,
+	);
+	const [fileType, setFileType] = useState<string>(file.type);
+	const [fileFolderId, setFileFolderId] = useState<string | null>(
+		file.folderId,
+	);
+	const [fileFavorite, setFileFavorite] = useState<boolean>(file.favorite);
 
-	const [deleteFilePopup, setDeleteFilePopup] = useState<boolean>(false)
-	const [editFilePopup, setEditFilePopup] = useState<boolean>(false)
+	const [tempHidden, setTempHidden] = useState<boolean>(false);
 
-	const [editFileMaxViews, setEditFileMaxViews] = useState<number | null>(file.maxViews);
-	const [editFileOriginalName, setEditFileOriginalName] = useState<string | null>(file.originalName);
+	const [deleteFilePopup, setDeleteFilePopup] = useState<boolean>(false);
+	const [editFilePopup, setEditFilePopup] = useState<boolean>(false);
+
+	const [editFileMaxViews, setEditFileMaxViews] = useState<number | null>(
+		file.maxViews,
+	);
+	const [editFileOriginalName, setEditFileOriginalName] = useState<
+		string | null
+	>(file.originalName);
 	const [editFileType, setEditFileType] = useState<string>(file.type);
 	const [editFilePassword, setEditFilePassword] = useState<string | null>(null);
 
 	useEffect(() => {
 		(async () => {
-			const tags = await getTags()
-			const folders = await getFolders(true)
+			const tags = await getTags();
+			const folders = await getFolders(true);
 
-			setTags(typeof tags === "string" ? [] : tags)
-			setFolders(typeof folders === "string" ? [] : folders)
-		})()
-	}, [])
+			setTags(typeof tags === "string" ? [] : tags);
+			setFolders(typeof folders === "string" ? [] : folders);
+		})();
+	}, []);
 
 	useEffect(() => {
 		if (fileType.startsWith("text/")) {
 			(async () => {
-				const res =	await axios.get(`${dashUrl}/raw/${file.name}`, {
-					responseType: "text"
-				})
+				const res = await axios.get(`${dashUrl}/raw/${file.name}`, {
+					responseType: "text",
+				});
 
-				setFileContent(res.data as string)
-			})()
+				setFileContent(res.data as string);
+			})();
 		}
 
-		setDeleteFilePopup(false)
-		setTempHidden(false)
-	}, [file, dashUrl, fileType])
+		setDeleteFilePopup(false);
+		setTempHidden(false);
+	}, [file, dashUrl, fileType]);
 
 	return (
 		<>
-			<Popup hidden={!deleteFilePopup} onClose={() => {
-				setDeleteFilePopup(false)
-				setTempHidden(false)
-			}}>
+			<Popup
+				hidden={!deleteFilePopup}
+				onClose={() => {
+					setDeleteFilePopup(false);
+					setTempHidden(false);
+				}}
+			>
 				<View style={styles.popupContent}>
 					<Text style={styles.mainHeaderText}>Are you sure?</Text>
 
-					<Text style={styles.serverActionWarningText}>Are you sure you want to delete {file.name}? This action cannot be undone.</Text>
+					<Text style={styles.serverActionWarningText}>
+						Are you sure you want to delete {file.name}? This action cannot be
+						undone.
+					</Text>
 
 					<View style={styles.fileDeleteButtonsContainer}>
-					<Button
+						<Button
 							color="#181c28"
 							text="Cancel"
 							onPress={() => {
-								setDeleteFilePopup(false)
-								setTempHidden(false)
+								setDeleteFilePopup(false);
+								setTempHidden(false);
 							}}
 							margin={{
 								top: 10,
-								right: 10
+								right: 10,
 							}}
 						/>
 
@@ -109,50 +143,48 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							color="#CF4238"
 							text={`Delete ${file.name}`}
 							onPress={async () => {
-								const fileId = file.id
-	
-								const success = await deleteFile(fileId)
-	
+								const fileId = file.id;
+
+								const success = await deleteFile(fileId);
+
 								if (typeof success === "string") {
-									ToastAndroid.show(
-										`Error: ${success}`,
-										ToastAndroid.SHORT
-									)
-	
-									setDeleteFilePopup(false)
-									setTempHidden(false)
-	
+									ToastAndroid.show(`Error: ${success}`, ToastAndroid.SHORT);
+
+									setDeleteFilePopup(false);
+									setTempHidden(false);
+
 									return;
 								}
-	
-								setDeleteFilePopup(false)
-								setTempHidden(false)
-								onClose(true)
-	
+
+								setDeleteFilePopup(false);
+								setTempHidden(false);
+								onClose(true);
+
 								ToastAndroid.show(
 									`Successfully deleted the file ${file.name}`,
-									ToastAndroid.SHORT
-								)
+									ToastAndroid.SHORT,
+								);
 							}}
 							margin={{
 								top: 10,
-								right: 10
+								right: 10,
 							}}
 						/>
 					</View>
 				</View>
 
-				<Text
-					style={styles.popupSubHeaderText}
-				>
+				<Text style={styles.popupSubHeaderText}>
 					Press outside to close this popup
 				</Text>
 			</Popup>
 
-			<Popup hidden={!editFilePopup} onClose={() => {
-				setEditFilePopup(false)
-				setTempHidden(false)
-			}}>
+			<Popup
+				hidden={!editFilePopup}
+				onClose={() => {
+					setEditFilePopup(false);
+					setTempHidden(false);
+				}}
+			>
 				<View style={styles.popupContent}>
 					<Text style={styles.mainHeaderText}>Editing "{file.name}"</Text>
 
@@ -187,29 +219,30 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							color="#CF4238"
 							text="Remove Password"
 							onPress={() => {
-								const fileId = file.id
+								const fileId = file.id;
 
 								const success = editFile(fileId, {
-									password: null
-								})
+									password: null,
+								});
 
-								if (typeof success === "string") return ToastAndroid.show(
-									`Error: ${success}`,
-									ToastAndroid.SHORT
-								)
+								if (typeof success === "string")
+									return ToastAndroid.show(
+										`Error: ${success}`,
+										ToastAndroid.SHORT,
+									);
 
-								setEditFilePassword(null)
+								setEditFilePassword(null);
 
-								setFilePassword(false)
-								file.password = false
+								setFilePassword(false);
+								file.password = false;
 
 								ToastAndroid.show(
 									"Successfully removed the password",
-									ToastAndroid.SHORT
-								)
+									ToastAndroid.SHORT,
+								);
 							}}
 							margin={{
-								top: 10
+								top: 10,
 							}}
 						/>
 					) : (
@@ -228,46 +261,48 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 						text="Save Changes"
 						icon="save"
 						onPress={async () => {
-							const fileId = file.id
+							const fileId = file.id;
 
-							const editData: EditFileOptions = {}
+							const editData: EditFileOptions = {};
 
-							editData.maxViews = editFileMaxViews || null
-							editData.type = editFileType
-							if (editFileOriginalName) editData.originalName = editFileOriginalName
-							if (editFilePassword) editData.password = editFilePassword
+							editData.maxViews = editFileMaxViews || null;
+							editData.type = editFileType;
+							if (editFileOriginalName)
+								editData.originalName = editFileOriginalName;
+							if (editFilePassword) editData.password = editFilePassword;
 
-							const success = await editFile(fileId, editData)
+							const success = await editFile(fileId, editData);
 
-							if (typeof success === "string") return ToastAndroid.show(
-								`Error: ${success}`,
-								ToastAndroid.SHORT
-							)
-							
+							if (typeof success === "string")
+								return ToastAndroid.show(
+									`Error: ${success}`,
+									ToastAndroid.SHORT,
+								);
+
 							if (editFilePassword) {
-								setFilePassword(true)
-								file.password = true
+								setFilePassword(true);
+								file.password = true;
 							}
 
-							file.originalName = editFileOriginalName || null
-							setFileOriginalName(editFileOriginalName || null)
+							file.originalName = editFileOriginalName || null;
+							setFileOriginalName(editFileOriginalName || null);
 
-							file.type = editFileType
-							setFileType(editFileType)
+							file.type = editFileType;
+							setFileType(editFileType);
 
-							file.maxViews = editFileMaxViews || null
-							setFileMaxViews(editFileMaxViews)
+							file.maxViews = editFileMaxViews || null;
+							setFileMaxViews(editFileMaxViews);
 
-							setEditFilePopup(false)
-							setTempHidden(false)
+							setEditFilePopup(false);
+							setTempHidden(false);
 
 							ToastAndroid.show(
 								`Successfully edited the file ${file.name}`,
-								ToastAndroid.SHORT
-							)
+								ToastAndroid.SHORT,
+							);
 						}}
 						margin={{
-							top: 10
+							top: 10,
 						}}
 					/>
 				</View>
@@ -320,9 +355,11 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							<MaterialIcons name="sd-storage" size={28} color="white" />
 							<View style={styles.fileInfoTextContainer}>
 								<Text style={styles.fileInfoHeader}>Size</Text>
-								<Text style={styles.fileInfoText}>{convertToBytes(file.size, {
-									unitSeparator: " "
-								})}</Text>
+								<Text style={styles.fileInfoText}>
+									{convertToBytes(file.size, {
+										unitSeparator: " ",
+									})}
+								</Text>
 							</View>
 						</View>
 
@@ -330,7 +367,12 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							<MaterialIcons name="visibility" size={28} color="white" />
 							<View style={styles.fileInfoTextContainer}>
 								<Text style={styles.fileInfoHeader}>View</Text>
-								<Text style={styles.fileInfoText}>{file.views}{(fileMaxViews && !Number.isNaN(fileMaxViews)) && `/${fileMaxViews}`}</Text>
+								<Text style={styles.fileInfoText}>
+									{file.views}
+									{fileMaxViews &&
+										!Number.isNaN(fileMaxViews) &&
+										`/${fileMaxViews}`}
+								</Text>
 							</View>
 						</View>
 
@@ -338,7 +380,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							<MaterialIcons name="file-upload" size={28} color="white" />
 							<View style={styles.fileInfoTextContainer}>
 								<Text style={styles.fileInfoHeader}>Created At</Text>
-								<Text style={styles.fileInfoText}>{new Date(file.createdAt).toLocaleString()}</Text>
+								<Text style={styles.fileInfoText}>
+									{new Date(file.createdAt).toLocaleString()}
+								</Text>
 							</View>
 						</View>
 
@@ -346,7 +390,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							<MaterialIcons name="autorenew" size={28} color="white" />
 							<View style={styles.fileInfoTextContainer}>
 								<Text style={styles.fileInfoHeader}>Updated At</Text>
-								<Text style={styles.fileInfoText}>{new Date(file.updatedAt).toLocaleString()}</Text>
+								<Text style={styles.fileInfoText}>
+									{new Date(file.updatedAt).toLocaleString()}
+								</Text>
 							</View>
 						</View>
 
@@ -355,7 +401,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								<MaterialIcons name="auto-delete" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
 									<Text style={styles.fileInfoHeader}>Deletes At</Text>
-									<Text style={styles.fileInfoText}>{new Date(file.deletesAt).toLocaleString()}</Text>
+									<Text style={styles.fileInfoText}>
+										{new Date(file.deletesAt).toLocaleString()}
+									</Text>
 								</View>
 							</View>
 						)}
@@ -375,50 +423,68 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							placeholder="Select Tags..."
 							multiple
 							disabled={tags.length <= 0}
-							data={tags.map(tag => ({
+							data={tags.map((tag) => ({
 								label: tag.name,
 								value: tag.id,
-								color: tag.color
+								color: tag.color,
 							}))}
 							onSelect={async (selectedTags) => {
-								const newTags = selectedTags.map(tag => tag.value)
+								const newTags = selectedTags.map((tag) => tag.value);
 
 								const success = editFile(file.id, {
-									tags: newTags
-								})
+									tags: newTags,
+								});
 
-								if (typeof success === "string") return ToastAndroid.show(
-									`Error: ${success}`,
-									ToastAndroid.SHORT
-								)
+								if (typeof success === "string")
+									return ToastAndroid.show(
+										`Error: ${success}`,
+										ToastAndroid.SHORT,
+									);
 
-								file.tags = tags.filter(tag => newTags.includes(tag.id))
+								file.tags = tags.filter((tag) => newTags.includes(tag.id));
 
 								ToastAndroid.show(
 									"Successfully updated the tags",
-									ToastAndroid.SHORT
-								)
+									ToastAndroid.SHORT,
+								);
 							}}
 							renderItem={(item) => (
 								<View style={styles.selectRenderItemContainer}>
-									<Text style={{
-										...styles.selectRenderItemText,
-										color: isLightColor(item.color as string) ? "black" : "white",
-										backgroundColor: item.color as ColorValue,
-									}}>{item.label}</Text>
+									<Text
+										style={{
+											...styles.selectRenderItemText,
+											color: isLightColor(item.color as string)
+												? "black"
+												: "white",
+											backgroundColor: item.color as ColorValue,
+										}}
+									>
+										{item.label}
+									</Text>
 								</View>
 							)}
-							defaultValues={tags.filter(tag => file.tags.find(fileTag => fileTag.id === tag.id)).map(tag => ({
-								label: tag.name,
-								value: tag.id,
-								color: tag.color
-							}))}
+							defaultValues={tags
+								.filter((tag) =>
+									file.tags.find((fileTag) => fileTag.id === tag.id),
+								)
+								.map((tag) => ({
+									label: tag.name,
+									value: tag.id,
+									color: tag.color,
+								}))}
 							renderSelectedItem={(item, key) => (
-								<Text key={key} style={{
-									...styles.selectRenderSelectedItemText,
-									color: isLightColor(item.color as string) ? "black" : "white",
-									backgroundColor: item.color as ColorValue,
-								}}>{item.label}</Text>
+								<Text
+									key={key}
+									style={{
+										...styles.selectRenderSelectedItemText,
+										color: isLightColor(item.color as string)
+											? "black"
+											: "white",
+										backgroundColor: item.color as ColorValue,
+									}}
+								>
+									{item.label}
+								</Text>
 							)}
 							maxHeight={500}
 						/>
@@ -427,63 +493,73 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 						{fileFolderId ? (
 							<Button
 								color="#e03131"
-								text={`Remove from folder "${folders.find(folder => folder.id === file.folderId)?.name}"`}
+								text={`Remove from folder "${folders.find((folder) => folder.id === file.folderId)?.name}"`}
 								onPress={async () => {
 									if (!fileFolderId) return;
-	
-									const folderId = fileFolderId
-									const fileId = file.id
-	
-									const success = removeFileFromFolder(folderId, fileId)
-	
-									if (typeof success === "string") return ToastAndroid.show(
-										`Error: ${success}`,
-										ToastAndroid.SHORT
-									)
-	
-									setFileFolderId(null)
-									file.folderId = null
-	
+
+									const folderId = fileFolderId;
+									const fileId = file.id;
+
+									const success = removeFileFromFolder(folderId, fileId);
+
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
+
+									setFileFolderId(null);
+									file.folderId = null;
+
 									ToastAndroid.show(
 										"Successfully removed the file from the folder",
-										ToastAndroid.SHORT
-									)
+										ToastAndroid.SHORT,
+									);
 								}}
 								margin={{
-									top: 5
+									top: 5,
 								}}
 							/>
 						) : (
 							<Select
 								placeholder="Add to Folder..."
-								data={folders.map(folder => ({
+								data={folders.map((folder) => ({
 									label: folder.name,
 									value: folder.id,
 								}))}
-								defaultValue={file.folderId ? {
-									label: (folders.find(folder => folder.id === file.folderId) as APIFoldersNoIncl[0])?.name,
-									value: file.folderId
-								} : undefined}
+								defaultValue={
+									file.folderId
+										? {
+												label: (
+													folders.find(
+														(folder) => folder.id === file.folderId,
+													) as APIFoldersNoIncl[0]
+												)?.name,
+												value: file.folderId,
+											}
+										: undefined
+								}
 								onSelect={async (selectedFolder) => {
 									if (selectedFolder.length <= 0) return;
 
-									const folderId = selectedFolder[0].value
-									const fileId = file.id
+									const folderId = selectedFolder[0].value;
+									const fileId = file.id;
 
-									const success = await addFileToFolder(folderId, fileId)
+									const success = await addFileToFolder(folderId, fileId);
 
-									if (typeof success === "string") return ToastAndroid.show(
-										`Error: ${success}`,
-										ToastAndroid.SHORT
-									)
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
 
-									setFileFolderId(folderId)
-									file.folderId = folderId
+									setFileFolderId(folderId);
+									file.folderId = folderId;
 
 									ToastAndroid.show(
 										"Successfully added the file to the folder",
-										ToastAndroid.SHORT
-									)
+										ToastAndroid.SHORT,
+									);
 								}}
 							/>
 						)}
@@ -495,8 +571,8 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								icon="edit"
 								color="#e8590c"
 								onPress={() => {
-									setEditFilePopup(true)
-									setTempHidden(true)
+									setEditFilePopup(true);
+									setTempHidden(true);
 								}}
 								iconSize={20}
 								width={30}
@@ -504,7 +580,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								padding={5}
 								margin={{
 									left: 5,
-									right: 5
+									right: 5,
 								}}
 							/>
 
@@ -512,8 +588,8 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								icon="delete"
 								color="#e03131"
 								onPress={() => {
-									setDeleteFilePopup(true)
-									setTempHidden(true)
+									setDeleteFilePopup(true);
+									setTempHidden(true);
 								}}
 								iconSize={20}
 								width={30}
@@ -521,7 +597,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								padding={5}
 								margin={{
 									left: 5,
-									right: 5
+									right: 5,
 								}}
 							/>
 
@@ -530,21 +606,22 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								color={fileFavorite ? "#f08c00" : "#343a40"}
 								onPress={async () => {
 									const success = editFile(file.id, {
-										favorite: !file.favorite
-									})
-	
-									if (typeof success === "string") return ToastAndroid.show(
-										`Error: ${success}`,
-										ToastAndroid.SHORT
-									)
-	
-									file.favorite = !fileFavorite
-									setFileFavorite((prev) => !prev)
-	
+										favorite: !file.favorite,
+									});
+
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
+
+									file.favorite = !fileFavorite;
+									setFileFavorite((prev) => !prev);
+
 									ToastAndroid.show(
 										`Successfully ${fileFavorite ? "removed from" : "added to"} favorites`,
-										ToastAndroid.SHORT
-									)
+										ToastAndroid.SHORT,
+									);
 								}}
 								iconSize={20}
 								width={30}
@@ -552,7 +629,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								padding={5}
 								margin={{
 									left: 5,
-									right: 5
+									right: 5,
 								}}
 							/>
 
@@ -560,7 +637,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								icon="open-in-new"
 								color="#323ea8"
 								onPress={() => {
-									router.replace(`${dashUrl}${file.url}` as ExternalPathString)
+									router.replace(`${dashUrl}${file.url}` as ExternalPathString);
 								}}
 								iconSize={20}
 								width={30}
@@ -568,7 +645,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								padding={5}
 								margin={{
 									left: 5,
-									right: 5
+									right: 5,
 								}}
 							/>
 
@@ -576,19 +653,20 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								icon="content-copy"
 								color="#343a40"
 								onPress={async () => {
-									const url = `${dashUrl}${file.url}`
-	
-									const success = await Clipboard.setStringAsync(url)
-	
-									if (!success) return ToastAndroid.show(
-										"Failed to copy the URL",
-										ToastAndroid.SHORT
-									)
-	
+									const url = `${dashUrl}${file.url}`;
+
+									const success = await Clipboard.setStringAsync(url);
+
+									if (!success)
+										return ToastAndroid.show(
+											"Failed to copy the URL",
+											ToastAndroid.SHORT,
+										);
+
 									ToastAndroid.show(
 										"Copied URL to clipboard",
-										ToastAndroid.SHORT
-									)
+										ToastAndroid.SHORT,
+									);
 								}}
 								iconSize={20}
 								width={30}
@@ -596,7 +674,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								padding={5}
 								margin={{
 									left: 5,
-									right: 5
+									right: 5,
 								}}
 							/>
 
@@ -604,48 +682,59 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								icon="file-download"
 								color="#343a40"
 								onPress={async () => {
-									const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`
-	
-									let savedFileDownloadUri = db.get("fileDownloadPath")
-	
+									const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
+
+									let savedFileDownloadUri = db.get("fileDownloadPath");
+
 									if (!savedFileDownloadUri) {
-										const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-	
-										if (!permissions.granted) return ToastAndroid.show(
-											"The permission to save the file was not granted",
-											ToastAndroid.SHORT
-										);
-	
-										db.set("fileDownloadPath", permissions.directoryUri)
-										savedFileDownloadUri = permissions.directoryUri
+										const permissions =
+											await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+										if (!permissions.granted)
+											return ToastAndroid.show(
+												"The permission to save the file was not granted",
+												ToastAndroid.SHORT,
+											);
+
+										db.set("fileDownloadPath", permissions.directoryUri);
+										savedFileDownloadUri = permissions.directoryUri;
 									}
-	
-									ToastAndroid.show(
-										"Downloading...",
-										ToastAndroid.SHORT
-									)
-	
-									const saveUri = await FileSystem.StorageAccessFramework.createFileAsync(savedFileDownloadUri, file.name, file.type)
-	
-									const downloadResult = await FileSystem.downloadAsync(downloadUrl, `${FileSystem.cacheDirectory}/${file.name}`)
-	
-									if (!downloadResult.uri) return ToastAndroid.show(
-										"Something went wrong while downloading the file",
-										ToastAndroid.SHORT
-									)
-	
-									const base64File = await FileSystem.readAsStringAsync(downloadResult.uri, {
-										encoding: FileSystem.EncodingType.Base64
-									})
-	
+
+									ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
+
+									const saveUri =
+										await FileSystem.StorageAccessFramework.createFileAsync(
+											savedFileDownloadUri,
+											file.name,
+											file.type,
+										);
+
+									const downloadResult = await FileSystem.downloadAsync(
+										downloadUrl,
+										`${FileSystem.cacheDirectory}/${file.name}`,
+									);
+
+									if (!downloadResult.uri)
+										return ToastAndroid.show(
+											"Something went wrong while downloading the file",
+											ToastAndroid.SHORT,
+										);
+
+									const base64File = await FileSystem.readAsStringAsync(
+										downloadResult.uri,
+										{
+											encoding: FileSystem.EncodingType.Base64,
+										},
+									);
+
 									await FileSystem.writeAsStringAsync(saveUri, base64File, {
-										encoding: FileSystem.EncodingType.Base64
-									})
-	
+										encoding: FileSystem.EncodingType.Base64,
+									});
+
 									ToastAndroid.show(
 										"Successfully downloaded the file",
-										ToastAndroid.SHORT
-									)
+										ToastAndroid.SHORT,
+									);
 								}}
 								iconSize={20}
 								width={30}
@@ -653,7 +742,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								padding={5}
 								margin={{
 									left: 5,
-									right: 5
+									right: 5,
 								}}
 							/>
 						</View>

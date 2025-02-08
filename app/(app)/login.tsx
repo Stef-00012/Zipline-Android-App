@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -13,19 +13,27 @@ export default function Login() {
 	const router = useRouter();
 
 	const [error, setError] = useState<string>();
-	const [tokenLogin, setTokenLogin] = useState<boolean>(false)
+	const [tokenLogin, setTokenLogin] = useState<boolean>(false);
 
 	const [inputtedUrl, setInputtedUrl] = useState<string | null>(db.get("url"));
-	const [inputtedToken, setInputtedToken] = useState<string | null>(db.get("token"));
+	const [inputtedToken, setInputtedToken] = useState<string | null>(
+		db.get("token"),
+	);
 
-	const [inputtedUsername, setInputtedUsername] = useState<string | undefined>(undefined);
-	const [inputtedPassword, setInputtedPassword] = useState<string | undefined>(undefined);
-	const [inputtedTOTP, setInputtedTOTP] = useState<string | undefined>(undefined);
+	const [inputtedUsername, setInputtedUsername] = useState<string | undefined>(
+		undefined,
+	);
+	const [inputtedPassword, setInputtedPassword] = useState<string | undefined>(
+		undefined,
+	);
+	const [inputtedTOTP, setInputtedTOTP] = useState<string | undefined>(
+		undefined,
+	);
 	const [totpRequired, setTOTPRequired] = useState<boolean>(false);
 
-    const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
+	const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
-	useLoginAuth()
+	useLoginAuth();
 
 	return (
 		<View style={styles.loginContainer}>
@@ -49,7 +57,7 @@ export default function Login() {
 							password
 						/>
 					</>
-				): (
+				) : (
 					<>
 						<TextInput
 							title="Zipline URL:"
@@ -89,41 +97,51 @@ export default function Login() {
 					color="#616060"
 					text={`Use ${tokenLogin ? "Password" : "Token"} Login`}
 					margin={{
-						top: 5
+						top: 5,
 					}}
 				/>
 
 				<Button
 					onPress={async () => {
-                        setError(undefined)
+						setError(undefined);
 
-                        if (!inputtedUrl) return setError("Please insert your Zipline URL");
-                        if (!urlRegex.test(inputtedUrl)) return setError("Please insert a valid URL");
+						if (!inputtedUrl) return setError("Please insert your Zipline URL");
+						if (!urlRegex.test(inputtedUrl))
+							return setError("Please insert a valid URL");
 
-						const url = inputtedUrl.endsWith("/") ? inputtedUrl.slice(0, -1) : inputtedUrl
+						const url = inputtedUrl.endsWith("/")
+							? inputtedUrl.slice(0, -1)
+							: inputtedUrl;
 
 						db.set("url", url);
 
-                        if (tokenLogin) {
+						if (tokenLogin) {
 							if (!inputtedToken) return setError("Please insert your token");
 
 							db.set("token", inputtedToken);
 
 							const authenticated = await isAuthenticated();
 
-							if (!authenticated) return setError(
-								"There was an error during the login, make sure your token is valid and your server is running Zipline V4",
-							);
+							if (!authenticated)
+								return setError(
+									"There was an error during the login, make sure your token is valid and your server is running Zipline V4",
+								);
 
 							return router.replace("/");
 						}
 
-						if (!inputtedPassword) return setError("Please insert your password");
-						if (!inputtedUsername) return setError("Please insert your username");
+						if (!inputtedPassword)
+							return setError("Please insert your password");
+						if (!inputtedUsername)
+							return setError("Please insert your username");
 
-						const loginRes = await login(inputtedUsername, inputtedPassword, inputtedTOTP)
+						const loginRes = await login(
+							inputtedUsername,
+							inputtedPassword,
+							inputtedTOTP,
+						);
 
-						if (typeof loginRes === "string") return setError(loginRes)
+						if (typeof loginRes === "string") return setError(loginRes);
 
 						if (loginRes.totp) return setTOTPRequired(true);
 
@@ -138,7 +156,7 @@ export default function Login() {
 					text="Login"
 					color="#323ea8"
 					margin={{
-						top: 5
+						top: 5,
 					}}
 				/>
 			</View>

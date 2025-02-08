@@ -761,7 +761,10 @@ export default function UserSettings() {
 													]}
 													widthArr={[150, 130, 50, 70, 90]}
 													style={styles.tableHeader}
-													textStyle={styles.rowText}
+													textStyle={{
+														...styles.rowText,
+														...styles.headerRow
+													}}
 												/>
 											</Table>
 											<ScrollView

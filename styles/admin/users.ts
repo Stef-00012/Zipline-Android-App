@@ -134,6 +134,9 @@ export const styles = StyleSheet.create({
         color: "white",
         textAlign: "center",
     },
+	headerRow: {
+		fontWeight: "bold"
+	},
     link: {
         color: "#575DB5",
     },

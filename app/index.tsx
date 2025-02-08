@@ -42,7 +42,7 @@ export default function Home() {
 			// db.del("url")
 			// db.del("token")
 
-			// router.replace("/login");
+			// router.replace("/metrics");
 		}
 	});
 
@@ -160,14 +160,14 @@ export default function Home() {
 							<Table>
 								<Row
 									data={["File Type", "Count"]}
-									widthArr={[250, 150]}
+									widthArr={[260, 150]}
 									textStyle={styles.tableHeadText}
 								/>
 								<Rows
 									data={Object.entries(stats.sortTypeCount).sort(
 										(a, b) => b[1] - a[1],
 									)}
-									widthArr={[250, 150]}
+									widthArr={[260, 150]}
 									textStyle={styles.tableText}
 								/>
 							</Table>

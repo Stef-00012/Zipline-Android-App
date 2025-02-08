@@ -30,6 +30,6 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [ ] Metrics page
+- [x] Metrics page
 - [ ] check for unused styles
 - [ ] App update checking + update button

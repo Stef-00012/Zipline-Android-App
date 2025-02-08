@@ -347,7 +347,10 @@ export default function Urls() {
 											]}
 											widthArr={[80, 100, 200, 100, 100, 130, 50, 130]}
 											style={styles.tableHeader}
-											textStyle={styles.rowText}
+											textStyle={{
+												...styles.rowText,
+												...styles.headerRow
+											}}
 										/>
 									</Table>
 									<ScrollView

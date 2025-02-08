@@ -3,14 +3,23 @@ import Popup from "./Popup";
 import DateTimePicker from 'react-native-ui-datepicker';
 import type { DatePickeMultipleProps, DatePickerRangeProps, DatePickerSingleProps } from "react-native-ui-datepicker/lib/typescript/DateTimePicker";
 import Button from "./Button";
+import type { ReactNode } from "react";
 
 type Props = (DatePickeMultipleProps | DatePickerRangeProps | DatePickerSingleProps) & {
     open: boolean;
-    onClose: () => void | Promise<void>
+    onClose: () => void | Promise<void>;
+    children?: ReactNode
 }
 
 export default function DatePicker(props: Props) {
-    const defaultProps: Props = {
+    const {
+        open,
+        onClose,
+        children,
+        ...datePickerProps
+    } = props;
+
+    const defaultProps = {
         monthContainerStyle: styles.monthContainerStyle,
         yearContainerStyle: styles.yearContainerStyle,
         calendarTextStyle: styles.calendarTextStyle,
@@ -23,12 +32,14 @@ export default function DatePicker(props: Props) {
         displayFullDays: true,
         firstDayOfWeek: 1,
         locale: "en",
-        ...props
-    }
+        ...datePickerProps
+    };
 
     return (
-        <Popup hidden={!props.open} onClose={props.onClose}>
+        <Popup hidden={!open} onClose={onClose}>
             <DateTimePicker {...defaultProps}/>
+
+            {props.children}
 
             <Button
                 text="Close"

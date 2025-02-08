@@ -160,7 +160,10 @@ export default function Invites() {
 											]}
 											widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
 											style={styles.tableHeader}
-											textStyle={styles.rowText}
+											textStyle={{
+												...styles.rowText,
+												...styles.headerRow
+											}}
 										/>
 									</Table>
 									<ScrollView

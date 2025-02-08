@@ -138,7 +138,10 @@ export default function Folders() {
 											data={["Name", "Public", "Created", "Actions"]}
 											widthArr={[80, 50, 130, 150]}
 											style={styles.tableHeader}
-											textStyle={styles.rowText}
+											textStyle={{
+												...styles.rowText,
+												...styles.headerRow
+											}}
 										/>
 									</Table>
 									<ScrollView

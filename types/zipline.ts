@@ -331,12 +331,14 @@ export interface APIFiles {
 	pages: number;
 }
 
-export interface APIStats {
+export interface APIStat {
 	id: string;
 	createdAt: string;
 	updatedAt: string;
 	data: APIStatData;
 }
+
+export type APIStats = Array<APIStat>;
 
 export interface APIStatData {
 	users: number;

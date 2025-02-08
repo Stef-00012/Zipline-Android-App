@@ -7,7 +7,7 @@ import { styles } from "@/styles/metrics";
 import type { APIStats } from "@/types/zipline";
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import DatePicker from "@/components/DatePicker";
 import { add } from "date-fns";
 import type { DateType } from "react-native-ui-datepicker";
@@ -56,11 +56,11 @@ export default function Metrics() {
                     onChange={(params) => {
                         setRange(params)
 
-                        if (params.endDate && params.startDate) {
-                            // setDatePickerOpen(false)
+                        // if (params.endDate && params.startDate) {
+                        //     setDatePickerOpen(false)
 
-                            // handle date change
-                        }
+                        //     handle date change
+                        // }
                         console.log("params", params)
                     }}
                     mode="range"
@@ -69,13 +69,27 @@ export default function Metrics() {
                     maxDate={new Date()}
                 />
 
-                <Button
-                    onPress={() => {
-                        setDatePickerOpen(true)
-                    }}
-                    text="test"
-                    color="blue"
-                />
+                {stats ? (
+                    <View>
+                        <ScrollView>
+                            <View style={styles.header}>
+                                <Text style={styles.headerText}>Metrics</Text>
+                                <Text style={styles.dateRangeText}>{new Date(range.startDate as string).toLocaleDateString()} to {new Date(range.endDate as string).toLocaleDateString()}</Text>
+                            </View>
+                        </ScrollView>
+                        {/* <Button
+                            onPress={() => {
+                                setDatePickerOpen(true)
+                            }}
+                            text="test"
+                            color="blue"
+                        /> */}
+                    </View>
+                ) : (
+                    <View style={styles.loadingContainer}>
+                        <Text style={styles.loadingText}>Loading...</Text>
+                    </View>
+                )}
             </View>
         </View>
     )

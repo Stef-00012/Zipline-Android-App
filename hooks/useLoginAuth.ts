@@ -15,6 +15,8 @@ export const useLoginAuth = () => {
     });
 
     async function loginAuth() {
+        console.debug("useLoginAuth")
+
         const authenticated = await isAuthenticated();
 
         if (authenticated) return router.replace("/");

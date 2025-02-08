@@ -9,6 +9,8 @@ export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 
     useFocusEffect(() => {
         (async () => {
+            console.debug("useAuth")
+
             const authenticated = await isAuthenticated();
 
             if (!authenticated) return router.replace("/login");

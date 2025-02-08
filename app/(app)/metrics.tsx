@@ -64,6 +64,9 @@ export default function Metrics() {
     }: StatsProps) {
         if (!all && (!from || !to)) return;
 
+		setStats(null);
+		setFilteredStats(null)
+
         const stats = await getStats({
             from,
             to,
@@ -150,6 +153,7 @@ export default function Metrics() {
 										right: 10,
 										top: 10,
 									}}
+									rippleColor="#283557"
 								/>
 							</View>
 

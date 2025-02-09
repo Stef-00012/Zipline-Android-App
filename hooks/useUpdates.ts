@@ -4,10 +4,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import semver from "semver";
 import * as db from "@/functions/database";
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+// import * as DocumentPicker from "expo-document-picker";
+// import * as FileSystem from "expo-file-system";
 import { ToastAndroid } from "react-native";
-import { ExternalPathString, useRouter } from "expo-router";
+import { type ExternalPathString, useRouter } from "expo-router";
 
 export function useAppUpdates() {
 	const router = useRouter();

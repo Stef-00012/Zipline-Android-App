@@ -24,7 +24,7 @@ export default function Home() {
 	useAuth();
 	useShareIntent();
 
-	useAppUpdates()
+	useAppUpdates();
 
 	const url = db.get("url") as DashURL | null;
 

@@ -37,6 +37,7 @@ export function useAppUpdates() {
 		  }
 	> {
 		setIsChecking(true);
+		setIsUpdateAvailable(false)
 
 		try {
 			const res = await axios.get(
@@ -73,7 +74,11 @@ export function useAppUpdates() {
 				const lastUpdateAlert = db.get("lastUpdateAlert");
 
 				// 1000 * 60 * 30 = 30 minutes
-				if (!lastUpdateAlert || new Date().getTime() - new Date(lastUpdateAlert).getTime() > 1000 * 60 * 30) {
+				if (
+					!lastUpdateAlert ||
+					new Date().getTime() - new Date(lastUpdateAlert).getTime() >
+						1000 * 60 * 30
+				) {
 					ToastAndroid.show(
 						"There's an Update Available, head to the user settings to download it",
 						ToastAndroid.LONG,

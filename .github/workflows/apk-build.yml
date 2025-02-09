@@ -10,6 +10,7 @@ on:
       - styles/**
       - types/**
       - assets/**
+      - app/**
       - metro.config.js
       - babel.config.js
       - app.config.ts

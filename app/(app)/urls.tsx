@@ -1,7 +1,7 @@
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
 import { getSettings } from "@/functions/zipline/settings";
-import { Row, Table } from "react-native-table-component";
+import { Row, Table } from "react-native-reanimated-table";
 import {
 	createURL,
 	type CreateURLParams,

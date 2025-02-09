@@ -5,7 +5,7 @@ import type {
 	DashURL,
 } from "@/types/zipline";
 import { getSettings } from "@/functions/zipline/settings";
-import { Row, Table } from "react-native-table-component";
+import { Row, Table } from "react-native-reanimated-table";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/admin/invites";
 import { useEffect, useState } from "react";

@@ -8,6 +8,12 @@ export const styles = StyleSheet.create({
 	settingsContainer: {
 		flex: 1,
 	},
+
+	multilineTextInput: {
+		height: 150,
+		textAlignVertical: "top",
+		fontFamily: "monospace",
+	},
 	scrollView: {
 		flex: 1,
 	},

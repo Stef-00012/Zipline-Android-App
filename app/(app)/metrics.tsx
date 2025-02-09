@@ -16,7 +16,7 @@ import type { DateType } from "react-native-ui-datepicker";
 import { LineChart, PieChart } from "react-native-gifted-charts";
 import ChartLegend from "@/components/ChartLegend";
 import { colorHash, convertToBytes } from "@/functions/util";
-import { Row, Table } from "react-native-table-component";
+import { Row, Table } from "react-native-reanimated-table";
 import { getSettings } from "@/functions/zipline/settings";
 
 export default function Metrics() {

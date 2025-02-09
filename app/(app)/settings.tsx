@@ -24,7 +24,7 @@ import {
 	deleteUserExport,
 	getUserExports,
 } from "@/functions/zipline/exports";
-import { Row, Table } from "react-native-table-component";
+import { Row, Table } from "react-native-reanimated-table";
 import * as db from "@/functions/database";
 import Popup from "@/components/Popup";
 import {
@@ -38,12 +38,27 @@ import { useRouter } from "expo-router";
 import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
+import { useAppUpdates } from "@/hooks/useUpdates";
 
 export default function UserSettings() {
 	const router = useRouter();
 
+	const {
+		checkForUpdates,
+		downloadUpdate,
+		// downloadProgress,
+		// downloadSize,
+		isChecking,
+		isDownloading,
+		isUpdateAvailable,
+	} = useAppUpdates();
+
 	useAuth();
 	useShareIntent();
+
+	const [updateAlertDisabled, setUpdateAlertDisabled] = useState<boolean>(
+		db.get("disableUpdateAlert") === "true",
+	);
 
 	const [user, setUser] = useState<APISelfUser | null>(null);
 	const [token, setToken] = useState<string | null>(null);
@@ -680,6 +695,7 @@ export default function UserSettings() {
 									disabled={!viewEnabled}
 									disableContext={!viewEnabled}
 									multiline
+									inputStyle={styles.multilineTextInput}
 									onValueChange={(content) => setViewContent(content)}
 									value={viewContent || ""}
 									placeholder="This is my file"
@@ -1076,6 +1092,67 @@ export default function UserSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>App Settings</Text>
 
+								<Switch
+									title="Disable Update Alert"
+									value={updateAlertDisabled}
+									onValueChange={() => {
+										db.set(
+											"disableUpdateAlert",
+											updateAlertDisabled ? "false" : "true",
+										);
+
+										setUpdateAlertDisabled((prev) => !prev);
+									}}
+								/>
+
+								{isUpdateAvailable ? (
+									<Button
+										onPress={async () => {
+											const message = await downloadUpdate();
+
+											// ToastAndroid.show(message, ToastAndroid.SHORT);
+										}}
+										color={isDownloading ? "#373d79" : "#323ea8"}
+										text={isDownloading ? "Downloading Update..." : "Download Update"}
+										// text={
+										// 	isDownloading
+										// 		? `Downloading Update... ${downloadProgress}%${
+										// 				downloadSize
+										// 					? ` (${convertToBytes(downloadSize, {
+										// 							unitSeparator: " ",
+										// 						})})`
+										// 					: ""
+										// 			}`
+										// 		: "Download Update"
+										// }
+										disabled={isDownloading}
+										margin={{
+											top: 10,
+										}}
+									/>
+								) : (
+									<Button
+										onPress={async () => {
+											const update = await checkForUpdates();
+
+											ToastAndroid.show(
+												`${update.available ? "" : "No "}Update Avaible${update.nextVersion ? `v${update.currentVersion} -> v${update.nextVersion}` : ""}`,
+												ToastAndroid.SHORT,
+											);
+										}}
+										color={isChecking ? "#373d79" : "#323ea8"}
+										text={
+											isChecking
+												? "Checking for Updates..."
+												: "Check for Updates"
+										}
+										disabled={isChecking}
+										margin={{
+											top: 10,
+										}}
+									/>
+								)}
+
 								<Button
 									onPress={async () => {
 										const permissions =
@@ -1121,6 +1198,31 @@ export default function UserSettings() {
 									}}
 									color="#323244"
 									text="Change File Download Folder"
+									margin={{
+										top: 10,
+									}}
+								/>
+
+								<Button
+									onPress={async () => {
+										const permissions =
+											await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+										if (!permissions.granted)
+											return ToastAndroid.show(
+												"The permission to the folder was not granted",
+												ToastAndroid.SHORT,
+											);
+
+										db.set("updateDownloadPath", permissions.directoryUri);
+
+										ToastAndroid.show(
+											"Successfully changed the folder",
+											ToastAndroid.SHORT,
+										);
+									}}
+									color="#323244"
+									text="Change Updates Download Folder"
 									margin={{
 										top: 10,
 									}}

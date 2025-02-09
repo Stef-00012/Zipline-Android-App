@@ -1,5 +1,5 @@
 import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
-import { Table, Row, Rows } from "react-native-table-component";
+import { Table, Row, Rows } from "react-native-reanimated-table";
 import { getUserStats } from "@/functions/zipline/stats";
 // import { useFocusEffect, useRouter } from "expo-router";
 import { Text, View, ScrollView } from "react-native";
@@ -18,10 +18,13 @@ import { useShareIntent } from "@/hooks/useShareIntent";
 import { useAuth } from "@/hooks/useAuth";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { convertToBytes } from "@/functions/util";
+import { useAppUpdates } from "@/hooks/useUpdates";
 
 export default function Home() {
 	useAuth();
 	useShareIntent();
+
+	useAppUpdates()
 
 	const url = db.get("url") as DashURL | null;
 

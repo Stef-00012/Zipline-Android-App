@@ -1,6 +1,6 @@
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIFolders, DashURL } from "@/types/zipline";
-import { Row, Table } from "react-native-table-component";
+import { Row, Table } from "react-native-reanimated-table";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/folders";
 import { useEffect, useState } from "react";

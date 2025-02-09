@@ -70,10 +70,4 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	runtimeVersion: {
 		policy: "appVersion",
 	},
-	updates: {
-		url: "https://u.expo.dev/ec797fe5-7e0f-4c3a-8aa9-8588d9f44fb1",
-		enabled: true,
-		checkAutomatically: "NEVER",
-		useEmbeddedUpdate: true,
-	},
 });

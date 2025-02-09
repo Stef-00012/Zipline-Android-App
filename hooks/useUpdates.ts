@@ -19,7 +19,7 @@ export function useAppUpdates() {
 	// const [downloadSize, setDownloadSize] = useState<number>(0);
 
 	useEffect(() => {
-		setIsUpdateAvailable(false)
+		setIsUpdateAvailable(false);
 
 		checkForUpdates();
 	}, []);
@@ -39,7 +39,7 @@ export function useAppUpdates() {
 		  }
 	> {
 		setIsChecking(true);
-		setIsUpdateAvailable(false)
+		setIsUpdateAvailable(false);
 
 		try {
 			const res = await axios.get(
@@ -74,12 +74,15 @@ export function useAppUpdates() {
 				setIsChecking(false);
 
 				const lastUpdateAlert = db.get("lastUpdateAlert");
+				const latestUpdateAlertVersion = db.get("lastUpdateAlertVersion");
 
 				// 1000 * 60 * 30 = 30 minutes
 				if (
 					!lastUpdateAlert ||
 					new Date().getTime() - new Date(lastUpdateAlert).getTime() >
-						1000 * 60 * 30
+						1000 * 60 * 30 ||
+					!latestUpdateAlertVersion ||
+					semver.gt(coercedVersion, latestUpdateAlertVersion)
 				) {
 					ToastAndroid.show(
 						"There's an Update Available, head to the user settings to download it",
@@ -87,6 +90,7 @@ export function useAppUpdates() {
 					);
 
 					db.set("lastUpdateAlert", new Date().toISOString());
+					db.set("lastUpdateAlertVersion", coercedVersion.raw);
 				}
 
 				return {

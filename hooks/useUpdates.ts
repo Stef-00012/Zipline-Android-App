@@ -19,6 +19,8 @@ export function useAppUpdates() {
 	// const [downloadSize, setDownloadSize] = useState<number>(0);
 
 	useEffect(() => {
+		setIsUpdateAvailable(false)
+
 		checkForUpdates();
 	}, []);
 

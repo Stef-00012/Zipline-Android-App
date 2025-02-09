@@ -7,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: `Zipline${IS_DEV ? " (Dev)" : IS_RELEASE ? " (Dev Release)" : ""}`,
 	slug: "zipline",
-	version: "1.0.1",
+	version: "1.0.2",
 	orientation: "portrait",
 	icon: "./assets/images/icon.png",
 	scheme: "zipline",

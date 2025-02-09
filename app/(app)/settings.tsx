@@ -39,6 +39,7 @@ import TextInput from "@/components/TextInput";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import { useAppUpdates } from "@/hooks/useUpdates";
+import { version as appVersion } from "@/package.json";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -1091,6 +1092,7 @@ export default function UserSettings() {
 							{/* App Settings */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>App Settings</Text>
+								<Text style={styles.subHeaderText}>App Version: {appVersion}</Text>
 
 								<Switch
 									title="Disable Update Alert"
@@ -1136,7 +1138,7 @@ export default function UserSettings() {
 											const update = await checkForUpdates();
 
 											ToastAndroid.show(
-												`${update.available ? "" : "No "}Update Avaible${update.nextVersion ? `v${update.currentVersion} -> v${update.nextVersion}` : ""}`,
+												`${update.available ? "" : "No "}Update Avaible${update.nextVersion ? ` (v${update.currentVersion} -> v${update.nextVersion})` : ""}`,
 												ToastAndroid.SHORT,
 											);
 										}}

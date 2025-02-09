@@ -25,7 +25,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Check commit message
+      - name: Check Commit Message
         id: check_commit_message
         run: |
           if echo "${{ github.event.head_commit.message }}" | grep -q '^\[nobuild\]'; then

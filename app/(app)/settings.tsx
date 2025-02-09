@@ -1110,7 +1110,7 @@ export default function UserSettings() {
 								{isUpdateAvailable ? (
 									<Button
 										onPress={async () => {
-											const message = await downloadUpdate();
+											await downloadUpdate();
 
 											// ToastAndroid.show(message, ToastAndroid.SHORT);
 										}}

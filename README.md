@@ -7,7 +7,7 @@ This is an android app made to manage your [Zipline V4](https://github.com/diced
 
 # Download
 
-To download the app, just go to the [latest release](https://github.com/Stef-00012/zipline-android-app/releases/latest) and download the `app-release.apk` file.\
+To download the app's APK, just go to the [latest release](https://github.com/Stef-00012/zipline-android-app/releases/latest) and download the `app-release.apk` file.\
 Or directly download it from [here](https://github.com/Stef-00012/zipline-android-app/releases/latest/download/app-release.apk).
 
 # Creating a development build

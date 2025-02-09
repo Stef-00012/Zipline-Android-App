@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > iOS is not supported
 
-This is an android app made to manage your [Zipline V4](https://github.com/diced/zipline/tree/v4) (selfhosted) server and also upload files or shorten URLs. You can also share files to the app to upload them.
+This is an android app made to manage your [Zipline V4](https://github.com/diced/zipline/tree/v4) (self-hosted) server and also upload files or shorten URLs. You can also share files to the app to upload them.
 
 # Download
 

@@ -103,13 +103,20 @@ export default function Metrics() {
 					open={datePickerOpen}
 					onClose={() => {
 						setDatePickerOpen(false);
-						console.log("close");
+						
+						if (!range.endDate) {
+						    setRange({
+						        startDate: add(range.startDate, {
+						            weeks: -1
+						        }),
+						        endDate: range.startDate
+						    })
+						}
 					}}
 					onChange={(params) => {
 						setAllTime(false);
 
 						setRange(params);
-						console.log("params", params);
 					}}
 					mode="range"
 					startDate={range.startDate}
@@ -125,6 +132,15 @@ export default function Metrics() {
 						onPress={() => {
 							setDatePickerOpen(false);
 							setAllTime(true);
+							
+							if (!range.endDate) {
+    						    setRange({
+    						        startDate: add(range.startDate, {
+    						            weeks: -1
+    						        }),
+    						        endDate: range.startDate
+    						    })
+    						}
 						}}
 					/>
 				</DatePicker>

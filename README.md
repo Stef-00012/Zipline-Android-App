@@ -35,4 +35,13 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [ ] App update checking + update button (maybe, idk)
+- [ ] Fix keyboard covering TOTP input on login screen
+- [ ] Optimize pages by re-rendering only the components that use certain variables and not other unrelated components (~~this is not Spotify~~)
+  - app/(app)/admin/invites.ts: remove useless settings fetch, move header out of the condition
+  - app/(app)/admin/settings.ts: re-render individual selects/inputs/switchs instead of the whole page, move header out of the condition
+  - app/(app)/admin/users.ts: remove useless settings fetch, move header out of the condition
+  - app/(app)/folders.ts: move header out of the condition
+  - app/(app)/metrics.ts: move header out of the condition
+  - app/(app)/settings.ts: re-render individual selects/inputs/switchs instead of the whole page, move header out of the condition
+  - app/(app)/urls.ts: move header out of the condition
+  - app/index.ts: move header out of the condition

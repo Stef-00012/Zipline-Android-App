@@ -1,4 +1,5 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
+import { version as appVersion } from "@/package.json"
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 
@@ -6,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: `Zipline${IS_DEV ? " (Dev)" : ""}`,
 	slug: "zipline",
-	version: "1.0.3",
+	version: appVersion,
 	orientation: "portrait",
 	icon: "./assets/images/icon.png",
 	scheme: "zipline",

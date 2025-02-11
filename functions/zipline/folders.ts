@@ -111,10 +111,15 @@ export async function createFolder(
 	}
 }
 
+interface FolderEditOptions {
+	public?: boolean,
+	name?: string;
+}
+
 // PATCH /api/user/folders/[id]
 export async function editFolder(
 	id: string,
-	isPublic: boolean,
+	options: FolderEditOptions = {}
 ): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
@@ -124,9 +129,7 @@ export async function editFolder(
 	try {
 		const res = await axios.patch(
 			`${url}/api/user/folders/${id}`,
-			{
-				isPublic,
-			},
+			options,
 			{
 				headers: {
 					Authorization: token,

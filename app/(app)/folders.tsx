@@ -35,6 +35,12 @@ export default function Folders() {
 
 	const [newFolderError, setNewFolderError] = useState<string | null>(null);
 
+	const [folderToEdit, setFolderToEdit] = useState<APIFolders[0] | null>(null)
+
+	const [editFolderName, setEditFolderName] = useState<string | undefined>(undefined)
+
+	const [editFolderError, setEditFolderError] = useState<string | null>(null)
+
 	const dashUrl = db.get("url") as DashURL | null;
 
 	useEffect(() => {
@@ -103,7 +109,72 @@ export default function Folders() {
 							}}
 							text="Create"
 							color="#323ea8"
+							margin={{
+								top: 5
+							}}
 						/>
+					</View>
+				</Popup>
+
+				<Popup
+					hidden={!folderToEdit}
+					onClose={() => {
+						setFolderToEdit(null);
+						setEditFolderName(undefined);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Edit Folder Name</Text>
+						{editFolderError && (
+							<Text style={styles.errorText}>{editFolderError}</Text>
+						)}
+
+						{folderToEdit && (
+							<View>
+								<TextInput
+									title="New Folder Name:"
+									onValueChange={(content) => {
+										setEditFolderName(content);
+									}}
+									value={editFolderName || ""}
+									placeholder="myFolder"
+								/>
+
+								<Button
+									onPress={async () => {
+										setEditFolderError(null);
+
+										if (!editFolderName || editFolderName.length <= 0)
+											return setEditFolderError("Please insert a folder name");
+
+										const folderId = folderToEdit.id
+
+										const editedFolder = await editFolder(
+											folderId,
+											{
+												name: editFolderName
+											}
+										);
+
+										if (typeof editedFolder === "string")
+											return setEditFolderError(editedFolder);
+
+										setEditFolderName(undefined)
+
+										const newFolders = await getFolders();
+
+										setFolders(typeof newFolders === "string" ? null : newFolders);
+
+										setFolderToEdit(null);
+									}}
+									text="Save"
+									color="#323ea8"
+									margin={{
+										top: 10
+									}}
+								/>
+							</View>
+						)}
 					</View>
 				</Popup>
 
@@ -135,7 +206,7 @@ export default function Folders() {
 										<Table>
 											<Row
 												data={["Name", "Public", "Created", "Actions"]}
-												widthArr={[80, 50, 130, 150]}
+												widthArr={[80, 50, 130, 190]}
 												style={styles.tableHeader}
 												textStyle={{
 													...styles.rowText,
@@ -228,12 +299,20 @@ export default function Folders() {
 															/>
 
 															<Button
+																icon={folder.public ? "lock-open" : "lock"}
+																color={folder.public ? "#323ea8" : "#343a40"}
+																iconSize={20}
+																width={32}
+																height={32}
+																padding={6}
 																onPress={async () => {
 																	const folderId = folder.id;
 
 																	const success = await editFolder(
 																		folderId,
-																		!folder.public,
+																		{
+																			public: !folder.public,
+																		}
 																	);
 
 																	if (typeof success === "string")
@@ -256,8 +335,15 @@ export default function Folders() {
 
 																	setFolders(newFolders);
 																}}
-																color={folder.public ? "#323ea8" : "#343a40"}
-																icon={folder.public ? "lock-open" : "lock"}
+															/>
+
+															<Button
+																icon="edit"
+																color="#323ea8"
+																onPress={async () => {
+																	setFolderToEdit(folder)
+																	setEditFolderName(folder.name)
+																}}
 																iconSize={20}
 																width={32}
 																height={32}
@@ -315,7 +401,7 @@ export default function Folders() {
 														<Row
 															key={folder.id}
 															data={[name, isPublic, created, actions]}
-															widthArr={[80, 50, 130, 150]}
+															widthArr={[80, 50, 130, 190]}
 															style={rowStyle}
 															textStyle={styles.rowText}
 														/>

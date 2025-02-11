@@ -1,8 +1,8 @@
-import { styles } from "@/styles/components/select";
+import { Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState, useEffect, type ReactNode } from "react";
-import { Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
-import CheckBox from "./CheckBox";
+import { styles } from "@/styles/components/select";
+import CheckBox from "@/components/CheckBox";
 
 export interface SelectProps {
 	data: Array<{

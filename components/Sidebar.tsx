@@ -1,3 +1,11 @@
+import { type SidebarOption, sidebarOptions } from "@/constants/sidebar";
+import { type RelativePathString, usePathname } from "expo-router";
+import { getSettings } from "@/functions/zipline/settings";
+import { Animated, View, Dimensions } from "react-native";
+import { getCurrentUser } from "@/functions/zipline/user";
+import { styles } from "@/styles/components/sidebar";
+import Button from "@/components/Button";
+import { useRouter } from "expo-router";
 import React, {
 	type Dispatch,
 	type SetStateAction,
@@ -5,14 +13,6 @@ import React, {
 	useRef,
 	useState,
 } from "react";
-import { Animated, View, Dimensions } from "react-native";
-import { styles } from "@/styles/components/sidebar";
-import { type RelativePathString, usePathname } from "expo-router";
-import { getSettings } from "@/functions/zipline/settings";
-import { getCurrentUser } from "@/functions/zipline/user";
-import { type SidebarOption, sidebarOptions } from "@/constants/sidebar";
-import { useRouter } from "expo-router";
-import Button from "./Button";
 
 interface Props {
 	open: boolean;

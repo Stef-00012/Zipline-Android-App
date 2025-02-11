@@ -1,31 +1,26 @@
-import { useAuth } from "@/hooks/useAuth";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import type { APIExports, APISelfUser, DashURL } from "@/types/zipline";
-import { useState, useEffect } from "react";
 import { View, Text, Pressable, ToastAndroid, ScrollView } from "react-native";
-import { styles } from "@/styles/settings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import {
-	editCurrentUser,
-	type EditUserOptions,
-	getCurrentUser,
-	getCurrentUserAvatar,
-} from "@/functions/zipline/user";
-import * as Clipboard from "expo-clipboard";
-import { getTokenWithToken } from "@/functions/zipline/auth";
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import type { APIExports, APISelfUser, DashURL } from "@/types/zipline";
 import { convertToBytes, getFileDataURI } from "@/functions/util";
-import UserAvatar from "@/components/UserAvatar";
-import Select from "@/components/Select";
-import { alignments } from "@/constants/settings";
-import {
-	createUserExport,
-	deleteUserExport,
-	getUserExports,
-} from "@/functions/zipline/exports";
+import { getTokenWithToken } from "@/functions/zipline/auth";
 import { Row, Table } from "react-native-reanimated-table";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { version as appVersion } from "@/package.json";
+import * as DocumentPicker from "expo-document-picker";
+import { useAppUpdates } from "@/hooks/useUpdates";
+import { alignments } from "@/constants/settings";
+import UserAvatar from "@/components/UserAvatar";
+import TextInput from "@/components/TextInput";
+import * as FileSystem from "expo-file-system";
+import { useState, useEffect } from "react";
+import * as Clipboard from "expo-clipboard";
+import { styles } from "@/styles/settings";
 import * as db from "@/functions/database";
+import { useAuth } from "@/hooks/useAuth";
+import Switch from "@/components/Switch";
+import Button from "@/components/Button";
+import Select from "@/components/Select";
+import { useRouter } from "expo-router";
 import Popup from "@/components/Popup";
 import {
 	clearTempFiles,
@@ -34,12 +29,17 @@ import {
 	getZeroByteFiles,
 	requeryFileSize,
 } from "@/functions/zipline/serverActions";
-import { useRouter } from "expo-router";
-import TextInput from "@/components/TextInput";
-import Switch from "@/components/Switch";
-import Button from "@/components/Button";
-import { useAppUpdates } from "@/hooks/useUpdates";
-import { version as appVersion } from "@/package.json";
+import {
+	createUserExport,
+	deleteUserExport,
+	getUserExports,
+} from "@/functions/zipline/exports";
+import {
+	editCurrentUser,
+	type EditUserOptions,
+	getCurrentUser,
+	getCurrentUserAvatar,
+} from "@/functions/zipline/user";
 
 export default function UserSettings() {
 	const router = useRouter();

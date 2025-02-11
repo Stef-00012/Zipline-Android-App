@@ -1,6 +1,6 @@
-import { getRippleColor } from "@/functions/util";
 import { styles } from "@/styles/components/button";
 import { MaterialIcons } from "@expo/vector-icons";
+import { getRippleColor } from "@/functions/util";
 import {
 	type AnimatableNumericValue,
 	type ColorValue,

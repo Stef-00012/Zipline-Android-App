@@ -1,13 +1,13 @@
-import type { Mimetypes } from "@/types/mimetypes";
-import { guessExtension } from "@/functions/util";
 import { Image as NativeImage, Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
-import { useEffect, useState } from "react";
+import { type ExternalPathString, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { styles } from "@/styles/components/fileDisplay";
 import type { APIFile, DashURL } from "@/types/zipline";
+import type { Mimetypes } from "@/types/mimetypes";
+import { guessExtension } from "@/functions/util";
+import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
-import { type ExternalPathString, useRouter } from "expo-router";
+import { Image } from "expo-image";
 
 interface Props {
 	uri: string;

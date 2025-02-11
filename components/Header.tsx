@@ -1,14 +1,14 @@
 import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
-import { type PropsWithChildren, useEffect, useRef, useState } from "react";
+import { type PropsWithChildren, useEffect, useState } from "react";
 import { Stack, IconButton } from "@react-native-material/core";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { View, Pressable } from "react-native";
+import { usePathname, useRouter } from "expo-router";
 import type { APISelfUser } from "@/types/zipline";
 import { styles } from "@/styles/components/header";
-import type React from "react";
+import UserAvatar from "@/components/UserAvatar";
+import { View, Pressable } from "react-native";
 import Sidebar from "@/components/Sidebar";
-import { usePathname, useRouter } from "expo-router";
-import UserAvatar from "./UserAvatar";
+import type React from "react";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter();

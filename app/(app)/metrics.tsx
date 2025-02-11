@@ -1,23 +1,24 @@
+import { Dimensions, ScrollView, Text, View } from "react-native";
+import { LineChart, PieChart } from "react-native-gifted-charts";
+import { colorHash, convertToBytes } from "@/functions/util";
+import type { DateType } from "react-native-ui-datepicker";
+import { Row, Table } from "react-native-reanimated-table";
+import { getSettings } from "@/functions/zipline/settings";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import ChartLegend from "@/components/ChartLegend";
+import DatePicker from "@/components/DatePicker";
+import type { APIStats } from "@/types/zipline";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { styles } from "@/styles/metrics";
 import Button from "@/components/Button";
+import { add } from "date-fns";
 import {
 	filterStats,
 	getStats,
 	type StatsProps,
 } from "@/functions/zipline/stats";
-import { useAuth } from "@/hooks/useAuth";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { styles } from "@/styles/metrics";
-import type { APIStats } from "@/types/zipline";
-import { useEffect, useState } from "react";
-import { Dimensions, ScrollView, Text, View } from "react-native";
-import DatePicker from "@/components/DatePicker";
-import { add } from "date-fns";
-import type { DateType } from "react-native-ui-datepicker";
-import { LineChart, PieChart } from "react-native-gifted-charts";
-import ChartLegend from "@/components/ChartLegend";
-import { colorHash, convertToBytes } from "@/functions/util";
-import { Row, Table } from "react-native-reanimated-table";
-import { getSettings } from "@/functions/zipline/settings";
+import React from "react";
 
 export default function Metrics() {
 	useAuth();
@@ -103,14 +104,14 @@ export default function Metrics() {
 					open={datePickerOpen}
 					onClose={() => {
 						setDatePickerOpen(false);
-						
-						if (!range.endDate) {
-						    setRange({
-						        startDate: add(range.startDate, {
-						            weeks: -1
-						        }),
-						        endDate: range.startDate
-						    })
+
+						if (!range.endDate && range.startDate) {
+							setRange({
+								startDate: add(range.startDate as string, {
+									weeks: -1,
+								}),
+								endDate: range.startDate,
+							});
 						}
 					}}
 					onChange={(params) => {
@@ -132,15 +133,15 @@ export default function Metrics() {
 						onPress={() => {
 							setDatePickerOpen(false);
 							setAllTime(true);
-							
-							if (!range.endDate) {
-    						    setRange({
-    						        startDate: add(range.startDate, {
-    						            weeks: -1
-    						        }),
-    						        endDate: range.startDate
-    						    })
-    						}
+
+							if (!range.endDate && range.startDate) {
+								setRange({
+									startDate: add(range.startDate as string, {
+										weeks: -1,
+									}),
+									endDate: range.startDate,
+								});
+							}
 						}}
 					/>
 				</DatePicker>

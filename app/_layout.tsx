@@ -3,11 +3,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ShareIntentProvider } from "expo-share-intent";
 import NetInfo from "@react-native-community/netinfo";
 import { Slot, useRouter } from "expo-router";
+import { styles } from "@/styles/noInternet";
 import { StatusBar } from "expo-status-bar";
-import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { styles } from "@/styles/noInternet";
+import Header from "@/components/Header";
 
 export default function Layout() {
 	const router = useRouter();

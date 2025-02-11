@@ -1,28 +1,28 @@
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import type {
-	APIInvites,
-	APISettings,
-	DashURL,
-} from "@/types/zipline";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-reanimated-table";
+import { useShareIntent } from "@/hooks/useShareIntent";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/admin/invites";
+import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
+import { dates } from "@/constants/invites";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
+import { useAuth } from "@/hooks/useAuth";
+import Select from "@/components/Select";
+import Button from "@/components/Button";
+import Popup from "@/components/Popup";
 import {
 	createInvite,
 	deleteInvite,
 	getInvites,
 } from "@/functions/zipline/invites";
-import Popup from "@/components/Popup";
-import Select from "@/components/Select";
-import { dates } from "@/constants/invites";
-import { useAuth } from "@/hooks/useAuth";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import TextInput from "@/components/TextInput";
-import Button from "@/components/Button";
+import type {
+	APIInvites,
+	APISettings,
+	DashURL,
+} from "@/types/zipline";
 
 export default function Invites() {
 	useAuth("ADMIN");

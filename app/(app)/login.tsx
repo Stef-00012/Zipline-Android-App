@@ -37,8 +37,8 @@ export default function Login() {
 	useLoginAuth();
 
 	return (
-		<View style={styles.loginContainer}>
-			<KeyboardAvoidingView behavior="height" style={styles.loginBox}>
+		<KeyboardAvoidingView behavior="height" style={styles.loginContainer}>
+			<View style={styles.loginBox}>
 				{error && <Text style={styles.errorText}>{error}</Text>}
 
 				{tokenLogin ? (
@@ -160,7 +160,7 @@ export default function Login() {
 						top: 5,
 					}}
 				/>
-			</KeyboardAvoidingView>
-		</View>
+			</View>
+		</KeyboardAvoidingView>
 	);
 }

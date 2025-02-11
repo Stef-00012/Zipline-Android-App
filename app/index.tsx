@@ -38,16 +38,16 @@ export default function Home() {
 		handleAuth();
 	}, []);
 
-	// const router = useRouter();
+// 	const router = useRouter();
 
-	// useFocusEffect(() => {
-	// 	if (__DEV__) {
-	// 		// db.del("url")
-	// 		// db.del("token")
+// 	useFocusEffect(() => {
+// 		if (__DEV__) {
+// // 			db.del("url")
+// // 			db.del("token")
 
-	// 		// router.replace("/metrics");
-	// 	}
-	// });
+// 			// router.replace("/metrics");
+// 		}
+// 	});
 
 	async function handleAuth() {
 		const user = await getCurrentUser();

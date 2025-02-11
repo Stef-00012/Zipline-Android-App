@@ -1,11 +1,10 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
 
 const IS_DEV = process.env.APP_VARIANT === "development";
-const IS_RELEASE = process.env.APP_VARIANT === "devrelease";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
-	name: `Zipline${IS_DEV ? " (Dev)" : IS_RELEASE ? " (Dev Release)" : ""}`,
+	name: `Zipline${IS_DEV ? " (Dev)" : ""}`,
 	slug: "zipline",
 	version: "1.0.2",
 	orientation: "portrait",
@@ -15,7 +14,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	userInterfaceStyle: "automatic",
 	platforms: ["android"],
 	ios: {
-		bundleIdentifier: `com.stefdp.zipline${IS_DEV ? ".dev" : IS_RELEASE ? ".devrelease" : ""}`
+		bundleIdentifier: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
 	},
 	android: {
 		adaptiveIcon: {
@@ -23,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			monochromeImage: "./assets/images/monochromatic-adaptive-icon.png",
 			backgroundColor: "#121317",
 		},
-		package: `com.stefdp.zipline${IS_DEV ? ".dev" : IS_RELEASE ? ".devrelease" : ""}`
+		package: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
 	},
 	androidStatusBar: {
 		barStyle: "light-content",

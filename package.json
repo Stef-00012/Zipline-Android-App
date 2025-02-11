@@ -5,16 +5,11 @@
   "scripts": {
     "start": "expo start",
     "start:dev": "APP_VARIANT=development EDGE_PATH=/home/stef/.local/bin/google-chrome expo start --dev-client",
-    "start:release": "APP_VARIANT=devrelease EDGE_PATH=/home/stef/.local/bin/google-chrome expo start --dev-client",
-    "prebuild": "expo prebuild --no-install --clean",
-    "prebuild:dev": "APP_VARIANT=development expo prebuild --no-install --clean",
-    "prebuild:release": "APP_VARIANT=devrelease expo prebuild --no-install --clean",
+    "prebuild": "EXPO_NO_GIT_STATUS=1 expo prebuild --no-install --clean --platform android",
+    "prebuild:dev": "EXPO_NO_GIT_STATUS=1 APP_VARIANT=development expo prebuild --no-install --clean --platform android",
     "run:android": "expo run:android",
-    "run:android:release": "expo run:android --variant release",
     "test": "jest --watchAll",
-    "lint": "expo lint",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "lint": "expo lint"
   },
   "jest": {
     "preset": "jest-expo"

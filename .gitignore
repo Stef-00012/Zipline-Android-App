@@ -35,7 +35,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# expo prebuild
 /android
 /ios
+
+# misc
 biome.json
 package-lock.json

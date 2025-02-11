@@ -1,13 +1,13 @@
+import { type ExternalPathString, useRouter } from "expo-router";
+// import * as DocumentPicker from "expo-document-picker";
 import { repoName, username } from "@/constants/updates";
 import { version as appVersion } from "@/package.json";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import semver from "semver";
-import * as db from "@/functions/database";
-// import * as DocumentPicker from "expo-document-picker";
 // import * as FileSystem from "expo-file-system";
+import { useEffect, useState } from "react";
 import { ToastAndroid } from "react-native";
-import { type ExternalPathString, useRouter } from "expo-router";
+import * as db from "@/functions/database";
+import semver from "semver";
+import axios from "axios";
 
 export function useAppUpdates() {
 	const router = useRouter();

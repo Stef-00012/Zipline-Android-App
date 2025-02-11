@@ -1,6 +1,6 @@
 import type { APIUserStats, APIStats } from "@/types/zipline";
-import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 
 export interface StatsProps {
 	from?: string;

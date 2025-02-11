@@ -1,6 +1,6 @@
 import { isAuthenticated } from "@/functions/zipline/auth";
-import type { APIUser } from "@/types/zipline";
 import { useFocusEffect, useRouter } from "expo-router";
+import type { APIUser } from "@/types/zipline";
 import { roles } from "@/constants/auth";
 
 export const useAuth = (minimumRole: APIUser["role"] = "USER") => {

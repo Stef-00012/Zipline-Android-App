@@ -1,5 +1,4 @@
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-reanimated-table";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { timeDifference } from "@/functions/util";
@@ -20,7 +19,6 @@ import {
 } from "@/functions/zipline/invites";
 import type {
 	APIInvites,
-	APISettings,
 	DashURL,
 } from "@/types/zipline";
 
@@ -29,7 +27,6 @@ export default function Invites() {
 	useShareIntent();
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);
-	const [settings, setSettings] = useState<APISettings | null>(null);
 
 	const [createNewInvite, setCreateNewInvite] = useState<boolean>(false);
 
@@ -43,10 +40,8 @@ export default function Invites() {
 	useEffect(() => {
 		(async () => {
 			const invites = await getInvites();
-			const settings = await getSettings();
 
 			setInvites(typeof invites === "string" ? null : invites);
-			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 
@@ -136,28 +131,30 @@ export default function Invites() {
 					</View>
 				</Popup>
 
-				{invites && settings && dashUrl ? (
-					<View style={{ flex: 1 }}>
-						<View style={styles.header}>
-							<Text style={styles.headerText}>Invites</Text>
-							<View style={styles.headerButtons}>
-								<Button
-									onPress={() => {
-										setCreateNewInvite(true);
-									}}
-									icon="add"
-									color="transparent"
-									iconColor="#2d3f70"
-									borderColor="#222c47"
-									borderWidth={2}
-									iconSize={30}
-									padding={4}
-									rippleColor="#283557"
-								/>
-							</View>
-						</View>
+				<View style={styles.header}>
+					<Text style={styles.headerText}>Invites</Text>
+					<View style={styles.headerButtons}>
+						<Button
+							onPress={() => {
+								setCreateNewInvite(true);
+							}}
+							icon="add"
+							color="transparent"
+							// iconColor="#2d3f70"
+							iconColor={(invites && dashUrl) ? "#2d3f70" : "#2d3f7055"}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							disabled={!invites || !dashUrl}
+						/>
+					</View>
+				</View>
 
-						<View style={{ ...styles.invitesContainer, flex: 1 }}>
+				<View style={{ flex: 1 }}>
+					<View style={{ ...styles.invitesContainer, flex: 1 }}>
+						{invites && dashUrl ? (
 							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 								<View>
 									<Table>
@@ -337,13 +334,13 @@ export default function Invites() {
 									</ScrollView>
 								</View>
 							</ScrollView>
-						</View>
+						) : (
+							<View style={styles.loadingContainer}>
+								<Text style={styles.loadingText}>Loading...</Text>
+							</View>
+						)}
 					</View>
-				) : (
-					<View style={styles.loadingContainer}>
-						<Text style={styles.loadingText}>Loading...</Text>
-					</View>
-				)}
+				</View>
 			</View>
 		</View>
 	);

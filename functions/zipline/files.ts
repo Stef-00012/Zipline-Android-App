@@ -1,3 +1,6 @@
+import * as FileSystem from "expo-file-system";
+import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 import type {
 	APIFile,
 	APIFiles,
@@ -5,9 +8,6 @@ import type {
 	APITag,
 	APIUploadFile,
 } from "@/types/zipline";
-import * as FileSystem from "expo-file-system";
-import * as db from "@/functions/database";
-import axios, { type AxiosError } from "axios";
 
 export interface GetFilesOptions {
 	id?: string;

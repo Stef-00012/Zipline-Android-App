@@ -468,7 +468,10 @@ export default function Files() {
 								}}
 								icon={favorites ? "star" : "star-border"}
 								color="transparent"
-								iconColor={favorites ? "#f1d01f" : "#2d3f70"}
+								iconColor={favorites
+									? files ? "#f1d01f" : "#f1d01f55"
+									: files ? "#2d3f70" : "#2d3f7055"
+								}
 								borderColor="#222c47"
 								borderWidth={2}
 								iconSize={30}
@@ -489,7 +492,7 @@ export default function Files() {
 										}}
 										icon="sell"
 										color="transparent"
-										iconColor="#2d3f70"
+										iconColor={files ? "#2d3f70" : "#2d3f7055"}
 										borderColor="#222c47"
 										borderWidth={2}
 										iconSize={30}
@@ -508,7 +511,7 @@ export default function Files() {
 										}}
 										icon="upload-file"
 										color="transparent"
-										iconColor="#2d3f70"
+										iconColor={files ? "#2d3f70" : "#2d3f7055"}
 										borderColor="#222c47"
 										borderWidth={2}
 										iconSize={30}

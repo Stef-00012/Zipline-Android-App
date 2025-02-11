@@ -142,11 +142,11 @@ export function toRgba(color: string): RGBA {
 	};
 }
 
-function gammaCorrect(c: number) {
+function gammaCorrect(c: number): number {
 	return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }
 
-function getLightnessFromOklch(oklchColor: string) {
+function getLightnessFromOklch(oklchColor: string): number | null {
 	const match = oklchColor.match(/oklch\((.*?)%\s/);
 	return match ? Number.parseFloat(match[1]) : null;
 }
@@ -169,7 +169,7 @@ export function luminance(color: string): number {
 	return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
 }
 
-export function isLightColor(color: string, luminanceThreshold = 0.179) {
+export function isLightColor(color: string, luminanceThreshold = 0.179): boolean {
 	if (color.startsWith("var(")) {
 		return false;
 	}
@@ -177,7 +177,7 @@ export function isLightColor(color: string, luminanceThreshold = 0.179) {
 	return luminance(color) > luminanceThreshold;
 }
 
-export function rgbaToHex(r: number, g: number, b: number, a = 1) {
+export function rgbaToHex(r: number, g: number, b: number, a = 1): string {
 	r = Math.min(255, Math.max(0, r));
 	g = Math.min(255, Math.max(0, g));
 	b = Math.min(255, Math.max(0, b));

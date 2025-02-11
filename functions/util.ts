@@ -1,10 +1,10 @@
+import { isLightColor, rgbaToHex, toRgba } from "@/functions/color";
 import mimetypesJSON from "@/assets/mimetypes.json";
 import type { Mimetypes } from "@/types/mimetypes";
-import bytes from "bytes";
-import ms, { type FormatOptions } from "enhanced-ms";
-import * as FileSystem from "expo-file-system";
-import { isLightColor, rgbaToHex, toRgba } from "./color";
 import { namedColors } from "@/constants/colors";
+import * as FileSystem from "expo-file-system";
+import ms from "enhanced-ms";
+import bytes from "bytes";
 
 const mimetypes = mimetypesJSON as Mimetypes;
 
@@ -117,7 +117,8 @@ export function convertToBytes(
 
 export function convertToTime(
 	value: string | number,
-	options?: FormatOptions,
+	// biome-ignore lint/suspicious/noExplicitAny: enhanced-ms does not export the FormatOptions interface
+	options?: any,
 ): string | null {
 	if (typeof value === "number") return ms(value);
 

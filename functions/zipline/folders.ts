@@ -1,6 +1,6 @@
 import type { APIFoldersNoIncl, APIFolders, APIFolder } from "@/types/zipline";
-import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 
 // GET /api/user/folders
 export async function getFolders<T extends boolean | undefined = undefined>(

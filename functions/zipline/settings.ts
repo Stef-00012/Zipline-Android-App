@@ -1,7 +1,7 @@
-import type { APISettings } from "@/types/zipline";
-import * as db from "@/functions/database";
-import axios, { type AxiosError } from "axios";
 import { settingNames } from "@/constants/adminSettings";
+import type { APISettings } from "@/types/zipline";
+import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 
 // GET /api/server/settings
 export async function getSettings(): Promise<APISettings | string> {

@@ -28,16 +28,16 @@ export const fileQuotaTypes: SelectProps["data"] = [
 ];
 
 export const templateUser: APIUser = {
-	avatar: null,
 	createdAt: new Date().toISOString(),
-	id: "1234567890",
-	oauthProviders: [],
-	passkeys: [],
-	quota: null,
-	role: "USER",
-	sessions: [],
-	totpSecret: null,
 	updatedAt: new Date().toISOString(),
 	username: "Placeholder",
+	oauthProviders: [],
+	totpSecret: null,
+	id: "1234567890",
+	passkeys: [],
+	sessions: [],
+	avatar: null,
+	role: "USER",
+	quota: null,
 	view: {},
 };

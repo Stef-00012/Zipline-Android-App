@@ -2,23 +2,23 @@ import type { IconProps } from "@react-native-material/core";
 import type MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 interface SidebarOptionButton {
+	icon: keyof typeof MaterialIcons.glyphMap;
+	invitesRoute: boolean;
+	adminOnly: boolean;
+	type: "button";
 	route: string;
 	name: string;
-	icon: keyof typeof MaterialIcons.glyphMap;
-	adminOnly: boolean;
-	invitesRoute: boolean;
-	type: "button";
 	subMenus: [];
 }
 
 interface SidebarOptionSelect {
-	route: null;
-	name: string;
 	icon: keyof typeof MaterialIcons.glyphMap;
-	adminOnly: boolean;
-	invitesRoute: boolean;
-	type: "select";
 	subMenus: Array<SidebarOption>;
+	invitesRoute: boolean;
+	adminOnly: boolean;
+	type: "select";
+	name: string;
+	route: null;
 }
 
 export type SidebarOption = SidebarOptionButton | SidebarOptionSelect;

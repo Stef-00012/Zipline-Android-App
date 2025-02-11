@@ -2,7 +2,6 @@ import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { getFileDataURI, timeDifference } from "@/functions/util";
 import { fileQuotaTypes, userRoles } from "@/constants/users";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-reanimated-table";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
@@ -25,7 +24,6 @@ import {
 	getUsers,
 } from "@/functions/zipline/users";
 import type {
-	APISettings,
 	APIUser,
 	APIUserQuota,
 	APIUsersNoIncl,
@@ -37,7 +35,6 @@ export default function Users() {
 	useShareIntent();
 
 	const [users, setUsers] = useState<APIUsersNoIncl | null>(null);
-	const [settings, setSettings] = useState<APISettings | null>(null);
 
 	const [userToEdit, setUserToEdit] = useState<APIUsersNoIncl[0] | null>(null);
 
@@ -88,10 +85,8 @@ export default function Users() {
 	useEffect(() => {
 		(async () => {
 			const users = await getUsers(true);
-			const settings = await getSettings();
 
 			setUsers(typeof users === "string" ? null : users);
-			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
 
@@ -651,190 +646,191 @@ export default function Users() {
 					</View>
 				</Popup>
 
-				{users && settings && dashUrl ? (
+				<View style={styles.header}>
+					<Text style={styles.headerText}>Users</Text>
+					<View style={styles.headerButtons}>
+						<Button
+							onPress={() => {
+								setCreateNewUser(true);
+							}}
+							icon="person-add"
+							color="transparent"
+							iconColor={(users && dashUrl) ? "#2d3f70" : "#2d3f7055"}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							disabled={!users || !dashUrl}
+						/>
+					</View>
+				</View>
+
 					<View style={{ flex: 1 }}>
-						<View style={styles.header}>
-							<Text style={styles.headerText}>Users</Text>
-							<View style={styles.headerButtons}>
-								<Button
-									onPress={() => {
-										setCreateNewUser(true);
-									}}
-									icon="person-add"
-									color="transparent"
-									iconColor="#2d3f70"
-									borderColor="#222c47"
-									borderWidth={2}
-									iconSize={30}
-									padding={4}
-									rippleColor="#283557"
-								/>
-							</View>
-						</View>
-
 						<View style={{ ...styles.usersContainer, flex: 1 }}>
-							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-								<View>
-									<Table>
-										<Row
-											data={[
-												"Avatar",
-												"Username",
-												"Role",
-												"Created",
-												"Last Updated",
-												"Actions",
-											]}
-											widthArr={[80, 100, 100, 130, 130, 130]}
-											style={styles.tableHeader}
-											textStyle={{
-												...styles.rowText,
-												...styles.headerRow,
-											}}
-										/>
-									</Table>
-									<ScrollView
-										showsVerticalScrollIndicator={false}
-										style={styles.tableVerticalScroll}
-									>
+							{users && dashUrl ? (
+								<ScrollView showsHorizontalScrollIndicator={false} horizontal>
+									<View>
 										<Table>
-											{users.map((user, index) => {
-												const avatar = user.avatar ? (
-													<Image
-														source={{ uri: user.avatar }}
-														style={styles.userAvatar}
-														alt={`${user.username}'s avatar`}
-													/>
-												) : (
-													<View style={styles.userAvatar}>
-														<MaterialIcons
-															name="person"
-															size={30}
-															color={"white"}
-														/>
-													</View>
-												);
-
-												const username = (
-													<Text key={user.id} style={styles.rowText}>
-														{user.username}
-													</Text>
-												);
-
-												const role = (
-													<Text key={user.id} style={styles.rowText}>
-														{user.role.charAt(0).toUpperCase() +
-															user.role.slice(1).toLowerCase()}
-													</Text>
-												);
-
-												const created = (
-													<Text style={styles.rowText}>
-														{timeDifference(
-															new Date(),
-															new Date(user.createdAt),
-														)}
-													</Text>
-												);
-
-												const lastUpdated = (
-													<Text style={styles.rowText}>
-														{timeDifference(
-															new Date(),
-															new Date(user.updatedAt),
-														)}
-													</Text>
-												);
-
-												const actions = (
-													<View style={styles.actionsContainer}>
-														<Button
-															icon="folder-open"
-															color="#323ea8"
-															onPress={async () => {
-																const userId = user.id;
-
-																router.replace(`/files?id=${userId}`);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
-
-														<Button
-															icon="edit"
-															color="#323ea8"
-															onPress={() => {
-																const userId = user.id;
-
-																setUserToEdit(
-																	users.find((usr) => usr.id === userId) ||
-																		null,
-																);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
-
-														<Button
-															icon="delete"
-															color="#CF4238"
-															onPress={async () => {
-																setUserToDelete(user);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
-													</View>
-												);
-
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === users.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
-
-												return (
-													<Row
-														key={user.id}
-														data={[
-															avatar,
-															username,
-															role,
-															created,
-															lastUpdated,
-															actions,
-														]}
-														widthArr={[80, 100, 100, 130, 130, 130]}
-														style={rowStyle}
-														textStyle={styles.rowText}
-													/>
-												);
-											})}
+											<Row
+												data={[
+													"Avatar",
+													"Username",
+													"Role",
+													"Created",
+													"Last Updated",
+													"Actions",
+												]}
+												widthArr={[80, 100, 100, 130, 130, 130]}
+												style={styles.tableHeader}
+												textStyle={{
+													...styles.rowText,
+													...styles.headerRow,
+												}}
+											/>
 										</Table>
-									</ScrollView>
+										<ScrollView
+											showsVerticalScrollIndicator={false}
+											style={styles.tableVerticalScroll}
+										>
+											<Table>
+												{users.map((user, index) => {
+													const avatar = user.avatar ? (
+														<Image
+															source={{ uri: user.avatar }}
+															style={styles.userAvatar}
+															alt={`${user.username}'s avatar`}
+														/>
+													) : (
+														<View style={styles.userAvatar}>
+															<MaterialIcons
+																name="person"
+																size={30}
+																color={"white"}
+															/>
+														</View>
+													);
+
+													const username = (
+														<Text key={user.id} style={styles.rowText}>
+															{user.username}
+														</Text>
+													);
+
+													const role = (
+														<Text key={user.id} style={styles.rowText}>
+															{user.role.charAt(0).toUpperCase() +
+																user.role.slice(1).toLowerCase()}
+														</Text>
+													);
+
+													const created = (
+														<Text style={styles.rowText}>
+															{timeDifference(
+																new Date(),
+																new Date(user.createdAt),
+															)}
+														</Text>
+													);
+
+													const lastUpdated = (
+														<Text style={styles.rowText}>
+															{timeDifference(
+																new Date(),
+																new Date(user.updatedAt),
+															)}
+														</Text>
+													);
+
+													const actions = (
+														<View style={styles.actionsContainer}>
+															<Button
+																icon="folder-open"
+																color="#323ea8"
+																onPress={async () => {
+																	const userId = user.id;
+
+																	router.replace(`/files?id=${userId}`);
+																}}
+																iconSize={20}
+																width={32}
+																height={32}
+																padding={6}
+															/>
+
+															<Button
+																icon="edit"
+																color="#323ea8"
+																onPress={() => {
+																	const userId = user.id;
+
+																	setUserToEdit(
+																		users.find((usr) => usr.id === userId) ||
+																			null,
+																	);
+																}}
+																iconSize={20}
+																width={32}
+																height={32}
+																padding={6}
+															/>
+
+															<Button
+																icon="delete"
+																color="#CF4238"
+																onPress={async () => {
+																	setUserToDelete(user);
+																}}
+																iconSize={20}
+																width={32}
+																height={32}
+																padding={6}
+															/>
+														</View>
+													);
+
+													let rowStyle = styles.row;
+
+													if (index === 0)
+														rowStyle = {
+															...styles.row,
+															...styles.firstRow,
+														};
+
+													if (index === users.length - 1)
+														rowStyle = {
+															...styles.row,
+															...styles.lastRow,
+														};
+
+													return (
+														<Row
+															key={user.id}
+															data={[
+																avatar,
+																username,
+																role,
+																created,
+																lastUpdated,
+																actions,
+															]}
+															widthArr={[80, 100, 100, 130, 130, 130]}
+															style={rowStyle}
+															textStyle={styles.rowText}
+														/>
+													);
+												})}
+											</Table>
+										</ScrollView>
+									</View>
+								</ScrollView>
+							) : (
+								<View style={styles.loadingContainer}>
+									<Text style={styles.loadingText}>Loading...</Text>
 								</View>
-							</ScrollView>
+							)}
 						</View>
 					</View>
-				) : (
-					<View style={styles.loadingContainer}>
-						<Text style={styles.loadingText}>Loading...</Text>
-					</View>
-				)}
 			</View>
 		</View>
 	);

@@ -1,5 +1,5 @@
-import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 import type {
 	APIUsersNoIncl,
 	APIUsers,

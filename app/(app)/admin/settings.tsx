@@ -635,22 +635,22 @@ export default function ServerSettings() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
+				<View style={styles.header}>
+					<Text style={styles.headerText}>Server Settings</Text>
+
+					{saveError && (
+						<View>
+							{saveError.map((error) => (
+								<Text style={styles.errorText} key={error}>
+									{error}
+								</Text>
+							))}
+						</View>
+					)}
+				</View>
+
 				{settings ? (
 					<View style={styles.settingsContainer}>
-						<View style={styles.header}>
-							<Text style={styles.headerText}>Server Settings</Text>
-
-							{saveError && (
-								<View>
-									{saveError.map((error) => (
-										<Text style={styles.errorText} key={error}>
-											{error}
-										</Text>
-									))}
-								</View>
-							)}
-						</View>
-
 						<KeyboardAwareScrollView style={styles.scrollView}>
 							{/* Core */}
 							<View style={styles.settingGroup}>

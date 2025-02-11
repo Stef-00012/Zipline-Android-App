@@ -328,28 +328,29 @@ export default function Urls() {
 					</View>
 				</Popup>
 
-				{urls && settings && dashUrl ? (
-					<View style={{ flex: 1 }}>
-						<View style={styles.header}>
-							<Text style={styles.headerText}>URLs</Text>
-							<View style={styles.headerButtons}>
-								<Button
-									onPress={() => {
-										setCreateNewUrl(true);
-									}}
-									icon="add-link"
-									color="transparent"
-									iconColor="#2d3f70"
-									borderColor="#222c47"
-									borderWidth={2}
-									iconSize={30}
-									padding={4}
-									rippleColor="#283557"
-								/>
-							</View>
-						</View>
+				<View style={styles.header}>
+					<Text style={styles.headerText}>URLs</Text>
+					<View style={styles.headerButtons}>
+						<Button
+							onPress={() => {
+								setCreateNewUrl(true);
+							}}
+							icon="add-link"
+							color="transparent"
+							iconColor={(urls && settings && dashUrl) ? "#2d3f70" : "#2d3f7055"}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							disabled={!urls || !dashUrl || !settings}
+						/>
+					</View>
+				</View>
 
-						<View style={{ ...styles.urlsContainer, flex: 1 }}>
+				<View style={{ flex: 1 }}>
+					<View style={{ ...styles.urlsContainer, flex: 1 }}>
+						{urls && settings && dashUrl ? (
 							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 								<View>
 									<Table>
@@ -562,13 +563,13 @@ export default function Urls() {
 									</ScrollView>
 								</View>
 							</ScrollView>
-						</View>
+						) : (
+							<View style={styles.loadingContainer}>
+								<Text style={styles.loadingText}>Loading...</Text>
+							</View>
+						)}
 					</View>
-				) : (
-					<View style={styles.loadingContainer}>
-						<Text style={styles.loadingText}>Loading...</Text>
-					</View>
-				)}
+				</View>
 			</View>
 		</View>
 	);

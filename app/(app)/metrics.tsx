@@ -146,38 +146,42 @@ export default function Metrics() {
 					/>
 				</DatePicker>
 
+				<View style={styles.header}>
+					<Text style={styles.headerText}>Metrics</Text>
+
+					<Text style={styles.dateRangeText}>
+						{allTime
+							? "All Time"
+							: `${new Date(
+									range.startDate as string,
+								).toLocaleDateString()}${
+									range.endDate
+										? ` to ${new Date(range.endDate as string).toLocaleDateString()}`
+										: ""
+								}`}
+					</Text>
+
+					<Button
+						onPress={() => {
+							setDatePickerOpen(true);
+						}}
+						color="transparent"
+						text="Change Date Range"
+						borderWidth={2}
+						borderColor="#222c47"
+						margin={{
+							right: 10,
+							top: 10,
+						}}
+						rippleColor="#283557"
+						disabled={!filteredStats || !mainStat}
+						textColor={(filteredStats && mainStat) ? "white" : "gray"}
+					/>
+				</View>
+
 				{filteredStats && mainStat ? (
 					<View>
 						<ScrollView>
-							<View style={styles.header}>
-								<Text style={styles.headerText}>Metrics</Text>
-								<Text style={styles.dateRangeText}>
-									{allTime
-										? "All Time"
-										: `${new Date(
-												range.startDate as string,
-											).toLocaleDateString()}${
-												range.endDate
-													? ` to ${new Date(range.endDate as string).toLocaleDateString()}`
-													: ""
-											}`}
-								</Text>
-								<Button
-									onPress={() => {
-										setDatePickerOpen(true);
-									}}
-									color="transparent"
-									text="Change Date Range"
-									borderWidth={2}
-									borderColor="#222c47"
-									margin={{
-										right: 10,
-										top: 10,
-									}}
-									rippleColor="#283557"
-								/>
-							</View>
-
 							<ScrollView
 								horizontal
 								style={{

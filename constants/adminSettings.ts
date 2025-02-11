@@ -1,26 +1,26 @@
-import type { SelectProps } from "@/components/Select";
 import type { APISettings, ShortenEmbed, UploadEmbed } from "@/types/zipline";
+import type { SelectProps } from "@/components/Select";
 
 export const defaultUploadEmbed: UploadEmbed = {
-	url: false,
-	color: null,
-	title: null,
-	footer: null,
-	thumbnail: false,
-	timestamp: false,
-	description: null,
 	imageOrVideo: false,
+	description: null,
+	timestamp: false,
+	thumbnail: false,
+	footer: null,
+	title: null,
+	color: null,
+	url: false,
 };
 
 export const defaultShortenEmbed: ShortenEmbed = {
-	url: false,
-	color: null,
-	title: null,
-	footer: null,
-	thumbnail: false,
-	timestamp: false,
-	description: null,
 	imageOrVideo: false,
+	description: null,
+	timestamp: false,
+	thumbnail: false,
+	footer: null,
+	title: null,
+	color: null,
+	url: false,
 };
 
 export type SettingPath<T extends keyof APISettings = keyof APISettings> =
@@ -162,9 +162,24 @@ export const settingNames: Partial<Record<SettingPath, string>> = {
 };
 
 export const formats: SelectProps["data"] = [
-	{ label: "Random", value: "random" },
-	{ label: "Date", value: "date" },
-	{ label: "UUID", value: "uuid" },
-	{ label: "Use File Name", value: "name" },
-	{ label: "Gfycat-style Name", value: "gfycat" },
+	{
+		label: "Random",
+		value: "random",
+	},
+	{
+		label: "Date",
+		value: "date",
+	},
+	{
+		label: "UUID",
+		value: "uuid",
+	},
+	{
+		label: "Use File Name",
+		value: "name",
+	},
+	{
+		label: "Gfycat-style Name",
+		value: "gfycat",
+	},
 ];

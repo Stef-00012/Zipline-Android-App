@@ -1,6 +1,6 @@
 import type { APIURLs, APIURL } from "@/types/zipline";
-import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 
 // GET /user/urls
 export async function getURLs(): Promise<APIURLs | string> {

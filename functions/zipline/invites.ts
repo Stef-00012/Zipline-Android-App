@@ -1,6 +1,6 @@
 import type { APIInvite, APIInvites } from "@/types/zipline";
-import * as db from "@/functions/database";
 import axios, { type AxiosError } from "axios";
+import * as db from "@/functions/database";
 
 // GET /api/auth/invites
 export async function getInvites(): Promise<APIInvites | string> {

@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
+		marginBottom: 10
 	},
 	dateRangeText: {
 		color: "gray",
@@ -36,13 +37,13 @@ export const styles = StyleSheet.create({
 		marginTop: 10,
 	},
 	scrollView: {
-		marginTop: 15,
 		borderStyle: "solid",
 		borderWidth: 2,
 		borderColor: "#222c47",
 		marginHorizontal: 10,
 		borderRadius: 15,
 		padding: 15,
+		marginBottom: 10
 	},
 	statsContainer: {
 		paddingHorizontal: 7,

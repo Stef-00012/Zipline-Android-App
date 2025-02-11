@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
 import { useShareIntentContext } from "expo-share-intent";
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 
 export const useShareIntent = (skipRedirect = false) => {
 	const router = useRouter();

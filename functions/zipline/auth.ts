@@ -1,10 +1,10 @@
+import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
 import type {
 	APILoginResponse,
 	APISelfUser,
 	APITokenResponse,
 } from "@/types/zipline";
-import axios, { type AxiosError } from "axios";
 
 export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 	const url = db.get("url");

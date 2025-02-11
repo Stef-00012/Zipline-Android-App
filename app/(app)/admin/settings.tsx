@@ -1,26 +1,26 @@
-import { useAuth } from "@/hooks/useAuth";
+import { getSettings, updateSettings } from "@/functions/zipline/settings";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { convertToBytes, convertToTime } from "@/functions/util";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { View, Text, ToastAndroid } from "react-native";
+import { formats } from "@/constants/adminSettings";
+import { styles } from "@/styles/admin/settings";
+import TextInput from "@/components/TextInput";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import Select from "@/components/Select";
+import Switch from "@/components/Switch";
+import Button from "@/components/Button";
+import {
+	defaultUploadEmbed,
+	defaultShortenEmbed,
+} from "@/constants/adminSettings";
 import type {
 	APISettings,
 	ExternalLink,
 	ShortenEmbed,
 	UploadEmbed,
 } from "@/types/zipline";
-import { useState, useEffect } from "react";
-import { getSettings, updateSettings } from "@/functions/zipline/settings";
-import { View, Text, ToastAndroid } from "react-native";
-import { styles } from "@/styles/admin/settings";
-import Select from "@/components/Select";
-import { formats } from "@/constants/adminSettings";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import {
-	defaultUploadEmbed,
-	defaultShortenEmbed,
-} from "@/constants/adminSettings";
-import { convertToBytes, convertToTime } from "@/functions/util";
-import TextInput from "@/components/TextInput";
-import Switch from "@/components/Switch";
-import Button from "@/components/Button";
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");

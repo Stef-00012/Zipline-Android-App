@@ -1,11 +1,15 @@
 import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
 import { Table, Row, Rows } from "react-native-reanimated-table";
+import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { getUserStats } from "@/functions/zipline/stats";
-// import { useFocusEffect, useRouter } from "expo-router";
+import { useShareIntent } from "@/hooks/useShareIntent";
 import { Text, View, ScrollView } from "react-native";
+import { useAppUpdates } from "@/hooks/useUpdates";
 import FileDisplay from "@/components/FileDisplay";
+import { convertToBytes } from "@/functions/util";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
+import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
 import type {
 	APIFile,
@@ -14,11 +18,8 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { useAuth } from "@/hooks/useAuth";
-import LargeFileDisplay from "@/components/LargeFileDisplay";
-import { convertToBytes } from "@/functions/util";
-import { useAppUpdates } from "@/hooks/useUpdates";
+
+// import { useFocusEffect, useRouter } from "expo-router";
 
 export default function Home() {
 	useAuth();

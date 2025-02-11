@@ -1,8 +1,7 @@
-import { Text, View } from "react-native";
-import { useRouter } from "expo-router";
-
 import { styles } from "@/styles/not-found";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
+import { useRouter } from "expo-router";
 
 export default function NotFoundScreen() {
 	const router = useRouter();

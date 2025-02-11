@@ -1,14 +1,14 @@
-import { Text, View } from "react-native";
-import { isAuthenticated, login } from "@/functions/zipline/auth";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import * as db from "@/functions/database";
-import { styles } from "@/styles/login";
-import { useLoginAuth } from "@/hooks/useLoginAuth";
-import React from "react";
-import TextInput from "@/components/TextInput";
-import Button from "@/components/Button";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { isAuthenticated, login } from "@/functions/zipline/auth";
+import { useLoginAuth } from "@/hooks/useLoginAuth";
+import TextInput from "@/components/TextInput";
+import * as db from "@/functions/database";
+import { Text, View } from "react-native";
+import Button from "@/components/Button";
+import { useRouter } from "expo-router";
+import { styles } from "@/styles/login";
+import { useState } from "react";
+import React from "react";
 
 export default function Login() {
 	const router = useRouter();

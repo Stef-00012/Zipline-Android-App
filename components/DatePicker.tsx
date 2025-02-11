@@ -1,13 +1,13 @@
-import { styles } from "@/styles/components/datePicker";
-import Popup from "./Popup";
 import DateTimePicker from "react-native-ui-datepicker";
+import { styles } from "@/styles/components/datePicker";
+import Button from "@/components/Button";
+import type { ReactNode } from "react";
+import Popup from "@/components/Popup";
 import type {
 	DatePickeMultipleProps,
-	DatePickerRangeProps,
 	DatePickerSingleProps,
+	DatePickerRangeProps,
 } from "react-native-ui-datepicker/lib/typescript/DateTimePicker";
-import Button from "./Button";
-import type { ReactNode } from "react";
 
 type Props = (
 	| DatePickeMultipleProps

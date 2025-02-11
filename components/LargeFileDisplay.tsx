@@ -1,44 +1,44 @@
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { type ExternalPathString, useRouter } from "expo-router";
 import { styles } from "@/styles/components/largeFileDisplay";
+import FileDisplay from "@/components/FileDisplay";
+import { MaterialIcons } from "@expo/vector-icons";
+import { getTags } from "@/functions/zipline/tags";
+import { convertToBytes } from "@/functions/util";
+import { isLightColor } from "@/functions/color";
+import * as FileSystem from "expo-file-system";
+import TextInput from "@/components/TextInput";
+import { useEffect, useState } from "react";
+import * as Clipboard from "expo-clipboard";
+import * as db from "@/functions/database";
+import Select from "@/components/Select";
+import Button from "@/components/Button";
+import Popup from "@/components/Popup";
+import React from "react";
+import axios from "axios";
+import {
+	removeFileFromFolder,
+	addFileToFolder,
+	getFolders,
+} from "@/functions/zipline/folders";
+import {
+	type EditFileOptions,
+	deleteFile,
+	editFile,
+} from "@/functions/zipline/files";
 import type {
-	APIFile,
 	APIFoldersNoIncl,
+	APIFile,
 	APITags,
 	DashURL,
 } from "@/types/zipline";
 import {
 	type ColorValue,
+	ToastAndroid,
 	Pressable,
 	Text,
-	ToastAndroid,
 	View,
 } from "react-native";
-import FileDisplay from "@/components/FileDisplay";
-import * as db from "@/functions/database";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { MaterialIcons } from "@expo/vector-icons";
-import Select from "./Select";
-import { convertToBytes } from "@/functions/util";
-import { useEffect, useState } from "react";
-import { getTags } from "@/functions/zipline/tags";
-import { isLightColor } from "@/functions/color";
-import {
-	addFileToFolder,
-	getFolders,
-	removeFileFromFolder,
-} from "@/functions/zipline/folders";
-import axios from "axios";
-import {
-	deleteFile,
-	editFile,
-	type EditFileOptions,
-} from "@/functions/zipline/files";
-import { type ExternalPathString, useRouter } from "expo-router";
-import * as Clipboard from "expo-clipboard";
-import * as FileSystem from "expo-file-system";
-import Popup from "@/components/Popup";
-import React from "react";
-import TextInput from "./TextInput";
-import Button from "./Button";
 
 interface Props {
 	file: APIFile;

@@ -1,24 +1,24 @@
+import { type ExternalPathString, Link, useRouter } from "expo-router";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIFolders, DashURL } from "@/types/zipline";
 import { Row, Table } from "react-native-reanimated-table";
+import { useShareIntent } from "@/hooks/useShareIntent";
 import { timeDifference } from "@/functions/util";
-import { styles } from "@/styles/folders";
+import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
-import { type ExternalPathString, Link, useRouter } from "expo-router";
+import { styles } from "@/styles/folders";
+import { useAuth } from "@/hooks/useAuth";
+import Switch from "@/components/Switch";
+import Button from "@/components/Button";
+import Popup from "@/components/Popup";
 import {
 	createFolder,
 	deleteFolder,
 	editFolder,
 	getFolders,
 } from "@/functions/zipline/folders";
-import Popup from "@/components/Popup";
-import { useAuth } from "@/hooks/useAuth";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import TextInput from "@/components/TextInput";
-import Switch from "@/components/Switch";
-import Button from "@/components/Button";
 
 export default function Folders() {
 	const router = useRouter();

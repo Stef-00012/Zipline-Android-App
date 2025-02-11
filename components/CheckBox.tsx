@@ -1,6 +1,6 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/components/checkbox";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface Props {
 	value: boolean;

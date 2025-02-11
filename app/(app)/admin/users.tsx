@@ -1,18 +1,22 @@
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import type {
-	APISettings,
-	APIUser,
-	APIUserQuota,
-	APIUsersNoIncl,
-	DashURL,
-} from "@/types/zipline";
+import { getFileDataURI, timeDifference } from "@/functions/util";
+import { fileQuotaTypes, userRoles } from "@/constants/users";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getSettings } from "@/functions/zipline/settings";
 import { Row, Table } from "react-native-reanimated-table";
-import { getFileDataURI, timeDifference } from "@/functions/util";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
+import TextInput from "@/components/TextInput";
 import { styles } from "@/styles/admin/users";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
+import { useAuth } from "@/hooks/useAuth";
+import Button from "@/components/Button";
+import Select from "@/components/Select";
+import Popup from "@/components/Popup";
+import { router } from "expo-router";
+import { Image } from "expo-image";
 import {
 	createUser,
 	deleteUser,
@@ -20,17 +24,13 @@ import {
 	type EditUserOptions,
 	getUsers,
 } from "@/functions/zipline/users";
-import { Image } from "expo-image";
-import Popup from "@/components/Popup";
-import Select from "@/components/Select";
-import { fileQuotaTypes, userRoles } from "@/constants/users";
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
-import { useAuth } from "@/hooks/useAuth";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { router } from "expo-router";
-import TextInput from "@/components/TextInput";
-import Button from "@/components/Button";
+import type {
+	APISettings,
+	APIUser,
+	APIUserQuota,
+	APIUsersNoIncl,
+	DashURL,
+} from "@/types/zipline";
 
 export default function Users() {
 	useAuth("ADMIN");

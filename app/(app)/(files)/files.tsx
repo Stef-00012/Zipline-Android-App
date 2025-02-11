@@ -1,20 +1,20 @@
-import {
-	ScrollView,
-	Text,
-	ToastAndroid,
-	View,
-} from "react-native";
 import type { APITags, APIFiles, DashURL, APIFile } from "@/types/zipline";
 import { getFiles, type GetFilesOptions } from "@/functions/zipline/files";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import LargeFileDisplay from "@/components/LargeFileDisplay";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { getFolder } from "@/functions/zipline/folders";
+import { getUser } from "@/functions/zipline/users";
 import FileDisplay from "@/components/FileDisplay";
+import { isLightColor } from "@/functions/color";
+import TextInput from "@/components/TextInput";
 import { styles } from "@/styles/files/files";
+import { colorHash } from "@/functions/util";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { getUser } from "@/functions/zipline/users";
-import { getFolder } from "@/functions/zipline/folders";
+import Button from "@/components/Button";
+import Popup from "@/components/Popup";
 import React from "react";
 import {
 	createTag,
@@ -22,12 +22,12 @@ import {
 	editTag,
 	getTags,
 } from "@/functions/zipline/tags";
-import Popup from "@/components/Popup";
-import { isLightColor } from "@/functions/color";
-import { colorHash } from "@/functions/util";
-import LargeFileDisplay from "@/components/LargeFileDisplay";
-import TextInput from "@/components/TextInput";
-import Button from "@/components/Button";
+import {
+	ScrollView,
+	Text,
+	ToastAndroid,
+	View,
+} from "react-native";
 
 export default function Files() {
 	const router = useRouter();

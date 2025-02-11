@@ -1,21 +1,19 @@
+import type { MaterialIcons } from "@expo/vector-icons";
+import { styles } from "@/styles/components/textInput";
+import Button from "@/components/Button";
+import { useState } from "react";
 import {
+	type TextInputSubmitEditingEventData,
+	type TextInputChangeEventData,
+	TextInput as NativeTextInput,
+	type NativeSyntheticEvent,
+	type ReturnKeyTypeOptions,
+	type KeyboardType,
+	type ColorValue,
+	type TextStyle,
 	View,
 	Text,
-	TextInput as NativeTextInput,
-	type ColorValue,
 } from "react-native";
-import { styles } from "@/styles/components/textInput";
-import { useState } from "react";
-import type { MaterialIcons } from "@expo/vector-icons";
-import type {
-	KeyboardType,
-	NativeSyntheticEvent,
-	ReturnKeyTypeOptions,
-	TextInputChangeEventData,
-	TextInputSubmitEditingEventData,
-	TextStyle,
-} from "react-native";
-import Button from "./Button";
 
 interface Props {
 	value?: string;

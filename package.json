@@ -9,7 +9,9 @@
     "prebuild:dev": "EXPO_NO_GIT_STATUS=1 APP_VARIANT=development expo prebuild --no-install --clean --platform android",
     "run:android": "expo run:android",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "jest": {
     "preset": "jest-expo"

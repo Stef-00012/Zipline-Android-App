@@ -1,5 +1,5 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
-import { version as appVersion } from "@/package.json"
+import { version as appVersion } from "./package.json"
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 

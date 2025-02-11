@@ -8,6 +8,7 @@ import { useLoginAuth } from "@/hooks/useLoginAuth";
 import React from "react";
 import TextInput from "@/components/TextInput";
 import Button from "@/components/Button";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 export default function Login() {
 	const router = useRouter();
@@ -37,7 +38,7 @@ export default function Login() {
 
 	return (
 		<View style={styles.loginContainer}>
-			<View style={styles.loginBox}>
+			<KeyboardAvoidingView behavior="height" style={styles.loginBox}>
 				{error && <Text style={styles.errorText}>{error}</Text>}
 
 				{tokenLogin ? (
@@ -159,7 +160,7 @@ export default function Login() {
 						top: 5,
 					}}
 				/>
-			</View>
+			</KeyboardAvoidingView>
 		</View>
 	);
 }

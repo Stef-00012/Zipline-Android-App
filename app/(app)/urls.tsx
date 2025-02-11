@@ -364,7 +364,7 @@ export default function Urls() {
 												"Enabled",
 												"Actions",
 											]}
-											widthArr={[80, 100, 200, 100, 100, 130, 50, 130]}
+											widthArr={[80, 100, 200, 100, 100, 130, 60, 130]}
 											style={styles.tableHeader}
 											textStyle={{
 												...styles.rowText,
@@ -552,7 +552,7 @@ export default function Urls() {
 															enabled,
 															actions,
 														]}
-														widthArr={[80, 100, 200, 100, 100, 130, 50, 130]}
+														widthArr={[80, 100, 200, 100, 100, 130, 60, 130]}
 														style={rowStyle}
 														textStyle={styles.rowText}
 													/>

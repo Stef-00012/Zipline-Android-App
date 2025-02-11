@@ -35,5 +35,5 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] Fix keyboard covering TOTP input on login screen
-- [x] Optimize pages by re-rendering only the components that use certain variables and not other unrelated components (~~this is not Spotify~~)
+- [x] ~~Fix keyboard covering TOTP input on login screen~~
+- [x] ~~Optimize pages by re-rendering only the components that use certain variables and not other unrelated components~~ (~~this is not Spotify~~)

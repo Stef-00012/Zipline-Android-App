@@ -35,7 +35,7 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [ ] Fix keyboard covering TOTP input on login screen
+- [x] Fix keyboard covering TOTP input on login screen
 - [ ] Optimize pages by re-rendering only the components that use certain variables and not other unrelated components (~~this is not Spotify~~)
   - app/(app)/admin/invites.ts: remove useless settings fetch, move header out of the condition
   - app/(app)/admin/settings.ts: re-render individual selects/inputs/switchs instead of the whole page, move header out of the condition

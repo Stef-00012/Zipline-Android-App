@@ -141,16 +141,16 @@ export function getRippleColor(color: string, fraction = 0.4) {
 	const lightColor = isLightColor(hexColor);
 
 	if (lightColor) {
-		const newR = Math.max(0, Math.floor(r * (1 - fraction)));
-		const newG = Math.max(0, Math.floor(g * (1 - fraction)));
-		const newB = Math.max(0, Math.floor(b * (1 - fraction)));
+		const newRed = Math.max(0, Math.floor(r * (1 - fraction)));
+		const newGreen = Math.max(0, Math.floor(g * (1 - fraction)));
+		const newBlue = Math.max(0, Math.floor(b * (1 - fraction)));
 
-		return rgbaToHex(newR, newG, newB);
+		return rgbaToHex(newRed, newGreen, newBlue);
 	}
 
-	const newR = Math.min(255, Math.floor(r + (255 - r) * fraction));
-	const newG = Math.min(255, Math.floor(g + (255 - g) * fraction));
-	const newB = Math.min(255, Math.floor(b + (255 - b) * fraction));
+	const newRed = Math.min(255, Math.floor(r + (255 - r) * fraction));
+	const newGreen = Math.min(255, Math.floor(g + (255 - g) * fraction));
+	const newBlue = Math.min(255, Math.floor(b + (255 - b) * fraction));
 
-	return rgbaToHex(newR, newG, newB);
+	return rgbaToHex(newRed, newGreen, newBlue);
 }

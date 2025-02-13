@@ -35,5 +35,16 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] ~~Fix keyboard covering TOTP input on login screen~~
-- [x] ~~Optimize pages by re-rendering only the components that use certain variables and not other unrelated components~~ (~~this is not Spotify~~)
+- [ ] File compact view
+- [ ] Filter by table column + search by column type:
+    - Files
+    - Folders
+    - URLs
+    - Users
+    - Invites
+
+- [ ] (Maybe? not confirmed) Large view:
+    - Folders
+    - URLs
+    - Users
+    - Invites

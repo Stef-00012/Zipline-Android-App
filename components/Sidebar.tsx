@@ -13,6 +13,7 @@ import React, {
 	useRef,
 	useState,
 } from "react";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 interface Props {
 	open: boolean;
@@ -26,6 +27,8 @@ export default function Sidebar({
 	setOpen,
 }: Props) {
 	const router = useRouter();
+
+	const resetShareIntent = useShareIntent(true);
 
 	const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
 
@@ -101,6 +104,8 @@ export default function Sidebar({
 						setOpen(false);
 
 						if (isActive) return;
+
+						resetShareIntent();
 
 						router.replace(route);
 					}}

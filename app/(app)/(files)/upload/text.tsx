@@ -43,7 +43,7 @@ export default function UploadText({
 	const router = useRouter();
 
 	useAuth();
-	useShareIntent(fromShareIntent);
+	const resetShareIntent = useShareIntent(fromShareIntent);
 
 	const [uploadedFile, setUploadedFile] =
 		useState<APIUploadResponse["files"][0]>();
@@ -219,6 +219,8 @@ export default function UploadText({
 					<View style={styles.headerButtons}>
 						<Button
 							onPress={() => {
+								resetShareIntent();
+
 								router.replace("/files");
 							}}
 							icon="folder-open"
@@ -543,7 +545,7 @@ export default function UploadText({
 						left: "auto",
 						right: "auto",
 						top: 10,
-						bottom: 10
+						bottom: 10,
 					}}
 				/>
 			</View>

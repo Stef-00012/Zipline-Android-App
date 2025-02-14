@@ -44,7 +44,7 @@ export default function UploadFile({
 	const router = useRouter();
 
 	useAuth();
-	useShareIntent(fromShareIntent);
+	const resetShareIntent = useShareIntent(fromShareIntent);
 
 	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>(
 		defaultFiles || [],
@@ -87,7 +87,7 @@ export default function UploadFile({
 		defaultFiles ? defaultFiles.length <= 1 : true,
 	);
 	const [uploading, setUploading] = useState<boolean>(false);
-	const [uploadPercentage, setUploadPercentage] = useState<string>("0")
+	const [uploadPercentage, setUploadPercentage] = useState<string>("0");
 
 	useEffect(() => {
 		(async () => {
@@ -240,6 +240,8 @@ export default function UploadFile({
 					<View style={styles.headerButtons}>
 						<Button
 							onPress={() => {
+								resetShareIntent();
+
 								router.replace("/files");
 							}}
 							icon="folder-open"
@@ -523,19 +525,29 @@ export default function UploadFile({
 								mimetype,
 							};
 
-							const uploadedFile = await uploadFiles(fileData, {
-								compression,
-								expiresAt: deletesAt,
-								filename: fileNameEnabled ? fileName : undefined,
-								folder,
-								format: nameFormat,
-								maxViews,
-								originalName,
-								overrideDomain,
-								password,
-							}, (uploadData) => {
-								setUploadPercentage(((uploadData.totalBytesSent / uploadData.totalBytesExpectedToSend) * 100).toFixed(2))
-							});
+							const uploadedFile = await uploadFiles(
+								fileData,
+								{
+									compression,
+									expiresAt: deletesAt,
+									filename: fileNameEnabled ? fileName : undefined,
+									folder,
+									format: nameFormat,
+									maxViews,
+									originalName,
+									overrideDomain,
+									password,
+								},
+								(uploadData) => {
+									setUploadPercentage(
+										(
+											(uploadData.totalBytesSent /
+												uploadData.totalBytesExpectedToSend) *
+											100
+										).toFixed(2),
+									);
+								},
+							);
 
 							if (typeof uploadedFile === "string") {
 								fails.push({
@@ -555,14 +567,16 @@ export default function UploadFile({
 
 						afterUploadCleanup();
 					}}
-					text={uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"}
+					text={
+						uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"
+					}
 					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
 					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",
 						top: 10,
-						bottom: 10
+						bottom: 10,
 					}}
 				/>
 			</View>

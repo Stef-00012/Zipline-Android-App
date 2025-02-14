@@ -9,10 +9,13 @@ import UserAvatar from "@/components/UserAvatar";
 import { View, Pressable } from "react-native";
 import Sidebar from "@/components/Sidebar";
 import type React from "react";
+import { useShareIntent } from "@/hooks/useShareIntent";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter();
 	const pathname = usePathname();
+
+	const resetShareIntent = useShareIntent(true);
 
 	const [avatar, setAvatar] = useState<string | null>(null);
 	const [user, setUser] = useState<APISelfUser | null>(null);
@@ -76,7 +79,11 @@ export default function Header({ children }: PropsWithChildren) {
 							<View>
 								<Pressable
 									onPress={() => {
-										if (pathname !== "/settings") router.replace("/settings");
+										if (pathname !== "/settings") {
+											resetShareIntent();
+
+											router.replace("/settings");
+										}
 									}}
 								>
 									<UserAvatar username={user.username} avatar={avatar} />

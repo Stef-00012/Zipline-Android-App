@@ -35,6 +35,7 @@ This will create an apk but won't automatically install
 
 # TODO
 
+- [ ] Show upload percentage (`uploadAsync` => `createUploadTask` with callback)
 - [ ] File compact view
 - [ ] Filter by table column + search by column type:
     - Files

@@ -212,6 +212,11 @@ export async function editFile(
 	}
 }
 
+interface UploadProgressData {
+	totalBytesSent: number;
+	totalBytesExpectedToSend: number;
+  }
+
 export interface UploadFileOptions {
 	text?: boolean;
 	maxViews?: number;
@@ -231,6 +236,7 @@ export async function uploadFiles(
 		mimetype: string;
 	},
 	options: UploadFileOptions = {},
+	onProgress?: (uploadProgressData: UploadProgressData) => void
 ): Promise<Array<APIUploadFile> | string> {
 	const token = db.get("token");
 	const url = db.get("url");
@@ -260,13 +266,17 @@ export async function uploadFiles(
 	if (options.filename) headers["X-Zipline-Filename"] = options.filename;
 
 	try {
-		const res = await FileSystem.uploadAsync(`${url}/api/upload`, file.uri, {
+		const uploadTask = FileSystem.createUploadTask(`${url}/api/upload`, file.uri, {
 			uploadType: FileSystem.FileSystemUploadType.MULTIPART,
 			headers,
 			httpMethod: "POST",
 			fieldName: "file",
 			mimeType: file.mimetype,
-		});
+		}, onProgress)
+
+		const res = await uploadTask.uploadAsync();
+
+		if (!res) return "Something went wrong...";
 
 		return JSON.parse(res.body)?.files || [];
 	} catch (e) {

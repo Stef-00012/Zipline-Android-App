@@ -87,6 +87,7 @@ export default function UploadFile({
 		defaultFiles ? defaultFiles.length <= 1 : true,
 	);
 	const [uploading, setUploading] = useState<boolean>(false);
+	const [uploadPercentage, setUploadPercentage] = useState<string>("0")
 
 	useEffect(() => {
 		(async () => {
@@ -532,6 +533,8 @@ export default function UploadFile({
 								originalName,
 								overrideDomain,
 								password,
+							}, (uploadData) => {
+								setUploadPercentage(((uploadData.totalBytesSent / uploadData.totalBytesExpectedToSend) * 100).toFixed(2))
 							});
 
 							if (typeof uploadedFile === "string") {
@@ -552,13 +555,14 @@ export default function UploadFile({
 
 						afterUploadCleanup();
 					}}
-					text={uploading ? "Uploading..." : "Upload File(s)"}
+					text={uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"}
 					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
 					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",
 						top: 10,
+						bottom: 10
 					}}
 				/>
 			</View>

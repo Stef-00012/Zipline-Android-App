@@ -543,6 +543,7 @@ export default function UploadText({
 						left: "auto",
 						right: "auto",
 						top: 10,
+						bottom: 10
 					}}
 				/>
 			</View>

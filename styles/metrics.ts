@@ -92,6 +92,7 @@ export const styles = StyleSheet.create({
 	},
 	tableHeader: {
 		height: 50,
+		padding: 8,
 		backgroundColor: "#0c101c",
 		borderTopLeftRadius: 10,
 		borderTopRightRadius: 10,

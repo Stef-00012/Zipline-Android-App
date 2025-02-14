@@ -123,4 +123,52 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 	},
+	rowText: {
+		color: "white",
+		textAlign: "center",
+	},
+	headerRow: {
+		fontWeight: "bold",
+	},
+	row: {
+		backgroundColor: "#0c101c",
+		padding: 8,
+		borderTopWidth: 1,
+		borderTopColor: "",
+		borderBottomWidth: 1,
+		borderBottomColor: "",
+	},
+	lastRow: {
+		borderBottomWidth: 0,
+	},
+	firstRow: {
+		borderTopWidth: 0,
+	},
+	actionsContainer: {
+		flexDirection: "row",
+		justifyContent: "space-around",
+		paddingTop: 10,
+		paddingRight: 10,
+	},
+	tableHeader: {
+		height: 50,
+		padding: 8,
+		backgroundColor: "#0c101c",
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+	},
+	tableVerticalScroll: {
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
+	},
+	tagsContainer: {
+		flexDirection: "row",
+		marginHorizontal: 10,
+		justifyContent: "center"
+	},
+	tag: {
+		padding: 5,
+		borderRadius: 50,
+		marginHorizontal: 5
+	}
 });

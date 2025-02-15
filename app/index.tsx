@@ -1,5 +1,4 @@
 import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
-import { Table, Row, Rows } from "react-native-reanimated-table";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { getUserStats } from "@/functions/zipline/stats";
 import { useShareIntent } from "@/hooks/useShareIntent";
@@ -18,6 +17,7 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
+import Table from "@/components/Table";
 
 // import { useFocusEffect, useRouter } from "expo-router";
 
@@ -39,16 +39,16 @@ export default function Home() {
 		handleAuth();
 	}, []);
 
-// 	const router = useRouter();
+	// 	const router = useRouter();
 
-// 	useFocusEffect(() => {
-// 		if (__DEV__) {
-// // 			db.del("url")
-// // 			db.del("token")
+	// 	useFocusEffect(() => {
+	// 		if (__DEV__) {
+	// // 			db.del("url")
+	// // 			db.del("token")
 
-// 			// router.replace("/metrics");
-// 		}
-// 	});
+	// 			// router.replace("/metrics");
+	// 		}
+	// 	});
 
 	async function handleAuth() {
 		const user = await getCurrentUser();
@@ -135,7 +135,9 @@ export default function Home() {
 									</View>
 
 									<View style={styles.statContainer}>
-										<Text style={styles.subHeaderText}>Average Storage Used:</Text>
+										<Text style={styles.subHeaderText}>
+											Average Storage Used:
+										</Text>
 										<Text style={styles.statText}>
 											{convertToBytes(stats.avgStorageUsed, {
 												unitSeparator: " ",
@@ -149,7 +151,9 @@ export default function Home() {
 									</View>
 
 									<View style={styles.statContainer}>
-										<Text style={styles.subHeaderText}>File Average Views:</Text>
+										<Text style={styles.subHeaderText}>
+											File Average Views:
+										</Text>
 										<Text style={styles.statText}>
 											{Math.round(stats.avgViews)}
 										</Text>
@@ -176,20 +180,13 @@ export default function Home() {
 										...styles.fileTypesContainer,
 									}}
 								>
-									<Table>
-										<Row
-											data={["File Type", "Count"]}
-											widthArr={[260, 150]}
-											textStyle={styles.tableHeadText}
-										/>
-										<Rows
-											data={Object.entries(stats.sortTypeCount).sort(
-												(a, b) => b[1] - a[1],
-											)}
-											widthArr={[260, 150]}
-											textStyle={styles.tableText}
-										/>
-									</Table>
+									<Table
+										headerRow={["File Type", "Count"]}
+										rowWidth={[210, 150]}
+										rows={Object.entries(stats.sortTypeCount).sort(
+											(a, b) => b[1] - a[1],
+										)}
+									/>
 								</View>
 							</View>
 						</>

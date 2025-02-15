@@ -1,8 +1,7 @@
-import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
 import { type ExternalPathString, Link } from "expo-router";
 import { getSettings } from "@/functions/zipline/settings";
-import { Row, Table } from "react-native-reanimated-table";
+import { Text, View, ToastAndroid } from "react-native";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { timeDifference } from "@/functions/util";
 import TextInput from "@/components/TextInput";
@@ -22,6 +21,7 @@ import {
 	type EditURLOptions,
 	getURLs,
 } from "@/functions/zipline/urls";
+import Table from "@/components/Table";
 
 export default function Urls() {
 	useAuth();
@@ -337,7 +337,7 @@ export default function Urls() {
 							}}
 							icon="add-link"
 							color="transparent"
-							iconColor={(urls && settings && dashUrl) ? "#2d3f70" : "#2d3f7055"}
+							iconColor={urls && settings && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
 							borderWidth={2}
 							iconSize={30}
@@ -349,220 +349,180 @@ export default function Urls() {
 				</View>
 
 				<View style={{ flex: 1 }}>
-					<View style={{ ...styles.urlsContainer, flex: 1 }}>
+					<View style={styles.urlsContainer}>
 						{urls && settings && dashUrl ? (
-							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-								<View>
-									<Table>
-										<Row
-											data={[
-												"Code",
-												"Vanity",
-												"URL",
-												"Views",
-												"Max Views",
-												"Created",
-												"Enabled",
-												"Actions",
-											]}
-											widthArr={[80, 100, 200, 100, 100, 130, 60, 130]}
-											style={styles.tableHeader}
-											textStyle={{
+							<Table
+								headerRow={[
+									"Code",
+									"Vanity",
+									"URL",
+									"Views",
+									"Max Views",
+									"Created",
+									"Enabled",
+									"Actions",
+								]}
+								rowWidth={[80, 100, 200, 100, 100, 130, 60, 130]}
+								rows={urls.map((url) => {
+									const code = (
+										<Link
+											key={url.id}
+											href={
+												`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}` as ExternalPathString
+											}
+											style={{
 												...styles.rowText,
-												...styles.headerRow,
+												...styles.link,
 											}}
-										/>
-									</Table>
-									<ScrollView
-										showsVerticalScrollIndicator={false}
-										style={styles.tableVerticalScroll}
-									>
-										<Table>
-											{urls.map((url, index) => {
-												const code = (
-													<Link
-														key={url.id}
-														href={
-															`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}` as ExternalPathString
-														}
-														style={{
-															...styles.rowText,
-															...styles.link,
-														}}
-													>
-														{url.code}
-													</Link>
-												);
+										>
+											{url.code}
+										</Link>
+									);
 
-												const vanity = (
-													<Link
-														key={url.id}
-														href={
-															`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}` as ExternalPathString
-														}
-														style={{
-															...styles.rowText,
-															...styles.link,
-														}}
-													>
-														{url.vanity}
-													</Link>
-												);
+									const vanity = (
+										<Link
+											key={url.id}
+											href={
+												`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}` as ExternalPathString
+											}
+											style={{
+												...styles.rowText,
+												...styles.link,
+											}}
+										>
+											{url.vanity}
+										</Link>
+									);
 
-												const noVanity = (
-													<Text style={styles.rowText}>None</Text>
-												);
+									const noVanity = (
+										<Text key={url.id} style={styles.rowText}>
+											None
+										</Text>
+									);
 
-												const destination = (
-													<Link
-														key={url.id}
-														href={url.destination as ExternalPathString}
-														style={{
-															...styles.rowText,
-															...styles.link,
-														}}
-													>
-														{url.destination}
-													</Link>
-												);
+									const destination = (
+										<Link
+											key={url.id}
+											href={url.destination as ExternalPathString}
+											style={{
+												...styles.rowText,
+												...styles.link,
+											}}
+										>
+											{url.destination}
+										</Link>
+									);
 
-												const views = (
-													<Text style={styles.rowText}>{url.views}</Text>
-												);
+									const views = (
+										<Text key={url.id} style={styles.rowText}>
+											{url.views}
+										</Text>
+									);
 
-												const maxViews = (
-													<Text style={styles.rowText}>
-														{url.maxViews || "Unlimited"}
-													</Text>
-												);
+									const maxViews = (
+										<Text key={url.id} style={styles.rowText}>
+											{url.maxViews || "Unlimited"}
+										</Text>
+									);
 
-												const enabled = (
-													<Text style={styles.rowText}>
-														{url.enabled ? "Yes" : "No"}
-													</Text>
-												);
+									const enabled = (
+										<Text key={url.id} style={styles.rowText}>
+											{url.enabled ? "Yes" : "No"}
+										</Text>
+									);
 
-												const created = (
-													<Text style={styles.rowText}>
-														{timeDifference(
-															new Date(),
-															new Date(url.createdAt),
-														)}
-													</Text>
-												);
+									const created = (
+										<Text key={url.id} style={styles.rowText}>
+											{timeDifference(new Date(), new Date(url.createdAt))}
+										</Text>
+									);
 
-												const actions = (
-													<View style={styles.actionsContainer}>
-														<Button
-															icon="content-copy"
-															color="#323ea8"
-															onPress={async () => {
-																const urlDest = url.vanity
-																	? `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}`
-																	: `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}`;
+									const actions = (
+										<View key={url.id} style={styles.actionsContainer}>
+											<Button
+												icon="content-copy"
+												color="#323ea8"
+												onPress={async () => {
+													const urlDest = url.vanity
+														? `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}`
+														: `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}`;
 
-																const saved =
-																	await Clipboard.setStringAsync(urlDest);
+													const saved = await Clipboard.setStringAsync(urlDest);
 
-																if (saved)
-																	return ToastAndroid.show(
-																		"URL copied to clipboard",
-																		ToastAndroid.SHORT,
-																	);
+													if (saved)
+														return ToastAndroid.show(
+															"URL copied to clipboard",
+															ToastAndroid.SHORT,
+														);
 
-																return ToastAndroid.show(
-																	"Failed to paste to the clipboard",
-																	ToastAndroid.SHORT,
-																);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
+													return ToastAndroid.show(
+														"Failed to paste to the clipboard",
+														ToastAndroid.SHORT,
+													);
+												}}
+												iconSize={20}
+												width={32}
+												height={32}
+												padding={6}
+											/>
 
-														<Button
-															icon="edit"
-															color="#323ea8"
-															onPress={() => {
-																setUrlToEdit(url);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
+											<Button
+												icon="edit"
+												color="#323ea8"
+												onPress={() => {
+													setUrlToEdit(url);
+												}}
+												iconSize={20}
+												width={32}
+												height={32}
+												padding={6}
+											/>
 
-														<Button
-															icon="delete"
-															color="#CF4238"
-															onPress={async () => {
-																const urlId = url.id;
+											<Button
+												icon="delete"
+												color="#CF4238"
+												onPress={async () => {
+													const urlId = url.id;
 
-																const success = await deleteURL(urlId);
+													const success = await deleteURL(urlId);
 
-																if (typeof success === "string")
-																	return ToastAndroid.show(
-																		`Failed to delete the url "${url.vanity || url.code}"`,
-																		ToastAndroid.SHORT,
-																	);
+													if (typeof success === "string")
+														return ToastAndroid.show(
+															`Failed to delete the url "${url.vanity || url.code}"`,
+															ToastAndroid.SHORT,
+														);
 
-																const newUrls = urls.filter(
-																	(uri) => url.id !== uri.id,
-																);
+													const newUrls = urls.filter(
+														(uri) => url.id !== uri.id,
+													);
 
-																setUrls(newUrls);
+													setUrls(newUrls);
 
-																ToastAndroid.show(
-																	`Deleted the url "${url.vanity || url.code}"`,
-																	ToastAndroid.SHORT,
-																);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
-													</View>
-												);
+													ToastAndroid.show(
+														`Deleted the url "${url.vanity || url.code}"`,
+														ToastAndroid.SHORT,
+													);
+												}}
+												iconSize={20}
+												width={32}
+												height={32}
+												padding={6}
+											/>
+										</View>
+									);
 
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === urls.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
-
-												return (
-													<Row
-														key={url.id}
-														data={[
-															code,
-															url.vanity ? vanity : noVanity,
-															destination,
-															views,
-															maxViews,
-															created,
-															enabled,
-															actions,
-														]}
-														widthArr={[80, 100, 200, 100, 100, 130, 60, 130]}
-														style={rowStyle}
-														textStyle={styles.rowText}
-													/>
-												);
-											})}
-										</Table>
-									</ScrollView>
-								</View>
-							</ScrollView>
+									return [
+										code,
+										url.vanity ? vanity : noVanity,
+										destination,
+										views,
+										maxViews,
+										created,
+										enabled,
+										actions,
+									];
+								})}
+							/>
 						) : (
 							<View style={styles.loadingContainer}>
 								<Text style={styles.loadingText}>Loading...</Text>

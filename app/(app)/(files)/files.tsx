@@ -1,10 +1,6 @@
 import { colorHash, convertToBytes, timeDifference } from "@/functions/util";
 import type { APITags, APIFiles, DashURL, APIFile } from "@/types/zipline";
-import {
-	deleteFile,
-	getFiles,
-	type GetFilesOptions,
-} from "@/functions/zipline/files";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { useShareIntent } from "@/hooks/useShareIntent";
@@ -14,22 +10,26 @@ import FileDisplay from "@/components/FileDisplay";
 import { isLightColor } from "@/functions/color";
 import TextInput from "@/components/TextInput";
 import { styles } from "@/styles/files/files";
+import CheckBox from "@/components/CheckBox";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/Button";
+import Table from "@/components/Table";
 import Popup from "@/components/Popup";
 import React from "react";
+import {
+	deleteFile,
+	getFiles,
+	type GetFilesOptions,
+} from "@/functions/zipline/files";
 import {
 	createTag,
 	deleteTag,
 	editTag,
 	getTags,
 } from "@/functions/zipline/tags";
-import { ScrollView, Text, ToastAndroid, View } from "react-native";
-import { Row, Table } from "react-native-reanimated-table";
-import CheckBox from "@/components/CheckBox";
 
 export default function Files() {
 	const router = useRouter();
@@ -577,238 +577,209 @@ export default function Files() {
 					{files && dashUrl ? (
 						<>
 							{compactModeEnabled ? (
-								<>
-									<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-										<View>
-											<Table>
-												<Row
-													data={[
-														<CheckBox
-															key={"tableHeaderCheckbox"}
-															value={selectedFiles.length === files.page.length}
-															onValueChange={() => {
-																if (selectedFiles.length === files.page.length)
-																	return setSelectedFiles([]);
+								<Table
+									headerRow={[
+										<CheckBox
+											key={"tableHeaderCheckbox"}
+											value={selectedFiles.length === files.page.length}
+											onValueChange={() => {
+												if (selectedFiles.length === files.page.length)
+													return setSelectedFiles([]);
 
-																setSelectedFiles(
-																	files.page.map((file) => file.id),
-																);
-															}}
-														/>,
-														"Name",
-														"Tags",
-														"Type",
-														"Size",
-														"Created At",
-														"Favorite",
-														"ID",
-														"Actions",
-													]}
-													widthArr={[30, 150, 150, 120, 70, 110, 60, 210, 170]}
-													style={styles.tableHeader}
-													textStyle={{
-														...styles.rowText,
-														...styles.headerRow,
+												setSelectedFiles(
+													files.page.map((file) => file.id),
+												);
+											}}
+										/>,
+										"Name",
+										"Tags",
+										"Type",
+										"Size",
+										"Created At",
+										"Favorite",
+										"ID",
+										"Actions",
+									]}
+									rowWidth={[30, 150, 150, 120, 70, 110, 60, 210, 170]}
+									rows={files.page.map((file, index) => {
+										const checkbox = (
+											<CheckBox
+												key={file.id}
+												value={selectedFiles.includes(file.id)}
+												onValueChange={() => {
+													setSelectedFiles((prev) => {
+														if (prev.includes(file.id))
+															return prev.filter(
+																(selectedFileId) =>
+																	selectedFileId !== file.id,
+															);
+
+														return [...prev, file.id];
+													});
+												}}
+											/>
+										);
+
+										const name = (
+											<Text key={file.id} style={styles.rowText}>{file.name}</Text>
+										);
+
+										const tags = (
+											<View key={file.id} style={styles.tagsContainer}>
+												{file.tags.map((tag) => (
+													<Text
+														key={tag.id}
+														style={{
+															...styles.tag,
+															backgroundColor: tag.color,
+															color: isLightColor(tag.color)
+																? "black"
+																: "white",
+														}}
+													>
+														{tag.name}
+													</Text>
+												))}
+											</View>
+										);
+
+										const type = (
+											<Text key={file.id} style={styles.rowText}>{file.type}</Text>
+										);
+
+										const size = (
+											<Text key={file.id} style={styles.rowText}>
+												{convertToBytes(file.size, {
+													unitSeparator: " ",
+												})}
+											</Text>
+										);
+
+										const createdAt = (
+											<Text key={file.id} style={styles.rowText}>
+												{timeDifference(
+													new Date(),
+													new Date(file.createdAt),
+												)}
+											</Text>
+										);
+
+										const favorite = (
+											<Text key={file.id} style={styles.rowText}>
+												{file.favorite ? "Yes" : "No"}
+											</Text>
+										);
+
+										const id = (
+											<Text key={file.id} style={styles.rowText}>{file.id}</Text>
+										);
+
+										const actions = (
+											<View key={file.id} style={styles.actionsContainer}>
+												<Button
+													icon="insert-drive-file"
+													color="#323ea8"
+													onPress={async () => {
+														setFocusedFile(file);
 													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
 												/>
-											</Table>
-											<ScrollView
-												showsVerticalScrollIndicator={false}
-												style={styles.tableVerticalScroll}
-											>
-												<Table>
-													{files.page.map((file, index) => {
-														const checkbox = (
-															<CheckBox
-																value={selectedFiles.includes(file.id)}
-																onValueChange={() => {
-																	setSelectedFiles((prev) => {
-																		if (prev.includes(file.id))
-																			return prev.filter(
-																				(selectedFileId) =>
-																					selectedFileId !== file.id,
-																			);
 
-																		return [...prev, file.id];
-																	});
-																}}
-															/>
+												<Button
+													icon="open-in-new"
+													color="#323ea8"
+													onPress={() => {
+														router.replace(`${dashUrl}${file.url}`);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+
+												<Button
+													icon="content-copy"
+													color="#323ea8"
+													onPress={async () => {
+														const url = `${dashUrl}${file.url}`;
+
+														const saved =
+															await Clipboard.setStringAsync(url);
+
+														if (saved)
+															return ToastAndroid.show(
+																"URL copied to clipboard",
+																ToastAndroid.SHORT,
+															);
+
+														return ToastAndroid.show(
+															"Failed to paste to the clipboard",
+															ToastAndroid.SHORT,
 														);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
 
-														const name = (
-															<Text style={styles.rowText}>{file.name}</Text>
+												<Button
+													icon="delete"
+													color="#CF4238"
+													onPress={async () => {
+														const fileId = file.id;
+
+														const success = await deleteFile(fileId);
+
+														if (typeof success === "string")
+															return ToastAndroid.show(
+																`Error: ${success}`,
+																ToastAndroid.SHORT,
+															);
+
+														ToastAndroid.show(
+															`Successfully deleted the file ${file.name}`,
+															ToastAndroid.SHORT,
 														);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+											</View>
+										);
 
-														const tags = (
-															<View style={styles.tagsContainer}>
-																{file.tags.map((tag) => (
-																	<Text
-																		key={tag.id}
-																		style={{
-																			...styles.tag,
-																			backgroundColor: tag.color,
-																			color: isLightColor(tag.color)
-																				? "black"
-																				: "white",
-																		}}
-																	>
-																		{tag.name}
-																	</Text>
-																))}
-															</View>
-														);
+										let rowStyle = styles.row;
 
-														const type = (
-															<Text style={styles.rowText}>{file.type}</Text>
-														);
+										if (index === 0)
+											rowStyle = {
+												...styles.row,
+												...styles.firstRow,
+											};
 
-														const size = (
-															<Text style={styles.rowText}>
-																{convertToBytes(file.size, {
-																	unitSeparator: " ",
-																})}
-															</Text>
-														);
+										if (index === files.page.length - 1)
+											rowStyle = {
+												...styles.row,
+												...styles.lastRow,
+											};
 
-														const createdAt = (
-															<Text style={styles.rowText}>
-																{timeDifference(
-																	new Date(),
-																	new Date(file.createdAt),
-																)}
-															</Text>
-														);
-
-														const favorite = (
-															<Text style={styles.rowText}>
-																{file.favorite ? "Yes" : "No"}
-															</Text>
-														);
-
-														const id = (
-															<Text style={styles.rowText}>{file.id}</Text>
-														);
-
-														const actions = (
-															<View style={styles.actionsContainer}>
-																<Button
-																	icon="insert-drive-file"
-																	color="#323ea8"
-																	onPress={async () => {
-																		setFocusedFile(file);
-																	}}
-																	iconSize={20}
-																	width={32}
-																	height={32}
-																	padding={6}
-																/>
-
-																<Button
-																	icon="open-in-new"
-																	color="#323ea8"
-																	onPress={() => {
-																		router.replace(`${dashUrl}${file.url}`);
-																	}}
-																	iconSize={20}
-																	width={32}
-																	height={32}
-																	padding={6}
-																/>
-
-																<Button
-																	icon="content-copy"
-																	color="#323ea8"
-																	onPress={async () => {
-																		const url = `${dashUrl}${file.url}`;
-
-																		const saved =
-																			await Clipboard.setStringAsync(url);
-
-																		if (saved)
-																			return ToastAndroid.show(
-																				"URL copied to clipboard",
-																				ToastAndroid.SHORT,
-																			);
-
-																		return ToastAndroid.show(
-																			"Failed to paste to the clipboard",
-																			ToastAndroid.SHORT,
-																		);
-																	}}
-																	iconSize={20}
-																	width={32}
-																	height={32}
-																	padding={6}
-																/>
-
-																<Button
-																	icon="delete"
-																	color="#CF4238"
-																	onPress={async () => {
-																		const fileId = file.id;
-
-																		const success = await deleteFile(fileId);
-
-																		if (typeof success === "string")
-																			return ToastAndroid.show(
-																				`Error: ${success}`,
-																				ToastAndroid.SHORT,
-																			);
-
-																		ToastAndroid.show(
-																			`Successfully deleted the file ${file.name}`,
-																			ToastAndroid.SHORT,
-																		);
-																	}}
-																	iconSize={20}
-																	width={32}
-																	height={32}
-																	padding={6}
-																/>
-															</View>
-														);
-
-														let rowStyle = styles.row;
-
-														if (index === 0)
-															rowStyle = {
-																...styles.row,
-																...styles.firstRow,
-															};
-
-														if (index === files.page.length - 1)
-															rowStyle = {
-																...styles.row,
-																...styles.lastRow,
-															};
-
-														return (
-															<Row
-																key={file.id}
-																data={[
-																	checkbox,
-																	name,
-																	tags,
-																	type,
-																	size,
-																	createdAt,
-																	favorite,
-																	id,
-																	actions,
-																]}
-																widthArr={[
-																	30, 150, 150, 120, 70, 110, 60, 210, 170,
-																]}
-																style={rowStyle}
-																textStyle={styles.rowText}
-															/>
-														);
-													})}
-												</Table>
-											</ScrollView>
-										</View>
-									</ScrollView>
-								</>
+										return [
+											checkbox,
+											name,
+											tags,
+											type,
+											size,
+											createdAt,
+											favorite,
+											id,
+											actions,
+										];
+									})}
+								/>
 							) : (
 								<>
 									<ScrollView showsVerticalScrollIndicator={false}>

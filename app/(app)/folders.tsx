@@ -1,8 +1,7 @@
 import { type ExternalPathString, Link, useRouter } from "expo-router";
-import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIFolders, DashURL } from "@/types/zipline";
-import { Row, Table } from "react-native-reanimated-table";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { Text, View, ToastAndroid } from "react-native";
 import { timeDifference } from "@/functions/util";
 import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
@@ -19,6 +18,7 @@ import {
 	editFolder,
 	getFolders,
 } from "@/functions/zipline/folders";
+import Table from "@/components/Table";
 
 export default function Folders() {
 	const router = useRouter();
@@ -201,216 +201,400 @@ export default function Folders() {
 					<View style={{ flex: 1 }}>
 						<View style={{ ...styles.foldersContainer, flex: 1 }}>
 							{folders && dashUrl ? (
-								<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-									<View>
-										<Table>
-											<Row
-												data={["Name", "Public", "Created", "Actions"]}
-												widthArr={[80, 50, 130, 190]}
-												style={styles.tableHeader}
-												textStyle={{
+								<Table
+									headerRow={["Name", "Public", "Created", "Actions"]}
+									rowWidth={[120, 50, 130, 200]}
+									rows={folders.map((folder, index) => {
+										const name = folder.public ? (
+											<Link
+												key={folder.id}
+												href={
+													`${dashUrl}/folder/${folder.id}` as ExternalPathString
+												}
+												style={{
 													...styles.rowText,
-													...styles.headerRow,
+													...styles.link,
 												}}
-											/>
-										</Table>
-										<ScrollView
-											showsVerticalScrollIndicator={false}
-											style={styles.tableVerticalScroll}
-										>
-											<Table>
-												{folders.map((folder, index) => {
-													const name = folder.public ? (
-														<Link
-															key={folder.id}
-															href={
-																`${dashUrl}/folder/${folder.id}` as ExternalPathString
+											>
+												{folder.name}
+											</Link>
+										) : (
+											<Text key={folder.id} style={styles.rowText}>
+												{folder.name}
+											</Text>
+										);
+
+										const isPublic = (
+											<Text key={folder.id} style={styles.rowText}>
+												{folder.public ? "Yes" : "No"}
+											</Text>
+										);
+
+										const created = (
+											<Text key={folder.id} style={styles.rowText}>
+												{timeDifference(
+													new Date(),
+													new Date(folder.createdAt),
+												)}
+											</Text>
+										);
+
+										const actions = (
+											<View key={folder.id} style={styles.actionsContainer}>
+												<Button
+													icon="folder-open"
+													color="#323ea8"
+													onPress={() => {
+														const folderId = folder.id;
+
+														router.replace(`/files?folderId=${folderId}`);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+
+												<Button
+													icon="content-copy"
+													color={folder.public ? "#323ea8" : "#181c28"}
+													iconColor={folder.public ? "white" : "#2a3952"}
+													onPress={async () => {
+														const urlDest = `${dashUrl}/folder/${folder.id}`;
+
+														const saved =
+															await Clipboard.setStringAsync(urlDest);
+
+														if (saved)
+															return ToastAndroid.show(
+																"Folder URL copied to clipboard",
+																ToastAndroid.SHORT,
+															);
+
+														return ToastAndroid.show(
+															"Failed to paste to the clipboard",
+															ToastAndroid.SHORT,
+														);
+													}}
+													disabled={!folder.public}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+
+												<Button
+													icon={folder.public ? "lock-open" : "lock"}
+													color={folder.public ? "#323ea8" : "#343a40"}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+													onPress={async () => {
+														const folderId = folder.id;
+
+														const success = await editFolder(
+															folderId,
+															{
+																public: !folder.public,
 															}
-															style={{
-																...styles.rowText,
-																...styles.link,
-															}}
-														>
-															{folder.name}
-														</Link>
-													) : (
-														<Text key={folder.id} style={styles.rowText}>
-															{folder.name}
-														</Text>
-													);
+														);
 
-													const isPublic = (
-														<Text key={folder.id} style={styles.rowText}>
-															{folder.public ? "Yes" : "No"}
-														</Text>
-													);
+														if (typeof success === "string")
+															return ToastAndroid.show(
+																`Failed to update the folder "${folder.name}"`,
+																ToastAndroid.SHORT,
+															);
 
-													const created = (
-														<Text style={styles.rowText}>
-															{timeDifference(
-																new Date(),
-																new Date(folder.createdAt),
-															)}
-														</Text>
-													);
+														ToastAndroid.show(
+															`Updated the folder "${folder.name}"'s visibility`,
+															ToastAndroid.SHORT,
+														);
 
-													const actions = (
-														<View style={styles.actionsContainer}>
-															<Button
-																icon="folder-open"
-																color="#323ea8"
-																onPress={() => {
-																	const folderId = folder.id;
+														const folderIndex = folders.findIndex(
+															(fold) => folder.id === fold.id,
+														);
 
-																	router.replace(`/files?folderId=${folderId}`);
-																}}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
+														const newFolders = [...folders];
+														newFolders[folderIndex].public = !folder.public;
 
-															<Button
-																icon="content-copy"
-																color={folder.public ? "#323ea8" : "#181c28"}
-																iconColor={folder.public ? "white" : "#2a3952"}
-																onPress={async () => {
-																	const urlDest = `${dashUrl}/folder/${folder.id}`;
+														setFolders(newFolders);
+													}}
+												/>
 
-																	const saved =
-																		await Clipboard.setStringAsync(urlDest);
+												<Button
+													icon="edit"
+													color="#323ea8"
+													onPress={async () => {
+														setFolderToEdit(folder)
+														setEditFolderName(folder.name)
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
 
-																	if (saved)
-																		return ToastAndroid.show(
-																			"Folder URL copied to clipboard",
-																			ToastAndroid.SHORT,
-																		);
+												<Button
+													onPress={async () => {
+														const folderId = folder.id;
 
-																	return ToastAndroid.show(
-																		"Failed to paste to the clipboard",
-																		ToastAndroid.SHORT,
-																	);
-																}}
-																disabled={!folder.public}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
+														const success = await deleteFolder(folderId);
 
-															<Button
-																icon={folder.public ? "lock-open" : "lock"}
-																color={folder.public ? "#323ea8" : "#343a40"}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-																onPress={async () => {
-																	const folderId = folder.id;
+														if (typeof success === "string")
+															return ToastAndroid.show(
+																`Failed to delete the folder "${folder.name}"`,
+																ToastAndroid.SHORT,
+															);
 
-																	const success = await editFolder(
-																		folderId,
-																		{
-																			public: !folder.public,
-																		}
-																	);
+														const newFolders = folders.filter(
+															(fold) => fold.id !== folder.id,
+														);
 
-																	if (typeof success === "string")
-																		return ToastAndroid.show(
-																			`Failed to update the folder "${folder.name}"`,
-																			ToastAndroid.SHORT,
-																		);
+														setFolders(newFolders);
 
-																	ToastAndroid.show(
-																		`Updated the folder "${folder.name}"'s visibility`,
-																		ToastAndroid.SHORT,
-																	);
+														ToastAndroid.show(
+															`Deleted the folder "${folder.name}"`,
+															ToastAndroid.SHORT,
+														);
+													}}
+													color="#CF4238"
+													icon="delete"
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+											</View>
+										);
 
-																	const folderIndex = folders.findIndex(
-																		(fold) => folder.id === fold.id,
-																	);
+										let rowStyle = styles.row;
 
-																	const newFolders = [...folders];
-																	newFolders[folderIndex].public = !folder.public;
+										if (index === 0)
+											rowStyle = {
+												...styles.row,
+												...styles.firstRow,
+											};
 
-																	setFolders(newFolders);
-																}}
-															/>
+										if (index === folders.length - 1)
+											rowStyle = {
+												...styles.row,
+												...styles.lastRow,
+											};
 
-															<Button
-																icon="edit"
-																color="#323ea8"
-																onPress={async () => {
-																	setFolderToEdit(folder)
-																	setEditFolderName(folder.name)
-																}}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
+										return [name, isPublic, created, actions];
+									})}
+								/>
+								// <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+								// 	<View>
+								// 		<Table>
+								// 			<Row
+								// 				data={["Name", "Public", "Created", "Actions"]}
+								// 				widthArr={[80, 50, 130, 190]}
+								// 				style={styles.tableHeader}
+								// 				textStyle={{
+								// 					...styles.rowText,
+								// 					...styles.headerRow,
+								// 				}}
+								// 			/>
+								// 		</Table>
+								// 		<ScrollView
+								// 			showsVerticalScrollIndicator={false}
+								// 			style={styles.tableVerticalScroll}
+								// 		>
+								// 			<Table>
+								// 				{folders.map((folder, index) => {
+								// 					const name = folder.public ? (
+								// 						<Link
+								// 							key={folder.id}
+								// 							href={
+								// 								`${dashUrl}/folder/${folder.id}` as ExternalPathString
+								// 							}
+								// 							style={{
+								// 								...styles.rowText,
+								// 								...styles.link,
+								// 							}}
+								// 						>
+								// 							{folder.name}
+								// 						</Link>
+								// 					) : (
+								// 						<Text key={folder.id} style={styles.rowText}>
+								// 							{folder.name}
+								// 						</Text>
+								// 					);
 
-															<Button
-																onPress={async () => {
-																	const folderId = folder.id;
+								// 					const isPublic = (
+								// 						<Text key={folder.id} style={styles.rowText}>
+								// 							{folder.public ? "Yes" : "No"}
+								// 						</Text>
+								// 					);
 
-																	const success = await deleteFolder(folderId);
+								// 					const created = (
+								// 						<Text style={styles.rowText}>
+								// 							{timeDifference(
+								// 								new Date(),
+								// 								new Date(folder.createdAt),
+								// 							)}
+								// 						</Text>
+								// 					);
 
-																	if (typeof success === "string")
-																		return ToastAndroid.show(
-																			`Failed to delete the folder "${folder.name}"`,
-																			ToastAndroid.SHORT,
-																		);
+								// 					const actions = (
+								// 						<View style={styles.actionsContainer}>
+								// 							<Button
+								// 								icon="folder-open"
+								// 								color="#323ea8"
+								// 								onPress={() => {
+								// 									const folderId = folder.id;
 
-																	const newFolders = folders.filter(
-																		(fold) => fold.id !== folder.id,
-																	);
+								// 									router.replace(`/files?folderId=${folderId}`);
+								// 								}}
+								// 								iconSize={20}
+								// 								width={32}
+								// 								height={32}
+								// 								padding={6}
+								// 							/>
 
-																	setFolders(newFolders);
+								// 							<Button
+								// 								icon="content-copy"
+								// 								color={folder.public ? "#323ea8" : "#181c28"}
+								// 								iconColor={folder.public ? "white" : "#2a3952"}
+								// 								onPress={async () => {
+								// 									const urlDest = `${dashUrl}/folder/${folder.id}`;
 
-																	ToastAndroid.show(
-																		`Deleted the folder "${folder.name}"`,
-																		ToastAndroid.SHORT,
-																	);
-																}}
-																color="#CF4238"
-																icon="delete"
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
-														</View>
-													);
+								// 									const saved =
+								// 										await Clipboard.setStringAsync(urlDest);
 
-													let rowStyle = styles.row;
+								// 									if (saved)
+								// 										return ToastAndroid.show(
+								// 											"Folder URL copied to clipboard",
+								// 											ToastAndroid.SHORT,
+								// 										);
 
-													if (index === 0)
-														rowStyle = {
-															...styles.row,
-															...styles.firstRow,
-														};
+								// 									return ToastAndroid.show(
+								// 										"Failed to paste to the clipboard",
+								// 										ToastAndroid.SHORT,
+								// 									);
+								// 								}}
+								// 								disabled={!folder.public}
+								// 								iconSize={20}
+								// 								width={32}
+								// 								height={32}
+								// 								padding={6}
+								// 							/>
 
-													if (index === folders.length - 1)
-														rowStyle = {
-															...styles.row,
-															...styles.lastRow,
-														};
+								// 							<Button
+								// 								icon={folder.public ? "lock-open" : "lock"}
+								// 								color={folder.public ? "#323ea8" : "#343a40"}
+								// 								iconSize={20}
+								// 								width={32}
+								// 								height={32}
+								// 								padding={6}
+								// 								onPress={async () => {
+								// 									const folderId = folder.id;
 
-													return (
-														<Row
-															key={folder.id}
-															data={[name, isPublic, created, actions]}
-															widthArr={[80, 50, 130, 190]}
-															style={rowStyle}
-															textStyle={styles.rowText}
-														/>
-													);
-												})}
-											</Table>
-										</ScrollView>
-									</View>
-								</ScrollView>
+								// 									const success = await editFolder(
+								// 										folderId,
+								// 										{
+								// 											public: !folder.public,
+								// 										}
+								// 									);
+
+								// 									if (typeof success === "string")
+								// 										return ToastAndroid.show(
+								// 											`Failed to update the folder "${folder.name}"`,
+								// 											ToastAndroid.SHORT,
+								// 										);
+
+								// 									ToastAndroid.show(
+								// 										`Updated the folder "${folder.name}"'s visibility`,
+								// 										ToastAndroid.SHORT,
+								// 									);
+
+								// 									const folderIndex = folders.findIndex(
+								// 										(fold) => folder.id === fold.id,
+								// 									);
+
+								// 									const newFolders = [...folders];
+								// 									newFolders[folderIndex].public = !folder.public;
+
+								// 									setFolders(newFolders);
+								// 								}}
+								// 							/>
+
+								// 							<Button
+								// 								icon="edit"
+								// 								color="#323ea8"
+								// 								onPress={async () => {
+								// 									setFolderToEdit(folder)
+								// 									setEditFolderName(folder.name)
+								// 								}}
+								// 								iconSize={20}
+								// 								width={32}
+								// 								height={32}
+								// 								padding={6}
+								// 							/>
+
+								// 							<Button
+								// 								onPress={async () => {
+								// 									const folderId = folder.id;
+
+								// 									const success = await deleteFolder(folderId);
+
+								// 									if (typeof success === "string")
+								// 										return ToastAndroid.show(
+								// 											`Failed to delete the folder "${folder.name}"`,
+								// 											ToastAndroid.SHORT,
+								// 										);
+
+								// 									const newFolders = folders.filter(
+								// 										(fold) => fold.id !== folder.id,
+								// 									);
+
+								// 									setFolders(newFolders);
+
+								// 									ToastAndroid.show(
+								// 										`Deleted the folder "${folder.name}"`,
+								// 										ToastAndroid.SHORT,
+								// 									);
+								// 								}}
+								// 								color="#CF4238"
+								// 								icon="delete"
+								// 								iconSize={20}
+								// 								width={32}
+								// 								height={32}
+								// 								padding={6}
+								// 							/>
+								// 						</View>
+								// 					);
+
+								// 					let rowStyle = styles.row;
+
+								// 					if (index === 0)
+								// 						rowStyle = {
+								// 							...styles.row,
+								// 							...styles.firstRow,
+								// 						};
+
+								// 					if (index === folders.length - 1)
+								// 						rowStyle = {
+								// 							...styles.row,
+								// 							...styles.lastRow,
+								// 						};
+
+								// 					return (
+								// 						<Row
+								// 							key={folder.id}
+								// 							data={[name, isPublic, created, actions]}
+								// 							widthArr={[80, 50, 130, 190]}
+								// 							style={rowStyle}
+								// 							textStyle={styles.rowText}
+								// 						/>
+								// 					);
+								// 				})}
+								// 			</Table>
+								// 		</ScrollView>
+								// 	</View>
+								// </ScrollView>
 							) : (
 								<View style={styles.loadingContainer}>
 									<Text style={styles.loadingText}>Loading...</Text>

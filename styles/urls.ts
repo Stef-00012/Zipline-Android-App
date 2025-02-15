@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
 		borderStyle: "solid",
 		borderRadius: 10,
 		margin: 10,
+		flex: 1
 	},
 	header: {
 		flexDirection: "row",

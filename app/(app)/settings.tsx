@@ -1,9 +1,8 @@
-import { View, Text, Pressable, ToastAndroid, ScrollView } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import type { APIExports, APISelfUser, DashURL } from "@/types/zipline";
+import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { convertToBytes, getFileDataURI } from "@/functions/util";
 import { getTokenWithToken } from "@/functions/zipline/auth";
-import { Row, Table } from "react-native-reanimated-table";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { version as appVersion } from "@/package.json";
 import * as DocumentPicker from "expo-document-picker";
@@ -40,6 +39,7 @@ import {
 	getCurrentUser,
 	getCurrentUserAvatar,
 } from "@/functions/zipline/user";
+import Table from "@/components/Table";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -813,216 +813,190 @@ export default function UserSettings() {
 									/>
 
 									<View style={styles.exportsContainer}>
-										<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-											<View>
-												<Table>
-													<Row
-														data={[
-															"ID",
-															"Started On",
-															"Files",
-															"Size",
-															"Actions",
-														]}
-														widthArr={[150, 130, 50, 70, 90]}
-														style={styles.tableHeader}
-														textStyle={{
-															...styles.rowText,
-															...styles.headerRow,
-														}}
-													/>
-												</Table>
-												<ScrollView
-													showsVerticalScrollIndicator={false}
-													style={styles.tableVerticalScroll}
-												>
-													<Table>
-														{exports.map((zlExport, index) => {
-															const id = (
-																<Text style={styles.rowText}>{zlExport.id}</Text>
-															);
+										<Table
+											headerRow={[
+												"ID",
+												"Started On",
+												"Files",
+												"Size",
+												"Actions",
+											]}
+											rowWidth={[150, 130, 50, 70, 90]}
+											rows={exports.map((zlExport, index) => {
+												const id = (
+													<Text key={zlExport.id} style={styles.rowText}>{zlExport.id}</Text>
+												);
 
-															const startedOn = (
-																<Text style={styles.rowText}>
-																	{new Date(zlExport.createdAt).toLocaleString()}
-																</Text>
-															);
+												const startedOn = (
+													<Text key={zlExport.id} style={styles.rowText}>
+														{new Date(zlExport.createdAt).toLocaleString()}
+													</Text>
+												);
 
-															const files = (
-																<Text style={styles.rowText}>
-																	{zlExport.files}
-																</Text>
-															);
+												const files = (
+													<Text key={zlExport.id} style={styles.rowText}>
+														{zlExport.files}
+													</Text>
+												);
 
-															const size = (
-																<Text style={styles.rowText}>
-																	{convertToBytes(
-																		Number.parseInt(zlExport.size),
+												const size = (
+													<Text key={zlExport.id} style={styles.rowText}>
+														{convertToBytes(
+															Number.parseInt(zlExport.size),
+															{
+																unitSeparator: " ",
+															},
+														)}
+													</Text>
+												);
+
+												const actions = (
+													<View key={zlExport.id} style={styles.actionsContainer}>
+														<Button
+															icon="delete"
+															color="#CF4238"
+															onPress={async () => {
+																setSaveError(null);
+
+																const exportId = zlExport.id;
+
+																const success =
+																	await deleteUserExport(exportId);
+
+																if (typeof success === "string")
+																	return setSaveError(success);
+
+																const newExports = await getUserExports();
+
+																setExports(
+																	typeof newExports === "string"
+																		? null
+																		: newExports,
+																);
+
+																return ToastAndroid.show(
+																	"Successfully deleted the export",
+																	ToastAndroid.SHORT,
+																);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+
+														<Button
+															icon="download"
+															color={
+																zlExport.completed ? "#323ea8" : "#181c28"
+															}
+															iconColor={
+																zlExport.completed ? "white" : "gray"
+															}
+															disabled={!zlExport.completed}
+															onPress={async () => {
+																const exportId = zlExport.id;
+
+																const downloadUrl = `${url}/api/user/export?id=${exportId}`;
+
+																let savedExportDownloadUri =
+																	db.get("exportDownloadPath");
+
+																if (!savedExportDownloadUri) {
+																	const permissions =
+																		await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+																	if (!permissions.granted)
+																		return ToastAndroid.show(
+																			"The permission to save the file was not granted",
+																			ToastAndroid.SHORT,
+																		);
+
+																	db.set(
+																		"exportDownloadPath",
+																		permissions.directoryUri,
+																	);
+																	savedExportDownloadUri =
+																		permissions.directoryUri;
+																}
+
+																ToastAndroid.show(
+																	"Downloading...",
+																	ToastAndroid.SHORT,
+																);
+
+																const saveUri =
+																	await FileSystem.StorageAccessFramework.createFileAsync(
+																		savedExportDownloadUri,
+																		zlExport.path,
+																		"application/zip",
+																	);
+
+																const downloadResult =
+																	await FileSystem.downloadAsync(
+																		downloadUrl,
+																		`${FileSystem.cacheDirectory}/${zlExport.path}`,
 																		{
-																			unitSeparator: " ",
+																			headers: {
+																				Authorization: token,
+																			},
 																		},
-																	)}
-																</Text>
-															);
+																	);
 
-															const actions = (
-																<View style={styles.actionsContainer}>
-																	<Button
-																		icon="delete"
-																		color="#CF4238"
-																		onPress={async () => {
-																			setSaveError(null);
+																if (!downloadResult.uri)
+																	return ToastAndroid.show(
+																		"Something went wrong while downloading the file",
+																		ToastAndroid.SHORT,
+																	);
 
-																			const exportId = zlExport.id;
+																const base64Export =
+																	await FileSystem.readAsStringAsync(
+																		downloadResult.uri,
+																		{
+																			encoding:
+																				FileSystem.EncodingType.Base64,
+																		},
+																	);
 
-																			const success =
-																				await deleteUserExport(exportId);
+																await FileSystem.writeAsStringAsync(
+																	saveUri,
+																	base64Export,
+																	{
+																		encoding:
+																			FileSystem.EncodingType.Base64,
+																	},
+																);
 
-																			if (typeof success === "string")
-																				return setSaveError(success);
+																ToastAndroid.show(
+																	"Successfully downloaded the export",
+																	ToastAndroid.SHORT,
+																);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+													</View>
+												);
 
-																			const newExports = await getUserExports();
+												let rowStyle = styles.row;
 
-																			setExports(
-																				typeof newExports === "string"
-																					? null
-																					: newExports,
-																			);
+												if (index === 0)
+													rowStyle = {
+														...styles.row,
+														...styles.firstRow,
+													};
 
-																			return ToastAndroid.show(
-																				"Successfully deleted the export",
-																				ToastAndroid.SHORT,
-																			);
-																		}}
-																		iconSize={20}
-																		width={32}
-																		height={32}
-																		padding={6}
-																	/>
+												if (index === exports.length - 1)
+													rowStyle = {
+														...styles.row,
+														...styles.lastRow,
+													};
 
-																	<Button
-																		icon="download"
-																		color={
-																			zlExport.completed ? "#323ea8" : "#181c28"
-																		}
-																		iconColor={
-																			zlExport.completed ? "white" : "gray"
-																		}
-																		disabled={!zlExport.completed}
-																		onPress={async () => {
-																			const exportId = zlExport.id;
-
-																			const downloadUrl = `${url}/api/user/export?id=${exportId}`;
-
-																			let savedExportDownloadUri =
-																				db.get("exportDownloadPath");
-
-																			if (!savedExportDownloadUri) {
-																				const permissions =
-																					await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-																				if (!permissions.granted)
-																					return ToastAndroid.show(
-																						"The permission to save the file was not granted",
-																						ToastAndroid.SHORT,
-																					);
-
-																				db.set(
-																					"exportDownloadPath",
-																					permissions.directoryUri,
-																				);
-																				savedExportDownloadUri =
-																					permissions.directoryUri;
-																			}
-
-																			ToastAndroid.show(
-																				"Downloading...",
-																				ToastAndroid.SHORT,
-																			);
-
-																			const saveUri =
-																				await FileSystem.StorageAccessFramework.createFileAsync(
-																					savedExportDownloadUri,
-																					zlExport.path,
-																					"application/zip",
-																				);
-
-																			const downloadResult =
-																				await FileSystem.downloadAsync(
-																					downloadUrl,
-																					`${FileSystem.cacheDirectory}/${zlExport.path}`,
-																					{
-																						headers: {
-																							Authorization: token,
-																						},
-																					},
-																				);
-
-																			if (!downloadResult.uri)
-																				return ToastAndroid.show(
-																					"Something went wrong while downloading the file",
-																					ToastAndroid.SHORT,
-																				);
-
-																			const base64Export =
-																				await FileSystem.readAsStringAsync(
-																					downloadResult.uri,
-																					{
-																						encoding:
-																							FileSystem.EncodingType.Base64,
-																					},
-																				);
-
-																			await FileSystem.writeAsStringAsync(
-																				saveUri,
-																				base64Export,
-																				{
-																					encoding:
-																						FileSystem.EncodingType.Base64,
-																				},
-																			);
-
-																			ToastAndroid.show(
-																				"Successfully downloaded the export",
-																				ToastAndroid.SHORT,
-																			);
-																		}}
-																		iconSize={20}
-																		width={32}
-																		height={32}
-																		padding={6}
-																	/>
-																</View>
-															);
-
-															let rowStyle = styles.row;
-
-															if (index === 0)
-																rowStyle = {
-																	...styles.row,
-																	...styles.firstRow,
-																};
-
-															if (index === exports.length - 1)
-																rowStyle = {
-																	...styles.row,
-																	...styles.lastRow,
-																};
-
-															return (
-																<Row
-																	key={zlExport.id}
-																	data={[id, startedOn, files, size, actions]}
-																	widthArr={[150, 130, 50, 70, 90]}
-																	style={rowStyle}
-																	textStyle={styles.rowText}
-																/>
-															);
-														})}
-													</Table>
-												</ScrollView>
-											</View>
-										</ScrollView>
+												return [id, startedOn, files, size, actions];
+											})}
+										/>
 									</View>
 								</View>
 							)}

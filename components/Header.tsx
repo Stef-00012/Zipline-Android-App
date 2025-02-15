@@ -10,6 +10,7 @@ import { View, Pressable } from "react-native";
 import Sidebar from "@/components/Sidebar";
 import type React from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { getRippleColor } from "@/functions/util";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter();
@@ -69,6 +70,9 @@ export default function Header({ children }: PropsWithChildren) {
 								icon={() => (
 									<MaterialIcons name="menu" color={"#fff"} size={40} />
 								)}
+								android_ripple={{
+									color: getRippleColor("#0c101c")
+								}}
 								onPress={() => {
 									setSidebarOpen((prev) => !prev);
 								}}
@@ -78,12 +82,19 @@ export default function Header({ children }: PropsWithChildren) {
 						<Stack>
 							<View>
 								<Pressable
+									android_ripple={{
+										color: getRippleColor("#0c101c"),
+										radius: 50
+									}}
+									disabled={pathname === "/settings"}
+									style={{
+										padding: 10,
+										borderRadius: 10
+									}}
 									onPress={() => {
-										if (pathname !== "/settings") {
-											resetShareIntent();
+										resetShareIntent();
 
-											router.replace("/settings");
-										}
+										router.replace("/settings");
 									}}
 								>
 									<UserAvatar username={user.username} avatar={avatar} />

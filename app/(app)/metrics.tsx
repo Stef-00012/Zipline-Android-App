@@ -2,7 +2,6 @@ import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart, PieChart } from "react-native-gifted-charts";
 import { colorHash, convertToBytes } from "@/functions/util";
 import type { DateType } from "react-native-ui-datepicker";
-import { Row, Table } from "react-native-reanimated-table";
 import { getSettings } from "@/functions/zipline/settings";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import ChartLegend from "@/components/ChartLegend";
@@ -19,6 +18,7 @@ import {
 	type StatsProps,
 } from "@/functions/zipline/stats";
 import React from "react";
+import Table from "@/components/Table";
 
 export default function Metrics() {
 	useAuth();
@@ -152,9 +152,7 @@ export default function Metrics() {
 					<Text style={styles.dateRangeText}>
 						{allTime
 							? "All Time"
-							: `${new Date(
-									range.startDate as string,
-								).toLocaleDateString()}${
+							: `${new Date(range.startDate as string).toLocaleDateString()}${
 									range.endDate
 										? ` to ${new Date(range.endDate as string).toLocaleDateString()}`
 										: ""
@@ -175,7 +173,7 @@ export default function Metrics() {
 						}}
 						rippleColor="#283557"
 						disabled={!filteredStats || !mainStat}
-						textColor={(filteredStats && mainStat) ? "white" : "gray"}
+						textColor={filteredStats && mainStat ? "white" : "gray"}
 					/>
 				</View>
 
@@ -232,83 +230,45 @@ export default function Metrics() {
 											padding: 0,
 										}}
 									>
-										<ScrollView
-											showsHorizontalScrollIndicator={false}
-											horizontal
-										>
-											<View>
-												<Table>
-													<Row
-														data={["User", "URLs", "Views"]}
-														widthArr={[180, 100, 100]}
-														style={styles.tableHeader}
-														textStyle={{
-															...styles.rowText,
-															...styles.headerRow,
-														}}
-													/>
-												</Table>
-												<ScrollView
-													showsVerticalScrollIndicator={false}
-													style={styles.tableVerticalScroll}
-												>
-													<Table>
-														{mainStat.data.urlsUsers.map((userUrl, index) => {
-															const username = (
-																<Text
-																	key={userUrl.username}
-																	style={styles.rowText}
-																>
-																	{userUrl.username}
-																</Text>
-															);
+										<Table
+											headerRow={["User", "URLs", "Views"]}
+											rowWidth={[180, 100, 100]}
+											rows={mainStat.data.urlsUsers.map((userUrl, index) => {
+												const username = (
+													<Text key={userUrl.username} style={styles.rowText}>
+														{userUrl.username}
+													</Text>
+												);
 
-															const urls = (
-																<Text
-																	key={userUrl.username}
-																	style={styles.rowText}
-																>
-																	{userUrl.sum}
-																</Text>
-															);
+												const urls = (
+													<Text key={userUrl.username} style={styles.rowText}>
+														{userUrl.sum}
+													</Text>
+												);
 
-															const views = (
-																<Text
-																	key={userUrl.username}
-																	style={styles.rowText}
-																>
-																	{userUrl.views}
-																</Text>
-															);
+												const views = (
+													<Text key={userUrl.username} style={styles.rowText}>
+														{userUrl.views}
+													</Text>
+												);
 
-															let rowStyle = styles.row;
+												let rowStyle = styles.row;
 
-															if (index === 0)
-																rowStyle = {
-																	...styles.row,
-																	...styles.firstRow,
-																};
+												if (index === 0)
+													rowStyle = {
+														...styles.row,
+														...styles.firstRow,
+													};
 
-															if (index === mainStat.data.types.length - 1)
-																rowStyle = {
-																	...styles.row,
-																	...styles.lastRow,
-																};
+												if (index === mainStat.data.types.length - 1)
+													rowStyle = {
+														...styles.row,
+														...styles.lastRow,
+													};
 
-															return (
-																<Row
-																	key={userUrl.username}
-																	data={[username, urls, views]}
-																	widthArr={[180, 100, 100]}
-																	style={rowStyle}
-																	textStyle={styles.rowText}
-																/>
-															);
-														})}
-													</Table>
-												</ScrollView>
-											</View>
-										</ScrollView>
+												return [username, urls, views];
+											})}
+										/>
 									</View>
 
 									<View
@@ -317,94 +277,53 @@ export default function Metrics() {
 											padding: 0,
 										}}
 									>
-										<ScrollView
-											showsHorizontalScrollIndicator={false}
-											horizontal
-										>
-											<View>
-												<Table>
-													<Row
-														data={["User", "Files", "Storage Used", "Views"]}
-														widthArr={[130, 50, 130, 50]}
-														style={styles.tableHeader}
-														textStyle={{
-															...styles.rowText,
-															...styles.headerRow,
-														}}
-													/>
-												</Table>
-												<ScrollView
-													showsVerticalScrollIndicator={false}
-													style={styles.tableVerticalScroll}
-												>
-													<Table>
-														{mainStat.data.filesUsers.map((userFile, index) => {
-															const username = (
-																<Text
-																	key={userFile.username}
-																	style={styles.rowText}
-																>
-																	{userFile.username}
-																</Text>
-															);
+										<Table
+											headerRow={["User", "Files", "Storage Used", "Views"]}
+											rowWidth={[130, 50, 130, 50]}
+											rows={mainStat.data.filesUsers.map((userFile, index) => {
+												const username = (
+													<Text key={userFile.username} style={styles.rowText}>
+														{userFile.username}
+													</Text>
+												);
 
-															const files = (
-																<Text
-																	key={userFile.username}
-																	style={styles.rowText}
-																>
-																	{userFile.sum}
-																</Text>
-															);
+												const files = (
+													<Text key={userFile.username} style={styles.rowText}>
+														{userFile.sum}
+													</Text>
+												);
 
-															const storageUsed = (
-																<Text
-																	key={userFile.username}
-																	style={styles.rowText}
-																>
-																	{convertToBytes(userFile.storage, {
-																		unitSeparator: " ",
-																	})}
-																</Text>
-															);
-
-															const views = (
-																<Text
-																	key={userFile.username}
-																	style={styles.rowText}
-																>
-																	{userFile.views}
-																</Text>
-															);
-
-															let rowStyle = styles.row;
-
-															if (index === 0)
-																rowStyle = {
-																	...styles.row,
-																	...styles.firstRow,
-																};
-
-															if (index === mainStat.data.types.length - 1)
-																rowStyle = {
-																	...styles.row,
-																	...styles.lastRow,
-																};
-
-															return (
-																<Row
-																	key={userFile.username}
-																	data={[username, files, storageUsed, views]}
-																	widthArr={[130, 50, 130, 50]}
-																	style={rowStyle}
-																	textStyle={styles.rowText}
-																/>
-															);
+												const storageUsed = (
+													<Text key={userFile.username} style={styles.rowText}>
+														{convertToBytes(userFile.storage, {
+															unitSeparator: " ",
 														})}
-													</Table>
-												</ScrollView>
-											</View>
-										</ScrollView>
+													</Text>
+												);
+
+												const views = (
+													<Text key={userFile.username} style={styles.rowText}>
+														{userFile.views}
+													</Text>
+												);
+
+												let rowStyle = styles.row;
+
+												if (index === 0)
+													rowStyle = {
+														...styles.row,
+														...styles.firstRow,
+													};
+
+												if (index === mainStat.data.types.length - 1)
+													rowStyle = {
+														...styles.row,
+														...styles.lastRow,
+													};
+
+												return [username, files, storageUsed, views];
+											})}
+										/>
 									</View>
 
 									<View
@@ -413,74 +332,39 @@ export default function Metrics() {
 											padding: 0,
 										}}
 									>
-										<ScrollView
-											showsHorizontalScrollIndicator={false}
-											horizontal
-										>
-											<View>
-												<Table>
-													<Row
-														data={["Type", "Files"]}
-														widthArr={[tableTypeWidth, tableFilesWidth]}
-														style={styles.tableHeader}
-														textStyle={{
-															...styles.rowText,
-															...styles.headerRow,
-														}}
-													/>
-												</Table>
-												<ScrollView
-													showsVerticalScrollIndicator={false}
-													style={styles.tableVerticalScroll}
-												>
-													<Table>
-														{mainStat.data.types.map((typeData, index) => {
-															const type = (
-																<Text
-																	key={typeData.type}
-																	style={styles.rowText}
-																>
-																	{typeData.type}
-																</Text>
-															);
+										<Table
+											headerRow={["Type", "Files"]}
+											rowWidth={[tableTypeWidth, tableFilesWidth]}
+											rows={mainStat.data.types.map((typeData, index) => {
+												const type = (
+													<Text key={typeData.type} style={styles.rowText}>
+														{typeData.type}
+													</Text>
+												);
 
-															const files = (
-																<Text
-																	key={typeData.type}
-																	style={styles.rowText}
-																>
-																	{typeData.sum}
-																</Text>
-															);
+												const files = (
+													<Text key={typeData.type} style={styles.rowText}>
+														{typeData.sum}
+													</Text>
+												);
 
-															let rowStyle = styles.row;
+												let rowStyle = styles.row;
 
-															if (index === 0)
-																rowStyle = {
-																	...styles.row,
-																	...styles.firstRow,
-																};
+												if (index === 0)
+													rowStyle = {
+														...styles.row,
+														...styles.firstRow,
+													};
 
-															if (index === mainStat.data.types.length - 1)
-																rowStyle = {
-																	...styles.row,
-																	...styles.lastRow,
-																};
+												if (index === mainStat.data.types.length - 1)
+													rowStyle = {
+														...styles.row,
+														...styles.lastRow,
+													};
 
-															return (
-																<Row
-																	key={typeData.type}
-																	data={[type, files]}
-																	widthArr={[tableTypeWidth, tableFilesWidth]}
-																	style={rowStyle}
-																	textStyle={styles.rowText}
-																/>
-															);
-														})}
-													</Table>
-												</ScrollView>
-											</View>
-										</ScrollView>
+												return [type, files];
+											})}
+										/>
 									</View>
 								</>
 							)}

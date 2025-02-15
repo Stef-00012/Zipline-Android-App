@@ -1,5 +1,4 @@
-import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import { Row, Table } from "react-native-reanimated-table";
+import { Text, View, ToastAndroid } from "react-native";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/admin/invites";
@@ -21,6 +20,7 @@ import type {
 	APIInvites,
 	DashURL,
 } from "@/types/zipline";
+import Table from "@/components/Table";
 
 export default function Invites() {
 	useAuth("ADMIN");
@@ -155,185 +155,338 @@ export default function Invites() {
 				<View style={{ flex: 1 }}>
 					<View style={{ ...styles.invitesContainer, flex: 1 }}>
 						{invites && dashUrl ? (
-							<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-								<View>
-									<Table>
-										<Row
-											data={[
-												"Code",
-												"Created By",
-												"Created",
-												"Last Updated",
-												"Expires",
-												"Max Uses",
-												"Uses",
-												"Actions",
-											]}
-											widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
-											style={styles.tableHeader}
-											textStyle={{
-												...styles.rowText,
-												...styles.headerRow,
-											}}
-										/>
-									</Table>
-									<ScrollView
-										showsVerticalScrollIndicator={false}
-										style={styles.tableVerticalScroll}
-									>
-										<Table>
-											{invites.map((invite, index) => {
-												const code = (
-													<Text key={invite.id} style={styles.rowText}>
-														{invite.code}
-													</Text>
-												);
+							<Table
+								headerRow={[
+									"Code",
+									"Created By",
+									"Created",
+									"Last Updated",
+									"Expires",
+									"Max Uses",
+									"Uses",
+									"Actions",
+								]}
+								rowWidth={[80, 100, 130, 130, 130, 100, 100, 90]}
+								rows={invites.map((invite, index) => {
+									const code = (
+										<Text key={invite.id} style={styles.rowText}>
+											{invite.code}
+										</Text>
+									);
 
-												const createdBy = (
-													<Text key={invite.id} style={styles.rowText}>
-														{invite.inviter.username}
-													</Text>
-												);
+									const createdBy = (
+										<Text key={invite.id} style={styles.rowText}>
+											{invite.inviter.username}
+										</Text>
+									);
 
-												const created = (
-													<Text style={styles.rowText}>
-														{timeDifference(
-															new Date(),
-															new Date(invite.createdAt),
-														)}
-													</Text>
-												);
+									const created = (
+										<Text key={invite.id} style={styles.rowText}>
+											{timeDifference(
+												new Date(),
+												new Date(invite.createdAt),
+											)}
+										</Text>
+									);
 
-												const lastUpdated = (
-													<Text style={styles.rowText}>
-														{timeDifference(
-															new Date(),
-															new Date(invite.updatedAt),
-														)}
-													</Text>
-												);
+									const lastUpdated = (
+										<Text key={invite.id} style={styles.rowText}>
+											{timeDifference(
+												new Date(),
+												new Date(invite.updatedAt),
+											)}
+										</Text>
+									);
 
-												const expires = invite.expiresAt ? (
-													<Text style={styles.rowText}>
-														{timeDifference(
-															new Date(),
-															new Date(invite.expiresAt),
-														)}
-													</Text>
-												) : (
-													<Text key={invite.id} style={styles.rowText}>
-														Never
-													</Text>
-												);
+									const expires = invite.expiresAt ? (
+										<Text key={invite.id} style={styles.rowText}>
+											{timeDifference(
+												new Date(),
+												new Date(invite.expiresAt),
+											)}
+										</Text>
+									) : (
+										<Text key={invite.id} style={styles.rowText}>
+											Never
+										</Text>
+									);
 
-												const uses = (
-													<Text style={styles.rowText}>{invite.uses}</Text>
-												);
+									const uses = (
+										<Text key={invite.id} style={styles.rowText}>{invite.uses}</Text>
+									);
 
-												const maxUses = (
-													<Text style={styles.rowText}>
-														{invite.maxUses || "Unlimited"}
-													</Text>
-												);
+									const maxUses = (
+										<Text key={invite.id} style={styles.rowText}>
+											{invite.maxUses || "Unlimited"}
+										</Text>
+									);
 
-												const actions = (
-													<View style={styles.actionsContainer}>
-														<Button
-															icon="content-copy"
-															color="#323ea8"
-															onPress={async () => {
-																const urlDest = `${dashUrl}/invite/${invite.code}`;
+									const actions = (
+										<View key={invite.id} style={styles.actionsContainer}>
+											<Button
+												icon="content-copy"
+												color="#323ea8"
+												onPress={async () => {
+													const urlDest = `${dashUrl}/invite/${invite.code}`;
 
-																const saved =
-																	await Clipboard.setStringAsync(urlDest);
+													const saved =
+														await Clipboard.setStringAsync(urlDest);
 
-																if (saved)
-																	return ToastAndroid.show(
-																		"Invite URL copied to clipboard",
-																		ToastAndroid.SHORT,
-																	);
+													if (saved)
+														return ToastAndroid.show(
+															"Invite URL copied to clipboard",
+															ToastAndroid.SHORT,
+														);
 
-																return ToastAndroid.show(
-																	"Failed to paste to the clipboard",
-																	ToastAndroid.SHORT,
-																);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
+													return ToastAndroid.show(
+														"Failed to paste to the clipboard",
+														ToastAndroid.SHORT,
+													);
+												}}
+												iconSize={20}
+												width={32}
+												height={32}
+												padding={6}
+											/>
 
-														<Button
-															icon="delete"
-															color="#CF4238"
-															onPress={async () => {
-																const inviteId = invite.id;
+											<Button
+												icon="delete"
+												color="#CF4238"
+												onPress={async () => {
+													const inviteId = invite.id;
 
-																const success = await deleteInvite(inviteId);
+													const success = await deleteInvite(inviteId);
 
-																if (typeof success === "string")
-																	return ToastAndroid.show(
-																		`Failed to delete the invite "${invite.code}"`,
-																		ToastAndroid.SHORT,
-																	);
+													if (typeof success === "string")
+														return ToastAndroid.show(
+															`Failed to delete the invite "${invite.code}"`,
+															ToastAndroid.SHORT,
+														);
 
-																const newInvites = invites.filter(
-																	(inv) => inv.id !== invite.id,
-																);
+													const newInvites = invites.filter(
+														(inv) => inv.id !== invite.id,
+													);
 
-																setInvites(newInvites);
+													setInvites(newInvites);
 
-																ToastAndroid.show(
-																	`Deleted the invite "${invite.code}"`,
-																	ToastAndroid.SHORT,
-																);
-															}}
-															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
-														/>
-													</View>
-												);
+													ToastAndroid.show(
+														`Deleted the invite "${invite.code}"`,
+														ToastAndroid.SHORT,
+													);
+												}}
+												iconSize={20}
+												width={32}
+												height={32}
+												padding={6}
+											/>
+										</View>
+									);
 
-												let rowStyle = styles.row;
+									let rowStyle = styles.row;
 
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
+									if (index === 0)
+										rowStyle = {
+											...styles.row,
+											...styles.firstRow,
+										};
 
-												if (index === invites.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
+									if (index === invites.length - 1)
+										rowStyle = {
+											...styles.row,
+											...styles.lastRow,
+										};
 
-												return (
-													<Row
-														key={invite.id}
-														data={[
-															code,
-															createdBy,
-															created,
-															lastUpdated,
-															expires,
-															maxUses,
-															uses,
-															actions,
-														]}
-														widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
-														style={rowStyle}
-														textStyle={styles.rowText}
-													/>
-												);
-											})}
-										</Table>
-									</ScrollView>
-								</View>
-							</ScrollView>
+									return [
+										code,
+										createdBy,
+										created,
+										lastUpdated,
+										expires,
+										maxUses,
+										uses,
+										actions,
+									];
+								})}
+							/>
+							// <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+							// 	<View>
+							// 		<Table>
+							// 			<Row
+							// 				data={[
+							// 					"Code",
+							// 					"Created By",
+							// 					"Created",
+							// 					"Last Updated",
+							// 					"Expires",
+							// 					"Max Uses",
+							// 					"Uses",
+							// 					"Actions",
+							// 				]}
+							// 				widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
+							// 				style={styles.tableHeader}
+							// 				textStyle={{
+							// 					...styles.rowText,
+							// 					...styles.headerRow,
+							// 				}}
+							// 			/>
+							// 		</Table>
+							// 		<ScrollView
+							// 			showsVerticalScrollIndicator={false}
+							// 			style={styles.tableVerticalScroll}
+							// 		>
+							// 			<Table>
+							// 				{invites.map((invite, index) => {
+							// 					const code = (
+							// 						<Text key={invite.id} style={styles.rowText}>
+							// 							{invite.code}
+							// 						</Text>
+							// 					);
+
+							// 					const createdBy = (
+							// 						<Text key={invite.id} style={styles.rowText}>
+							// 							{invite.inviter.username}
+							// 						</Text>
+							// 					);
+
+							// 					const created = (
+							// 						<Text style={styles.rowText}>
+							// 							{timeDifference(
+							// 								new Date(),
+							// 								new Date(invite.createdAt),
+							// 							)}
+							// 						</Text>
+							// 					);
+
+							// 					const lastUpdated = (
+							// 						<Text style={styles.rowText}>
+							// 							{timeDifference(
+							// 								new Date(),
+							// 								new Date(invite.updatedAt),
+							// 							)}
+							// 						</Text>
+							// 					);
+
+							// 					const expires = invite.expiresAt ? (
+							// 						<Text style={styles.rowText}>
+							// 							{timeDifference(
+							// 								new Date(),
+							// 								new Date(invite.expiresAt),
+							// 							)}
+							// 						</Text>
+							// 					) : (
+							// 						<Text key={invite.id} style={styles.rowText}>
+							// 							Never
+							// 						</Text>
+							// 					);
+
+							// 					const uses = (
+							// 						<Text style={styles.rowText}>{invite.uses}</Text>
+							// 					);
+
+							// 					const maxUses = (
+							// 						<Text style={styles.rowText}>
+							// 							{invite.maxUses || "Unlimited"}
+							// 						</Text>
+							// 					);
+
+							// 					const actions = (
+							// 						<View style={styles.actionsContainer}>
+							// 							<Button
+							// 								icon="content-copy"
+							// 								color="#323ea8"
+							// 								onPress={async () => {
+							// 									const urlDest = `${dashUrl}/invite/${invite.code}`;
+
+							// 									const saved =
+							// 										await Clipboard.setStringAsync(urlDest);
+
+							// 									if (saved)
+							// 										return ToastAndroid.show(
+							// 											"Invite URL copied to clipboard",
+							// 											ToastAndroid.SHORT,
+							// 										);
+
+							// 									return ToastAndroid.show(
+							// 										"Failed to paste to the clipboard",
+							// 										ToastAndroid.SHORT,
+							// 									);
+							// 								}}
+							// 								iconSize={20}
+							// 								width={32}
+							// 								height={32}
+							// 								padding={6}
+							// 							/>
+
+							// 							<Button
+							// 								icon="delete"
+							// 								color="#CF4238"
+							// 								onPress={async () => {
+							// 									const inviteId = invite.id;
+
+							// 									const success = await deleteInvite(inviteId);
+
+							// 									if (typeof success === "string")
+							// 										return ToastAndroid.show(
+							// 											`Failed to delete the invite "${invite.code}"`,
+							// 											ToastAndroid.SHORT,
+							// 										);
+
+							// 									const newInvites = invites.filter(
+							// 										(inv) => inv.id !== invite.id,
+							// 									);
+
+							// 									setInvites(newInvites);
+
+							// 									ToastAndroid.show(
+							// 										`Deleted the invite "${invite.code}"`,
+							// 										ToastAndroid.SHORT,
+							// 									);
+							// 								}}
+							// 								iconSize={20}
+							// 								width={32}
+							// 								height={32}
+							// 								padding={6}
+							// 							/>
+							// 						</View>
+							// 					);
+
+							// 					let rowStyle = styles.row;
+
+							// 					if (index === 0)
+							// 						rowStyle = {
+							// 							...styles.row,
+							// 							...styles.firstRow,
+							// 						};
+
+							// 					if (index === invites.length - 1)
+							// 						rowStyle = {
+							// 							...styles.row,
+							// 							...styles.lastRow,
+							// 						};
+
+							// 					return (
+							// 						<Row
+							// 							key={invite.id}
+							// 							data={[
+							// 								code,
+							// 								createdBy,
+							// 								created,
+							// 								lastUpdated,
+							// 								expires,
+							// 								maxUses,
+							// 								uses,
+							// 								actions,
+							// 							]}
+							// 							widthArr={[80, 100, 130, 130, 130, 100, 100, 90]}
+							// 							style={rowStyle}
+							// 							textStyle={styles.rowText}
+							// 						/>
+							// 					);
+							// 				})}
+							// 			</Table>
+							// 		</ScrollView>
+							// 	</View>
+							// </ScrollView>
 						) : (
 							<View style={styles.loadingContainer}>
 								<Text style={styles.loadingText}>Loading...</Text>

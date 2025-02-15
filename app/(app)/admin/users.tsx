@@ -2,7 +2,6 @@ import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { getFileDataURI, timeDifference } from "@/functions/util";
 import { fileQuotaTypes, userRoles } from "@/constants/users";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Row, Table } from "react-native-reanimated-table";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
@@ -29,6 +28,7 @@ import type {
 	APIUsersNoIncl,
 	DashURL,
 } from "@/types/zipline";
+import Table from "@/components/Table";
 
 export default function Users() {
 	useAuth("ADMIN");
@@ -517,7 +517,9 @@ export default function Users() {
 								</Text>
 
 								<Text style={styles.deleteWarningText}>
-									Are you sure you want to delete {userToDelete.username}? This
+									Are you sure you want to delete <Text style={{
+										fontWeight: "bold"
+									}}>{userToDelete.username}</Text>? This
 									action cannot be undone.
 								</Text>
 
@@ -574,7 +576,9 @@ export default function Users() {
 								</Text>
 
 								<Text style={styles.deleteWarningText}>
-									Would you like to delete {userToDeleteData.username}'s files
+									Would you like to delete <Text style={{
+										fontWeight: "bold"
+									}}>{userToDeleteData.username}</Text>'s files
 									and urls? This action cannot be undone.
 								</Text>
 
@@ -669,161 +673,136 @@ export default function Users() {
 					<View style={{ flex: 1 }}>
 						<View style={{ ...styles.usersContainer, flex: 1 }}>
 							{users && dashUrl ? (
-								<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-									<View>
-										<Table>
-											<Row
-												data={[
-													"Avatar",
-													"Username",
-													"Role",
-													"Created",
-													"Last Updated",
-													"Actions",
-												]}
-												widthArr={[80, 100, 100, 130, 130, 130]}
-												style={styles.tableHeader}
-												textStyle={{
-													...styles.rowText,
-													...styles.headerRow,
-												}}
+								<Table
+									headerRow={[
+										"Avatar",
+										"Username",
+										"Role",
+										"Created",
+										"Last Updated",
+										"Actions",
+									]}
+									rowWidth={[80, 100, 100, 130, 130, 130]}
+									rows={users.map((user, index) => {
+										const avatar = user.avatar ? (
+											<Image
+												key={user.id}
+												source={{ uri: user.avatar }}
+												style={styles.userAvatar}
+												alt={`${user.username}'s avatar`}
 											/>
-										</Table>
-										<ScrollView
-											showsVerticalScrollIndicator={false}
-											style={styles.tableVerticalScroll}
-										>
-											<Table>
-												{users.map((user, index) => {
-													const avatar = user.avatar ? (
-														<Image
-															source={{ uri: user.avatar }}
-															style={styles.userAvatar}
-															alt={`${user.username}'s avatar`}
-														/>
-													) : (
-														<View style={styles.userAvatar}>
-															<MaterialIcons
-																name="person"
-																size={30}
-																color={"white"}
-															/>
-														</View>
-													);
+										) : (
+											<View key={user.id} style={styles.userAvatar}>
+												<MaterialIcons
+													name="person"
+													size={30}
+													color={"white"}
+												/>
+											</View>
+										);
 
-													const username = (
-														<Text key={user.id} style={styles.rowText}>
-															{user.username}
-														</Text>
-													);
+										const username = (
+											<Text key={user.id} style={styles.rowText}>
+												{user.username}
+											</Text>
+										);
 
-													const role = (
-														<Text key={user.id} style={styles.rowText}>
-															{user.role.charAt(0).toUpperCase() +
-																user.role.slice(1).toLowerCase()}
-														</Text>
-													);
+										const role = (
+											<Text key={user.id} style={styles.rowText}>
+												{user.role.charAt(0).toUpperCase() +
+													user.role.slice(1).toLowerCase()}
+											</Text>
+										);
 
-													const created = (
-														<Text style={styles.rowText}>
-															{timeDifference(
-																new Date(),
-																new Date(user.createdAt),
-															)}
-														</Text>
-													);
+										const created = (
+											<Text key={user.id} style={styles.rowText}>
+												{timeDifference(
+													new Date(),
+													new Date(user.createdAt),
+												)}
+											</Text>
+										);
 
-													const lastUpdated = (
-														<Text style={styles.rowText}>
-															{timeDifference(
-																new Date(),
-																new Date(user.updatedAt),
-															)}
-														</Text>
-													);
+										const lastUpdated = (
+											<Text key={user.id} style={styles.rowText}>
+												{timeDifference(
+													new Date(),
+													new Date(user.updatedAt),
+												)}
+											</Text>
+										);
 
-													const actions = (
-														<View style={styles.actionsContainer}>
-															<Button
-																icon="folder-open"
-																color="#323ea8"
-																onPress={async () => {
-																	const userId = user.id;
+										const actions = (
+											<View key={user.id} style={styles.actionsContainer}>
+												<Button
+													icon="folder-open"
+													color="#323ea8"
+													onPress={async () => {
+														const userId = user.id;
 
-																	router.replace(`/files?id=${userId}`);
-																}}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
+														router.replace(`/files?id=${userId}`);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
 
-															<Button
-																icon="edit"
-																color="#323ea8"
-																onPress={() => {
-																	const userId = user.id;
+												<Button
+													icon="edit"
+													color="#323ea8"
+													onPress={() => {
+														const userId = user.id;
 
-																	setUserToEdit(
-																		users.find((usr) => usr.id === userId) ||
-																			null,
-																	);
-																}}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
+														setUserToEdit(
+															users.find((usr) => usr.id === userId) ||
+																null,
+														);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
 
-															<Button
-																icon="delete"
-																color="#CF4238"
-																onPress={async () => {
-																	setUserToDelete(user);
-																}}
-																iconSize={20}
-																width={32}
-																height={32}
-																padding={6}
-															/>
-														</View>
-													);
+												<Button
+													icon="delete"
+													color="#CF4238"
+													onPress={async () => {
+														setUserToDelete(user);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+											</View>
+										);
 
-													let rowStyle = styles.row;
+										let rowStyle = styles.row;
 
-													if (index === 0)
-														rowStyle = {
-															...styles.row,
-															...styles.firstRow,
-														};
+										if (index === 0)
+											rowStyle = {
+												...styles.row,
+												...styles.firstRow,
+											};
 
-													if (index === users.length - 1)
-														rowStyle = {
-															...styles.row,
-															...styles.lastRow,
-														};
+										if (index === users.length - 1)
+											rowStyle = {
+												...styles.row,
+												...styles.lastRow,
+											};
 
-													return (
-														<Row
-															key={user.id}
-															data={[
-																avatar,
-																username,
-																role,
-																created,
-																lastUpdated,
-																actions,
-															]}
-															widthArr={[80, 100, 100, 130, 130, 130]}
-															style={rowStyle}
-															textStyle={styles.rowText}
-														/>
-													);
-												})}
-											</Table>
-										</ScrollView>
-									</View>
-								</ScrollView>
+										return [
+											avatar,
+											username,
+											role,
+											created,
+											lastUpdated,
+											actions,
+										];
+									})}
+								/>
 							) : (
 								<View style={styles.loadingContainer}>
 									<Text style={styles.loadingText}>Loading...</Text>

@@ -65,6 +65,7 @@ export const styles = StyleSheet.create({
 	},
 	fileTypesContainer: {
 		marginBottom: 10,
+		maxHeight: 400
 	},
 	tableHeadText: {
 		color: "white",

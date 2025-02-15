@@ -56,6 +56,7 @@ export default function UploadFile({
 		Array<{
 			uri: string;
 			name: string;
+			error: string;
 		}>
 	>([]);
 
@@ -213,7 +214,8 @@ export default function UploadFile({
 						<ScrollView style={styles.popupScrollView}>
 							{failedUploads.map((file) => (
 								<Text key={file.uri} style={styles.failedFileText}>
-									{file.name}
+									<Text style={{ fontWeight: "bold" }}>{file.name}</Text>:{" "}
+									<Text style={{ color: "red" }}>{file.error}</Text>
 								</Text>
 							))}
 						</ScrollView>
@@ -451,6 +453,7 @@ export default function UploadFile({
 								: selectedFolder[0].value,
 						);
 					}}
+					maxHeight={400}
 				/>
 
 				<TextInput
@@ -498,7 +501,7 @@ export default function UploadFile({
 						setUploading(true);
 
 						const successful = [];
-						const fails = [];
+						const fails: typeof failedUploads = [];
 
 						for (const file of selectedFiles) {
 							const fileInfo = await FileSystem.getInfoAsync(file.uri, {
@@ -507,6 +510,7 @@ export default function UploadFile({
 
 							if (!fileInfo.exists || fileInfo.isDirectory) {
 								fails.push({
+									error: "File does not exist",
 									uri: file.uri,
 									name: file.name,
 								});

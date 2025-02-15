@@ -6,8 +6,9 @@ import { View } from "react-native";
 interface Props {
 	value: boolean;
 	title?: string;
-	onValueChange: () => void | Promise<void>;
+	onValueChange: (value: boolean, id?: Props["id"]) => void | Promise<void>;
 	disabled?: boolean;
+	id?: string;
 }
 
 export default function Switch({
@@ -15,13 +16,14 @@ export default function Switch({
 	title,
 	onValueChange,
 	disabled = false,
+	id,
 }: Props) {
 	return (
 		<View style={styles.switchContainer}>
 			<NativeSwitch
 				disabled={disabled}
 				value={value}
-				onValueChange={onValueChange}
+				onValueChange={(value) => onValueChange(value, id)}
 				thumbColor={value ? "#2e3e6b" : "#222c47"}
 				trackColor={{
 					true: "#21273b",

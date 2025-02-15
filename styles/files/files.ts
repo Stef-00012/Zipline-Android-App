@@ -33,6 +33,20 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		flexGrow: 1,
 	},
+	selectedFilesContainer: {
+		borderWidth: 2,
+		borderColor: "#222c47",
+		borderStyle: "solid",
+		borderRadius: 10,
+		margin: 10,
+		padding: 10,
+		paddingTop: 0,
+	},
+	selectedFilesActionsContainer: {
+		flexDirection: "row",
+		marginTop: 10,
+		marginBottom: 5,
+	},
 	pagesContainer: {
 		height: 50,
 		flexDirection: "row",
@@ -164,11 +178,11 @@ export const styles = StyleSheet.create({
 	tagsContainer: {
 		flexDirection: "row",
 		marginHorizontal: 10,
-		justifyContent: "center"
+		justifyContent: "center",
 	},
 	tag: {
 		padding: 5,
 		borderRadius: 50,
-		marginHorizontal: 5
-	}
+		marginHorizontal: 5,
+	},
 });

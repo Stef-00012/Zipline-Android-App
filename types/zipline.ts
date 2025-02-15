@@ -147,6 +147,11 @@ export interface APIUploadResponse {
 	assumedMimetypes: Array<string | null | APIUploadFile>;
 }
 
+export interface APITransactionResult {
+	count: number;
+	name?: string;
+}
+
 export interface APISettings {
 	coreReturnHttpsUrls: boolean;
 	coreDefaultDomain: string | null;

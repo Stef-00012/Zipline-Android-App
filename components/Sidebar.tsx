@@ -37,17 +37,18 @@ export default function Sidebar({
 
 	const [invitesEnabled, setInvitesEnabled] = useState<boolean>(false);
 	const [isAdmin, setIsAdmin] = useState<boolean>(false);
+	const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
 
 	useEffect(() => {
 		(async () => {
 			const settings = await getSettings();
 			const user = await getCurrentUser();
 
-			if (
-				typeof user !== "string" &&
-				["ADMIN", "SUPERADMIN"].includes(user.role)
-			)
-				setIsAdmin(true);
+			if (typeof user !== "string") {
+				if (["ADMIN", "SUPERADMIN"].includes(user.role)) setIsAdmin(true);
+				if (user.role === "SUPERADMIN") setIsSuperAdmin(true);
+			}
+
 			if (typeof settings !== "string" && settings.invitesEnabled)
 				setInvitesEnabled(true);
 		})();
@@ -84,10 +85,11 @@ export default function Sidebar({
 	);
 
 	function renderSidebarOptions(option: SidebarOption) {
-		if (option.adminOnly && !isAdmin)
-			return <View key={option.route || option.name} />;
-
-		if (option.invitesRoute && !invitesEnabled)
+		if (
+			(option.adminOnly && !isAdmin) ||
+			(option.invitesRoute && !invitesEnabled) ||
+			(option.superAdminOnly && !isSuperAdmin)
+		)
 			return <View key={option.route || option.name} />;
 
 		if (option.type === "button") {

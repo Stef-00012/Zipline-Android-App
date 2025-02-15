@@ -84,7 +84,6 @@ export default function Header({ children }: PropsWithChildren) {
 								<Pressable
 									android_ripple={{
 										color: getRippleColor("#0c101c"),
-										radius: 50
 									}}
 									disabled={pathname === "/settings"}
 									style={{

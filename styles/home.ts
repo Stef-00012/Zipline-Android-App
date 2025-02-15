@@ -5,6 +5,17 @@ export const styles = StyleSheet.create({
 		backgroundColor: "#0c101c",
 		flex: 1,
 	},
+	mainHeader: {
+		fontWeight: "bold",
+		fontSize: 28,
+		color: "white",
+	},
+	subHeader: {
+		color: "gray",
+	},
+	subHeaderNumber: {
+		fontWeight: "bold",
+	},
 	loadingContainer: {
 		display: "flex",
 		flex: 1,
@@ -65,7 +76,7 @@ export const styles = StyleSheet.create({
 	},
 	fileTypesContainer: {
 		marginBottom: 10,
-		maxHeight: 400
+		maxHeight: 400,
 	},
 	tableHeadText: {
 		color: "white",

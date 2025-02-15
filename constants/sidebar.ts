@@ -5,6 +5,7 @@ interface SidebarOptionButton {
 	icon: keyof typeof MaterialIcons.glyphMap;
 	invitesRoute: boolean;
 	adminOnly: boolean;
+	superAdminOnly: boolean;
 	type: "button";
 	route: string;
 	name: string;
@@ -16,6 +17,7 @@ interface SidebarOptionSelect {
 	subMenus: Array<SidebarOption>;
 	invitesRoute: boolean;
 	adminOnly: boolean;
+	superAdminOnly: boolean;
 	type: "select";
 	name: string;
 	route: null;
@@ -29,6 +31,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "Home",
 		icon: "home",
 		adminOnly: false,
+		superAdminOnly: false,
 		invitesRoute: false,
 		subMenus: [],
 		type: "button",
@@ -38,6 +41,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "Metrics",
 		icon: "bar-chart",
 		adminOnly: false,
+		superAdminOnly: false,
 		invitesRoute: false,
 		subMenus: [],
 		type: "button",
@@ -47,6 +51,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "Files",
 		icon: "insert-drive-file",
 		adminOnly: false,
+		superAdminOnly: false,
 		invitesRoute: false,
 		subMenus: [],
 		type: "button",
@@ -56,6 +61,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "Folders",
 		icon: "folder",
 		adminOnly: false,
+		superAdminOnly: false,
 		invitesRoute: false,
 		subMenus: [],
 		type: "button",
@@ -65,23 +71,26 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "Upload",
 		icon: "cloud-upload",
 		adminOnly: false,
+		superAdminOnly: false,
 		invitesRoute: false,
 		type: "select",
 		subMenus: [
 			{
-				route: "/upload/text",
-				name: "Text",
-				icon: "text-fields",
+				route: "/upload/file",
+				name: "File",
+				icon: "upload-file",
 				adminOnly: false,
+				superAdminOnly: false,
 				invitesRoute: false,
 				subMenus: [],
 				type: "button",
 			},
 			{
-				route: "/upload/file",
-				name: "File",
-				icon: "attach-file",
+				route: "/upload/text",
+				name: "Text",
+				icon: "text-fields",
 				adminOnly: false,
+				superAdminOnly: false,
 				invitesRoute: false,
 				subMenus: [],
 				type: "button",
@@ -93,6 +102,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "URLs",
 		icon: "link",
 		adminOnly: false,
+		superAdminOnly: false,
 		invitesRoute: false,
 		subMenus: [],
 		type: "button",
@@ -102,6 +112,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 		name: "Administrator",
 		icon: "admin-panel-settings",
 		adminOnly: true,
+		superAdminOnly: false,
 		invitesRoute: false,
 		type: "select",
 		subMenus: [
@@ -110,6 +121,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 				name: "Settings",
 				icon: "settings",
 				adminOnly: true,
+				superAdminOnly: true,
 				invitesRoute: false,
 				subMenus: [],
 				type: "button",
@@ -119,6 +131,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 				name: "Users",
 				icon: "people",
 				adminOnly: true,
+				superAdminOnly: false,
 				invitesRoute: false,
 				subMenus: [],
 				type: "button",
@@ -128,6 +141,7 @@ export const sidebarOptions: Array<SidebarOption> = [
 				name: "Invites",
 				icon: "mail-outline",
 				adminOnly: true,
+				superAdminOnly: false,
 				invitesRoute: true,
 				subMenus: [],
 				type: "button",

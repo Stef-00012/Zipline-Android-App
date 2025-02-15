@@ -81,6 +81,51 @@ export default function Home() {
 
 			{user ? (
 				<ScrollView>
+					<Text style={styles.mainHeader}>Welcome Back, {user.username}</Text>
+					<Text style={styles.subHeader}>
+						You have{" "}
+						<Text style={styles.subHeaderNumber}>{stats?.filesUploaded}</Text>{" "}
+						files uploaded.
+					</Text>
+
+					{user.quota?.filesQuota === "BY_FILES" && user.quota?.maxFiles && (
+						<Text style={styles.subHeader}>
+							You have uploaded{" "}
+							<Text style={styles.subHeaderNumber}>{stats?.filesUploaded}</Text>{" "}
+							files out of{" "}
+							<Text style={styles.subHeaderNumber}>{user.quota.maxFiles}</Text>{" "}
+							files allowed.
+						</Text>
+					)}
+
+					{user.quota?.filesQuota === "BY_BYTES" && user.quota?.maxBytes && (
+						<Text style={styles.subHeader}>
+							You have used{" "}
+							<Text style={styles.subHeaderNumber}>
+								{convertToBytes(stats?.storageUsed || 0, {
+									unitSeparator: " ",
+								})}
+							</Text>{" "}
+							out of{" "}
+							<Text style={styles.subHeaderNumber}>
+								{convertToBytes(user.quota?.maxBytes, {
+									unitSeparator: " ",
+								})}
+							</Text>{" "}
+							of storage.
+						</Text>
+					)}
+
+					{user.quota?.maxUrls && (
+						<Text style={styles.subHeader}>
+							You have created{" "}
+							<Text style={styles.subHeaderNumber}>{stats?.urlsCreated}</Text>{" "}
+							links out of{" "}
+							<Text style={styles.subHeaderNumber}>{user.quota?.maxUrls}</Text>{" "}
+							links allowed.
+						</Text>
+					)}
+
 					{recentFiles && (
 						<View>
 							<Text style={styles.headerText}>Recent Files</Text>

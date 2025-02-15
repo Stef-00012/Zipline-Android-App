@@ -561,6 +561,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										ToastAndroid.SHORT,
 									);
 								}}
+								maxHeight={400}
 							/>
 						)}
 

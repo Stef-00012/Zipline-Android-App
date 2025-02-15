@@ -1,4 +1,11 @@
-import { Text, View, TouchableOpacity, FlatList, Modal } from "react-native";
+import {
+	Text,
+	View,
+	TouchableOpacity,
+	FlatList,
+	Modal,
+	type DimensionValue,
+} from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState, useEffect, type ReactNode } from "react";
 import { styles } from "@/styles/components/select";
@@ -11,7 +18,7 @@ export interface SelectProps {
 		[key: string]: string | number | boolean | null;
 	}>;
 	placeholder: string;
-	onSelect: (selectedItem: SelectProps["data"]) => void;
+	onSelect: (selectedItem: SelectProps["data"], id?: SelectProps["id"]) => void;
 	showScrollIndicator?: boolean;
 	disabled?: boolean;
 	defaultValue?: SelectProps["data"][0];
@@ -23,6 +30,14 @@ export interface SelectProps {
 		key: string,
 	) => ReactNode | string;
 	renderItem?: (item: SelectProps["data"][0]) => ReactNode;
+	id?: string;
+	width?: DimensionValue;
+	margin?: {
+		top?: DimensionValue;
+		bottom?: DimensionValue;
+		left?: DimensionValue;
+		right?: DimensionValue;
+	};
 }
 
 export default function Select({
@@ -35,6 +50,8 @@ export default function Select({
 	disabled = false,
 	maxHeight = 200,
 	multiple = false,
+	width,
+	margin = {},
 	renderSelectedItem = (item, key) => (
 		<Text
 			key={key}
@@ -47,6 +64,7 @@ export default function Select({
 		</Text>
 	),
 	renderItem = (item) => <Text style={styles.menuItemText}>{item.label}</Text>,
+	id,
 }: SelectProps) {
 	const [selectedItems, setSelectedItems] = useState<SelectProps["data"]>(
 		getDefaultValues(),
@@ -90,19 +108,27 @@ export default function Select({
 		} else {
 			setSelectedItems([item]);
 			setIsOpen(false);
-			onSelect([item]);
+			onSelect([item], id);
 		}
 	}
 
 	return (
-		<View>
+		<View
+			style={{
+				width: width,
+				marginLeft: margin.left,
+				marginRight: margin.right,
+				marginTop: margin.top,
+				marginBottom: margin.bottom,
+			}}
+		>
 			<TouchableOpacity
 				style={styles.selectButton}
 				onPress={() => {
 					const open = !isOpen;
 
 					setIsOpen(open);
-					if (!open) onSelect(selectedItems);
+					if (!open) onSelect(selectedItems, id);
 				}}
 				disabled={disabled}
 			>
@@ -131,14 +157,14 @@ export default function Select({
 					visible={isOpen}
 					onRequestClose={() => {
 						setIsOpen(false);
-						onSelect(selectedItems);
+						onSelect(selectedItems, id);
 					}}
 				>
 					<TouchableOpacity
 						style={styles.selectContainer}
 						onPress={() => {
 							setIsOpen(false);
-							onSelect(selectedItems);
+							onSelect(selectedItems, id);
 						}}
 					>
 						<View

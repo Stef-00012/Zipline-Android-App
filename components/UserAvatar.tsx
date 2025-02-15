@@ -32,7 +32,7 @@ export default function UserAvatar({ username, avatar }: Props) {
 					...(!avatar && styles.userMenuTextWithSettingsIcon),
 				}}
 			>
-				{username}
+				{username.length > 18 ? `${username.substring(0, 18)}...` : username}
 			</Text>
 		</View>
 	);

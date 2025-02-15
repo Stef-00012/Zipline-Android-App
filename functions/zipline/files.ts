@@ -6,6 +6,7 @@ import type {
 	APIFiles,
 	APISettings,
 	APITag,
+	APITransactionResult,
 	APIUploadFile,
 } from "@/types/zipline";
 
@@ -215,7 +216,7 @@ export async function editFile(
 interface UploadProgressData {
 	totalBytesSent: number;
 	totalBytesExpectedToSend: number;
-  }
+}
 
 export interface UploadFileOptions {
 	text?: boolean;
@@ -236,7 +237,7 @@ export async function uploadFiles(
 		mimetype: string;
 	},
 	options: UploadFileOptions = {},
-	onProgress?: (uploadProgressData: UploadProgressData) => void
+	onProgress?: (uploadProgressData: UploadProgressData) => void,
 ): Promise<Array<APIUploadFile> | string> {
 	const token = db.get("token");
 	const url = db.get("url");
@@ -266,19 +267,99 @@ export async function uploadFiles(
 	if (options.filename) headers["X-Zipline-Filename"] = options.filename;
 
 	try {
-		const uploadTask = FileSystem.createUploadTask(`${url}/api/upload`, file.uri, {
-			uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-			headers,
-			httpMethod: "POST",
-			fieldName: "file",
-			mimeType: file.mimetype,
-		}, onProgress)
+		const uploadTask = FileSystem.createUploadTask(
+			`${url}/api/upload`,
+			file.uri,
+			{
+				uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+				headers,
+				httpMethod: "POST",
+				fieldName: "file",
+				mimeType: file.mimetype,
+			},
+			onProgress,
+		);
 
 		const res = await uploadTask.uploadAsync();
+
+		if (res?.status && (res.status < 200 || res.status > 299)) {
+			const data = JSON.parse(res?.body) as {
+				error: string;
+				statusCode: number;
+			} | null;
+
+			if (data) return data.error;
+
+			return "Something went wrong...";
+		}
 
 		if (!res) return "Something went wrong...";
 
 		return JSON.parse(res.body)?.files || [];
+	} catch (e) {
+		const error = e as AxiosError;
+
+		const data = error.response?.data as
+			| {
+					error: string;
+					statusCode: number;
+			  }
+			| undefined;
+
+		if (data) return data.error;
+
+		return "Something went wrong...";
+	}
+}
+
+interface BulkEditFilesOptions {
+	files: Array<APIFile["id"]>;
+	favorite?: boolean;
+	folder?: string;
+	remove?: boolean;
+}
+
+// PATCH/DELETE /api/user/files/transaction
+export async function bulkEditFiles({
+	files,
+	favorite = false,
+	folder,
+	remove,
+}: BulkEditFilesOptions): Promise<APITransactionResult | string> {
+	const token = db.get("token");
+	const url = db.get("url");
+
+	if (!url || !token) return "Invalid token or URL";
+
+	try {
+		if (remove) {
+			const res = await axios.delete(`${url}/api/user/files/transaction`, {
+				headers: {
+					Authorization: token,
+				},
+				data: {
+					files,
+				},
+			});
+
+			return res.data;
+		}
+
+		const res = await axios.patch(
+			`${url}/api/user/files/transaction`,
+			{
+				files,
+				favorite,
+				folder,
+			},
+			{
+				headers: {
+					Authorization: token,
+				},
+			},
+		);
+
+		return res.data;
 	} catch (e) {
 		const error = e as AxiosError;
 

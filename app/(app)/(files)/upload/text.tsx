@@ -48,6 +48,7 @@ export default function UploadText({
 	const [uploadedFile, setUploadedFile] =
 		useState<APIUploadResponse["files"][0]>();
 	const [failedUpload, setFailedUpload] = useState<boolean>(false);
+	const [uploadError, setUploadError] = useState<string>("");
 
 	const [overrideDomain, setOverrideDomain] =
 		useState<UploadFileOptions["overrideDomain"]>();
@@ -192,11 +193,15 @@ export default function UploadText({
 
 				{failedUpload && (
 					<View>
-						<Text style={styles.headerText}>Failed Files</Text>
+						<Text style={styles.headerText}>Failed Upload</Text>
 
 						<ScrollView style={styles.popupScrollView}>
 							<Text style={styles.failedFileText}>
-								The text failed to upload
+								<Text style={{ fontWeight: "bold" }}>
+									The text failed to upload
+								</Text>
+								{"\n"}
+								<Text style={{ color: "red" }}>{uploadError}</Text>
 							</Text>
 						</ScrollView>
 					</View>
@@ -451,6 +456,7 @@ export default function UploadText({
 								: selectedFolder[0].value,
 						);
 					}}
+					maxHeight={400}
 				/>
 
 				<TextInput
@@ -528,6 +534,9 @@ export default function UploadText({
 						});
 
 						if (typeof uploadedFiles === "string") {
+							setUploadError(uploadedFiles);
+							setUploading(false);
+
 							return setFailedUpload(true);
 						}
 

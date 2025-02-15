@@ -1,10 +1,16 @@
 import { colorHash, convertToBytes, timeDifference } from "@/functions/util";
-import type { APITags, APIFiles, DashURL, APIFile } from "@/types/zipline";
+import type {
+	APITags,
+	APIFiles,
+	DashURL,
+	APIFile,
+	APIFoldersNoIncl,
+} from "@/types/zipline";
 import { ScrollView, Text, ToastAndroid, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import { getFolder } from "@/functions/zipline/folders";
+import { getFolder, getFolders } from "@/functions/zipline/folders";
 import { getUser } from "@/functions/zipline/users";
 import FileDisplay from "@/components/FileDisplay";
 import { isLightColor } from "@/functions/color";
@@ -20,6 +26,7 @@ import Table from "@/components/Table";
 import Popup from "@/components/Popup";
 import React from "react";
 import {
+	bulkEditFiles,
 	deleteFile,
 	getFiles,
 	type GetFilesOptions,
@@ -30,6 +37,7 @@ import {
 	editTag,
 	getTags,
 } from "@/functions/zipline/tags";
+import Select from "@/components/Select";
 
 export default function Files() {
 	const router = useRouter();
@@ -78,11 +86,21 @@ export default function Files() {
 	const url = db.get("url") as DashURL | null;
 
 	const [name, setName] = useState<string | null>(null);
-	const [isFolder, setisFolder] = useState<boolean>(false);
+	const [isFolder, setIsFolder] = useState<boolean>(false);
 
 	const [focusedFile, setFocusedFile] = useState<APIFile | null>(null);
 
+	const [folders, setFolders] = useState<APIFoldersNoIncl>([]);
+
 	const dashUrl = db.get("url") as DashURL | null;
+
+	useEffect(() => {
+		(async () => {
+			const folders = await getFolders(true);
+
+			setFolders(typeof folders === "string" ? [] : folders);
+		})();
+	}, []);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
 	useEffect(() => {
@@ -111,7 +129,7 @@ export default function Files() {
 
 			setName(folder.name);
 
-			setisFolder(true);
+			setIsFolder(true);
 			return setFiles({
 				page: folder.files,
 				pages: 1,
@@ -466,108 +484,261 @@ export default function Files() {
 					<Text style={styles.headerText}>
 						{name
 							? isFolder
-								? `Files in ${name}`
-								: `${name}'s Files`
+								? `Files in ${name.length > 8 ? `${name.substring(0, 8)}...` : name}`
+								: `${name.length > 8 ? `${name.substring(0, 8)}...` : name}'s Files`
 							: "Files"}
 					</Text>
 
-					{!isFolder && (
-						<View style={styles.headerButtons}>
+					<View style={styles.headerButtons}>
+						{!isFolder && (
+							<>
+								<Button
+									onPress={() => {
+										setFavorites((prev) => !prev);
+									}}
+									icon={favorites ? "star" : "star-border"}
+									color="transparent"
+									iconColor={
+										favorites
+											? files
+												? "#f1d01f"
+												: "#f1d01f55"
+											: files
+												? "#2d3f70"
+												: "#2d3f7055"
+									}
+									borderColor="#222c47"
+									borderWidth={2}
+									iconSize={30}
+									padding={4}
+									rippleColor="#283557"
+									disabled={!files}
+									margin={{
+										left: 2,
+										right: 2,
+									}}
+								/>
+
+								{!name && (
+									<>
+										<Button
+											onPress={() => {
+												setTagsMenuOpen(true);
+											}}
+											icon="sell"
+											color="transparent"
+											iconColor={files ? "#2d3f70" : "#2d3f7055"}
+											borderColor="#222c47"
+											borderWidth={2}
+											iconSize={30}
+											disabled={!files}
+											padding={4}
+											rippleColor="#283557"
+											margin={{
+												left: 2,
+												right: 2,
+											}}
+										/>
+
+										<Button
+											onPress={() => {
+												router.replace("/upload/file");
+											}}
+											icon="upload-file"
+											color="transparent"
+											iconColor={files ? "#2d3f70" : "#2d3f7055"}
+											borderColor="#222c47"
+											borderWidth={2}
+											iconSize={30}
+											disabled={!files}
+											padding={4}
+											rippleColor="#283557"
+											margin={{
+												left: 2,
+												right: 2,
+											}}
+										/>
+									</>
+								)}
+							</>
+						)}
+
+						<Button
+							onPress={() => {
+								db.set(
+									"filesCompactView",
+									compactModeEnabled ? "false" : "true",
+								);
+
+								setCompactModeEnabled((prev) => !prev);
+
+								setSelectedFiles([]);
+							}}
+							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							color="transparent"
+							iconColor={files ? "#2d3f70" : "#2d3f7055"}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							disabled={!files}
+							margin={{
+								left: 2,
+								right: 2,
+							}}
+						/>
+					</View>
+				</View>
+
+				{selectedFiles.length > 0 && (
+					<View style={styles.selectedFilesContainer}>
+						<Text style={styles.popupSubHeaderText}>
+							Selections are saved across page changes
+						</Text>
+
+						<View
+							style={{
+								marginTop: 10,
+								flexDirection: "row",
+							}}
+						>
 							<Button
-								onPress={() => {
-									setFavorites((prev) => !prev);
-								}}
-								icon={favorites ? "star" : "star-border"}
+								icon="delete"
 								color="transparent"
-								iconColor={
-									favorites
-										? files
-											? "#f1d01f"
-											: "#f1d01f55"
-										: files
-											? "#2d3f70"
-											: "#2d3f7055"
-								}
-								borderColor="#222c47"
+								rippleColor="gray"
 								borderWidth={2}
-								iconSize={30}
-								padding={4}
-								rippleColor="#283557"
-								disabled={!files}
+								borderColor="#ff8787"
+								textColor="#ff8787"
+								iconColor="#ff8787"
+								width={"47%"}
+								onPress={async () => {
+									const success = await bulkEditFiles({
+										files: selectedFiles,
+										remove: true,
+									});
+
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
+
+									await changePage();
+
+									setSelectedFiles([]);
+
+									return ToastAndroid.show(
+										`Successfully deleted ${success.count} file${success.count > 1 ? "s" : ""}`,
+										ToastAndroid.SHORT,
+									);
+								}}
+								text={`Delete ${selectedFiles.length} File${selectedFiles.length > 1 ? "s" : ""}`}
 								margin={{
-									left: 2,
-									right: 2,
+									left: 5,
+									right: 5,
 								}}
 							/>
 
-							{!name && (
-								<>
-									<Button
-										onPress={() => {
-											setTagsMenuOpen(true);
-										}}
-										icon="sell"
-										color="transparent"
-										iconColor={files ? "#2d3f70" : "#2d3f7055"}
-										borderColor="#222c47"
-										borderWidth={2}
-										iconSize={30}
-										disabled={!files}
-										padding={4}
-										rippleColor="#283557"
-										margin={{
-											left: 2,
-											right: 2,
-										}}
-									/>
-
-									<Button
-										onPress={() => {
-											router.replace("/upload/file");
-										}}
-										icon="upload-file"
-										color="transparent"
-										iconColor={files ? "#2d3f70" : "#2d3f7055"}
-										borderColor="#222c47"
-										borderWidth={2}
-										iconSize={30}
-										disabled={!files}
-										padding={4}
-										rippleColor="#283557"
-										margin={{
-											left: 2,
-											right: 2,
-										}}
-									/>
-								</>
-							)}
-
 							<Button
-								onPress={() => {
-									db.set(
-										"filesCompactView",
-										compactModeEnabled ? "false" : "true",
-									);
-
-									setCompactModeEnabled((prev) => !prev);
-								}}
-								icon={compactModeEnabled ? "view-module" : "view-agenda"}
+								icon="star-border"
 								color="transparent"
-								iconColor={files ? "#2d3f70" : "#2d3f7055"}
-								borderColor="#222c47"
+								rippleColor="gray"
 								borderWidth={2}
-								iconSize={30}
-								padding={4}
-								rippleColor="#283557"
-								disabled={!files}
+								borderColor="#f7d55a"
+								iconColor="#f7d55a"
+								textColor="#f7d55a"
+								width={"47%"}
+								onPress={async () => {
+									const success = await bulkEditFiles({
+										files: selectedFiles,
+										favorite: true,
+									});
+
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
+
+									await changePage();
+
+									setSelectedFiles([]);
+
+									return ToastAndroid.show(
+										`Successfully added ${success.count} file${success.count > 1 ? "s" : ""} to favorites`,
+										ToastAndroid.SHORT,
+									);
+								}}
+								text={`Favorite ${selectedFiles.length} File${selectedFiles.length > 1 ? "s" : ""}`}
 								margin={{
-									left: 2,
-									right: 2,
+									left: 5,
+									right: 5,
 								}}
 							/>
 						</View>
-					)}
-				</View>
+
+						<View
+							style={{
+								marginTop: 10,
+								flexDirection: "row",
+							}}
+						>
+							<Select
+								data={folders.map((folder) => ({
+									label: folder.name,
+									value: folder.id,
+								}))}
+								onSelect={async (selectedFolder) => {
+									const folderId = selectedFolder[0].value;
+
+									const success = await bulkEditFiles({
+										files: selectedFiles,
+										folder: folderId,
+									});
+
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
+
+									await changePage();
+
+									setSelectedFiles([]);
+
+									return ToastAndroid.show(
+										`Successfully added ${success.count} file${success.count > 1 ? "s" : ""} to "${success.name}"`,
+										ToastAndroid.SHORT,
+									);
+								}}
+								placeholder="Add to Folder..."
+								maxHeight={400}
+								width={"47%"}
+								margin={{
+									right: 5,
+									left: 5,
+									top: -5,
+								}}
+							/>
+
+							<Button
+								color="transparent"
+								rippleColor="gray"
+								borderWidth={2}
+								borderColor="#585daf"
+								textColor="#585daf"
+								iconColor="#585daf"
+								width={"47%"}
+								onPress={() => setSelectedFiles([])}
+								text="Clear Selection"
+								margin={{
+									left: 5,
+								}}
+							/>
+						</View>
+					</View>
+				)}
 
 				<ScrollView
 					showsVerticalScrollIndicator={false}
@@ -580,15 +751,32 @@ export default function Files() {
 								<Table
 									headerRow={[
 										<CheckBox
+											disabled={isFolder}
 											key={"tableHeaderCheckbox"}
-											value={selectedFiles.length === files.page.length}
+											value={files.page
+												.map((file) => file.id)
+												.every((fileId) => selectedFiles.includes(fileId))}
 											onValueChange={() => {
-												if (selectedFiles.length === files.page.length)
-													return setSelectedFiles([]);
+												if (
+													files.page
+														.map((file) => file.id)
+														.every((fileId) => selectedFiles.includes(fileId))
+												)
+													return setSelectedFiles((prev) =>
+														prev.filter(
+															(selectedFile) =>
+																!files.page
+																	.map((file) => file.id)
+																	.includes(selectedFile),
+														),
+													);
 
-												setSelectedFiles(
-													files.page.map((file) => file.id),
-												);
+												setSelectedFiles((prev) => [
+													...new Set([
+														...prev,
+														...files.page.map((file) => file.id),
+													]),
+												]);
 											}}
 										/>,
 										"Name",
@@ -604,14 +792,14 @@ export default function Files() {
 									rows={files.page.map((file, index) => {
 										const checkbox = (
 											<CheckBox
+												disabled={isFolder}
 												key={file.id}
 												value={selectedFiles.includes(file.id)}
 												onValueChange={() => {
 													setSelectedFiles((prev) => {
 														if (prev.includes(file.id))
 															return prev.filter(
-																(selectedFileId) =>
-																	selectedFileId !== file.id,
+																(selectedFileId) => selectedFileId !== file.id,
 															);
 
 														return [...prev, file.id];
@@ -621,7 +809,9 @@ export default function Files() {
 										);
 
 										const name = (
-											<Text key={file.id} style={styles.rowText}>{file.name}</Text>
+											<Text key={file.id} style={styles.rowText}>
+												{file.name}
+											</Text>
 										);
 
 										const tags = (
@@ -644,7 +834,9 @@ export default function Files() {
 										);
 
 										const type = (
-											<Text key={file.id} style={styles.rowText}>{file.type}</Text>
+											<Text key={file.id} style={styles.rowText}>
+												{file.type}
+											</Text>
 										);
 
 										const size = (
@@ -657,10 +849,7 @@ export default function Files() {
 
 										const createdAt = (
 											<Text key={file.id} style={styles.rowText}>
-												{timeDifference(
-													new Date(),
-													new Date(file.createdAt),
-												)}
+												{timeDifference(new Date(), new Date(file.createdAt))}
 											</Text>
 										);
 
@@ -671,7 +860,9 @@ export default function Files() {
 										);
 
 										const id = (
-											<Text key={file.id} style={styles.rowText}>{file.id}</Text>
+											<Text key={file.id} style={styles.rowText}>
+												{file.id}
+											</Text>
 										);
 
 										const actions = (
@@ -706,8 +897,7 @@ export default function Files() {
 													onPress={async () => {
 														const url = `${dashUrl}${file.url}`;
 
-														const saved =
-															await Clipboard.setStringAsync(url);
+														const saved = await Clipboard.setStringAsync(url);
 
 														if (saved)
 															return ToastAndroid.show(

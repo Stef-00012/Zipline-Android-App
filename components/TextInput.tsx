@@ -17,9 +17,14 @@ import {
 
 interface Props {
 	value?: string;
+	defaultValue?: string;
 	title?: string;
-	onPasswordToggle?: (visibile: boolean) => void | Promise<void>;
-	onValueChange?: (newValue: string) => void | Promise<void>;
+	id?: string;
+	onPasswordToggle?: (
+		visibile: boolean,
+		id?: Props["id"],
+	) => void | Promise<void>;
+	onValueChange?: (newValue: string, id?: Props["id"]) => void | Promise<void>;
 	disabled?: boolean;
 	disableContext?: boolean;
 	showDisabledStyle?: boolean;
@@ -29,16 +34,18 @@ interface Props {
 	placeholder?: string;
 	sideButtonColor?: ColorValue;
 	sideButtonIconColor?: ColorValue;
-	onSideButtonPress?: () => void | Promise<void>;
+	onSideButtonPress?: (id?: Props["id"]) => void | Promise<void>;
 	sideButtonIcon?: keyof typeof MaterialIcons.glyphMap;
 	maxLength?: number;
 	inputStyle?: TextStyle;
 	showSoftInputOnFocus?: boolean;
 	onChange?: (
 		event: NativeSyntheticEvent<TextInputChangeEventData>,
+		id?: Props["id"],
 	) => void | Promise<void>;
 	onSubmitEditing?: (
 		event: NativeSyntheticEvent<TextInputSubmitEditingEventData>,
+		id?: Props["id"],
 	) => void | Promise<void>;
 	returnKeyType?: ReturnKeyTypeOptions;
 }
@@ -65,6 +72,8 @@ export default function TextInput({
 	onChange = () => {},
 	onSubmitEditing = () => {},
 	returnKeyType,
+	id,
+	defaultValue,
 }: Props) {
 	const [displayPassword, setDisplayPassword] = useState<boolean>(false);
 
@@ -90,8 +99,8 @@ export default function TextInput({
 						showSoftInputOnFocus={showSoftInputOnFocus}
 						multiline={multiline}
 						secureTextEntry
-						onChange={onChange}
-						onSubmitEditing={onSubmitEditing}
+						onChange={(event) => onChange(event, id)}
+						onSubmitEditing={(event) => onSubmitEditing(event, id)}
 						maxLength={maxLength}
 						style={{
 							...styles.textInput,
@@ -101,17 +110,18 @@ export default function TextInput({
 						}}
 						editable={!disabled}
 						contextMenuHidden={disableContext}
-						onChangeText={onValueChange}
+						onChangeText={(text) => onValueChange(text, id)}
 						value={value}
 						keyboardType={displayPassword ? "visible-password" : "default"}
 						placeholder={placeholder}
 						placeholderTextColor="#222c47"
 						returnKeyType={returnKeyType}
+						defaultValue={defaultValue}
 					/>
 					<Button
 						onPress={() => {
-							onPasswordToggle(!displayPassword);
-							onSideButtonPress();
+							onPasswordToggle(!displayPassword, id);
+							onSideButtonPress(id);
 							setDisplayPassword((prev) => !prev);
 						}}
 						icon={displayPassword ? "visibility-off" : "visibility"}
@@ -143,8 +153,8 @@ export default function TextInput({
 					}}
 				>
 					<NativeTextInput
-						onChange={onChange}
-						onSubmitEditing={onSubmitEditing}
+						onChange={(event) => onChange(event, id)}
+						onSubmitEditing={(event) => onSubmitEditing(event, id)}
 						showSoftInputOnFocus={showSoftInputOnFocus}
 						multiline={multiline}
 						maxLength={maxLength}
@@ -156,16 +166,17 @@ export default function TextInput({
 						}}
 						editable={!disabled}
 						contextMenuHidden={disableContext}
-						onChangeText={onValueChange}
+						onChangeText={(text) => onValueChange(text, id)}
 						value={value}
 						keyboardType={keyboardType}
 						placeholder={placeholder}
 						placeholderTextColor="#222c47"
 						returnKeyType={returnKeyType}
+						defaultValue={defaultValue}
 					/>
 					<Button
 						onPress={() => {
-							onSideButtonPress();
+							onSideButtonPress(id);
 						}}
 						icon={sideButtonIcon}
 						iconColor={sideButtonIconColor}
@@ -191,8 +202,8 @@ export default function TextInput({
 				</Text>
 			)}
 			<NativeTextInput
-				onChange={onChange}
-				onSubmitEditing={onSubmitEditing}
+				onChange={(event) => onChange(event, id)}
+				onSubmitEditing={(event) => onSubmitEditing(event, id)}
 				showSoftInputOnFocus={showSoftInputOnFocus}
 				multiline={multiline}
 				maxLength={maxLength}
@@ -203,12 +214,13 @@ export default function TextInput({
 				}}
 				editable={!disabled}
 				contextMenuHidden={disableContext}
-				onChangeText={onValueChange}
+				onChangeText={(text) => onValueChange(text, id)}
 				value={value}
 				keyboardType={keyboardType}
 				placeholder={placeholder}
 				placeholderTextColor="#222c47"
 				returnKeyType={returnKeyType}
+				defaultValue={defaultValue}
 			/>
 		</View>
 	);

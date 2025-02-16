@@ -35,20 +35,4 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] Show upload percentage (`uploadAsync` => `createUploadTask` with callback)
-- [x] File compact view
-- [x] File compact view: handle selection
-- [x] Filter by table column + search by column type:
-    - Files
-    - Folders
-    - URLs
-    - Users
-    - Invites
-
-- [x] Large view:
-    - Folders
-    - URLs
-    - Users
-    - Invites
-
-- [x] Fix ScrollView cutting items (use margin on inner items instead of padding on the ScrollView)
+- [ ] Maybe upload profile presets? (suggested by iiTranquility)

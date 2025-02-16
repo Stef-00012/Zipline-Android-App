@@ -1,9 +1,11 @@
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
 import { type ExternalPathString, Link } from "expo-router";
 import { getSettings } from "@/functions/zipline/settings";
-import { Text, View, ToastAndroid } from "react-native";
+import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import LargeURLView from "@/components/LargeURLView";
 import { timeDifference } from "@/functions/util";
+import { searchKeyNames } from "@/constants/urls";
 import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
@@ -13,19 +15,27 @@ import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
 import { styles } from "@/styles/urls";
+import Table from "@/components/Table";
 import {
-	createURL,
 	type CreateURLParams,
+	type EditURLOptions,
+	createURL,
 	deleteURL,
 	editURL,
-	type EditURLOptions,
 	getURLs,
 } from "@/functions/zipline/urls";
-import Table from "@/components/Table";
+
+export type URLActions =
+	| "copyShortLink"
+	| "copyDestination"
+	| "edit"
+	| "delete";
 
 export default function Urls() {
 	useAuth();
 	useShareIntent();
+
+	const urlsCompactView = db.get("urlsCompactView");
 
 	const [urls, setUrls] = useState<APIURLs | null>(null);
 	const [settings, setSettings] = useState<APISettings | null>(null);
@@ -55,19 +65,62 @@ export default function Urls() {
 	>(null);
 	const [editUrlError, setEditUrlError] = useState<string>();
 
+	const [sortKey, setSortKey] = useState<{
+		id:
+			| "code"
+			| "vanity"
+			| "destination"
+			| "views"
+			| "maxViews"
+			| "createdAt"
+			| "enabled";
+		sortOrder: "asc" | "desc";
+	}>({
+		id: "createdAt",
+		sortOrder: "asc",
+	});
+
+	const [showSearch, setShowSearch] = useState<boolean>(false);
+	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
+	const [searchKey, setSearchKey] = useState<
+		"code" | "vanity" | "destination"
+	>();
+
+	const [compactModeEnabled, setCompactModeEnabled] = useState<boolean>(
+		urlsCompactView === "true",
+	);
+
 	const dashUrl = db.get("url") as DashURL | null;
 
 	const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
 	useEffect(() => {
 		(async () => {
-			const urls = await getURLs();
 			const settings = await getSettings();
 
-			setUrls(typeof urls === "string" ? null : urls);
 			setSettings(typeof settings === "string" ? null : settings);
 		})();
 	}, []);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: should only trigger when search term changes
+	useEffect(() => {
+		fetchURls();
+	}, [searchTerm]);
+
+	async function fetchURls() {
+		const urls = await getURLs({
+			searchField: searchKey,
+			searchQuery: searchTerm,
+		});
+
+		setUrls(typeof urls === "string" ? null : urls);
+	}
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: search term should be resetted when search key changes
+	useEffect(() => {
+		setSearchPlaceholder("");
+	}, [searchKey]);
 
 	useEffect(() => {
 		if (urlToEdit) {
@@ -78,6 +131,69 @@ export default function Urls() {
 			setEditUrlEnabled(urlToEdit.enabled ?? true);
 		}
 	}, [urlToEdit]);
+
+	async function onAction(type: URLActions, url: APIURLs[0]) {
+		switch (type) {
+			case "copyShortLink": {
+				const urlDest = url.vanity
+					? `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute}/${url.vanity}`
+					: `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute}/${url.code}`;
+
+				const saved = await Clipboard.setStringAsync(urlDest);
+
+				if (saved)
+					return ToastAndroid.show(
+						"URL copied to clipboard",
+						ToastAndroid.SHORT,
+					);
+
+				return ToastAndroid.show(
+					"Failed to paste to the clipboard",
+					ToastAndroid.SHORT,
+				);
+			}
+
+			case "edit": {
+				return setUrlToEdit(url);
+			}
+
+			case "delete": {
+				const urlId = url.id;
+
+				const success = await deleteURL(urlId);
+
+				if (typeof success === "string")
+					return ToastAndroid.show(
+						`Failed to delete the url "${url.vanity || url.code}"`,
+						ToastAndroid.SHORT,
+					);
+
+				await fetchURls();
+
+				return ToastAndroid.show(
+					`Deleted the url "${url.vanity || url.code}"`,
+					ToastAndroid.SHORT,
+				);
+			}
+
+			case "copyDestination": {
+				const urlDest = url.destination;
+
+				const saved = await Clipboard.setStringAsync(urlDest);
+
+				if (saved)
+					return ToastAndroid.show(
+						"URL Destination copied to clipboard",
+						ToastAndroid.SHORT,
+					);
+
+				return ToastAndroid.show(
+					"Failed to paste to the clipboard",
+					ToastAndroid.SHORT,
+				);
+			}
+		}
+	}
 
 	return (
 		<View style={styles.mainContainer}>
@@ -344,185 +460,309 @@ export default function Urls() {
 							padding={4}
 							rippleColor="#283557"
 							disabled={!urls || !dashUrl || !settings}
+							margin={{
+								left: 2,
+								right: 2,
+							}}
+						/>
+
+						<Button
+							onPress={() => {
+								db.set(
+									"urlsCompactView",
+									compactModeEnabled ? "false" : "true",
+								);
+
+								setCompactModeEnabled((prev) => !prev);
+							}}
+							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							color="transparent"
+							iconColor={urls && settings && dashUrl ? "#2d3f70" : "#2d3f7055"}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							disabled={!urls || !dashUrl || !settings}
+							margin={{
+								left: 2,
+								right: 2,
+							}}
 						/>
 					</View>
 				</View>
 
+				{showSearch && (
+					<View style={styles.mainSearchContainer}>
+						{showSearch && searchKey && (
+							<>
+								<View style={styles.searchContainer}>
+									<Text style={styles.searchHeader}>
+										Search by {searchKeyNames[searchKey]}
+									</Text>
+
+									<Button
+										onPress={() => setShowSearch(false)}
+										icon="close"
+										color="#191b27"
+										width={30}
+										height={30}
+										padding={5}
+									/>
+								</View>
+
+								<TextInput
+									placeholder="Search..."
+									defaultValue={searchPlaceholder}
+									onValueChange={(text) => setSearchPlaceholder(text)}
+									onSubmitEditing={(event) => {
+										const searchText = event.nativeEvent.text;
+
+										setSearchTerm(searchText);
+										setShowSearch(false);
+									}}
+									returnKeyType="search"
+								/>
+							</>
+						)}
+					</View>
+				)}
+
 				<View style={{ flex: 1 }}>
 					<View style={styles.urlsContainer}>
 						{urls && settings && dashUrl ? (
-							<Table
-								headerRow={[
-									"Code",
-									"Vanity",
-									"URL",
-									"Views",
-									"Max Views",
-									"Created",
-									"Enabled",
-									"Actions",
-								]}
-								rowWidth={[80, 100, 200, 100, 100, 130, 60, 130]}
-								rows={urls.map((url) => {
-									const code = (
-										<Link
-											key={url.id}
-											href={
-												`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}` as ExternalPathString
-											}
-											style={{
-												...styles.rowText,
-												...styles.link,
-											}}
-										>
-											{url.code}
-										</Link>
-									);
+							<>
+								{compactModeEnabled ? (
+									<Table
+										headerRow={[
+											{
+												row: "Code",
+												id: "code",
+												sortable: true,
+												searchable: true,
+											},
+											{
+												row: "Vanity",
+												id: "vanity",
+												sortable: true,
+												searchable: true,
+											},
+											{
+												row: "Destination",
+												id: "destination",
+												sortable: true,
+												searchable: true,
+											},
+											{
+												row: "Views",
+												id: "views",
+												sortable: true,
+											},
+											{
+												row: "Max Views",
+												id: "maxViews",
+												sortable: true,
+											},
+											{
+												row: "Created",
+												id: "createdAt",
+												sortable: true,
+											},
+											{
+												row: "Enabled",
+												id: "enabled",
+												sortable: true,
+											},
+											{
+												row: "Actions",
+											},
+										]}
+										sortKey={sortKey}
+										onSortOrderChange={(key, order) => {
+											setSortKey({
+												id: key as typeof sortKey.id,
+												sortOrder: order,
+											});
+										}}
+										onSearch={(key) => {
+											setShowSearch(true);
+											setSearchKey(key as typeof searchKey);
+										}}
+										rowWidth={[100, 120, 300, 100, 120, 130, 100, 130]}
+										rows={urls
+											.sort((a, b) => {
+												const compareKeyA =
+													sortKey.id === "createdAt"
+														? new Date(a[sortKey.id])
+														: a[sortKey.id];
 
-									const vanity = (
-										<Link
-											key={url.id}
-											href={
-												`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}` as ExternalPathString
-											}
-											style={{
-												...styles.rowText,
-												...styles.link,
-											}}
-										>
-											{url.vanity}
-										</Link>
-									);
+												const compareKeyB =
+													sortKey.id === "createdAt"
+														? new Date(b[sortKey.id])
+														: b[sortKey.id];
 
-									const noVanity = (
-										<Text key={url.id} style={styles.rowText}>
-											None
-										</Text>
-									);
+												let result = 0;
 
-									const destination = (
-										<Link
-											key={url.id}
-											href={url.destination as ExternalPathString}
-											style={{
-												...styles.rowText,
-												...styles.link,
-											}}
-										>
-											{url.destination}
-										</Link>
-									);
+												if (
+													typeof compareKeyA === "string" &&
+													typeof compareKeyB === "string"
+												)
+													result = compareKeyA.localeCompare(compareKeyB);
+												else if (
+													compareKeyA instanceof Date &&
+													compareKeyB instanceof Date
+												)
+													result =
+														compareKeyA.getTime() - compareKeyB.getTime();
+												else result = Number(compareKeyA) - Number(compareKeyB);
 
-									const views = (
-										<Text key={url.id} style={styles.rowText}>
-											{url.views}
-										</Text>
-									);
+												return sortKey.sortOrder === "desc" ? -result : result;
+											})
+											.map((url) => {
+												const code = (
+													<Link
+														key={url.id}
+														href={
+															`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}` as ExternalPathString
+														}
+														style={{
+															...styles.rowText,
+															...styles.link,
+														}}
+													>
+														{url.code}
+													</Link>
+												);
 
-									const maxViews = (
-										<Text key={url.id} style={styles.rowText}>
-											{url.maxViews || "Unlimited"}
-										</Text>
-									);
+												const vanity = (
+													<>
+														{url.vanity ? (
+															<Link
+																key={url.id}
+																href={
+																	`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}` as ExternalPathString
+																}
+																style={{
+																	...styles.rowText,
+																	...styles.link,
+																}}
+															>
+																{url.vanity}
+															</Link>
+														) : (
+															<Text key={url.id} style={styles.rowText}>
+																None
+															</Text>
+														)}
+													</>
+												);
 
-									const enabled = (
-										<Text key={url.id} style={styles.rowText}>
-											{url.enabled ? "Yes" : "No"}
-										</Text>
-									);
+												const destination = (
+													<Link
+														key={url.id}
+														href={url.destination as ExternalPathString}
+														style={{
+															...styles.rowText,
+															...styles.link,
+														}}
+													>
+														{url.destination}
+													</Link>
+												);
 
-									const created = (
-										<Text key={url.id} style={styles.rowText}>
-											{timeDifference(new Date(), new Date(url.createdAt))}
-										</Text>
-									);
+												const views = (
+													<Text key={url.id} style={styles.rowText}>
+														{url.views}
+													</Text>
+												);
 
-									const actions = (
-										<View key={url.id} style={styles.actionsContainer}>
-											<Button
-												icon="content-copy"
-												color="#323ea8"
-												onPress={async () => {
-													const urlDest = url.vanity
-														? `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}`
-														: `${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}`;
+												const maxViews = (
+													<Text key={url.id} style={styles.rowText}>
+														{url.maxViews || "Unlimited"}
+													</Text>
+												);
 
-													const saved = await Clipboard.setStringAsync(urlDest);
+												const enabled = (
+													<Text key={url.id} style={styles.rowText}>
+														{url.enabled ? "Yes" : "No"}
+													</Text>
+												);
 
-													if (saved)
-														return ToastAndroid.show(
-															"URL copied to clipboard",
-															ToastAndroid.SHORT,
-														);
+												const created = (
+													<Text key={url.id} style={styles.rowText}>
+														{timeDifference(
+															new Date(),
+															new Date(url.createdAt),
+														)}
+													</Text>
+												);
 
-													return ToastAndroid.show(
-														"Failed to paste to the clipboard",
-														ToastAndroid.SHORT,
-													);
-												}}
-												iconSize={20}
-												width={32}
-												height={32}
-												padding={6}
+												const actions = (
+													<View key={url.id} style={styles.actionsContainer}>
+														<Button
+															icon="content-copy"
+															color="#323ea8"
+															onPress={async () => {
+																onAction("copyShortLink", url);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+
+														<Button
+															icon="edit"
+															color="#323ea8"
+															onPress={() => {
+																onAction("edit", url);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+
+														<Button
+															icon="delete"
+															color="#CF4238"
+															onPress={async () => {
+																onAction("delete", url);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+													</View>
+												);
+
+												return [
+													code,
+													vanity,
+													destination,
+													views,
+													maxViews,
+													created,
+													enabled,
+													actions,
+												];
+											})}
+									/>
+								) : (
+									<ScrollView>
+										{urls.map((url) => (
+											<LargeURLView
+												key={url.id}
+												url={url}
+												urlsRoute={settings.urlsRoute}
+												dashUrl={dashUrl}
+												onAction={onAction}
 											/>
-
-											<Button
-												icon="edit"
-												color="#323ea8"
-												onPress={() => {
-													setUrlToEdit(url);
-												}}
-												iconSize={20}
-												width={32}
-												height={32}
-												padding={6}
-											/>
-
-											<Button
-												icon="delete"
-												color="#CF4238"
-												onPress={async () => {
-													const urlId = url.id;
-
-													const success = await deleteURL(urlId);
-
-													if (typeof success === "string")
-														return ToastAndroid.show(
-															`Failed to delete the url "${url.vanity || url.code}"`,
-															ToastAndroid.SHORT,
-														);
-
-													const newUrls = urls.filter(
-														(uri) => url.id !== uri.id,
-													);
-
-													setUrls(newUrls);
-
-													ToastAndroid.show(
-														`Deleted the url "${url.vanity || url.code}"`,
-														ToastAndroid.SHORT,
-													);
-												}}
-												iconSize={20}
-												width={32}
-												height={32}
-												padding={6}
-											/>
-										</View>
-									);
-
-									return [
-										code,
-										url.vanity ? vanity : noVanity,
-										destination,
-										views,
-										maxViews,
-										created,
-										enabled,
-										actions,
-									];
-								})}
-							/>
+										))}
+									</ScrollView>
+								)}
+							</>
 						) : (
 							<View style={styles.loadingContainer}>
 								<Text style={styles.loadingText}>Loading...</Text>

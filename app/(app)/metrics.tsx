@@ -11,14 +11,14 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/metrics";
 import Button from "@/components/Button";
+import Table from "@/components/Table";
 import { add } from "date-fns";
+import React from "react";
 import {
 	filterStats,
 	getStats,
 	type StatsProps,
 } from "@/functions/zipline/stats";
-import React from "react";
-import Table from "@/components/Table";
 
 export default function Metrics() {
 	useAuth();
@@ -179,7 +179,7 @@ export default function Metrics() {
 
 				{filteredStats && mainStat ? (
 					<View>
-						<ScrollView>
+						<ScrollView style={{height: "93%"}}>
 							<ScrollView
 								horizontal
 								style={{
@@ -231,8 +231,18 @@ export default function Metrics() {
 										}}
 									>
 										<Table
-											headerRow={["User", "URLs", "Views"]}
-											rowWidth={[180, 100, 100]}
+											headerRow={[
+												{
+													row: "User",
+												},
+												{
+													row: "URLs",
+												},
+												{
+													row: "Views",
+												},
+											]}
+											rowWidth={[190, 100, 100]}
 											rows={mainStat.data.urlsUsers.map((userUrl, index) => {
 												const username = (
 													<Text key={userUrl.username} style={styles.rowText}>
@@ -278,8 +288,21 @@ export default function Metrics() {
 										}}
 									>
 										<Table
-											headerRow={["User", "Files", "Storage Used", "Views"]}
-											rowWidth={[130, 50, 130, 50]}
+											headerRow={[
+												{
+													row: "User",
+												},
+												{
+													row: "Files",
+												},
+												{
+													row: "Storage Used",
+												},
+												{
+													row: "Views",
+												},
+											]}
+											rowWidth={[150, 60, 130, 50]}
 											rows={mainStat.data.filesUsers.map((userFile, index) => {
 												const username = (
 													<Text key={userFile.username} style={styles.rowText}>
@@ -333,7 +356,14 @@ export default function Metrics() {
 										}}
 									>
 										<Table
-											headerRow={["Type", "Files"]}
+											headerRow={[
+												{
+													row: "Type",
+												},
+												{
+													row: "Files",
+												},
+											]}
 											rowWidth={[tableTypeWidth, tableFilesWidth]}
 											rows={mainStat.data.types.map((typeData, index) => {
 												const type = (

@@ -25,7 +25,6 @@ export const styles = StyleSheet.create({
 		borderColor: "#222c47",
 		marginHorizontal: 10,
 		borderRadius: 15,
-		padding: 15,
 		height: 220,
 	},
 	scrollViewKeyboardOpen: {
@@ -33,6 +32,7 @@ export const styles = StyleSheet.create({
 	},
 	recentFileContainer: {
 		marginHorizontal: 10,
+		marginVertical: 7.5
 	},
 	inputHeader: {
 		marginTop: 5,

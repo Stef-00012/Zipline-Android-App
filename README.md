@@ -24,7 +24,7 @@ Or directly download it from [here](https://github.com/Stef-00012/zipline-androi
 > Building an apk
 
 > [!NOTE]
-> add ` --local` flag if you don't have a Expo EAS account or want to build it locally on your PC\
+> add `--local` flag if you don't have a Expo EAS account or want to build it locally on your PC\
 > add `--output /path/to/file.apk` to save the apk in that path
 
 1. `bun install`
@@ -37,16 +37,18 @@ This will create an apk but won't automatically install
 
 - [x] Show upload percentage (`uploadAsync` => `createUploadTask` with callback)
 - [x] File compact view
-- [ ] File compact view: handle selection
-- [ ] Filter by table column + search by column type:
+- [x] File compact view: handle selection
+- [x] Filter by table column + search by column type:
     - Files
     - Folders
     - URLs
     - Users
     - Invites
 
-- [ ] (Maybe? not confirmed) Large view:
+- [x] Large view:
     - Folders
     - URLs
     - Users
     - Invites
+
+- [x] Fix ScrollView cutting items (use margin on inner items instead of padding on the ScrollView)

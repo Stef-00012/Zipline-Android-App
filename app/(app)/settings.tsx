@@ -21,6 +21,7 @@ import Button from "@/components/Button";
 import Select from "@/components/Select";
 import { useRouter } from "expo-router";
 import Popup from "@/components/Popup";
+import Table from "@/components/Table";
 import {
 	clearTempFiles,
 	clearZeroByteFiles,
@@ -39,7 +40,6 @@ import {
 	getCurrentUser,
 	getCurrentUserAvatar,
 } from "@/functions/zipline/user";
-import Table from "@/components/Table";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -783,7 +783,7 @@ export default function UserSettings() {
 							</View>
 
 							{/* Export Files */}
-							{(exports && token) && (
+							{exports && token && (
 								<View style={styles.settingGroup}>
 									<Text style={styles.headerText}>Export Files</Text>
 
@@ -815,16 +815,28 @@ export default function UserSettings() {
 									<View style={styles.exportsContainer}>
 										<Table
 											headerRow={[
-												"ID",
-												"Started On",
-												"Files",
-												"Size",
-												"Actions",
+												{
+													row: "ID",
+												},
+												{
+													row: "Started On",
+												},
+												{
+													row: "Files",
+												},
+												{
+													row: "Size",
+												},
+												{
+													row: "Actions",
+												},
 											]}
-											rowWidth={[150, 130, 50, 70, 90]}
+											rowWidth={[230, 130, 60, 90, 90]}
 											rows={exports.map((zlExport, index) => {
 												const id = (
-													<Text key={zlExport.id} style={styles.rowText}>{zlExport.id}</Text>
+													<Text key={zlExport.id} style={styles.rowText}>
+														{zlExport.id}
+													</Text>
 												);
 
 												const startedOn = (
@@ -841,17 +853,17 @@ export default function UserSettings() {
 
 												const size = (
 													<Text key={zlExport.id} style={styles.rowText}>
-														{convertToBytes(
-															Number.parseInt(zlExport.size),
-															{
-																unitSeparator: " ",
-															},
-														)}
+														{convertToBytes(Number.parseInt(zlExport.size), {
+															unitSeparator: " ",
+														})}
 													</Text>
 												);
 
 												const actions = (
-													<View key={zlExport.id} style={styles.actionsContainer}>
+													<View
+														key={zlExport.id}
+														style={styles.actionsContainer}
+													>
 														<Button
 															icon="delete"
 															color="#CF4238"
@@ -887,12 +899,8 @@ export default function UserSettings() {
 
 														<Button
 															icon="download"
-															color={
-																zlExport.completed ? "#323ea8" : "#181c28"
-															}
-															iconColor={
-																zlExport.completed ? "white" : "gray"
-															}
+															color={zlExport.completed ? "#323ea8" : "#181c28"}
+															iconColor={zlExport.completed ? "white" : "gray"}
 															disabled={!zlExport.completed}
 															onPress={async () => {
 																const exportId = zlExport.id;
@@ -953,8 +961,7 @@ export default function UserSettings() {
 																	await FileSystem.readAsStringAsync(
 																		downloadResult.uri,
 																		{
-																			encoding:
-																				FileSystem.EncodingType.Base64,
+																			encoding: FileSystem.EncodingType.Base64,
 																		},
 																	);
 
@@ -962,8 +969,7 @@ export default function UserSettings() {
 																	saveUri,
 																	base64Export,
 																	{
-																		encoding:
-																			FileSystem.EncodingType.Base64,
+																		encoding: FileSystem.EncodingType.Base64,
 																	},
 																);
 
@@ -1070,7 +1076,9 @@ export default function UserSettings() {
 							{/* App Settings */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>App Settings</Text>
-								<Text style={styles.subHeaderText}>App Version: {appVersion}</Text>
+								<Text style={styles.subHeaderText}>
+									App Version: {appVersion}
+								</Text>
 
 								<Switch
 									title="Disable Update Alert"
@@ -1093,7 +1101,11 @@ export default function UserSettings() {
 											// ToastAndroid.show(message, ToastAndroid.SHORT);
 										}}
 										color={isDownloading ? "#373d79" : "#323ea8"}
-										text={isDownloading ? "Downloading Update..." : "Download Update"}
+										text={
+											isDownloading
+												? "Downloading Update..."
+												: "Download Update"
+										}
 										// text={
 										// 	isDownloading
 										// 		? `Downloading Update... ${downloadProgress}%${

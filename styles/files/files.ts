@@ -185,4 +185,52 @@ export const styles = StyleSheet.create({
 		borderRadius: 50,
 		marginHorizontal: 5,
 	},
+	selectedFilesActionsContainerRow: {
+		marginTop: 10,
+		flexDirection: "row",
+	},
+	selectRenderItemText: {
+		fontSize: 18,
+		fontWeight: "bold",
+		padding: 4,
+		borderRadius: 10,
+		alignSelf: "flex-start",
+	},
+	selectRenderItemContainer: {
+		flex: 1,
+	},
+	selectRenderSelectedItemText: {
+		flex: 1,
+		textAlignVertical: "center",
+		fontSize: 15,
+		padding: 4,
+		borderRadius: 10,
+	},
+	searchContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginVertical: 8,
+	},
+	searchHeader: {
+		color: "white",
+		fontWeight: "bold",
+		fontSize: 20,
+		textAlignVertical: "center",
+	},
+	folderDataContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+	folderIdText: {
+		color: "gray",
+		marginBottom: 10,
+		marginLeft: 10,
+		fontWeight: "bold",
+	},
+	folderFilesText: {
+		color: "gray",
+		marginBottom: 10,
+		marginRight: 10,
+		fontWeight: "bold",
+	},
 });

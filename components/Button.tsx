@@ -1,10 +1,12 @@
 import { styles } from "@/styles/components/button";
 import { MaterialIcons } from "@expo/vector-icons";
 import { getRippleColor } from "@/functions/util";
+import type { RefObject } from "react";
 import {
 	type AnimatableNumericValue,
 	type ColorValue,
 	type DimensionValue,
+	type View,
 	Pressable,
 	Text,
 } from "react-native";
@@ -35,6 +37,7 @@ interface Props {
 	position?: "left" | "center" | "right";
 	bold?: boolean;
 	open?: boolean;
+	ref?: RefObject<View>;
 }
 
 export default function Button({
@@ -58,6 +61,7 @@ export default function Button({
 	position,
 	bold = true,
 	open,
+	ref,
 }: Props) {
 	const flexPositions: {
 		[key in "left" | "center" | "right"]: "center" | "flex-start" | "flex-end";
@@ -69,6 +73,7 @@ export default function Button({
 
 	return (
 		<Pressable
+			ref={ref}
 			onPress={onPress}
 			disabled={disabled}
 			android_ripple={{

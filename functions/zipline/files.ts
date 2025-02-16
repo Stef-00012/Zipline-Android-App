@@ -13,6 +13,11 @@ import type {
 export interface GetFilesOptions {
 	id?: string;
 	favorite?: boolean;
+	sortBy?: "name" | "type" | "size" | "createdAt" | "favorite";
+	order?: "asc" | "desc";
+	perPage?: number;
+	searchField?: "name" | "tags" | "type" | "id";
+	searchQuery?: string;
 }
 // GET /api/user/files
 export async function getFiles(
@@ -26,10 +31,16 @@ export async function getFiles(
 
 	const params = new URLSearchParams({
 		page: page,
+		sortBy: options.sortBy || "createdAt",
+		order: options.order || "desc",
 	});
 
 	if (options.id) params.append("id", options.id);
 	if (options.favorite) params.append("favorite", "true");
+	if (options.perPage) params.append("perpage", String(options.perPage));
+	if (options.searchField) params.append("searchField", options.searchField);
+	if (options.searchQuery)
+		params.append("searchQuery", encodeURIComponent(options.searchQuery));
 
 	try {
 		const res = await axios.get(`${url}/api/user/files?${params}`, {

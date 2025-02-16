@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
+import Table from "@/components/Table";
 import type {
 	APIFile,
 	APIRecentFiles,
@@ -17,7 +18,6 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
-import Table from "@/components/Table";
 
 // import { useFocusEffect, useRouter } from "expo-router";
 
@@ -157,7 +157,6 @@ export default function Home() {
 									horizontal
 									style={{
 										...styles.scrollView,
-										...styles.statsContainer,
 									}}
 								>
 									<View style={styles.statContainer}>
@@ -226,8 +225,15 @@ export default function Home() {
 									}}
 								>
 									<Table
-										headerRow={["File Type", "Count"]}
-										rowWidth={[210, 150]}
+										headerRow={[
+											{
+												row: "File Type",
+											},
+											{
+												row: "Count",
+											},
+										]}
+										rowWidth={[250, 150]}
 										rows={Object.entries(stats.sortTypeCount).sort(
 											(a, b) => b[1] - a[1],
 										)}

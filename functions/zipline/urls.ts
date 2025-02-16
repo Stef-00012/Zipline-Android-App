@@ -2,15 +2,28 @@ import type { APIURLs, APIURL } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
 
+interface GetURLsOptions {
+	searchField?: "code" | "vanity" | "destination";
+	searchQuery?: string;
+}
 // GET /user/urls
-export async function getURLs(): Promise<APIURLs | string> {
+export async function getURLs(
+	options?: GetURLsOptions,
+): Promise<APIURLs | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
 	if (!url || !token) return "Invalid token or URL";
 
+	const searchParams = new URLSearchParams();
+
+	if (options?.searchField && options?.searchQuery) {
+		searchParams.append("searchField", options.searchField);
+		searchParams.append("searchQuery", options.searchQuery);
+	}
+
 	try {
-		const res = await axios.get(`${url}/api/user/urls`, {
+		const res = await axios.get(`${url}/api/user/urls?${searchParams}`, {
 			headers: {
 				Authorization: token,
 			},

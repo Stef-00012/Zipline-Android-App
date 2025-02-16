@@ -4,6 +4,7 @@ import { fileQuotaTypes, userRoles } from "@/constants/users";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
+import LargeUserView from "@/components/LargeUserView";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
 import { styles } from "@/styles/admin/users";
@@ -13,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/Button";
 import Select from "@/components/Select";
 import Popup from "@/components/Popup";
+import Table from "@/components/Table";
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import {
@@ -28,11 +30,14 @@ import type {
 	APIUsersNoIncl,
 	DashURL,
 } from "@/types/zipline";
-import Table from "@/components/Table";
+
+export type UserActions = "viewFiles" | "edit" | "delete";
 
 export default function Users() {
 	useAuth("ADMIN");
 	useShareIntent();
+
+	const usersCompactView = db.get("usersCompactView");
 
 	const [users, setUsers] = useState<APIUsersNoIncl | null>(null);
 
@@ -80,6 +85,18 @@ export default function Users() {
 		APIUsersNoIncl[0] | null
 	>(null);
 
+	const [sortKey, setSortKey] = useState<{
+		id: "username" | "role" | "createdAt" | "updatedAt";
+		sortOrder: "asc" | "desc";
+	}>({
+		id: "createdAt",
+		sortOrder: "asc",
+	});
+
+	const [compactModeEnabled, setCompactModeEnabled] = useState<boolean>(
+		usersCompactView === "true",
+	);
+
 	const dashUrl = db.get("url") as DashURL | null;
 
 	useEffect(() => {
@@ -110,6 +127,26 @@ export default function Users() {
 			}
 		}
 	}, [userToEdit]);
+
+	async function onAction(type: UserActions, user: APIUsersNoIncl[0]) {
+		switch (type) {
+			case "viewFiles": {
+				const userId = user.id;
+
+				return router.replace(`/files?id=${userId}`);
+			}
+
+			case "edit": {
+				const userId = user.id;
+
+				return setUserToEdit(users?.find((usr) => usr.id === userId) || null);
+			}
+
+			case "delete": {
+				return setUserToDelete(user);
+			}
+		}
+	}
 
 	return (
 		<View style={styles.mainContainer}>
@@ -517,10 +554,15 @@ export default function Users() {
 								</Text>
 
 								<Text style={styles.deleteWarningText}>
-									Are you sure you want to delete <Text style={{
-										fontWeight: "bold"
-									}}>{userToDelete.username}</Text>? This
-									action cannot be undone.
+									Are you sure you want to delete{" "}
+									<Text
+										style={{
+											fontWeight: "bold",
+										}}
+									>
+										{userToDelete.username}
+									</Text>
+									? This action cannot be undone.
 								</Text>
 
 								<View style={styles.deleteActionButtonsContainer}>
@@ -576,10 +618,15 @@ export default function Users() {
 								</Text>
 
 								<Text style={styles.deleteWarningText}>
-									Would you like to delete <Text style={{
-										fontWeight: "bold"
-									}}>{userToDeleteData.username}</Text>'s files
-									and urls? This action cannot be undone.
+									Would you like to delete{" "}
+									<Text
+										style={{
+											fontWeight: "bold",
+										}}
+									>
+										{userToDeleteData.username}
+									</Text>
+									's files and urls? This action cannot be undone.
 								</Text>
 
 								<Button
@@ -659,157 +706,251 @@ export default function Users() {
 							}}
 							icon="person-add"
 							color="transparent"
-							iconColor={(users && dashUrl) ? "#2d3f70" : "#2d3f7055"}
+							iconColor={users && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
 							borderWidth={2}
 							iconSize={30}
 							padding={4}
 							rippleColor="#283557"
 							disabled={!users || !dashUrl}
+							margin={{
+								left: 2,
+								right: 2,
+							}}
+						/>
+
+						<Button
+							onPress={() => {
+								db.set(
+									"invitesCompactView",
+									compactModeEnabled ? "false" : "true",
+								);
+
+								setCompactModeEnabled((prev) => !prev);
+							}}
+							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							color="transparent"
+							iconColor={users && dashUrl ? "#2d3f70" : "#2d3f7055"}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							disabled={!users || !dashUrl}
+							margin={{
+								left: 2,
+								right: 2,
+							}}
 						/>
 					</View>
 				</View>
 
-					<View style={{ flex: 1 }}>
-						<View style={{ ...styles.usersContainer, flex: 1 }}>
-							{users && dashUrl ? (
-								<Table
-									headerRow={[
-										"Avatar",
-										"Username",
-										"Role",
-										"Created",
-										"Last Updated",
-										"Actions",
-									]}
-									rowWidth={[80, 100, 100, 130, 130, 130]}
-									rows={users.map((user, index) => {
-										const avatar = user.avatar ? (
-											<Image
+				<View style={{ flex: 1 }}>
+					<View style={{ ...styles.usersContainer, flex: 1 }}>
+						{users && dashUrl ? (
+							<>
+								{compactModeEnabled ? (
+									<Table
+										headerRow={[
+											{
+												row: "Avatar",
+											},
+											{
+												row: "Username",
+												id: "username",
+												sortable: true,
+											},
+											{
+												row: "Role",
+												id: "role",
+												sortable: true,
+											},
+											{
+												row: "Created",
+												id: "createdAt",
+												sortable: true,
+											},
+											{
+												row: "Last Updated",
+												id: "updatedAt",
+												sortable: true,
+											},
+											{
+												row: "Actions",
+											},
+										]}
+										sortKey={sortKey}
+										onSortOrderChange={(key, order) => {
+											setSortKey({
+												id: key as typeof sortKey.id,
+												sortOrder: order,
+											});
+										}}
+										rowWidth={[80, 120, 100, 130, 140, 130]}
+										rows={users
+											.sort((a, b) => {
+												const compareKeyA =
+													sortKey.id === "createdAt" ||
+													sortKey.id === "updatedAt"
+														? new Date(a[sortKey.id])
+														: a[sortKey.id];
+
+												const compareKeyB =
+													sortKey.id === "createdAt" ||
+													sortKey.id === "updatedAt"
+														? new Date(b[sortKey.id])
+														: b[sortKey.id];
+
+												let result = 0;
+
+												if (
+													typeof compareKeyA === "string" &&
+													typeof compareKeyB === "string"
+												)
+													result = compareKeyA.localeCompare(compareKeyB);
+												else if (
+													compareKeyA instanceof Date &&
+													compareKeyB instanceof Date
+												)
+													result =
+														compareKeyA.getTime() - compareKeyB.getTime();
+												else result = Number(compareKeyA) - Number(compareKeyB);
+
+												return sortKey.sortOrder === "desc" ? -result : result;
+											})
+											.map((user, index) => {
+												const avatar = user.avatar ? (
+													<Image
+														key={user.id}
+														source={{ uri: user.avatar }}
+														style={styles.userAvatar}
+														alt={`${user.username}'s avatar`}
+													/>
+												) : (
+													<View key={user.id} style={styles.userAvatar}>
+														<MaterialIcons
+															name="person"
+															size={30}
+															color={"white"}
+														/>
+													</View>
+												);
+
+												const username = (
+													<Text key={user.id} style={styles.rowText}>
+														{user.username}
+													</Text>
+												);
+
+												const role = (
+													<Text key={user.id} style={styles.rowText}>
+														{user.role.charAt(0).toUpperCase() +
+															user.role.slice(1).toLowerCase()}
+													</Text>
+												);
+
+												const created = (
+													<Text key={user.id} style={styles.rowText}>
+														{timeDifference(
+															new Date(),
+															new Date(user.createdAt),
+														)}
+													</Text>
+												);
+
+												const lastUpdated = (
+													<Text key={user.id} style={styles.rowText}>
+														{timeDifference(
+															new Date(),
+															new Date(user.updatedAt),
+														)}
+													</Text>
+												);
+
+												const actions = (
+													<View key={user.id} style={styles.actionsContainer}>
+														<Button
+															icon="folder-open"
+															color="#323ea8"
+															onPress={async () => {
+																onAction("viewFiles", user);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+
+														<Button
+															icon="edit"
+															color="#323ea8"
+															onPress={() => {
+																onAction("edit", user);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+
+														<Button
+															icon="delete"
+															color="#CF4238"
+															onPress={async () => {
+																onAction("delete", user);
+															}}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+														/>
+													</View>
+												);
+
+												let rowStyle = styles.row;
+
+												if (index === 0)
+													rowStyle = {
+														...styles.row,
+														...styles.firstRow,
+													};
+
+												if (index === users.length - 1)
+													rowStyle = {
+														...styles.row,
+														...styles.lastRow,
+													};
+
+												return [
+													avatar,
+													username,
+													role,
+													created,
+													lastUpdated,
+													actions,
+												];
+											})}
+									/>
+								) : (
+									<ScrollView>
+										{users.map((user) => (
+											<LargeUserView
 												key={user.id}
-												source={{ uri: user.avatar }}
-												style={styles.userAvatar}
-												alt={`${user.username}'s avatar`}
+												user={user}
+												dashUrl={dashUrl}
+												onAction={onAction}
 											/>
-										) : (
-											<View key={user.id} style={styles.userAvatar}>
-												<MaterialIcons
-													name="person"
-													size={30}
-													color={"white"}
-												/>
-											</View>
-										);
-
-										const username = (
-											<Text key={user.id} style={styles.rowText}>
-												{user.username}
-											</Text>
-										);
-
-										const role = (
-											<Text key={user.id} style={styles.rowText}>
-												{user.role.charAt(0).toUpperCase() +
-													user.role.slice(1).toLowerCase()}
-											</Text>
-										);
-
-										const created = (
-											<Text key={user.id} style={styles.rowText}>
-												{timeDifference(
-													new Date(),
-													new Date(user.createdAt),
-												)}
-											</Text>
-										);
-
-										const lastUpdated = (
-											<Text key={user.id} style={styles.rowText}>
-												{timeDifference(
-													new Date(),
-													new Date(user.updatedAt),
-												)}
-											</Text>
-										);
-
-										const actions = (
-											<View key={user.id} style={styles.actionsContainer}>
-												<Button
-													icon="folder-open"
-													color="#323ea8"
-													onPress={async () => {
-														const userId = user.id;
-
-														router.replace(`/files?id=${userId}`);
-													}}
-													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
-												/>
-
-												<Button
-													icon="edit"
-													color="#323ea8"
-													onPress={() => {
-														const userId = user.id;
-
-														setUserToEdit(
-															users.find((usr) => usr.id === userId) ||
-																null,
-														);
-													}}
-													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
-												/>
-
-												<Button
-													icon="delete"
-													color="#CF4238"
-													onPress={async () => {
-														setUserToDelete(user);
-													}}
-													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
-												/>
-											</View>
-										);
-
-										let rowStyle = styles.row;
-
-										if (index === 0)
-											rowStyle = {
-												...styles.row,
-												...styles.firstRow,
-											};
-
-										if (index === users.length - 1)
-											rowStyle = {
-												...styles.row,
-												...styles.lastRow,
-											};
-
-										return [
-											avatar,
-											username,
-											role,
-											created,
-											lastUpdated,
-											actions,
-										];
-									})}
-								/>
-							) : (
-								<View style={styles.loadingContainer}>
-									<Text style={styles.loadingText}>Loading...</Text>
-								</View>
-							)}
-						</View>
+										))}
+									</ScrollView>
+								)}
+							</>
+						) : (
+							<View style={styles.loadingContainer}>
+								<Text style={styles.loadingText}>Loading...</Text>
+							</View>
+						)}
 					</View>
+				</View>
 			</View>
 		</View>
 	);

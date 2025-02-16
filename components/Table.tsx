@@ -1,22 +1,145 @@
-import type { ReactNode } from "react";
-import { type DimensionValue, ScrollView, View } from "react-native";
 import { Table as NativeTable, Row } from "react-native-reanimated-table";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "@/styles/components/table";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useState, type ReactNode } from "react";
 
-interface Props {
-	headerRow: Array<ReactNode>;
-	rows: Array<Array<ReactNode>>;
-	rowWidth: Array<number>;
-	maxHeight?: DimensionValue;
+type HeaderRow = {
+	row: ReactNode;
+	sortable?: boolean;
+	searchable?: boolean;
+	id?: string;
+};
+
+interface RowSort {
+	[key: string]: "asc" | "desc" | null;
 }
 
-export default function Table({ headerRow, rows, rowWidth, maxHeight }: Props) {
+interface Props {
+	headerRow: Array<HeaderRow>;
+	rows: Array<Array<ReactNode>>;
+	rowWidth: Array<number>;
+	sortKey?: {
+		id: string;
+		sortOrder: "asc" | "desc";
+	};
+	onSortOrderChange?: (
+		sortKey: string,
+		sortOrder: "asc" | "desc",
+	) => Promise<void> | void;
+	onSearch?: (searchKey: string) => Promise<void> | void;
+}
+
+export default function Table({
+	headerRow,
+	rows,
+	rowWidth,
+	sortKey,
+	onSearch = () => {},
+	onSortOrderChange = () => {},
+}: Props) {
+	const defaultSortOrders: RowSort = {};
+
+	for (const row of headerRow) {
+		if (!row.id) continue;
+
+		defaultSortOrders[row.id] = null;
+	}
+
+	if (sortKey) defaultSortOrders[sortKey.id] = sortKey.sortOrder;
+
+	const [sortOrders, setSortOrders] = useState<RowSort>(defaultSortOrders);
+
+	const updatedHeaderRow = headerRow.map((row) => {
+		if (!row.id || (!row.searchable && !row.sortable)) return row.row;
+
+		const sortIcon = getSortIcon(sortOrders[row.id]);
+
+		return (
+			<Pressable
+				key={row.id}
+				disabled={!row.sortable || !row.id}
+				onPress={() => {
+					if (!row.id) return;
+
+					const sortOrder = sortOrders[row.id] === "asc" ? "desc" : "asc";
+
+					setSortOrders((prev) => {
+						if (!row.id) return prev;
+
+						const previous = Object.keys(prev).reduce((acc, key) => {
+							acc[key as string] = null;
+
+							return acc;
+						}, {} as RowSort);
+
+						return {
+							...previous,
+							[row.id]: sortOrder,
+						};
+					});
+
+					onSortOrderChange(row.id, sortOrder);
+				}}
+				style={styles.rowContainer}
+			>
+				{["string", "number", "boolean"].includes(typeof row.row) ? (
+					<Text
+						style={{
+							...styles.rowText,
+							...styles.headerRow,
+						}}
+					>
+						{row.row}
+					</Text>
+				) : (
+					row.row
+				)}
+
+				<View style={styles.actionsContainer}>
+					{row.sortable && (
+						<MaterialIcons
+							name={sortIcon}
+							color={sortIcon === "sort" ? "#303e58" : "white"}
+							size={16}
+							style={styles.sortableIcon}
+						/>
+					)}
+
+					{row.searchable && row.id && (
+						<Pressable
+							style={styles.searchButton}
+							onPress={() => {
+								if (row.id) return onSearch(row.id);
+							}}
+						>
+							<MaterialIcons name="filter-alt" color="#303e58" size={16} />
+						</Pressable>
+					)}
+				</View>
+			</Pressable>
+		);
+	});
+
+	function getSortIcon(
+		order: "asc" | "desc" | null,
+	): keyof typeof MaterialIcons.glyphMap {
+		switch (order) {
+			case "asc":
+				return "north";
+			case "desc":
+				return "south";
+			default:
+				return "sort";
+		}
+	}
+
 	return (
 		<ScrollView showsHorizontalScrollIndicator={false} horizontal>
 			<View>
 				<NativeTable>
 					<Row
-						data={headerRow}
+						data={updatedHeaderRow}
 						widthArr={rowWidth}
 						style={styles.tableHeader}
 						textStyle={{
@@ -26,7 +149,7 @@ export default function Table({ headerRow, rows, rowWidth, maxHeight }: Props) {
 					/>
 				</NativeTable>
 				<ScrollView
-				nestedScrollEnabled
+					nestedScrollEnabled
 					showsVerticalScrollIndicator={false}
 					style={styles.tableVerticalScroll}
 				>

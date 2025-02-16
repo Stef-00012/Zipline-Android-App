@@ -35,13 +35,10 @@ export const styles = StyleSheet.create({
 		borderColor: "#222c47",
 		marginHorizontal: 10,
 		borderRadius: 15,
-		padding: 15,
 	},
 	recentFileContainer: {
 		marginHorizontal: 10,
-	},
-	statsContainer: {
-		paddingHorizontal: 7,
+		marginVertical: 7.5
 	},
 	headerText: {
 		marginTop: 5,
@@ -68,6 +65,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 10,
 		marginHorizontal: 4,
+		marginVertical: 7.5
 	},
 	tableText: {
 		color: "white",
@@ -77,6 +75,7 @@ export const styles = StyleSheet.create({
 	fileTypesContainer: {
 		marginBottom: 10,
 		maxHeight: 400,
+		padding: 0,
 	},
 	tableHeadText: {
 		color: "white",

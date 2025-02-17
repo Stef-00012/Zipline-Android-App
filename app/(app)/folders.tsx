@@ -60,7 +60,7 @@ export default function Folders() {
 	const dashUrl = db.get("url") as DashURL | null;
 
 	const [sortKey, setSortKey] = useState<{
-		id: "name" | "public" | "createdAt" | "updatedAt" | "files";
+		id: "name" | "public" | "createdAt" | "updatedAt" | "files" | "id";
 		sortOrder: "asc" | "desc";
 	}>({
 		id: "createdAt",
@@ -360,6 +360,11 @@ export default function Folders() {
 												sortable: true,
 											},
 											{
+											    row: "ID",
+											    id: "id",
+											    sortable: true,
+											},
+											{
 												row: "Actions",
 											},
 										]}
@@ -370,7 +375,7 @@ export default function Folders() {
 												sortOrder: order,
 											});
 										}}
-										rowWidth={[140, 90, 140, 150, 80, 210]}
+										rowWidth={[140, 90, 140, 150, 80, 220, 210]}
 										rows={folders
 											.sort((a, b) => {
 												const compareKeyA =
@@ -454,6 +459,12 @@ export default function Folders() {
 														{folder.files.length}
 													</Text>
 												);
+												
+												const id = (
+													<Text key={folder.id} style={styles.rowText}>
+														{folder.id}
+													</Text>
+												);
 
 												const actions = (
 													<View key={folder.id} style={styles.actionsContainer}>
@@ -527,6 +538,7 @@ export default function Folders() {
 													created,
 													lastUpdatedAt,
 													files,
+													id,
 													actions,
 												];
 											})}

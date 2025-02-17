@@ -1,7 +1,7 @@
 import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
+import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import { type ExternalPathString, Link } from "expo-router";
 import { getSettings } from "@/functions/zipline/settings";
-import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import LargeURLView from "@/components/LargeURLView";
 import { timeDifference } from "@/functions/util";
@@ -73,7 +73,8 @@ export default function Urls() {
 			| "views"
 			| "maxViews"
 			| "createdAt"
-			| "enabled";
+			| "enabled"
+			| "id";
 		sortOrder: "asc" | "desc";
 	}>({
 		id: "createdAt",
@@ -574,6 +575,11 @@ export default function Urls() {
 												sortable: true,
 											},
 											{
+												row: "ID",
+												id: "id",
+												sortable: true
+											},
+											{
 												row: "Actions",
 											},
 										]}
@@ -588,7 +594,7 @@ export default function Urls() {
 											setShowSearch(true);
 											setSearchKey(key as typeof searchKey);
 										}}
-										rowWidth={[100, 120, 300, 100, 120, 130, 100, 130]}
+										rowWidth={[100, 120, 300, 100, 120, 130, 100, 220, 130]}
 										rows={urls
 											.sort((a, b) => {
 												const compareKeyA =
@@ -696,6 +702,12 @@ export default function Urls() {
 														)}
 													</Text>
 												);
+												
+												const id = (
+													<Text key={url.id} style={styles.rowText}>
+														{url.id}
+													</Text>
+												);
 
 												const actions = (
 													<View key={url.id} style={styles.actionsContainer}>
@@ -745,6 +757,7 @@ export default function Urls() {
 													maxViews,
 													created,
 													enabled,
+													id,
 													actions,
 												];
 											})}

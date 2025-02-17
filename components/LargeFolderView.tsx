@@ -101,6 +101,11 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 					<Text style={styles.keyName}>Files</Text>:{" "}
 					<Text>{folder.files.length}</Text>
 				</Text>
+				
+				<Text style={styles.key}>
+					<Text style={styles.keyName}>ID</Text>:{" "}
+					<Text>{folder.id}</Text>
+				</Text>
 			</View>
 		</View>
 	);

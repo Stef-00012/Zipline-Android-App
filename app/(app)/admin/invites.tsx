@@ -45,7 +45,8 @@ export default function Invites() {
 			| "updatedAt"
 			| "expiresAt"
 			| "maxUses"
-			| "uses";
+			| "uses"
+			| "id";
 		sortOrder: "asc" | "desc";
 	}>({
 		id: "createdAt",
@@ -286,6 +287,11 @@ export default function Invites() {
 												sortable: true,
 											},
 											{
+												row: "ID",
+												id: "id",
+												sortable: true
+											},
+											{
 												row: "Actions",
 											},
 										]}
@@ -296,7 +302,7 @@ export default function Invites() {
 												sortOrder: order,
 											});
 										}}
-										rowWidth={[90, 120, 130, 140, 130, 120, 100, 90]}
+										rowWidth={[90, 120, 130, 140, 130, 120, 100, 220, 90]}
 										rows={invites
 											.sort((a, b) => {
 												const compareKeyA =
@@ -395,6 +401,12 @@ export default function Invites() {
 														{invite.maxUses || "Unlimited"}
 													</Text>
 												);
+												
+												const id = (
+													<Text key={invite.id} style={styles.rowText}>
+														{invite.id}
+													</Text>
+												);
 
 												const actions = (
 													<View key={invite.id} style={styles.actionsContainer}>
@@ -424,20 +436,6 @@ export default function Invites() {
 													</View>
 												);
 
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === invites.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
-
 												return [
 													code,
 													createdBy,
@@ -446,6 +444,7 @@ export default function Invites() {
 													expires,
 													maxUses,
 													uses,
+													id,
 													actions,
 												];
 											})}

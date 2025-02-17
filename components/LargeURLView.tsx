@@ -125,6 +125,11 @@ export default function LargeURLView({
 						</Link>
 					</Text>
 				)}
+				
+				<Text style={styles.key}>
+					<Text style={styles.keyName}>ID</Text>:{" "}
+					<Text>{url.id}</Text>
+				</Text>
 			</View>
 		</View>
 	);

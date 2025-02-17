@@ -86,7 +86,7 @@ export default function Users() {
 	>(null);
 
 	const [sortKey, setSortKey] = useState<{
-		id: "username" | "role" | "createdAt" | "updatedAt";
+		id: "username" | "role" | "createdAt" | "updatedAt" | "id";
 		sortOrder: "asc" | "desc";
 	}>({
 		id: "createdAt",
@@ -776,6 +776,11 @@ export default function Users() {
 												sortable: true,
 											},
 											{
+												row: "ID",
+												id: "id",
+												sortable: true
+											},
+											{
 												row: "Actions",
 											},
 										]}
@@ -786,7 +791,7 @@ export default function Users() {
 												sortOrder: order,
 											});
 										}}
-										rowWidth={[80, 120, 100, 130, 140, 130]}
+										rowWidth={[80, 120, 100, 130, 140, 220, 130]}
 										rows={users
 											.sort((a, b) => {
 												const compareKeyA =
@@ -866,6 +871,12 @@ export default function Users() {
 														)}
 													</Text>
 												);
+												
+												const id = (
+													<Text key={user.id} style={styles.rowText}>
+														{user.id}
+													</Text>
+												);
 
 												const actions = (
 													<View key={user.id} style={styles.actionsContainer}>
@@ -907,26 +918,13 @@ export default function Users() {
 													</View>
 												);
 
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === users.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
-
 												return [
 													avatar,
 													username,
 													role,
 													created,
 													lastUpdated,
+													id,
 													actions,
 												];
 											})}

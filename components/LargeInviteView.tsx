@@ -86,6 +86,11 @@ export default function LargeInviteView({ invite, dashUrl, onAction }: Props) {
 				<Text style={styles.key}>
 					<Text style={styles.keyName}>Uses</Text>: <Text>{invite.uses}</Text>
 				</Text>
+				
+				<Text style={styles.key}>
+					<Text style={styles.keyName}>ID</Text>:{" "}
+					<Text>{invite.id}</Text>
+				</Text>
 			</View>
 		</View>
 	);

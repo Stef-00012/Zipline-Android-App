@@ -16,6 +16,7 @@ export const styles = StyleSheet.create({
 		textAlignVertical: "center",
 		color: "white",
 		fontSize: 16,
+		width: "85%",
 	},
 	link: {
 		color: "#575DB5",

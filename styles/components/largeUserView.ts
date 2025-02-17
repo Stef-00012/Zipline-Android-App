@@ -19,6 +19,10 @@ export const styles = StyleSheet.create({
 	titleRightContainer: {
 		flexDirection: "row",
 		justifyContent: "flex-start",
+		alignItems: "center",
+	},
+	userInfoContainer: {
+		width: "65%",
 	},
 	userUsername: {
 		textAlignVertical: "center",

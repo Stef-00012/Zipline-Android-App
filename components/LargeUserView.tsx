@@ -32,7 +32,7 @@ export default function LargeUserView({ user, dashUrl, onAction }: Props) {
 						</View>
 					)}
 
-					<View>
+					<View style={styles.userInfoContainer}>
 						<Text style={styles.userUsername}>{user.username}</Text>
 						<Text style={styles.userId}>{user.id}</Text>
 					</View>

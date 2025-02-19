@@ -41,3 +41,8 @@ export const templateUser: APIUser = {
 	quota: null,
 	view: {},
 };
+
+export const searchKeyNames = {
+	username: "Username",
+	id: "ID"
+}

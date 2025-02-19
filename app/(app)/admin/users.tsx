@@ -1,6 +1,6 @@
+import { fileQuotaTypes, searchKeyNames, userRoles } from "@/constants/users";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { getFileDataURI, timeDifference } from "@/functions/util";
-import { fileQuotaTypes, userRoles } from "@/constants/users";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
@@ -38,6 +38,11 @@ export default function Users() {
 	useShareIntent();
 
 	const usersCompactView = db.get("usersCompactView");
+
+	const [showSearch, setShowSearch] = useState<boolean>(false);
+	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
+	const [searchKey, setSearchKey] = useState<"username" | "id">("username");
 
 	const [users, setUsers] = useState<APIUsersNoIncl | null>(null);
 
@@ -127,6 +132,11 @@ export default function Users() {
 			}
 		}
 	}, [userToEdit]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: search term should be resetted when search key changes
+	useEffect(() => {
+		setSearchPlaceholder("");
+	}, [searchKey]);
 
 	async function onAction(type: UserActions, user: APIUsersNoIncl[0]) {
 		switch (type) {
@@ -722,7 +732,7 @@ export default function Users() {
 						<Button
 							onPress={() => {
 								db.set(
-									"invitesCompactView",
+									"usersCompactView",
 									compactModeEnabled ? "false" : "true",
 								);
 
@@ -745,6 +755,38 @@ export default function Users() {
 					</View>
 				</View>
 
+				{showSearch && (
+					<View style={styles.mainSearchContainer}>
+						<View style={styles.searchContainer}>
+							<Text style={styles.searchHeader}>
+								Search by {searchKeyNames[searchKey]}
+							</Text>
+
+							<Button
+								onPress={() => setShowSearch(false)}
+								icon="close"
+								color="#191b27"
+								width={30}
+								height={30}
+								padding={5}
+							/>
+						</View>
+
+						<TextInput
+							placeholder="Search..."
+							defaultValue={searchPlaceholder}
+							onValueChange={(text) => setSearchPlaceholder(text)}
+							onSubmitEditing={(event) => {
+								const searchText = event.nativeEvent.text;
+
+								setSearchTerm(searchText);
+								setShowSearch(false);
+							}}
+							returnKeyType="search"
+						/>
+					</View>
+				)}
+
 				<View style={{ flex: 1 }}>
 					<View style={{ ...styles.usersContainer, flex: 1 }}>
 						{users && dashUrl ? (
@@ -759,6 +801,7 @@ export default function Users() {
 												row: "Username",
 												id: "username",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Role",
@@ -778,21 +821,33 @@ export default function Users() {
 											{
 												row: "ID",
 												id: "id",
-												sortable: true
+												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Actions",
 											},
 										]}
 										sortKey={sortKey}
+										onSearch={(key) => {
+											setShowSearch(true);
+											setSearchKey(key as typeof searchKey);
+										}}
 										onSortOrderChange={(key, order) => {
 											setSortKey({
 												id: key as typeof sortKey.id,
 												sortOrder: order,
 											});
 										}}
-										rowWidth={[80, 120, 100, 130, 140, 220, 130]}
+										rowWidth={[80, 140, 100, 130, 140, 220, 130]}
 										rows={users
+											.filter((folder) => {
+												const filterKey = folder[searchKey];
+
+												return filterKey
+													.toLowerCase()
+													.includes(searchTerm.toLowerCase());
+											})
 											.sort((a, b) => {
 												const compareKeyA =
 													sortKey.id === "createdAt" ||

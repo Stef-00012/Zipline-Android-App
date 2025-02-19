@@ -123,4 +123,24 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 	},
+	mainSearchContainer: {
+		borderWidth: 2,
+		borderColor: "#222c47",
+		borderStyle: "solid",
+		borderRadius: 10,
+		margin: 10,
+		padding: 10,
+		paddingTop: 0,
+	},
+	searchContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginVertical: 8,
+	},
+	searchHeader: {
+		color: "white",
+		fontWeight: "bold",
+		fontSize: 20,
+		textAlignVertical: "center",
+	},
 });

@@ -85,7 +85,7 @@ export default function Urls() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
 	const [searchKey, setSearchKey] = useState<
-		"code" | "vanity" | "destination"
+		"code" | "vanity" | "destination" | "views" | "maxViews" | "id"
 	>();
 
 	const [compactModeEnabled, setCompactModeEnabled] = useState<boolean>(
@@ -109,9 +109,12 @@ export default function Urls() {
 		fetchURls();
 	}, [searchTerm]);
 
-	async function fetchURls() {
+	async function fetchURls(force = false) {
+		if (!force && searchKey && searchKey !== "vanity" && searchKey !== "destination") return;
+		if (force && searchKey && searchKey !== "code" && searchKey !== "vanity" && searchKey !== "destination") setSearchKey(undefined)
+		
 		const urls = await getURLs({
-			searchField: searchKey,
+			searchField: searchKey as "code" | "vanity" | "destination",
 			searchQuery: searchTerm,
 		});
 
@@ -298,9 +301,7 @@ export default function Urls() {
 								setNewUrlPassword(null);
 								setNewUrlEnabled(true);
 
-								const newUrls = await getURLs();
-
-								setUrls(typeof newUrls === "string" ? null : newUrls);
+								await fetchURls(true)
 
 								setCreateNewUrl(false);
 
@@ -558,11 +559,13 @@ export default function Urls() {
 												row: "Views",
 												id: "views",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Max Views",
 												id: "maxViews",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Created",
@@ -577,7 +580,8 @@ export default function Urls() {
 											{
 												row: "ID",
 												id: "id",
-												sortable: true
+												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Actions",
@@ -594,8 +598,19 @@ export default function Urls() {
 											setShowSearch(true);
 											setSearchKey(key as typeof searchKey);
 										}}
-										rowWidth={[100, 120, 300, 100, 120, 130, 100, 220, 130]}
+										rowWidth={[100, 120, 300, 110, 140, 130, 100, 220, 130]}
 										rows={urls
+											.filter((invite) => {
+												if (!searchKey) return invite;
+												
+												let filterKey = invite[searchKey];
+
+												if (searchKey === "maxViews" && !filterKey) filterKey = "0"
+
+												return String(filterKey)
+													.toLowerCase()
+													.includes(searchTerm.toLowerCase());
+											})
 											.sort((a, b) => {
 												const compareKeyA =
 													sortKey.id === "createdAt"
@@ -702,7 +717,7 @@ export default function Urls() {
 														)}
 													</Text>
 												);
-												
+
 												const id = (
 													<Text key={url.id} style={styles.rowText}>
 														{url.id}

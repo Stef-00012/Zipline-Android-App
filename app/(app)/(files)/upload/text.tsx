@@ -3,10 +3,10 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { avaibleTextMimetypes, dates, formats } from "@/constants/upload";
 import { type ExternalPathString, Link, useRouter } from "expo-router";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
+import type { APIUploadResponse, Preset } from "@/types/zipline";
 import { guessExtension, guessMimetype } from "@/functions/util";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import { getSettings } from "@/functions/zipline/settings";
-import type { APIUploadResponse } from "@/types/zipline";
 import { getFolders } from "@/functions/zipline/folders";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
@@ -16,6 +16,7 @@ import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
+import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import Select from "@/components/Select";
 import Switch from "@/components/Switch";
@@ -44,6 +45,10 @@ export default function UploadText({
 
 	useAuth();
 	const resetShareIntent = useShareIntent(fromShareIntent);
+
+	const stringifiedPresets = db.get("uploadPresets") || "[]"
+	
+	const [presets, setPresets] = useState<Array<Preset>>(JSON.parse(stringifiedPresets))
 
 	const [uploadedFile, setUploadedFile] =
 		useState<APIUploadResponse["files"][0]>();
@@ -85,6 +90,14 @@ export default function UploadText({
 	}, [text]);
 
 	const isKeyboardOpen = useDetectKeyboardOpen(false);
+
+	const [savePreset, setSavePreset] = useState<boolean>(false)
+	const [newPresetName, setNewPresetName] = useState<string>("")
+	const [newPresetError, setNewPresetError] = useState<string | null>(null)
+
+	const [editPresetName, setEditPresetName] = useState<string>("")
+	const [editPresetError, setEditPresetError] = useState<string | null>(null)
+	const [presetToEdit, setPresetToEdit] = useState<string | null>(null)
 
 	useEffect(() => {
 		(async () => {
@@ -215,6 +228,120 @@ export default function UploadText({
 				>
 					Press outside to close this popup
 				</Text>
+			</Popup>
+
+			<Popup
+				onClose={() => setSavePreset(false)}
+				hidden={!savePreset}
+			>
+				<View>
+					<Text style={styles.headerText}>Save Preset</Text>
+
+					{newPresetError && <Text style={styles.errorText}>{newPresetError}</Text>}
+
+					<TextInput
+						title="Name"
+						placeholder="My Cool Name"
+						value={newPresetName}
+						onValueChange={(text) => {
+							setNewPresetName(text)
+						}}
+					/>
+
+					<Button
+						color="#323ea8"
+						text="Save"
+						icon="save"
+						margin={{
+							top: 10
+						}}
+						onPress={() => {
+							setNewPresetError(null)
+
+							if (newPresetName.length <= 0) return setNewPresetError("Please add a preset name")
+							if (presets.find(preset => preset.name === newPresetName)) return setNewPresetError("A preset with this name already exists")
+
+							const newPresets: Array<Preset> = [
+								...presets,
+								{
+									compression: compression,
+									deletesAt: deletesAt,
+									folder: folder,
+									format: nameFormat,
+									maxViews: maxViews,
+									name: newPresetName,
+									originalName: originalName,
+									overrideDomain: overrideDomain,
+									overrideFileName: fileName,
+									password: password
+								}
+							]
+
+							setPresets(newPresets)
+
+							db.set("uploadPresets", JSON.stringify(newPresets))
+
+							ToastAndroid.show(
+								`Successfully saved the preset "${newPresetName}"`,
+								ToastAndroid.SHORT
+							)
+
+							setNewPresetName("")
+							setSavePreset(false)
+						}}
+					/>
+				</View>
+			</Popup>
+
+			<Popup
+				onClose={() => setPresetToEdit(null)}
+				hidden={!presetToEdit}
+			>
+				<View>
+					<Text style={styles.headerText}>Edit Preset</Text>
+
+					{editPresetError && <Text style={styles.errorText}>{editPresetError}</Text>}
+
+					<TextInput
+						title="Name"
+						placeholder="My Cool Name"
+						value={editPresetName}
+						onValueChange={(text) => {
+							setEditPresetName(text)
+						}}
+					/>
+
+					<Button
+						color="#323ea8"
+						text="Save"
+						icon="save"
+						margin={{
+							top: 10
+						}}
+						onPress={() => {
+							setEditPresetError(null)
+
+							if (editPresetName.length <= 0) return setEditPresetError("Please add a preset name")
+
+							const newPresets: Array<Preset> = presets
+
+							const presetIndex = newPresets.findIndex(preset => preset.name === presetToEdit)
+
+							newPresets[presetIndex].name = editPresetName
+
+							setPresets(newPresets)
+
+							db.set("uploadPresets", JSON.stringify(newPresets))
+
+							ToastAndroid.show(
+								`Successfully edited the preset "${editPresetName}"`,
+								ToastAndroid.SHORT
+							)
+
+							setPresetToEdit(null)
+						}}
+					/>
+				</View>
 			</Popup>
 
 			<View>
@@ -445,6 +572,7 @@ export default function UploadText({
 						},
 						...folders,
 					]}
+					defaultValue={folders.find(fold => fold.value === folder)}
 					disabled={uploading}
 					placeholder="Select Folder..."
 					onSelect={(selectedFolder) => {
@@ -494,6 +622,120 @@ export default function UploadText({
 					disabled={uploading}
 					onValueChange={() => setOriginalName((prev) => !prev)}
 				/>
+
+				<Text
+					style={{
+						...styles.inputHeader,
+						...(uploading && styles.inputHeaderDisabled),
+					}}
+				>
+					Preset:
+				</Text>
+				<View style={{flexDirection: "row"}}>
+					<Select
+						width={"45%"}
+						margin={{
+							left: "2.5%",
+							right: "2.5%"
+						}}
+						data={presets.map(preset => ({
+							label: preset.name,
+							value: preset.name
+						}))}
+						disabled={presets.length <= 0}
+						placeholder="Select Preset..."
+						onSelect={(selectePreset) => {
+							if (selectePreset.length <= 0) return;
+
+							const preset = selectePreset[0].value
+
+							const presetToUse = presets.find(pres => pres.name === preset)
+
+							console.log(presetToUse)
+
+							if (!presetToUse) return ToastAndroid.show(
+								"Invalid Preset",
+								ToastAndroid.SHORT
+							)
+
+							setDeletesAt(presetToUse.deletesAt)
+							setNameFormat(presetToUse.format)
+							setCompression(presetToUse.compression)
+							setMaxViews(presetToUse.maxViews)
+							setOverrideDomain(presetToUse.overrideDomain)
+							setFileName(presetToUse.overrideFileName)
+							setPassword(presetToUse.password)
+							setOriginalName(presetToUse.originalName)
+
+							if (folders.find(folder => folder.value === presetToUse.folder)) setFolder(presetToUse.folder)
+						}}
+						renderItem={(item, closeSelect) => (
+							<View style={styles.selectItemContainer}>
+								<Text style={styles.selectText}>{item.label}</Text>
+
+								<View style={styles.selectButtonContainer}>
+									<Button
+										color="#323ea8"
+										onPress={() => {
+											setEditPresetName(presets.find(preset => preset.name === item.value)?.name || "")
+											setPresetToEdit(item.value)
+
+											closeSelect()
+										}}
+										width={30}
+										height={30}
+										icon="edit"
+										iconSize={20}
+										padding={5}
+										margin={{
+											right: 5
+										}}
+									/>
+
+									<Button
+										color="#CF4238"
+										onPress={() => {
+											const newPresets = presets.filter(preset => preset.name !== item.value)
+
+											setPresets(newPresets)
+
+											db.set("uploadPresets", JSON.stringify(newPresets))
+
+											ToastAndroid.show(
+												`Successfully deleted the preset "${item.label}"`,
+												ToastAndroid.SHORT
+											)
+
+											if (newPresets.length <= 0) closeSelect()
+										}}
+										width={30}
+										height={30}
+										icon="delete"
+										iconSize={20}
+										padding={5}
+										margin={{
+											left: 5
+										}}
+									/>
+								</View>
+							</View>
+						)}
+					/>
+
+					<Button
+						width={"45%"}
+						text="Save Preset"
+						onPress={() => {
+							setSavePreset(true)
+						}}
+						color="#323ea8"
+						margin={{
+							left: "2.5%",
+							right: "2.5%",
+							top: 5
+						}}
+					/>
+				</View>
 			</KeyboardAwareScrollView>
 
 			<View>

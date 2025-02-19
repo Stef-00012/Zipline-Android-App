@@ -2,6 +2,7 @@ import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import type { APIInvites, DashURL } from "@/types/zipline";
 import LargeInviteView from "@/components/LargeInviteView";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { searchKeyNames } from "@/constants/invites";
 import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/admin/invites";
 import TextInput from "@/components/TextInput";
@@ -27,6 +28,11 @@ export default function Invites() {
 	useShareIntent();
 
 	const invitesCompactView = db.get("invitesCompactView");
+
+	const [showSearch, setShowSearch] = useState<boolean>(false);
+	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
+	const [searchKey, setSearchKey] = useState<"code" | "inviter" | "maxUses" | "uses" | "id">("code");
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);
 
@@ -66,6 +72,11 @@ export default function Invites() {
 			setInvites(typeof invites === "string" ? null : invites);
 		})();
 	}, []);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: search term should be resetted when search key changes
+	useEffect(() => {
+		setSearchPlaceholder("");
+	}, [searchKey]);
 
 	async function onAction(type: InviteActions, invite: APIInvites[0]) {
 		switch (type) {
@@ -244,6 +255,39 @@ export default function Invites() {
 					</View>
 				</View>
 
+				{showSearch && (
+					<View style={styles.mainSearchContainer}>
+						<View style={styles.searchContainer}>
+							<Text style={styles.searchHeader}>
+								Search by {searchKeyNames[searchKey]}
+							</Text>
+
+							<Button
+								onPress={() => setShowSearch(false)}
+								icon="close"
+								color="#191b27"
+								width={30}
+								height={30}
+								padding={5}
+							/>
+						</View>
+
+						<TextInput
+							placeholder="Search..."
+							defaultValue={searchPlaceholder}
+							keyboardType={(searchKey === "maxUses" || searchKey === "uses") ? "numeric" : "default"}
+							onValueChange={(text) => setSearchPlaceholder(text)}
+							onSubmitEditing={(event) => {
+								const searchText = event.nativeEvent.text;
+
+								setSearchTerm(searchText);
+								setShowSearch(false);
+							}}
+							returnKeyType="search"
+						/>
+					</View>
+				)}
+
 				<View style={{ flex: 1 }}>
 					<View style={{ ...styles.invitesContainer, flex: 1 }}>
 						{invites && dashUrl ? (
@@ -255,11 +299,13 @@ export default function Invites() {
 												row: "Code",
 												id: "code",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Created By",
 												id: "inviter",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Created",
@@ -280,30 +326,49 @@ export default function Invites() {
 												row: "Max Uses",
 												id: "maxUses",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Uses",
 												id: "uses",
 												sortable: true,
+												searchable: true
 											},
 											{
 												row: "ID",
 												id: "id",
-												sortable: true
+												sortable: true,
+												searchable: true
 											},
 											{
 												row: "Actions",
 											},
 										]}
 										sortKey={sortKey}
+										onSearch={(key) => {
+											setShowSearch(true);
+											setSearchKey(key as typeof searchKey);
+										}}
 										onSortOrderChange={(key, order) => {
 											setSortKey({
 												id: key as typeof sortKey.id,
 												sortOrder: order,
 											});
 										}}
-										rowWidth={[90, 120, 130, 140, 130, 120, 100, 220, 90]}
+										rowWidth={[100, 140, 130, 140, 130, 130, 100, 220, 90]}
 										rows={invites
+											.filter((folder) => {
+												let filterKey =
+													searchKey === "inviter"
+														? folder[searchKey].username
+														: folder[searchKey];
+
+												if (searchKey === "maxUses" && !filterKey) filterKey = "0"
+
+												return String(filterKey)
+													.toLowerCase()
+													.includes(searchTerm.toLowerCase());
+											})
 											.sort((a, b) => {
 												const compareKeyA =
 													sortKey.id === "createdAt" ||

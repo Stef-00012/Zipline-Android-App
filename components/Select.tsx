@@ -1,3 +1,7 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useState, useEffect, type ReactNode } from "react";
+import { styles } from "@/styles/components/select";
+import CheckBox from "@/components/CheckBox";
 import {
 	Text,
 	View,
@@ -6,10 +10,6 @@ import {
 	Modal,
 	type DimensionValue,
 } from "react-native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState, useEffect, type ReactNode } from "react";
-import { styles } from "@/styles/components/select";
-import CheckBox from "@/components/CheckBox";
 
 export interface SelectProps {
 	data: Array<{
@@ -29,7 +29,7 @@ export interface SelectProps {
 		item: SelectProps["data"][0],
 		key: string,
 	) => ReactNode | string;
-	renderItem?: (item: SelectProps["data"][0]) => ReactNode;
+	renderItem?: (item: SelectProps["data"][0], closeSelect: () => void) => ReactNode;
 	id?: string;
 	width?: DimensionValue;
 	margin?: {
@@ -196,7 +196,9 @@ export default function Select({
 												onValueChange={() => handleSelect(item, index)}
 											/>
 										)}
-										{renderItem(item)}
+										{renderItem(item, () => {
+											setIsOpen(false)
+										})}
 									</TouchableOpacity>
 								)}
 							/>

@@ -1,3 +1,4 @@
+import type { UploadFileOptions } from "@/functions/zipline/files";
 import type { Mimetypes } from "@/types/mimetypes";
 
 export type DashURL = `http${"s" | ""}://${string}.${string}`;
@@ -406,4 +407,17 @@ export type APIExports = Array<APIExport>;
 
 export interface ServerActionResponse {
 	status: string;
+}
+
+export interface Preset {
+	overrideDomain: UploadFileOptions["overrideDomain"];
+	overrideFileName: UploadFileOptions["filename"];
+	originalName: UploadFileOptions["originalName"];
+	compression: UploadFileOptions["compression"];
+	deletesAt: UploadFileOptions["expiresAt"];
+	maxViews: UploadFileOptions["maxViews"];
+	password: UploadFileOptions["password"];
+	format: UploadFileOptions["format"];
+	folder: UploadFileOptions["folder"];
+	name: string;
 }

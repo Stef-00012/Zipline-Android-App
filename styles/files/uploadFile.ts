@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
 	},
 	recentFileContainer: {
 		marginHorizontal: 10,
-		marginVertical: 7.5
+		marginVertical: 7.5,
 	},
 	inputHeader: {
 		marginTop: 5,
@@ -80,5 +80,24 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-around",
 		paddingTop: 10,
 		paddingRight: 10,
+	},
+	errorText: {
+		color: "red",
+		fontWeight: "bold",
+		textAlign: "center",
+	},
+	selectText: {
+		flex: 1,
+		textAlignVertical: "center",
+		fontSize: 15,
+		color: "white",
+	},
+	selectButtonContainer: {
+		flexDirection: "row",
+	},
+	selectItemContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "100%",
 	},
 });

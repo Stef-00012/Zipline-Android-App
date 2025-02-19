@@ -3,7 +3,7 @@ import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import type { APIFolders, DashURL } from "@/types/zipline";
 import LargeFolderView from "@/components/LargeFolderView";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import { searchKeyNames } from "@/constants/folders.ts";
+import { searchKeyNames } from "@/constants/folders";
 import { timeDifference } from "@/functions/util";
 import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
@@ -36,11 +36,11 @@ export default function Folders() {
 	useShareIntent();
 
 	const foldersCompactView = db.get("foldersCompactView");
-	
+
 	const [showSearch, setShowSearch] = useState<boolean>(false);
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
-	const [searchKey, setSearchKey] = useState<"name" | "id" | "files">();
+	const [searchKey, setSearchKey] = useState<"name" | "id" | "files">("name");
 
 	const [folders, setFolders] = useState<APIFolders | null>(null);
 
@@ -80,6 +80,11 @@ export default function Folders() {
 			setFolders(typeof folders === "string" ? null : folders);
 		})();
 	}, []);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: search term should be resetted when search key changes
+	useEffect(() => {
+		setSearchPlaceholder("");
+	}, [searchKey]);
 
 	async function onAction(type: FolderActions, folder: APIFolders[0]) {
 		switch (type) {
@@ -332,7 +337,7 @@ export default function Folders() {
 						/>
 					</View>
 				</View>
-				
+
 				{showSearch && (
 					<View style={styles.mainSearchContainer}>
 						<View style={styles.searchContainer}>
@@ -349,7 +354,7 @@ export default function Folders() {
 								padding={5}
 							/>
 						</View>
-						
+
 						<TextInput
 							placeholder="Search..."
 							defaultValue={searchPlaceholder}
@@ -377,7 +382,7 @@ export default function Folders() {
 												row: "Name",
 												id: "name",
 												sortable: true,
-											    searchable: true
+												searchable: true,
 											},
 											{
 												row: "Public",
@@ -398,22 +403,22 @@ export default function Folders() {
 												row: "Files",
 												id: "files",
 												sortable: true,
-											    searchable: true
+												searchable: true,
 											},
 											{
-											    row: "ID",
-											    id: "id",
-											    sortable: true,
-											    searchable: true
+												row: "ID",
+												id: "id",
+												sortable: true,
+												searchable: true,
 											},
 											{
 												row: "Actions",
 											},
 										]}
 										sortKey={sortKey}
-										onSearch={(searchKey) => {
+										onSearch={(key) => {
 											setShowSearch(true);
-											setSearchKey(searchKey as GetFilesOptions["searchField"]);
+											setSearchKey(key as typeof searchKey);
 										}}
 										onSortOrderChange={(key, order) => {
 											setSortKey({
@@ -423,10 +428,15 @@ export default function Folders() {
 										}}
 										rowWidth={[140, 90, 140, 150, 100, 220, 210]}
 										rows={folders
-											.filter(folder => {
-												const filterKey = searchKey === "files" ? folder[searchKey].length : folder[searchKey]
-												
-												return String(filterKey).toLowerCase().includes(searchTerm.toLowerCase())
+											.filter((folder) => {
+												const filterKey =
+													searchKey === "files"
+														? folder[searchKey].length
+														: folder[searchKey];
+
+												return String(filterKey)
+													.toLowerCase()
+													.includes(searchTerm.toLowerCase());
 											})
 											.sort((a, b) => {
 												const compareKeyA =
@@ -510,7 +520,7 @@ export default function Folders() {
 														{folder.files.length}
 													</Text>
 												);
-												
+
 												const id = (
 													<Text key={folder.id} style={styles.rowText}>
 														{folder.id}

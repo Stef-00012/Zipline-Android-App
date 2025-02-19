@@ -35,4 +35,4 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [ ] Maybe upload profile presets? (suggested by iiTranquility)
+- [X] Maybe upload profile presets? (suggested by iiTranquility)

@@ -1,7 +1,7 @@
 {
   "name": "zipline",
   "main": "expo-router/entry",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "scripts": {
     "start": "expo start",
     "start:dev": "APP_VARIANT=development EDGE_PATH=/home/stef/.local/bin/google-chrome expo start --dev-client",

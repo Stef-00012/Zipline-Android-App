@@ -38,6 +38,7 @@ export interface SelectProps {
 		left?: DimensionValue;
 		right?: DimensionValue;
 	};
+	title?: string
 }
 
 export default function Select({
@@ -51,6 +52,7 @@ export default function Select({
 	maxHeight = 200,
 	multiple = false,
 	width,
+	title,
 	margin = {},
 	renderSelectedItem = (item, key) => (
 		<Text
@@ -122,6 +124,16 @@ export default function Select({
 				marginBottom: margin.bottom,
 			}}
 		>
+			{title && (
+				<Text
+					style={{
+						...styles.inputHeader,
+						...(disabled && styles.inputHeaderDisabled),
+					}}
+				>
+					{title}
+				</Text>
+			)}
 			<TouchableOpacity
 				style={styles.selectButton}
 				onPress={() => {

@@ -62,4 +62,31 @@ export const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
+	externalLinkTitle: {
+		marginTop: 10,
+		marginBottom: 5,
+		fontSize: 18,
+		fontWeight: "bold",
+		color: "white",
+	},
+	popupContent: {
+		height: "auto",
+		width: "100%",
+	},
+	mainHeaderText: {
+		fontSize: 22,
+		fontWeight: "bold",
+		color: "white",
+	},
+	popupSubHeaderText: {
+		marginTop: 10,
+		marginLeft: 10,
+		fontSize: 13,
+		fontWeight: "bold",
+		color: "gray",
+	},
+	externalUrlsScrollView: {
+		maxHeight: 300,
+		borderRadius: 8,
+	},
 });

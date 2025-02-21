@@ -340,9 +340,10 @@ export type SaveCategories =
 	| "discordOnShortenWebhook";
 
 interface Category {
-	type: "category";
-	name: string;
 	children: Array<Setting>;
+	type: "category";
+	if?: SettingPath;
+	name: string;
 	category: `${
 		| SaveCategories
 		| "discordOAuth"
@@ -351,35 +352,35 @@ interface Category {
 		| "OIDCOAuth"
 		| "discordOnUploadEmbed"
 		| "discordOnShortenEmbed"}Category`;
-	if?: SettingPath;
 }
 
 interface Input {
+	displayType?: "bytes" | "time";
+	keyboardType?: KeyboardType;
+	passwordInput?: boolean;
+	placeholder?: string;
+	setting: SettingPath;
+	joinString?: string;
+	multiline?: boolean;
 	type: "input";
 	name: string;
-	setting: SettingPath;
-	placeholder?: string;
-	multiline?: boolean;
-	keyboardType?: KeyboardType;
-	joinString?: string;
-	displayType?: "bytes" | "time";
 }
 
 interface Switch {
+	setType?: "upload" | "shorten";
+	setting: SettingPath;
 	type: "switch";
 	name: string;
-	setting: SettingPath;
-	setType?: "upload" | "shorten";
 }
 
 interface Select {
+	defaultValue?: SelectProps["data"][0]["value"];
+	options: SelectProps["data"];
+	multiSelect?: boolean;
+	setting: SettingPath;
+	placeholder: string;
 	type: "select";
 	name: string;
-	setting: SettingPath;
-	options: SelectProps["data"];
-	defaultValue?: SelectProps["data"][0]["value"];
-	multiSelect?: boolean;
-	placeholder: string;
 }
 
 interface Save {
@@ -387,7 +388,11 @@ interface Save {
 	category: SaveCategories;
 }
 
-export type Setting = Category | Input | Switch | Select | Save;
+interface ExternalUrl {
+	type: "externalUrls";
+}
+
+export type Setting = Category | Input | Switch | Select | ExternalUrl | Save;
 
 export const settings: Array<Setting> = [
 	{
@@ -678,6 +683,10 @@ export const settings: Array<Setting> = [
 				setting: "urlsLength",
 				keyboardType: "numeric",
 			},
+			{
+				type: "save",
+				category: "urlShortener"
+			}
 		],
 	},
 	{
@@ -696,6 +705,10 @@ export const settings: Array<Setting> = [
 				setting: "invitesLength",
 				keyboardType: "numeric",
 			},
+			{
+				type: "save",
+				category: "invites"
+			}
 		],
 	},
 	{
@@ -757,11 +770,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "url",
 			},
 			{
-				type: "input",
-				name: "External Links",
-				setting: "websiteExternalLinks",
-				keyboardType: "default",
-				multiline: true,
+				type: "externalUrls",
 			},
 			{
 				type: "input",
@@ -841,6 +850,7 @@ export const settings: Array<Setting> = [
 						name: "Discord Client Secret",
 						setting: "oauthDiscordClientSecret",
 						keyboardType: "default",
+						passwordInput: true,
 					},
 					{
 						type: "input",
@@ -866,6 +876,7 @@ export const settings: Array<Setting> = [
 						name: "Google Client Secret",
 						setting: "oauthGoogleClientSecret",
 						keyboardType: "default",
+						passwordInput: true,
 					},
 					{
 						type: "input",
@@ -891,6 +902,7 @@ export const settings: Array<Setting> = [
 						name: "GitHub Client Secret",
 						setting: "oauthGithubClientSecret",
 						keyboardType: "default",
+						passwordInput: true,
 					},
 					{
 						type: "input",
@@ -916,6 +928,7 @@ export const settings: Array<Setting> = [
 						name: "OIDC Client Secret",
 						setting: "oauthOidcClientSecret",
 						keyboardType: "default",
+						passwordInput: true,
 					},
 					{
 						type: "input",

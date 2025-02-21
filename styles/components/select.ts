@@ -64,4 +64,14 @@ export const styles = StyleSheet.create({
 	selectedItemContainer: {
 		margin: 3,
 	},
+	inputHeader: {
+		marginTop: 5,
+		marginBottom: 5,
+		fontSize: 18,
+		fontWeight: "bold",
+		color: "white",
+	},
+	inputHeaderDisabled: {
+		color: "gray",
+	},
 });

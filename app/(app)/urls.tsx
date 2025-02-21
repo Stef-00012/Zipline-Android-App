@@ -31,6 +31,8 @@ export type URLActions =
 	| "edit"
 	| "delete";
 
+const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
+
 export default function Urls() {
 	useAuth();
 	useShareIntent();
@@ -93,8 +95,6 @@ export default function Urls() {
 	);
 
 	const dashUrl = db.get("url") as DashURL | null;
-
-	const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
 	useEffect(() => {
 		(async () => {

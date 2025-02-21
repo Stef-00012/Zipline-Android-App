@@ -3,8 +3,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { settings as zlSettings } from "@/constants/adminSettings";
 import { convertToBytes, convertToTime } from "@/functions/util";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import { View, Text, ToastAndroid } from "react-native";
-import type { APISettings } from "@/types/zipline";
+import { View, Text, ToastAndroid, ScrollView } from "react-native";
+import type { APISettings, ExternalLink } from "@/types/zipline";
+import ExternalUrl from "@/components/ExternalUrl";
 import { styles } from "@/styles/admin/settings";
 import TextInput from "@/components/TextInput";
 import { useState, useEffect } from "react";
@@ -17,6 +18,9 @@ import type {
 	SaveSettings,
 	Setting,
 } from "@/constants/adminSettings";
+import Popup from "@/components/Popup";
+
+const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");
@@ -472,6 +476,18 @@ export default function ServerSettings() {
 		);
 	}
 
+	const [editUrlIndex, setEditUrlIndex] = useState<number>(-1);
+	const [editUrlName, setEditUrlName] = useState<string | null>(null);
+	const [editUrlURL, setEditUrlURL] = useState<string | null>(null);
+
+	const [editUrlError, setEditUrlError] = useState<string | null>(null);
+
+	const [createNewUrl, setCreateNewUrl] = useState<boolean>(false);
+	const [newUrlName, setNewUrlName] = useState<string | null>(null);
+	const [newUrlURL, setNewUrlURL] = useState<string | null>(null);
+
+	const [newUrlError, setNewUrlError] = useState<string | null>(null);
+
 	function renderSetting(setting: Setting) {
 		switch (setting.type) {
 			case "category": {
@@ -500,6 +516,7 @@ export default function ServerSettings() {
 					<TextInput
 						key={setting.setting}
 						title={setting.name}
+						password={setting.passwordInput}
 						keyboardType={setting.keyboardType}
 						onValueChange={(content) =>
 							setSaveSettings((prev) => {
@@ -532,6 +549,7 @@ export default function ServerSettings() {
 			case "select": {
 				return (
 					<Select
+						title={setting.name}
 						key={setting.setting}
 						data={setting.options}
 						onSelect={(selectedItem) => {
@@ -568,6 +586,124 @@ export default function ServerSettings() {
 				);
 			}
 
+			case "externalUrls": {
+				return (
+					<>
+						<View
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								justifyContent: "space-between",
+							}}
+						>
+							<Text style={styles.externalLinkTitle}>External Links</Text>
+
+							<Button
+								color="#323ea8"
+								onPress={() => {
+									setCreateNewUrl(true);
+								}}
+								width={30}
+								height={30}
+								padding={0}
+								icon="add"
+								iconSize={30}
+								margin={{
+									right: 10,
+								}}
+							/>
+						</View>
+						<View
+							style={{
+								...styles.settingGroup,
+								marginTop: 0,
+							}}
+						>
+							<ScrollView
+								style={styles.externalUrlsScrollView}
+								showsVerticalScrollIndicator={false}
+								nestedScrollEnabled
+							>
+								{(
+									JSON.parse(
+										saveSettings?.websiteExternalLinks || "[]",
+									) as Array<ExternalLink>
+								).map((url, index) => (
+									<ExternalUrl
+										externalUrl={url}
+										key={`${url.url}-${index}`}
+										id={index}
+										onChange={(type, id) => {
+											switch (type) {
+												case "delete": {
+													const newUrls: Array<ExternalLink> = JSON.parse(
+														saveSettings?.websiteExternalLinks || "[]",
+													);
+
+													const name = newUrls[id].name;
+
+													newUrls.splice(id, 1);
+
+													setSaveSettings((prev) => {
+														if (!prev) return prev;
+
+														return {
+															...prev,
+															websiteExternalLinks: JSON.stringify(newUrls),
+														};
+													});
+
+													return ToastAndroid.show(
+														`Deleted the external URL ${name}`,
+														ToastAndroid.SHORT,
+													);
+												}
+
+												case "edit": {
+													const urls: Array<ExternalLink> = JSON.parse(
+														saveSettings?.websiteExternalLinks || "[]",
+													);
+
+													setEditUrlIndex(id);
+													setEditUrlName(urls[id].name);
+													setEditUrlURL(urls[id].url);
+												}
+											}
+										}}
+										onMove={(type, id) => {
+											const urls: Array<ExternalLink> = JSON.parse(
+												saveSettings?.websiteExternalLinks || "[]",
+											);
+
+											switch(type) {
+												case "down": {
+													[urls[id], urls[id + 1]] = [urls[id + 1], urls[id]]
+
+													break;
+												}
+
+												case "up": {
+													[urls[id], urls[id - 1]] = [urls[id - 1], urls[id]]
+												}
+											}
+
+											setSaveSettings((prev) => {
+												if (!prev) return prev;
+
+												return {
+													...prev,
+													websiteExternalLinks: JSON.stringify(urls),
+												};
+											});
+										}}
+									/>
+								))}
+							</ScrollView>
+						</View>
+					</>
+				);
+			}
+
 			case "save": {
 				return (
 					<Button
@@ -588,6 +724,171 @@ export default function ServerSettings() {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
+				<Popup
+					hidden={editUrlIndex < 0}
+					onClose={() => {
+						setEditUrlIndex(-1);
+						setEditUrlName(null);
+						setEditUrlURL(null);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Edit External URL</Text>
+						{editUrlError && (
+							<Text style={styles.errorText}>{editUrlError}</Text>
+						)}
+
+						<TextInput
+							title="Name:"
+							onValueChange={(content) => {
+								setEditUrlName(content);
+							}}
+							value={editUrlName || ""}
+							placeholder="Google"
+						/>
+
+						<TextInput
+							title="URL:"
+							onValueChange={(content) => {
+								setEditUrlURL(content);
+							}}
+							value={editUrlURL || ""}
+							keyboardType="url"
+							placeholder="https://google.com"
+						/>
+
+						<Button
+							color="#323ea8"
+							text="Save"
+							icon="save"
+							margin={{
+								top: 10,
+							}}
+							onPress={async () => {
+								setEditUrlError(null);
+
+								if (!editUrlName)
+									return setEditUrlError("Please insert a name");
+								if (!editUrlURL) return setEditUrlError("Please insert a URL");
+								if (!urlRegex.test(editUrlURL))
+									return setEditUrlError("Please insert a valid URL");
+
+								const newUrls: Array<ExternalLink> = JSON.parse(
+									saveSettings?.websiteExternalLinks || "[]",
+								);
+
+								newUrls[editUrlIndex] = {
+									name: editUrlName,
+									url: editUrlURL,
+								};
+
+								setSaveSettings((prev) => {
+									if (!prev) return prev;
+
+									return {
+										...prev,
+										websiteExternalLinks: JSON.stringify(newUrls),
+									};
+								});
+
+								ToastAndroid.show(
+									`Edited the external URL "${newUrls[editUrlIndex].name}"`,
+									ToastAndroid.SHORT,
+								);
+
+								setEditUrlName(null);
+								setEditUrlURL(null);
+								setEditUrlIndex(-1);
+							}}
+						/>
+
+						<Text style={styles.popupSubHeaderText}>
+							Press outside to close this popup
+						</Text>
+					</View>
+				</Popup>
+
+				<Popup
+					hidden={!createNewUrl}
+					onClose={() => {
+						setCreateNewUrl(false);
+						setNewUrlName(null);
+						setNewUrlURL(null);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Add External URL</Text>
+						{newUrlError && <Text style={styles.errorText}>{newUrlError}</Text>}
+
+						<TextInput
+							title="Name:"
+							onValueChange={(content) => {
+								setNewUrlName(content);
+							}}
+							value={newUrlName || ""}
+							placeholder="Google"
+						/>
+
+						<TextInput
+							title="URL:"
+							onValueChange={(content) => {
+								setNewUrlURL(content);
+							}}
+							value={newUrlURL || ""}
+							keyboardType="url"
+							placeholder="https://google.com"
+						/>
+
+						<Button
+							color="#323ea8"
+							text="Save"
+							icon="save"
+							margin={{
+								top: 10,
+							}}
+							onPress={async () => {
+								setNewUrlError(null);
+
+								if (!newUrlName) return setNewUrlError("Please insert a name");
+								if (!newUrlURL) return setNewUrlError("Please insert a URL");
+								if (!urlRegex.test(newUrlURL))
+									return setNewUrlError("Please insert a valid URL");
+
+								const newUrls: Array<ExternalLink> = JSON.parse(
+									saveSettings?.websiteExternalLinks || "[]",
+								);
+
+								newUrls.push({
+									name: newUrlName,
+									url: newUrlURL,
+								});
+
+								setSaveSettings((prev) => {
+									if (!prev) return prev;
+
+									return {
+										...prev,
+										websiteExternalLinks: JSON.stringify(newUrls),
+									};
+								});
+
+								ToastAndroid.show(
+									`Added the external URL "${newUrlName}"`,
+									ToastAndroid.SHORT,
+								);
+
+								setNewUrlName(null);
+								setNewUrlURL(null);
+								setCreateNewUrl(false);
+							}}
+						/>
+
+						<Text style={styles.popupSubHeaderText}>
+							Press outside to close this popup
+						</Text>
+					</View>
+				</Popup>
+
 				<View style={styles.header}>
 					<Text style={styles.headerText}>Server Settings</Text>
 

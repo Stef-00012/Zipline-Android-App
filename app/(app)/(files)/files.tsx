@@ -45,6 +45,7 @@ import {
 	ToastAndroid,
 	View,
 } from "react-native";
+import ColorPicker from "@/components/ColorPicker";
 
 export default function Files() {
 	const router = useRouter();
@@ -359,14 +360,12 @@ export default function Files() {
 							placeholder="myTag"
 						/>
 
-						<TextInput
-							title="Color:"
-							onValueChange={(content) => {
-								setNewTagColor(content);
+						<ColorPicker
+							title="Embed Color"
+							initialColor={newTagColor}
+							onSelectColor={(color) => {
+								setNewTagColor(color.hex);
 							}}
-							value={newTagColor || ""}
-							maxLength={7}
-							placeholder="#fa83d0"
 						/>
 
 						<View style={styles.manageTagButtonsContainer}>
@@ -451,14 +450,12 @@ export default function Files() {
 									placeholder="myTag"
 								/>
 
-								<TextInput
-									title="Color:"
-									onValueChange={(content) => {
-										setEditTagColor(content);
+								<ColorPicker
+									title="Embed Color"
+									initialColor={editTagColor}
+									onSelectColor={(color) => {
+										setEditTagColor(color.hex);
 									}}
-									value={editTagColor || ""}
-									maxLength={7}
-									placeholder="#fa83d0"
 								/>
 
 								<View style={styles.manageTagButtonsContainer}>

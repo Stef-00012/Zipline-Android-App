@@ -39,20 +39,27 @@ export default function Sidebar({
 	const [isAdmin, setIsAdmin] = useState<boolean>(false);
 	const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: should reload whenever sidebar status changes
 	useEffect(() => {
 		(async () => {
 			const settings = await getSettings();
 			const user = await getCurrentUser();
 
+			if (typeof settings !== "string" && settings.invitesEnabled)
+				setInvitesEnabled(true);
+			else setInvitesEnabled(false);
+
 			if (typeof user !== "string") {
+				if (user.role === "USER") {
+					setIsAdmin(false);
+					setIsSuperAdmin(false);
+				}
+
 				if (["ADMIN", "SUPERADMIN"].includes(user.role)) setIsAdmin(true);
 				if (user.role === "SUPERADMIN") setIsSuperAdmin(true);
 			}
-
-			if (typeof settings !== "string" && settings.invitesEnabled)
-				setInvitesEnabled(true);
 		})();
-	});
+	}, [open]);
 
 	const pathname = usePathname();
 

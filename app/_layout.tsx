@@ -1,3 +1,4 @@
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShareIntentProvider } from "expo-share-intent";
@@ -43,15 +44,19 @@ export default function Layout() {
 
 			<SafeAreaView style={{ flex: 1 }}>
 				<KeyboardProvider>
-					{hasInternet ? (
-						<Header>
-							<Slot />
-						</Header>
-					) : (
-						<View style={styles.noInternetContainer}>
-							<Text style={styles.noInternetText}>No internet connection.</Text>
-						</View>
-					)}
+					<GestureHandlerRootView>
+						{hasInternet ? (
+							<Header>
+								<Slot />
+							</Header>
+						) : (
+							<View style={styles.noInternetContainer}>
+								<Text style={styles.noInternetText}>
+									No internet connection.
+								</Text>
+							</View>
+						)}
+					</GestureHandlerRootView>
 				</KeyboardProvider>
 			</SafeAreaView>
 		</ShareIntentProvider>

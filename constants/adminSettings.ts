@@ -383,6 +383,12 @@ interface Select {
 	name: string;
 }
 
+interface ColorPicker {
+	type: "colorPicker";
+	setting: SettingPath;
+	name: string;
+}
+
 interface Save {
 	type: "save";
 	category: SaveCategories;
@@ -392,7 +398,14 @@ interface ExternalUrl {
 	type: "externalUrls";
 }
 
-export type Setting = Category | Input | Switch | Select | ExternalUrl | Save;
+export type Setting =
+	| Category
+	| Input
+	| Switch
+	| Select
+	| ExternalUrl
+	| ColorPicker
+	| Save;
 
 export const settings: Array<Setting> = [
 	{
@@ -685,8 +698,8 @@ export const settings: Array<Setting> = [
 			},
 			{
 				type: "save",
-				category: "urlShortener"
-			}
+				category: "urlShortener",
+			},
 		],
 	},
 	{
@@ -707,8 +720,8 @@ export const settings: Array<Setting> = [
 			},
 			{
 				type: "save",
-				category: "invites"
-			}
+				category: "invites",
+			},
 		],
 	},
 	{
@@ -1001,11 +1014,9 @@ export const settings: Array<Setting> = [
 				placeholder: "#000000",
 			},
 			{
-				type: "input",
+				type: "colorPicker",
 				name: "Background Color",
 				setting: "pwaBackgroundColor",
-				keyboardType: "default",
-				placeholder: "#000000",
 			},
 			{
 				type: "save",
@@ -1132,10 +1143,9 @@ export const settings: Array<Setting> = [
 								keyboardType: "default",
 							},
 							{
-								type: "input",
+								type: "colorPicker",
 								name: "Color",
 								setting: "discordOnUploadEmbed.color",
-								keyboardType: "default",
 							},
 							{
 								type: "switch",
@@ -1228,10 +1238,9 @@ export const settings: Array<Setting> = [
 								keyboardType: "default",
 							},
 							{
-								type: "input",
+								type: "colorPicker",
 								name: "Color",
 								setting: "discordOnShortenEmbed.color",
-								keyboardType: "default",
 							},
 							{
 								type: "switch",

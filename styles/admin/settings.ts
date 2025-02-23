@@ -19,12 +19,16 @@ export const styles = StyleSheet.create({
 		borderRadius: 8,
 	},
 	header: {
-		paddingVertical: 10,
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginVertical: 5
 	},
 	headerText: {
 		marginTop: 5,
 		marginLeft: 10,
 		fontSize: 23,
+		textAlignVertical: "center",
 		fontWeight: "bold",
 		color: "white",
 	},
@@ -88,5 +92,11 @@ export const styles = StyleSheet.create({
 	externalUrlsScrollView: {
 		maxHeight: 300,
 		borderRadius: 8,
+	},
+	headerButtons: {
+		flexDirection: "row",
+		justifyContent: "space-around",
+		paddingTop: 10,
+		paddingRight: 10,
 	},
 });

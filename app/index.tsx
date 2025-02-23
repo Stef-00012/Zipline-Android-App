@@ -19,7 +19,11 @@ import type {
 	DashURL,
 } from "@/types/zipline";
 
+// ------------------------ DEV -------------------------
+
 // import { useFocusEffect, useRouter } from "expo-router";
+
+// ---------------------- END DEV -----------------------
 
 export default function Home() {
 	useAuth();
@@ -39,16 +43,20 @@ export default function Home() {
 		handleAuth();
 	}, []);
 
-	// 	const router = useRouter();
+	// ----------------- DEV ------------------
 
-	// 	useFocusEffect(() => {
-	// 		if (__DEV__) {
-	// // 			db.del("url")
-	// // 			db.del("token")
+	// const router = useRouter();
 
-	// 			// router.replace("/metrics");
-	// 		}
-	// 	});
+	// useFocusEffect(() => {
+	// 	if (__DEV__) {
+	// 		// db.del("url")
+	// 		// db.del("token")
+
+	// 		router.replace("/test");
+	// 	}
+	// });
+
+	// --------------- END DEV ----------------
 
 	async function handleAuth() {
 		const user = await getCurrentUser();

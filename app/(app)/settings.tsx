@@ -40,6 +40,7 @@ import {
 	getCurrentUser,
 	getCurrentUserAvatar,
 } from "@/functions/zipline/user";
+import ColorPicker from "@/components/ColorPicker";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -762,13 +763,13 @@ export default function UserSettings() {
 									placeholder="My Cool Site Name"
 								/>
 
-								<TextInput
-									title="Embed Color:"
-									disableContext={!viewEmbed || !viewEnabled}
+								<ColorPicker
+									title="Embed Color"
+									initialColor={viewEmbedColor}
+									onSelectColor={(color) => {
+										setViewEmbedColor(color.hex);
+									}}
 									disabled={!viewEmbed || !viewEnabled}
-									onValueChange={(content) => setViewEmbedColor(content)}
-									value={viewEmbedColor || ""}
-									placeholder="My Cool Color"
 								/>
 
 								<Button

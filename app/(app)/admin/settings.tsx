@@ -1,4 +1,8 @@
-import { getSettings, updateSettings } from "@/functions/zipline/settings";
+import {
+	getSettings,
+	reloadSettings,
+	updateSettings,
+} from "@/functions/zipline/settings";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { settings as zlSettings } from "@/constants/adminSettings";
 import { convertToBytes, convertToTime } from "@/functions/util";
@@ -19,6 +23,7 @@ import type {
 	Setting,
 } from "@/constants/adminSettings";
 import Popup from "@/components/Popup";
+import ColorPicker from "@/components/ColorPicker";
 
 const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
@@ -466,6 +471,11 @@ export default function ServerSettings() {
 
 		if (Array.isArray(success)) return setSaveError(success);
 
+		const reloadSuccess = await reloadSettings();
+
+		if (typeof reloadSuccess === "string")
+			return setSaveError([`Error while reloading: ${reloadSuccess}`]);
+
 		const newSettings = await getSettings();
 
 		setSettings(typeof newSettings === "string" ? null : newSettings);
@@ -537,7 +547,9 @@ export default function ServerSettings() {
 							setting.multiline
 								? {
 										maxHeight: 400,
-										height: undefined,
+										minHeight: 150,
+										height: "auto",
+										textAlignVertical: "top",
 										fontFamily: "monospace",
 									}
 								: undefined
@@ -675,15 +687,15 @@ export default function ServerSettings() {
 												saveSettings?.websiteExternalLinks || "[]",
 											);
 
-											switch(type) {
+											switch (type) {
 												case "down": {
-													[urls[id], urls[id + 1]] = [urls[id + 1], urls[id]]
+													[urls[id], urls[id + 1]] = [urls[id + 1], urls[id]];
 
 													break;
 												}
 
 												case "up": {
-													[urls[id], urls[id - 1]] = [urls[id - 1], urls[id]]
+													[urls[id], urls[id - 1]] = [urls[id - 1], urls[id]];
 												}
 											}
 
@@ -701,6 +713,23 @@ export default function ServerSettings() {
 							</ScrollView>
 						</View>
 					</>
+				);
+			}
+
+			case "colorPicker": {
+				return (
+					<ColorPicker
+						title={setting.name}
+						initialColor={saveSettings?.[setting.setting] as string | undefined}
+						onSelectColor={(color) => {
+							setSaveSettings((prev) => {
+								return {
+									...prev,
+									[setting.setting]: color.hex,
+								} as SaveSettings;
+							});
+						}}
+					/>
 				);
 			}
 
@@ -890,7 +919,38 @@ export default function ServerSettings() {
 				</Popup>
 
 				<View style={styles.header}>
-					<Text style={styles.headerText}>Server Settings</Text>
+					<View
+						style={{
+							flexDirection: "row",
+							justifyContent: "space-between",
+							width: "100%",
+						}}
+					>
+						<Text style={styles.headerText}>Server Settings</Text>
+
+						<View style={styles.headerButtons}>
+							<Button
+								onPress={async () => {
+									const settings = await getSettings();
+
+									setSettings(typeof settings === "string" ? null : settings);
+
+									ToastAndroid.show(
+										"Successfully refreshed the settings",
+										ToastAndroid.SHORT,
+									);
+								}}
+								icon="refresh"
+								color="transparent"
+								iconColor="#2d3f70"
+								borderColor="#222c47"
+								borderWidth={2}
+								iconSize={30}
+								padding={4}
+								rippleColor="#283557"
+							/>
+						</View>
+					</View>
 
 					{saveError && (
 						<View>

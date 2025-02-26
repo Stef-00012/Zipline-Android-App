@@ -421,3 +421,7 @@ export interface Preset {
 	folder: UploadFileOptions["folder"];
 	name: string;
 }
+
+export interface APIVersion {
+	version: string;
+}

@@ -41,6 +41,7 @@ import {
 	getCurrentUserAvatar,
 } from "@/functions/zipline/user";
 import ColorPicker from "@/components/ColorPicker";
+import { getVersion } from "@/functions/zipline/version";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -117,6 +118,8 @@ export default function UserSettings() {
 	const [generateThumbnailsRerun, setGenerateThumbnailsRerun] =
 		useState<boolean>(false);
 
+	const [ziplineVersion, setZiplineVersion] = useState<string | null>(null)
+
 	const url = db.get("url") as DashURL;
 
 	useEffect(() => {
@@ -126,6 +129,7 @@ export default function UserSettings() {
 			const avatar = await getCurrentUserAvatar();
 			const exports = await getUserExports();
 			const zeroByteFiles = await getZeroByteFiles();
+			const versionData = await getVersion()
 
 			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
@@ -134,6 +138,7 @@ export default function UserSettings() {
 			setZeroByteFiles(
 				typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length,
 			);
+			setZiplineVersion(typeof versionData === "string" ? null : versionData.version)
 		})();
 	}, []);
 
@@ -1077,9 +1082,16 @@ export default function UserSettings() {
 							{/* App Settings */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>App Settings</Text>
+
 								<Text style={styles.subHeaderText}>
 									App Version: {appVersion}
 								</Text>
+
+								{ziplineVersion && (
+									<Text style={styles.subHeaderText}>
+										Zipline Version: {ziplineVersion}
+									</Text>
+								)}
 
 								<Switch
 									title="Disable Update Alert"

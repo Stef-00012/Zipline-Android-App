@@ -1,7 +1,10 @@
 import { isAuthenticated } from "@/functions/zipline/auth";
+import { getVersion } from "@/functions/zipline/version";
 import { useFocusEffect, useRouter } from "expo-router";
 import type { APIUser } from "@/types/zipline";
+import * as db from "@/functions/database";
 import { roles } from "@/constants/auth";
+import semver from "semver";
 
 export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 	const router = useRouter();
@@ -12,6 +15,18 @@ export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 			const authenticated = await isAuthenticated();
 
 			if (!authenticated) return router.replace("/login");
+
+			const versionData = await getVersion();
+
+			if (
+				typeof versionData === "string" ||
+				semver.lt(versionData.version, "4.0.0")
+			) {
+				await db.del("url");
+				await db.del("token");
+
+				return router.replace("/login");
+			}
 
 			const userPosition = roles[authenticated];
 

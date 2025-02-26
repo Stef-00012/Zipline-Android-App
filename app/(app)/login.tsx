@@ -1,5 +1,6 @@
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
+import { getVersion } from "@/functions/zipline/version";
 import { useLoginAuth } from "@/hooks/useLoginAuth";
 import TextInput from "@/components/TextInput";
 import * as db from "@/functions/database";
@@ -8,6 +9,7 @@ import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import { styles } from "@/styles/login";
 import { useState } from "react";
+import semver from "semver";
 import React from "react";
 
 export default function Login() {
@@ -128,6 +130,18 @@ export default function Login() {
 									"There was an error during the login, make sure your token is valid and your server is running Zipline V4",
 								);
 
+							const versionData = await getVersion();
+							
+							if (
+								typeof versionData === "string" ||
+								semver.lt(versionData.version, "4.0.0")
+							) {
+								await db.del("url");
+								await db.del("token");
+				
+								return setError("You must use Zipline v4.0.0 or greater");
+							}
+
 							return router.replace("/");
 						}
 
@@ -151,6 +165,18 @@ export default function Login() {
 						if (!token) return setError("Something went wrong...");
 
 						db.set("token", token);
+
+						const versionData = await getVersion();
+							
+						if (
+							typeof versionData === "string" ||
+							semver.lt(versionData.version, "4.0.0")
+						) {
+							await db.del("url");
+							await db.del("token");
+			
+							return setError("You must use Zipline v4.0.0 or greater");
+						}
 
 						return router.replace("/");
 					}}

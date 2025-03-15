@@ -174,6 +174,8 @@ export interface APISettings {
 	filesAssumeMimetypes: boolean;
 	filesDefaultDateFormat: string;
 	filesRemoveGpsMetadata: boolean;
+	filesRandomWordsNumAdjectives: number;
+	filesRandomWordsSeparator: string;
 	urlsRoute: string;
 	urlsLength: number;
 	featuresImageCompression: boolean;
@@ -263,7 +265,7 @@ export interface UploadEmbed {
 	imageOrVideo: boolean;
 }
 
-export type ShortenEmbed = UploadEmbed;
+export type ShortenEmbed = Omit<UploadEmbed, "imageOrVideo" | "thumbnail">;
 
 export type APIUserNoIncl = Omit<
 	APIUser,

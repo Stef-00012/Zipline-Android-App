@@ -42,6 +42,7 @@ export default function ServerSettings() {
 	}, []);
 
 	const [saveSettings, setSaveSettings] = useState<SaveSettings | null>(null);
+	const [saving, setSaving] = useState<boolean>(false)
 
 	useEffect(() => {
 		if (settings) {
@@ -111,6 +112,8 @@ export default function ServerSettings() {
 					}) || settings.filesMaxFileSize,
 				filesDefaultExpiration: settings.filesDefaultExpiration,
 				filesDefaultDateFormat: settings.filesDefaultDateFormat,
+				filesRandomWordsNumAdjectives: settings.filesRandomWordsNumAdjectives,
+				filesRandomWordsSeparator: settings.filesRandomWordsSeparator,
 
 				urlsRoute: settings.urlsRoute,
 				urlsLength: settings.urlsLength,
@@ -206,10 +209,6 @@ export default function ServerSettings() {
 					settings.discordOnShortenEmbed?.description ?? null,
 				"discordOnShortenEmbed.footer":
 					settings.discordOnShortenEmbed?.footer ?? null,
-				"discordOnShortenEmbed.imageOrVideo":
-					settings.discordOnShortenEmbed?.imageOrVideo ?? false,
-				"discordOnShortenEmbed.thumbnail":
-					settings.discordOnShortenEmbed?.thumbnail ?? false,
 				"discordOnShortenEmbed.timestamp":
 					settings.discordOnShortenEmbed?.timestamp ?? false,
 				"discordOnShortenEmbed.title":
@@ -224,8 +223,9 @@ export default function ServerSettings() {
 
 	async function handleSave(category: SaveCategories) {
 		setSaveError(null);
+		setSaving(true)
 
-		if (!saveSettings) return;
+		if (!saveSettings) return setSaving(false);
 		let settingsToSave: Partial<APISettings> = {};
 
 		switch (category) {
@@ -303,6 +303,9 @@ export default function ServerSettings() {
 					filesMaxFileSize: saveSettings.filesMaxFileSize,
 					filesDefaultExpiration: saveSettings.filesDefaultExpiration,
 					filesDefaultDateFormat: saveSettings.filesDefaultDateFormat,
+					filesRandomWordsSeparator: saveSettings.filesRandomWordsSeparator,
+					filesRandomWordsNumAdjectives:
+						saveSettings.filesRandomWordsNumAdjectives,
 				};
 
 				break;
@@ -427,9 +430,6 @@ export default function ServerSettings() {
 								color: saveSettings["discordOnShortenEmbed.color"],
 								description: saveSettings["discordOnShortenEmbed.description"],
 								footer: saveSettings["discordOnShortenEmbed.footer"],
-								imageOrVideo:
-									saveSettings["discordOnShortenEmbed.imageOrVideo"],
-								thumbnail: saveSettings["discordOnShortenEmbed.thumbnail"],
 								timestamp: saveSettings["discordOnShortenEmbed.timestamp"],
 								title: saveSettings["discordOnShortenEmbed.title"],
 								url: saveSettings["discordOnShortenEmbed.url"],
@@ -463,22 +463,30 @@ export default function ServerSettings() {
 				break;
 			}
 		}
-
-		if (Object.keys(settingsToSave).length <= 0)
-			return "Something went wrong...";
-
+		
+		if (Object.keys(settingsToSave).length <= 0) {
+			setSaveError(["Something went wrong..."])
+			return setSaving(false)
+		}
+		
 		const success = await updateSettings(settingsToSave);
-
-		if (Array.isArray(success)) return setSaveError(success);
-
+		
+		if (Array.isArray(success)) {
+			setSaveError(success);
+			setSaving(false)
+		}
+		
 		const reloadSuccess = await reloadSettings();
-
-		if (typeof reloadSuccess === "string")
-			return setSaveError([`Error while reloading: ${reloadSuccess}`]);
+		
+		if (typeof reloadSuccess === "string") {
+			setSaveError([`Error while reloading: ${reloadSuccess}`]);
+			setSaving(false)
+		}
 
 		const newSettings = await getSettings();
 
 		setSettings(typeof newSettings === "string" ? null : newSettings);
+		setSaving(false)
 
 		return ToastAndroid.show(
 			"Successfully saved the settings",
@@ -527,16 +535,23 @@ export default function ServerSettings() {
 						key={setting.setting}
 						title={setting.name}
 						password={setting.passwordInput}
+						disabled={saving}
 						keyboardType={setting.keyboardType}
 						onValueChange={(content) =>
 							setSaveSettings((prev) => {
 								return {
 									...prev,
-									[setting.setting]: content,
+									[setting.setting]: [
+										"number-pad",
+										"decimal-pad",
+										"numeric",
+									].includes(setting.keyboardType || "")
+										? Number.parseFloat(content)
+										: content,
 								} as SaveSettings;
 							})
 						}
-						value={
+						defaultValue={
 							saveSettings?.[setting.setting]
 								? String(saveSettings?.[setting.setting]) || ""
 								: ""
@@ -564,6 +579,7 @@ export default function ServerSettings() {
 						title={setting.name}
 						key={setting.setting}
 						data={setting.options}
+						disabled={saving}
 						onSelect={(selectedItem) => {
 							setSaveSettings((prev) => {
 								return {
@@ -584,6 +600,7 @@ export default function ServerSettings() {
 				return (
 					<Switch
 						key={setting.setting}
+						disabled={saving}
 						onValueChange={() =>
 							setSaveSettings((prev) => {
 								return {
@@ -612,6 +629,7 @@ export default function ServerSettings() {
 
 							<Button
 								color="#323ea8"
+								disabled={saving}
 								onPress={() => {
 									setCreateNewUrl(true);
 								}}
@@ -645,6 +663,7 @@ export default function ServerSettings() {
 										externalUrl={url}
 										key={`${url.url}-${index}`}
 										id={index}
+										disabled={saving}
 										onChange={(type, id) => {
 											switch (type) {
 												case "delete": {
@@ -720,6 +739,7 @@ export default function ServerSettings() {
 				return (
 					<ColorPicker
 						title={setting.name}
+						disabled={saving}
 						initialColor={saveSettings?.[setting.setting] as string | undefined}
 						onSelectColor={(color) => {
 							setSaveSettings((prev) => {
@@ -737,8 +757,11 @@ export default function ServerSettings() {
 				return (
 					<Button
 						key={setting.category}
+						disabled={saving}
 						onPress={() => handleSave(setting.category)}
-						color="#323ea8"
+						color={saving ? "#373d79" : "#323ea8"}
+						textColor={saving ? "gray" : "white"}
+						iconColor={saving ? "gray" : "white"}
 						text="Save"
 						icon="save"
 						margin={{
@@ -750,9 +773,60 @@ export default function ServerSettings() {
 		}
 	}
 
+	useEffect(() => {
+		console.log(saveError, !saveError || saveError.length <= 0)
+	}, [saveError])
+
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
+				<Popup
+					onClose={() => {
+						setSaveError(null)
+					}}
+					hidden={!saveError || saveError.length <= 0}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Errors</Text>
+
+						<ScrollView style={styles.popupScrollView}>
+							{saveError?.map((error) => (
+								<Text key={error} style={styles.errorText}>{error}</Text>
+							))}
+						</ScrollView>
+
+						<Text style={styles.popupSubHeaderText}>
+							Press outside to close this popup
+						</Text>
+					</View>
+				</Popup>
+
+
+
+
+				{/* <Popup
+					onClose={() => {
+						setSaveError(null)
+					}}
+					hidden={!saveError || saveError.length <= 0}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.headerText}>Failed Files</Text>
+
+						<ScrollView style={styles.popupScrollView}>
+							{saveError?.map((error) => (
+								<Text key={error} style={styles.errorText}>{error}</Text>
+							))}
+						</ScrollView>
+
+						<Text
+							style={styles.popupSubHeaderText}
+						>
+							Press outside to close this popup
+						</Text>
+					</View>
+				</Popup> */}
+
 				<Popup
 					hidden={editUrlIndex < 0}
 					onClose={() => {
@@ -952,7 +1026,7 @@ export default function ServerSettings() {
 						</View>
 					</View>
 
-					{saveError && (
+					{/* {saveError && (
 						<View>
 							{saveError.map((error) => (
 								<Text style={styles.errorText} key={error}>
@@ -960,7 +1034,7 @@ export default function ServerSettings() {
 								</Text>
 							))}
 						</View>
-					)}
+					)} */}
 				</View>
 
 				{saveSettings ? (

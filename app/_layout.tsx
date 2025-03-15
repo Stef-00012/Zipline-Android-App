@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Header from "@/components/Header";
+import { Host } from 'react-native-portalize';
 
 export default function Layout() {
 	const router = useRouter();
@@ -47,7 +48,9 @@ export default function Layout() {
 					<GestureHandlerRootView>
 						{hasInternet ? (
 							<Header>
-								<Slot />
+								<Host>
+									<Slot />
+								</Host>
 							</Header>
 						) : (
 							<View style={styles.noInternetContainer}>

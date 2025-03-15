@@ -19,10 +19,8 @@ export const defaultUploadEmbed: UploadEmbed = {
 };
 
 export const defaultShortenEmbed: ShortenEmbed = {
-	imageOrVideo: false,
 	description: null,
 	timestamp: false,
-	thumbnail: false,
 	footer: null,
 	title: null,
 	color: null,
@@ -153,8 +151,6 @@ export const settingNames: Partial<Record<SettingPath, string>> = {
 	"discordOnShortenEmbed.color": "Color",
 	"discordOnShortenEmbed.description": "Description",
 	"discordOnShortenEmbed.footer": "Footer",
-	"discordOnShortenEmbed.imageOrVideo": "Image/Video",
-	"discordOnShortenEmbed.thumbnail": "Thumbnail",
 	"discordOnShortenEmbed.timestamp": "Timestamp",
 	"discordOnShortenEmbed.title": "Title",
 	"discordOnShortenEmbed.url": "URL",
@@ -200,6 +196,8 @@ export interface SaveSettings {
 	filesMaxFileSize: number | string;
 	filesDefaultExpiration: string | null;
 	filesDefaultDateFormat: string;
+	filesRandomWordsSeparator: string;
+	filesRandomWordsNumAdjectives: number;
 
 	urlsRoute: string;
 	urlsLength: number;
@@ -284,8 +282,6 @@ export interface SaveSettings {
 	"discordOnShortenEmbed.color": string | null;
 	"discordOnShortenEmbed.description": string | null;
 	"discordOnShortenEmbed.footer": string | null;
-	"discordOnShortenEmbed.imageOrVideo": boolean;
-	"discordOnShortenEmbed.thumbnail": boolean;
 	"discordOnShortenEmbed.timestamp": boolean;
 	"discordOnShortenEmbed.title": string | null;
 	"discordOnShortenEmbed.url": boolean;
@@ -672,6 +668,18 @@ export const settings: Array<Setting> = [
 				name: "Default Date Format",
 				setting: "filesDefaultDateFormat",
 				keyboardType: "default",
+			},
+			{
+				type: "input",
+				name: "Random Words Num Adjectives",
+				setting: "filesRandomWordsNumAdjectives",
+				keyboardType: "numeric",
+			},
+			{
+				type: "input",
+				name: "Random Words Separator",
+				setting: "filesRandomWordsSeparator",
+				placeholder: "-",
 			},
 			{
 				type: "save",
@@ -1241,16 +1249,6 @@ export const settings: Array<Setting> = [
 								type: "colorPicker",
 								name: "Color",
 								setting: "discordOnShortenEmbed.color",
-							},
-							{
-								type: "switch",
-								name: "Thumbnail",
-								setting: "discordOnShortenEmbed.thumbnail",
-							},
-							{
-								type: "switch",
-								name: "Image/Video",
-								setting: "discordOnShortenEmbed.imageOrVideo",
 							},
 							{
 								type: "switch",

@@ -1,16 +1,7 @@
-import {
-	Keyboard,
-	Modal,
-	Pressable,
-	type StyleProp,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
-	type ViewStyle,
-} from "react-native";
+import { Pressable, type StyleProp, View, type ViewStyle } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { styles } from "@/styles/components/popup";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Portal } from 'react-native-portalize';
 
 interface Props {
 	onClose: () => void;
@@ -26,30 +17,22 @@ export default function Popup({
 	popupStyle = {},
 }: Props) {
 	return (
-		<Modal
-			onRequestClose={onClose}
-			onDismiss={onClose}
-			visible={!hidden}
-			transparent
-			animationType="fade"
-		>
-			<GestureHandlerRootView>
-				<Pressable
-					style={styles.popupContainerOverlay}
-					onPress={(e) => {
-						if (e.target === e.currentTarget) {
-							Keyboard.dismiss();
-							onClose();
-						}
-					}}
-				>
-					<View style={[styles.popupContainer, popupStyle]}>
-						<KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-							{children}
-						</KeyboardAwareScrollView>
-					</View>
-				</Pressable>
-			</GestureHandlerRootView>
-		</Modal>
+		<Portal>
+			<Pressable
+				style={{
+					...styles.popupContainerOverlay,
+					...(hidden && { display: "none" }),
+				}}
+				onPress={(e) => {
+					if (e.target === e.currentTarget) onClose();
+				}}
+			>
+				<View style={[styles.popupContainer, popupStyle]}>
+					<KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+						{children}
+					</KeyboardAwareScrollView>
+				</View>
+			</Pressable>
+		</Portal>
 	);
 }

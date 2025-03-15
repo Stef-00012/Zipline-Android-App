@@ -76,6 +76,7 @@ export const styles = StyleSheet.create({
 	popupContent: {
 		height: "auto",
 		width: "100%",
+		zIndex: 99999999999
 	},
 	mainHeaderText: {
 		fontSize: 22,
@@ -98,5 +99,10 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-around",
 		paddingTop: 10,
 		paddingRight: 10,
+	},
+	popupScrollView: {
+		flexGrow: 0,
+		flexShrink: 1,
+		maxHeight: 400,
 	},
 });

@@ -44,6 +44,7 @@
     "react-native-gesture-handler": "^2.24.0",
     "react-native-gifted-charts": "^1.4.56",
     "react-native-keyboard-controller": "^1.16.2",
+    "react-native-portalize": "^1.0.7",
     "react-native-reanimated": "^3.16.7",
     "react-native-reanimated-table": "^0.0.2",
     "react-native-safe-area-context": "^5.2.0",

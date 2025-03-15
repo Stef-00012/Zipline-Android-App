@@ -12,9 +12,10 @@ interface Props {
 	onChange: (type: ChangeType, id: Props["id"]) => void | Promise<void>;
     onMove: (type: MoveType, id: Props["id"]) => void | Promise<void>
 	id: number;
+    disabled?: boolean;
 }
 
-export default function ExternalUrl({ externalUrl, onChange, id, onMove }: Props) {
+export default function ExternalUrl({ externalUrl, onChange, id, onMove, disabled }: Props) {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={{width: "88%"}}>
@@ -35,6 +36,7 @@ export default function ExternalUrl({ externalUrl, onChange, id, onMove }: Props
                         onPress={() => {
                             onChange("edit", id);
                         }}
+                        disabled={disabled}
                         color="#323ea8"
                         width="45%"
                         margin={{
@@ -51,6 +53,7 @@ export default function ExternalUrl({ externalUrl, onChange, id, onMove }: Props
                         onPress={() => {
                             onChange("delete", id);
                         }}
+                        disabled={disabled}
                         color="#CF4238"
                         width="45%"
                         margin={{
@@ -72,6 +75,7 @@ export default function ExternalUrl({ externalUrl, onChange, id, onMove }: Props
                     onPress={() => {
                         onMove("up", id)
                     }}
+                    disabled={disabled}
                     color="#323ea8"
                     width={25}
                     height={25}
@@ -89,6 +93,7 @@ export default function ExternalUrl({ externalUrl, onChange, id, onMove }: Props
                     onPress={() => {
                         onMove("down", id)
                     }}
+                    disabled={disabled}
                     color="#323ea8"
                     width={25}
                     height={25}

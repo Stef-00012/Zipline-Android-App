@@ -306,6 +306,7 @@ export interface APIFolder {
 	public: boolean;
 	userId: string;
 	files: Array<APIFile>;
+	allowUploads: boolean;
 }
 
 export type APIFolderNoIncl = Omit<APIFolder, "files">;

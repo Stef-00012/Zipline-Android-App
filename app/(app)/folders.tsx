@@ -66,7 +66,7 @@ export default function Folders() {
 	const dashUrl = db.get("url") as DashURL | null;
 
 	const [sortKey, setSortKey] = useState<{
-		id: "name" | "public" | "createdAt" | "updatedAt" | "files" | "id";
+		id: "name" | "public" | "allowUploads" | "createdAt" | "updatedAt" | "files" | "id";
 		sortOrder: "asc" | "desc";
 	}>({
 		id: "createdAt",
@@ -130,6 +130,29 @@ export default function Folders() {
 
 				return ToastAndroid.show(
 					`Updated the folder "${folder.name}"'s visibility`,
+					ToastAndroid.SHORT,
+				);
+			}
+			
+			case "uploasPolicy": {
+				const folderId = folder.id;
+
+				const success = await editFolder(folderId, {
+					allowUploads: !folder.allowUploads,
+				});
+
+				if (typeof success === "string")
+					return ToastAndroid.show(
+						`Failed to update the folder "${folder.name}"`,
+						ToastAndroid.SHORT,
+					);
+
+				const newFolders = await getFolders();
+
+				setFolders(typeof newFolders === "string" ? null : newFolders);
+
+				return ToastAndroid.show(
+					`Updated the folder "${folder.name}"'s upload policy`,
 					ToastAndroid.SHORT,
 				);
 			}
@@ -390,6 +413,11 @@ export default function Folders() {
 												sortable: true,
 											},
 											{
+											    row: "Uploads?",
+											    id: "allowUploads",
+											    sortable: true,
+											},
+											{
 												row: "Created",
 												id: "createdAt",
 												sortable: true,
@@ -426,7 +454,7 @@ export default function Folders() {
 												sortOrder: order,
 											});
 										}}
-										rowWidth={[140, 90, 140, 150, 100, 220, 210]}
+										rowWidth={[140, 90, 110, 140, 150, 100, 220, 252]}
 										rows={folders
 											.filter((folder) => {
 												const filterKey =
@@ -494,6 +522,12 @@ export default function Folders() {
 												const isPublic = (
 													<Text key={folder.id} style={styles.rowText}>
 														{folder.public ? "Yes" : "No"}
+													</Text>
+												);
+												
+												const allowUploads = (
+													<Text key={folder.id} style={styles.rowText}>
+														{folder.allowUploads ? "Yes" : "No"}
 													</Text>
 												);
 
@@ -566,6 +600,18 @@ export default function Folders() {
 																onAction("visibility", folder);
 															}}
 														/>
+														
+														<Button
+															icon={folder.allowUploads ? "block" : "share"}
+															color={folder.allowUploads ? "#323ea8" : "#343a40"}
+															iconSize={20}
+															width={32}
+															height={32}
+															padding={6}
+															onPress={async () => {
+																onAction("uploasPolicy", folder);
+															}}
+														/>
 
 														<Button
 															icon="edit"
@@ -596,6 +642,7 @@ export default function Folders() {
 												return [
 													name,
 													isPublic,
+													allowUploads,
 													created,
 													lastUpdatedAt,
 													files,

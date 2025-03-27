@@ -35,4 +35,5 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [X] Maybe upload profile presets? (suggested by iiTranquility)
+- [ ] Add folder upload + upload button in folder view
+- [ ] Add description to settings like Zipline does

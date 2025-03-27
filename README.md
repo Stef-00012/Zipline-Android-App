@@ -37,3 +37,4 @@ This will create an apk but won't automatically install
 
 - [ ] Add folder upload + upload button in folder view
 - [ ] Add description to settings like Zipline does
+- [ ] Add upload policy to folder large view

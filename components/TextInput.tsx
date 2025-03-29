@@ -19,6 +19,7 @@ interface Props {
 	value?: string;
 	defaultValue?: string;
 	title?: string;
+	description?: string;
 	id?: string;
 	onPasswordToggle?: (
 		visibile: boolean,
@@ -60,6 +61,7 @@ export default function TextInput({
 	disableContext = false,
 	multiline = false,
 	title,
+	description,
 	password = false,
 	keyboardType = "default",
 	placeholder,
@@ -81,14 +83,25 @@ export default function TextInput({
 		return (
 			<View>
 				{title && (
-					<Text
-						style={{
-							...styles.inputHeader,
-							...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
-						}}
-					>
-						{title}
-					</Text>
+					<>
+						<Text
+							style={{
+								...styles.inputHeader,
+								...(!description && {
+									marginBottom: 5,
+								}),
+								...(disabled &&
+									showDisabledStyle &&
+									styles.inputHeaderDisabled),
+							}}
+						>
+							{title}
+						</Text>
+
+						{description && (
+							<Text style={styles.inputDescription}>{description}</Text>
+						)}
+					</>
 				)}
 				<View
 					style={{
@@ -138,14 +151,25 @@ export default function TextInput({
 		return (
 			<View>
 				{title && (
-					<Text
-						style={{
-							...styles.inputHeader,
-							...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
-						}}
-					>
-						{title}
-					</Text>
+					<>
+						<Text
+							style={{
+								...styles.inputHeader,
+								...(!description && {
+									marginBottom: 5,
+								}),
+								...(disabled &&
+									showDisabledStyle &&
+									styles.inputHeaderDisabled),
+							}}
+						>
+							{title}
+						</Text>
+
+						{description && (
+							<Text style={styles.inputDescription}>{description}</Text>
+						)}
+					</>
 				)}
 				<View
 					style={{
@@ -192,14 +216,23 @@ export default function TextInput({
 	return (
 		<View>
 			{title && (
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
-					}}
-				>
-					{title}
-				</Text>
+				<>
+					<Text
+						style={{
+							...styles.inputHeader,
+							...(!description && {
+								marginBottom: 5,
+							}),
+							...(disabled && showDisabledStyle && styles.inputHeaderDisabled),
+						}}
+					>
+						{title}
+					</Text>
+
+					{description && (
+						<Text style={styles.inputDescription}>{description}</Text>
+					)}
+				</>
 			)}
 			<NativeTextInput
 				onChange={(event) => onChange(event, id)}

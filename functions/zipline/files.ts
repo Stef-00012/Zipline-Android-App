@@ -253,13 +253,15 @@ export async function uploadFiles(
 	const token = db.get("token");
 	const url = db.get("url");
 
-	if (!url || !token) return "Invalid token or URL";
+	if (!url) return "Invalid URL";
+
+	if (!options.folder && !token) return "Invalid token";
 
 	const headers: {
 		[key: string]: string;
 	} = {};
 
-	headers.Authorization = token;
+	if (token) headers.Authorization = token;
 	headers["X-Zipline-Format"] = options.format?.toLowerCase() || "random";
 
 	if (options.compression)

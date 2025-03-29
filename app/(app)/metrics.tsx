@@ -1,6 +1,10 @@
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart, PieChart } from "react-native-gifted-charts";
-import { colorHash, convertToBytes } from "@/functions/util";
+import {
+	colorHash,
+	convertToBytes,
+	getMetricsDifference,
+} from "@/functions/util";
 import type { DateType } from "react-native-ui-datepicker";
 import { getSettings } from "@/functions/zipline/settings";
 import { useShareIntent } from "@/hooks/useShareIntent";
@@ -19,6 +23,7 @@ import {
 	getStats,
 	type StatsProps,
 } from "@/functions/zipline/stats";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Metrics() {
 	useAuth();
@@ -29,6 +34,21 @@ export default function Metrics() {
 		useState<boolean>(false);
 	const [filteredStats, setFilteredStats] = useState<APIStats | null>(null);
 	const [mainStat, setMainStat] = useState<APIStats[0] | null>(null);
+	const [statsDifferences, setStatsDifferences] = useState<{
+		files: number;
+		urls: number;
+		storage: number;
+		users: number;
+		fileViews: number;
+		urlViews: number;
+	}>({
+		files: 0,
+		fileViews: 0,
+		storage: 0,
+		urls: 0,
+		urlViews: 0,
+		users: 0,
+	});
 
 	const [datePickerOpen, setDatePickerOpen] = useState(false);
 	const [allTime, setAllTime] = useState<boolean>(false);
@@ -87,6 +107,20 @@ export default function Metrics() {
 		});
 
 		setStats(sortedStats);
+
+		const firstStat = sortedStats[sortedStats.length - 1].data;
+		const lastStat = sortedStats[0].data;
+
+		const statsDiff = {
+			files: getMetricsDifference(firstStat.files, lastStat.files),
+			fileViews: getMetricsDifference(firstStat.fileViews, lastStat.fileViews),
+			storage: getMetricsDifference(firstStat.storage, lastStat.storage),
+			urls: getMetricsDifference(firstStat.urls, lastStat.urls),
+			urlViews: getMetricsDifference(firstStat.urlViews, lastStat.urlViews),
+			users: getMetricsDifference(firstStat.users, lastStat.users),
+		};
+
+		setStatsDifferences(statsDiff);
 	}
 
 	const windowWidth = Dimensions.get("window").width;
@@ -179,47 +213,96 @@ export default function Metrics() {
 
 				{filteredStats && mainStat ? (
 					<View>
-						<ScrollView style={{height: "93%"}}>
-							<ScrollView
-								horizontal
-								style={{
-									...styles.scrollView,
-									...styles.statsContainer,
-								}}
-							>
-								<View style={styles.statContainer}>
-									<Text style={styles.subHeaderText}>Files:</Text>
-									<Text style={styles.statText}>{mainStat.data.files}</Text>
-								</View>
-
-								<View style={styles.statContainer}>
-									<Text style={styles.subHeaderText}>URLs:</Text>
-									<Text style={styles.statText}>{mainStat.data.urls}</Text>
-								</View>
-
-								<View style={styles.statContainer}>
-									<Text style={styles.subHeaderText}>Storage Used:</Text>
-									<Text style={styles.statText}>
-										{convertToBytes(mainStat.data.storage, {
+						<ScrollView style={{ height: "93%" }}>
+							<ScrollView horizontal style={styles.scrollView}>
+								{[
+									{
+										title: "Files:",
+										amount: mainStat.data.files,
+										difference: statsDifferences.files,
+									},
+									{
+										title: "URLs",
+										amount: mainStat.data.urls,
+										difference: statsDifferences.urls,
+									},
+									{
+										title: "Storage Used:",
+										amount: convertToBytes(mainStat.data.storage, {
 											unitSeparator: " ",
-										})}
-									</Text>
-								</View>
+										}),
+										difference: statsDifferences.storage,
+									},
+									{
+										title: "Users:",
+										amount: mainStat.data.users,
+										difference: statsDifferences.users,
+									},
+									{
+										title: "File Views:",
+										amount: mainStat.data.fileViews,
+										difference: statsDifferences.fileViews,
+									},
+									{
+										title: "URL Views:",
+										amount: mainStat.data.urlViews,
+										difference: statsDifferences.urlViews,
+									},
+								].map((stat) => (
+									<View key={stat.title} style={styles.statContainer}>
+										<Text style={styles.subHeaderText}>{stat.title}</Text>
 
-								<View style={styles.statContainer}>
-									<Text style={styles.subHeaderText}>Users:</Text>
-									<Text style={styles.statText}>{mainStat.data.users}</Text>
-								</View>
+										<View style={styles.statContainerData}>
+											<Text style={styles.statText}>{stat.amount}</Text>
 
-								<View style={styles.statContainer}>
-									<Text style={styles.subHeaderText}>File Views:</Text>
-									<Text style={styles.statText}>{mainStat.data.fileViews}</Text>
-								</View>
+											<View
+												style={{
+													...styles.statDifferenceContainer,
+													backgroundColor:
+														stat.difference === 0
+															? "#868E9640"
+															: stat.difference > 0
+																? "#40C05740"
+																: "#FA525240",
+												}}
+											>
+												{stat.difference > 0 ? (
+													<MaterialIcons
+														name="north"
+														size={18}
+														color="#69db7c"
+													/>
+												) : stat.difference < 0 ? (
+													<MaterialIcons
+														name="south"
+														size={18}
+														color="#ff8787"
+													/>
+												) : (
+													<MaterialIcons
+														name="remove"
+														size={18}
+														color="#ced4da"
+													/>
+												)}
 
-								<View style={styles.statContainer}>
-									<Text style={styles.subHeaderText}>URL Views:</Text>
-									<Text style={styles.statText}>{mainStat.data.urlViews}</Text>
-								</View>
+												<Text
+													style={{
+														...styles.statDifferenceText,
+														color:
+															stat.difference === 0
+																? "#ced4da"
+																: stat.difference > 0
+																	? "#69db7c"
+																	: "#ff8787",
+													}}
+												>
+													{stat.difference}%
+												</Text>
+											</View>
+										</View>
+									</View>
+								))}
 							</ScrollView>
 
 							{userSpecificMetrics && (

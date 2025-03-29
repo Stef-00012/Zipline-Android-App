@@ -40,6 +40,7 @@ interface CustomColorPickerProps {
 	initialColor?: string;
 	showOpacity?: boolean;
 	showPreview?: boolean;
+	description?: string;
 	showInput?: boolean;
 	disabled?: boolean;
 	showHue?: boolean;
@@ -85,6 +86,7 @@ export default function ColorPicker({
 	previewHideText,
 	showHue = true,
 	onSelectColor,
+	description,
 	title,
 	panel,
 }: CustomColorPickerProps) {
@@ -116,14 +118,23 @@ export default function ColorPicker({
 	return (
 		<>
 			{title && (
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(disabled && styles.inputHeaderDisabled),
-					}}
-				>
-					{title}
-				</Text>
+				<>
+					<Text
+						style={{
+							...styles.inputHeader,
+							...(!description && {
+								marginBottom: 5,
+							}),
+							...(disabled && styles.inputHeaderDisabled),
+						}}
+					>
+						{title}
+					</Text>
+
+					{description && (
+						<Text style={styles.inputDescription}>{description}</Text>
+					)}
+				</>
 			)}
 			<Pressable
 				disabled={disabled}

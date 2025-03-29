@@ -118,7 +118,7 @@ export default function UserSettings() {
 	const [generateThumbnailsRerun, setGenerateThumbnailsRerun] =
 		useState<boolean>(false);
 
-	const [ziplineVersion, setZiplineVersion] = useState<string | null>(null)
+	const [ziplineVersion, setZiplineVersion] = useState<string | null>(null);
 
 	const url = db.get("url") as DashURL;
 
@@ -129,7 +129,7 @@ export default function UserSettings() {
 			const avatar = await getCurrentUserAvatar();
 			const exports = await getUserExports();
 			const zeroByteFiles = await getZeroByteFiles();
-			const versionData = await getVersion()
+			const versionData = await getVersion();
 
 			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
@@ -138,7 +138,9 @@ export default function UserSettings() {
 			setZeroByteFiles(
 				typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length,
 			);
-			setZiplineVersion(typeof versionData === "string" ? null : versionData.version)
+			setZiplineVersion(
+				typeof versionData === "string" ? null : versionData.version,
+			);
 		})();
 	}, []);
 
@@ -526,6 +528,7 @@ export default function UserSettings() {
 										placeholder="myPassword123"
 										value={password || ""}
 										password
+										description="Leave blank to keep the same password"
 									/>
 
 									<Button
@@ -685,11 +688,15 @@ export default function UserSettings() {
 							{/* Viewing Files */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Viewing Files</Text>
+								<Text style={styles.headerDescription}>
+									All text fields support using variables.
+								</Text>
 
 								<Switch
 									title="Enable View Routes"
 									value={viewEnabled || false}
 									onValueChange={() => setViewEnabled((prev) => !prev)}
+									description="Enable viewing files through customizable view-routes"
 								/>
 
 								<Switch
@@ -697,10 +704,12 @@ export default function UserSettings() {
 									disabled={!viewEnabled}
 									value={viewShowMimetype || false}
 									onValueChange={() => setViewShowMimetype((prev) => !prev)}
+									description="Show the mimetype of the file in the view-route"
 								/>
 
 								<TextInput
 									title="View Content:"
+									description="Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable."
 									disabled={!viewEnabled}
 									disableContext={!viewEnabled}
 									multiline
@@ -710,15 +719,9 @@ export default function UserSettings() {
 									placeholder="This is my file"
 								/>
 
-								<Text
-									style={{
-										...styles.inputHeader,
-										...(!viewEnabled && styles.inputHeaderDisabled),
-									}}
-								>
-									View Content Alignment:
-								</Text>
 								<Select
+									title="View Content Alignment:"
+									description="Change the alignment of the content within view-routes"
 									disabled={!viewEnabled}
 									data={alignments}
 									onSelect={(selectedAlignment) => {
@@ -736,6 +739,7 @@ export default function UserSettings() {
 
 								<Switch
 									title="Embed"
+									description="Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
 									disabled={!viewEmbed || !viewEnabled}
 									value={viewEmbed || false}
 									onValueChange={() => setViewEmbed((prev) => !prev)}
@@ -1016,6 +1020,9 @@ export default function UserSettings() {
 							{/* Server Actions */}
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Server Actions</Text>
+								<Text style={styles.headerDescription}>
+									Helpful scripts and tools for server management.
+								</Text>
 
 								<View style={styles.serverActionButtonRow}>
 									<Button

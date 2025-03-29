@@ -50,6 +50,16 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 							},
 						},
 						{
+							name: folder.allowUploads
+								? "Deny Anonymous Uploads"
+								: "Allow Anonymous Uploads",
+							id: `${folder.id}-uploadPolicy`,
+							icon: folder.allowUploads ? "share" : "block",
+							onPress: async () => {
+								onAction("uploadPolicy", folder);
+							},
+						},
+						{
 							name: "Edit Name",
 							id: `${folder.id}-editName`,
 							icon: "edit",
@@ -76,6 +86,9 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 							},
 						},
 					]}
+					dropdown={{
+						width: 220,
+					}}
 				/>
 			</View>
 
@@ -98,13 +111,17 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 				</Text>
 
 				<Text style={styles.key}>
+					<Text style={styles.keyName}>Allow Anonymous Uploads</Text>:{" "}
+					<Text>{folder.allowUploads ? "Yes" : "No"}</Text>
+				</Text>
+
+				<Text style={styles.key}>
 					<Text style={styles.keyName}>Files</Text>:{" "}
 					<Text>{folder.files.length}</Text>
 				</Text>
-				
+
 				<Text style={styles.key}>
-					<Text style={styles.keyName}>ID</Text>:{" "}
-					<Text>{folder.id}</Text>
+					<Text style={styles.keyName}>ID</Text>: <Text>{folder.id}</Text>
 				</Text>
 			</View>
 		</View>

@@ -144,8 +144,23 @@ export interface APIUploadFile {
 
 export interface APIUploadResponse {
 	files: Array<APIUploadFile>;
-	partialSuccess: boolean;
-	assumedMimetypes: Array<string | null | APIUploadFile>;
+	partialSuccess?: boolean;
+	assumedMimetypes: Array<boolean>;
+	deletesAt?: string;
+}
+
+export interface APIShortenResponse {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	code: string;
+	vanity: string | null;
+	destination: string;
+	views: number;
+	maxViews: number | null;
+	enabled: true;
+	userId: string;
+	url: string;
 }
 
 export interface APITransactionResult {

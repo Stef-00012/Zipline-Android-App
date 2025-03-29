@@ -80,8 +80,6 @@ export async function getUserStats(): Promise<APIUserStats | string> {
 	}
 }
 
-export function getChartFiles(stats: APIStats) {}
-
 export function filterStats(data: APIStats, amount = 100) {
 	data.sort(
 		(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),

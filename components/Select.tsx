@@ -29,7 +29,10 @@ export interface SelectProps {
 		item: SelectProps["data"][0],
 		key: string,
 	) => ReactNode | string;
-	renderItem?: (item: SelectProps["data"][0], closeSelect: () => void) => ReactNode;
+	renderItem?: (
+		item: SelectProps["data"][0],
+		closeSelect: () => void,
+	) => ReactNode;
 	id?: string;
 	width?: DimensionValue;
 	margin?: {
@@ -38,7 +41,8 @@ export interface SelectProps {
 		left?: DimensionValue;
 		right?: DimensionValue;
 	};
-	title?: string
+	title?: string;
+	description?: string;
 }
 
 export default function Select({
@@ -53,6 +57,7 @@ export default function Select({
 	multiple = false,
 	width,
 	title,
+	description,
 	margin = {},
 	renderSelectedItem = (item, key) => (
 		<Text
@@ -125,14 +130,23 @@ export default function Select({
 			}}
 		>
 			{title && (
-				<Text
-					style={{
-						...styles.inputHeader,
-						...(disabled && styles.inputHeaderDisabled),
-					}}
-				>
-					{title}
-				</Text>
+				<>
+					<Text
+						style={{
+							...styles.inputHeader,
+							...(!description && {
+								marginBottom: 5,
+							}),
+							...(disabled && styles.inputHeaderDisabled),
+						}}
+					>
+						{title}
+					</Text>
+
+					{description && (
+						<Text style={styles.inputDescription}>{description}</Text>
+					)}
+				</>
 			)}
 			<TouchableOpacity
 				style={styles.selectButton}
@@ -209,7 +223,7 @@ export default function Select({
 											/>
 										)}
 										{renderItem(item, () => {
-											setIsOpen(false)
+											setIsOpen(false);
 										})}
 									</TouchableOpacity>
 								)}

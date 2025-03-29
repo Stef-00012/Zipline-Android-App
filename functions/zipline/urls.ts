@@ -1,4 +1,4 @@
-import type { APIURLs, APIURL } from "@/types/zipline";
+import type { APIURLs, APIURL, APIShortenResponse } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
 
@@ -91,12 +91,7 @@ export async function createURL({
 	maxViews,
 	password,
 	enabled = true,
-}: CreateURLParams): Promise<
-	| {
-			url: string;
-	  }
-	| string
-> {
+}: CreateURLParams): Promise<APIShortenResponse | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -123,7 +118,7 @@ export async function createURL({
 			},
 		);
 
-		return res.data;
+		return res.data as APIShortenResponse;
 	} catch (e) {
 		const error = e as AxiosError;
 

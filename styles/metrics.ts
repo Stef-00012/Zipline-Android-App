@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		marginBottom: 10
+		marginBottom: 10,
 	},
 	dateRangeText: {
 		color: "gray",
@@ -42,11 +42,7 @@ export const styles = StyleSheet.create({
 		borderColor: "#222c47",
 		marginHorizontal: 10,
 		borderRadius: 15,
-		padding: 15,
-		marginBottom: 10
-	},
-	statsContainer: {
-		paddingHorizontal: 7,
+		marginBottom: 10,
 	},
 	subHeaderText: {
 		fontSize: 18,
@@ -66,6 +62,21 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 10,
 		marginHorizontal: 4,
+		marginVertical: 10,
+	},
+	statContainerData: {
+		flexDirection: "row",
+	},
+	statDifferenceContainer: {
+		margin: 10,
+		marginTop: 15,
+		marginBottom: 5,
+		padding: 4,
+		borderRadius: 8,
+		flexDirection: "row",
+	},
+	statDifferenceText: {
+		marginLeft: 5,
 	},
 	chartContainer: {
 		margin: 10,

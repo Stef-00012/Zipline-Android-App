@@ -19,10 +19,13 @@ export const styles = StyleSheet.create({
 	},
 	inputHeader: {
 		marginTop: 5,
-		marginBottom: 5,
 		fontSize: 18,
 		fontWeight: "bold",
 		color: "white",
+	},
+	inputDescription: {
+		color: "#6c7a8d",
+		marginBottom: 5,
 	},
 	textInputDisabled: {
 		color: "gray",

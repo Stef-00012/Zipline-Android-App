@@ -34,6 +34,10 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "white",
 	},
+	headerDescription: {
+		marginLeft: 10,
+		color: "#6c7a8d",
+	},
 	errorText: {
 		color: "red",
 		fontWeight: "bold",

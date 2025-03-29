@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		marginVertical: 5
+		marginVertical: 5,
 	},
 	headerText: {
 		marginTop: 5,
@@ -31,6 +31,10 @@ export const styles = StyleSheet.create({
 		textAlignVertical: "center",
 		fontWeight: "bold",
 		color: "white",
+	},
+	headerDescription: {
+		color: "#6c7a8d",
+		marginLeft: 10,
 	},
 	errorText: {
 		color: "red",
@@ -68,15 +72,18 @@ export const styles = StyleSheet.create({
 	},
 	externalLinkTitle: {
 		marginTop: 10,
-		marginBottom: 5,
 		fontSize: 18,
 		fontWeight: "bold",
 		color: "white",
 	},
+	externalLinkDescription: {
+		color: "#6c7a8d",
+		marginBottom: 5,
+	},
 	popupContent: {
 		height: "auto",
 		width: "100%",
-		zIndex: 99999999999
+		zIndex: 99999999999,
 	},
 	mainHeaderText: {
 		fontSize: 22,

@@ -6,6 +6,7 @@ import { View } from "react-native";
 interface Props {
 	value: boolean;
 	title?: string;
+	description?: string;
 	onValueChange: (value: boolean, id?: Props["id"]) => void | Promise<void>;
 	disabled?: boolean;
 	id?: string;
@@ -14,6 +15,7 @@ interface Props {
 export default function Switch({
 	value,
 	title,
+	description,
 	onValueChange,
 	disabled = false,
 	id,
@@ -30,15 +32,22 @@ export default function Switch({
 					false: "#181c28",
 				}}
 			/>
+
 			{title && (
-				<Text
-					style={{
-						...styles.switchText,
-						...(disabled && styles.switchTextDisabled),
-					}}
-				>
-					{title}
-				</Text>
+				<View style={{ flexDirection: "column" }}>
+					<Text
+						style={{
+							...styles.switchText,
+							...(disabled && styles.switchTextDisabled),
+						}}
+					>
+						{title}
+					</Text>
+
+					{description && (
+						<Text style={styles.switchDescription}>{description}</Text>
+					)}
+				</View>
 			)}
 		</View>
 	);

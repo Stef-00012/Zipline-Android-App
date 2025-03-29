@@ -348,6 +348,7 @@ interface Category {
 		| "OIDCOAuth"
 		| "discordOnUploadEmbed"
 		| "discordOnShortenEmbed"}Category`;
+	description?: string;
 }
 
 interface Input {
@@ -360,6 +361,7 @@ interface Input {
 	multiline?: boolean;
 	type: "input";
 	name: string;
+	description?: string;
 }
 
 interface Switch {
@@ -367,6 +369,7 @@ interface Switch {
 	setting: SettingPath;
 	type: "switch";
 	name: string;
+	description: string;
 }
 
 interface Select {
@@ -377,12 +380,14 @@ interface Select {
 	placeholder: string;
 	type: "select";
 	name: string;
+	description: string;
 }
 
 interface ColorPicker {
 	type: "colorPicker";
 	setting: SettingPath;
 	name: string;
+	description: string;
 }
 
 interface Save {
@@ -413,6 +418,7 @@ export const settings: Array<Setting> = [
 				type: "switch",
 				name: "Return HTTPS URls",
 				setting: "coreReturnHttpsUrls",
+				description: "Return URLs with HTTPS protocol.",
 			},
 			{
 				type: "input",
@@ -420,6 +426,8 @@ export const settings: Array<Setting> = [
 				keyboardType: "url",
 				setting: "coreDefaultDomain",
 				placeholder: "example.com",
+				description:
+					"The domain to use when generating URLs. This value should not include the protocol.",
 			},
 			{
 				type: "input",
@@ -427,6 +435,8 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				setting: "coreTempDirectory",
 				placeholder: "/tmp/zipline",
+				description:
+					"The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.",
 			},
 			{
 				type: "save",
@@ -440,12 +450,20 @@ export const settings: Array<Setting> = [
 		category: "chunksCategory",
 		children: [
 			{
+				type: "switch",
+				name: "Enable Chunks",
+				setting: "chunksEnabled",
+				description: "Enable chunked uploads.",
+			},
+			{
 				type: "input",
 				name: "Max Chunks Size",
 				keyboardType: "numeric",
 				setting: "chunksMax",
 				placeholder: "95mb",
 				displayType: "bytes",
+				description:
+					"Maximum size of an upload before it is split into chunks.",
 			},
 			{
 				type: "input",
@@ -454,6 +472,7 @@ export const settings: Array<Setting> = [
 				setting: "chunksSize",
 				placeholder: "25mb",
 				displayType: "bytes",
+				description: "Size of each chunk.",
 			},
 			{
 				type: "save",
@@ -464,6 +483,7 @@ export const settings: Array<Setting> = [
 	{
 		type: "category",
 		name: "Tasks",
+		description: "All options require a restart to take effect.",
 		category: "tasksCategory",
 		children: [
 			{
@@ -473,6 +493,7 @@ export const settings: Array<Setting> = [
 				setting: "tasksDeleteInterval",
 				placeholder: "30m",
 				displayType: "time",
+				description: "How often to check and delete expired files.",
 			},
 			{
 				type: "input",
@@ -481,6 +502,7 @@ export const settings: Array<Setting> = [
 				setting: "tasksClearInvitesInterval",
 				placeholder: "30m",
 				displayType: "time",
+				description: "How often to check and clear expired/used invites.",
 			},
 			{
 				type: "input",
@@ -489,6 +511,8 @@ export const settings: Array<Setting> = [
 				setting: "tasksMaxViewsInterval",
 				placeholder: "30m",
 				displayType: "time",
+				description:
+					"How often to check and delete files that have reached max views.",
 			},
 			{
 				type: "input",
@@ -497,6 +521,8 @@ export const settings: Array<Setting> = [
 				setting: "tasksThumbnailsInterval",
 				placeholder: "5m",
 				displayType: "time",
+				description:
+					"How often to check and generate thumbnails for video files.",
 			},
 			// {
 			// 	type: "input",
@@ -521,11 +547,15 @@ export const settings: Array<Setting> = [
 				type: "switch",
 				name: "Passkeys",
 				setting: "mfaPasskeys",
+				description:
+					"Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.",
 			},
 			{
 				type: "switch",
 				name: "TOTP Enabled",
 				setting: "mfaTotpEnabled",
+				description:
+					"Enable Time-based One-Time Passwords with the use of an authenticator app.",
 			},
 			{
 				type: "input",
@@ -533,6 +563,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				setting: "mfaTotpIssuer",
 				placeholder: "Zipline",
+				description: "The issuer to use for the TOTP token.",
 			},
 			{
 				type: "save",
@@ -549,51 +580,67 @@ export const settings: Array<Setting> = [
 				type: "switch",
 				name: "Image Compression",
 				setting: "featuresImageCompression",
+				description: "Allows the ability for users to compress images.",
 			},
 			{
 				type: "switch",
 				name: "/robots.txt",
 				setting: "featuresRobotsTxt",
+				description:
+					"Enables a robots.txt file for search engine optimization. Requires a server restart.",
 			},
 			{
 				type: "switch",
 				name: "Healthcheck",
 				setting: "featuresHealthcheck",
+				description:
+					"Enables a healthcheck route for uptime monitoring. Requires a server restart.",
 			},
 			{
 				type: "switch",
 				name: "User Registration",
 				setting: "featuresUserRegistration",
+				description: "Allows users to register an account on the server.",
 			},
 			{
 				type: "switch",
 				name: "OAuth Registration",
 				setting: "featuresOauthRegistration",
+				description:
+					"Allows users to register an account using OAuth providers.",
 			},
 			{
 				type: "switch",
 				name: "Delete on Max Views",
 				setting: "featuresDeleteOnMaxViews",
+				description:
+					"Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.",
 			},
 			{
 				type: "switch",
 				name: "Enable Metrics",
 				setting: "featuresMetricsEnabled",
+				description:
+					"Enables metrics for the server. Requires a server restart.",
 			},
 			{
 				type: "switch",
 				name: "Admin Only Metrics",
 				setting: "featuresMetricsAdminOnly",
+				description: "Requires an administrator to view metrics.",
 			},
 			{
 				type: "switch",
 				name: "Show User Specific Metrics",
 				setting: "featuresMetricsShowUserSpecific",
+				description: "Shows metrics specific to each user, for all users.",
 			},
 			{
 				type: "switch",
 				name: "Enable Thumbnails",
 				setting: "featuresThumbnailsEnabled",
+				description:
+					"Enables thumbnail generation for images. Requires a server restart.",
 			},
 			{
 				type: "input",
@@ -601,6 +648,8 @@ export const settings: Array<Setting> = [
 				setting: "featuresThumbnailsNumberThreads",
 				keyboardType: "numeric",
 				placeholder: "Enter a number...",
+				description:
+					"Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.",
 			},
 			{
 				type: "save",
@@ -618,22 +667,28 @@ export const settings: Array<Setting> = [
 				name: "Route",
 				setting: "filesRoute",
 				keyboardType: "default",
+				description:
+					"The route to use for file uploads. Requires a server restart.",
 			},
 			{
 				type: "input",
 				name: "Length",
 				setting: "filesLength",
 				keyboardType: "numeric",
+				description:
+					"The length of the file name (for randomly generated names).",
 			},
 			{
 				type: "switch",
 				name: "Assume Mimetypes",
 				setting: "filesAssumeMimetypes",
+				description: "Assume the mimetype of a file for its extension.",
 			},
 			{
 				type: "switch",
 				name: "Remove GPS Metadata",
 				setting: "filesRemoveGpsMetadata",
+				description: "Remove GPS metadata from files.",
 			},
 			{
 				type: "select",
@@ -642,6 +697,7 @@ export const settings: Array<Setting> = [
 				defaultValue: "random",
 				setting: "filesDefaultFormat",
 				placeholder: "Select format...",
+				description: "The default format to use for file names.",
 			},
 			{
 				type: "input",
@@ -649,6 +705,7 @@ export const settings: Array<Setting> = [
 				setting: "filesDisabledExtensions",
 				keyboardType: "default",
 				joinString: ", ",
+				description: "Extensions to disable, separated by commas.",
 			},
 			{
 				type: "input",
@@ -656,30 +713,36 @@ export const settings: Array<Setting> = [
 				setting: "filesMaxFileSize",
 				keyboardType: "default",
 				displayType: "bytes",
+				description: "The maximum file size allowed.",
 			},
 			{
 				type: "input",
 				name: "Default Expiration",
 				setting: "filesDefaultExpiration",
 				keyboardType: "default",
+				description: "The default expiration time for files.",
 			},
 			{
 				type: "input",
 				name: "Default Date Format",
 				setting: "filesDefaultDateFormat",
 				keyboardType: "default",
+				description: "The default date format to use.",
 			},
 			{
 				type: "input",
 				name: "Random Words Num Adjectives",
 				setting: "filesRandomWordsNumAdjectives",
 				keyboardType: "numeric",
+				description:
+					"The number of adjectives to use for the random-words/gfycat format.",
 			},
 			{
 				type: "input",
 				name: "Random Words Separator",
 				setting: "filesRandomWordsSeparator",
 				placeholder: "-",
+				description: "The separator to use for the random-words/gfycat format.",
 			},
 			{
 				type: "save",
@@ -697,12 +760,16 @@ export const settings: Array<Setting> = [
 				name: "Route",
 				setting: "urlsRoute",
 				keyboardType: "default",
+				description:
+					"The route to use for short URLs. Requires a server restart.",
 			},
 			{
 				type: "input",
 				name: "Length",
 				setting: "urlsLength",
 				keyboardType: "numeric",
+				description:
+					"The length of the short URL (for randomly generated names).",
 			},
 			{
 				type: "save",
@@ -719,12 +786,14 @@ export const settings: Array<Setting> = [
 				type: "switch",
 				name: "Enable Invites",
 				setting: "invitesEnabled",
+				description: "Enable the use of invite links to register new users.",
 			},
 			{
 				type: "input",
 				name: "Length",
 				setting: "invitesLength",
 				keyboardType: "numeric",
+				description: "The length of the invite code.",
 			},
 			{
 				type: "save",
@@ -735,29 +804,35 @@ export const settings: Array<Setting> = [
 	{
 		type: "category",
 		name: "Ratelimit",
+		description: "All options require a restart to take effect.",
 		category: "ratelimitCategory",
 		children: [
 			{
 				type: "switch",
 				name: "Enable Ratelimit",
 				setting: "ratelimitEnabled",
+				description: "Enable ratelimiting for the server.",
 			},
 			{
 				type: "switch",
 				name: "Admin Bypass",
 				setting: "ratelimitAdminBypass",
+				description: "Allow admins to bypass the ratelimit.",
 			},
 			{
 				type: "input",
 				name: "Max Requests",
 				setting: "ratelimitMax",
 				keyboardType: "numeric",
+				description:
+					"The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.",
 			},
 			{
 				type: "input",
 				name: "Window",
 				setting: "ratelimitWindow",
 				keyboardType: "numeric",
+				description: "The window in seconds to allow the max requests.",
 			},
 			{
 				type: "input",
@@ -765,6 +840,8 @@ export const settings: Array<Setting> = [
 				setting: "ratelimitAllowList",
 				joinString: ", ",
 				keyboardType: "default",
+				description:
+					"A comma-separated list of IP addresses to bypass the ratelimit.",
 			},
 			{
 				type: "save",
@@ -783,56 +860,70 @@ export const settings: Array<Setting> = [
 				name: "Title",
 				setting: "websiteTitle",
 				keyboardType: "default",
+				description: "The title of the website in browser tabs and at the top.",
 			},
 			{
 				type: "input",
 				name: "Title Logo",
 				setting: "websiteTitleLogo",
 				keyboardType: "url",
+				description:
+					"The URL to use for the title logo. This is placed to the left of the title.",
 			},
 			{
 				type: "externalUrls",
 			},
 			{
 				type: "input",
-				name: "Login Backgorund",
+				name: "Login Background",
 				setting: "websiteLoginBackground",
 				keyboardType: "url",
+				description: "The URL to use for the login background.",
 			},
 			{
 				type: "switch",
-				name: "Login Backgorund Blur",
+				name: "Login Background Blur",
 				setting: "websiteLoginBackgroundBlur",
+				description: "Whether to blur the login background.",
 			},
 			{
 				type: "input",
 				name: "Default Avatar",
 				setting: "websiteDefaultAvatar",
 				keyboardType: "default",
+				description:
+					"The path to use for the default avatar. This must be a path to an image, not a URL.",
 			},
 			{
 				type: "input",
 				name: "Terms of Service",
 				setting: "websiteTos",
 				keyboardType: "default",
+				description:
+					"Path to a Markdown (.md) file to use for the terms of service.",
 			},
 			{
 				type: "input",
 				name: "Default Theme",
 				setting: "websiteThemeDefault",
 				keyboardType: "default",
+				description: "The default theme to use for the website.",
 			},
 			{
 				type: "input",
 				name: "Dark Theme",
 				setting: "websiteThemeDark",
 				keyboardType: "default",
+				description:
+					'The dark theme to use for the website when the default theme is "system".',
 			},
 			{
 				type: "input",
 				name: "Light Theme",
 				setting: "websiteThemeLight",
 				keyboardType: "default",
+				description:
+					'The light theme to use for the website when the default theme is "system".',
 			},
 			{
 				type: "save",
@@ -843,17 +934,23 @@ export const settings: Array<Setting> = [
 	{
 		type: "category",
 		name: "OAuth",
+		description:
+			'For OAuth to work, the "OAuth Registration" setting must be enabled in the Features section. If you have issues, try restarting Zipline after saving.',
 		category: "oauthCategory",
 		children: [
 			{
 				type: "switch",
 				name: "Bypass Local Login",
 				setting: "oauthBypassLocalLogin",
+				description:
+					"Skips the local login page and redirects to the OAuth provider, this only works with one provider enabled.",
 			},
 			{
 				type: "switch",
 				name: "Login Only",
 				setting: "oauthLoginOnly",
+				description:
+					"Disables registration and only allows login with OAuth, existing users can link providers for example.",
 			},
 			{
 				type: "category",
@@ -878,6 +975,8 @@ export const settings: Array<Setting> = [
 						name: "Discord Redirect URI",
 						setting: "oauthDiscordRedirectUri",
 						keyboardType: "default",
+						description:
+							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
 					},
 				],
 			},
@@ -904,6 +1003,8 @@ export const settings: Array<Setting> = [
 						name: "Google Redirect URI",
 						setting: "oauthGoogleRedirectUri",
 						keyboardType: "default",
+						description:
+							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
 					},
 				],
 			},
@@ -930,6 +1031,8 @@ export const settings: Array<Setting> = [
 						name: "GitHub Redirect URI",
 						setting: "oauthGithubRedirectUri",
 						keyboardType: "default",
+						description:
+							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
 					},
 				],
 			},
@@ -974,6 +1077,8 @@ export const settings: Array<Setting> = [
 						name: "OIDC Redirect URL",
 						setting: "oauthOidcRedirectUri",
 						keyboardType: "default",
+						description:
+							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
 					},
 				],
 			},
@@ -986,12 +1091,14 @@ export const settings: Array<Setting> = [
 	{
 		type: "category",
 		name: "PWA",
+		description: "Refresh the page after enabling PWA to see any changes.",
 		category: "pwaCategory",
 		children: [
 			{
 				type: "switch",
 				name: "PWA Enabled",
 				setting: "pwaEnabled",
+				description: "Allow users to install the Zipline PWA on their devices.",
 			},
 			{
 				type: "input",
@@ -999,6 +1106,7 @@ export const settings: Array<Setting> = [
 				setting: "pwaTitle",
 				keyboardType: "default",
 				placeholder: "Zipline",
+				description: "The title for the PWA",
 			},
 			{
 				type: "input",
@@ -1006,6 +1114,7 @@ export const settings: Array<Setting> = [
 				setting: "pwaShortName",
 				keyboardType: "default",
 				placeholder: "Zipline",
+				description: "The short name for the PWA",
 			},
 			{
 				type: "input",
@@ -1013,6 +1122,7 @@ export const settings: Array<Setting> = [
 				setting: "pwaDescription",
 				keyboardType: "default",
 				placeholder: "Zipline",
+				description: "The description for the PWA",
 			},
 			{
 				type: "input",
@@ -1020,11 +1130,13 @@ export const settings: Array<Setting> = [
 				setting: "pwaThemeColor",
 				keyboardType: "default",
 				placeholder: "#000000",
+				description: "The theme color for the PWA",
 			},
 			{
 				type: "colorPicker",
 				name: "Background Color",
 				setting: "pwaBackgroundColor",
+				description: "The background color for the PWA",
 			},
 			{
 				type: "save",
@@ -1043,6 +1155,8 @@ export const settings: Array<Setting> = [
 				setting: "httpWebhookOnUpload",
 				keyboardType: "url",
 				placeholder: "https://example.com/upload",
+				description:
+					"The URL to send a POST request to when a file is uploaded.",
 			},
 			{
 				type: "input",
@@ -1050,6 +1164,8 @@ export const settings: Array<Setting> = [
 				setting: "httpWebhookOnShorten",
 				keyboardType: "url",
 				placeholder: "https://example.com/shorten",
+				description:
+					"The URL to send a POST request to when a URL is shortened.",
 			},
 			{
 				type: "save",
@@ -1068,6 +1184,7 @@ export const settings: Array<Setting> = [
 				setting: "discordWebhookUrl",
 				keyboardType: "url",
 				placeholder: "https://discord.com/api/webhooks/...",
+				description: "The Discord webhook URL to send notifications to",
 			},
 			{
 				type: "input",
@@ -1075,6 +1192,7 @@ export const settings: Array<Setting> = [
 				setting: "discordUsername",
 				keyboardType: "default",
 				placeholder: "Zipline",
+				description: "The username to send notifications as",
 			},
 			{
 				type: "input",
@@ -1082,6 +1200,7 @@ export const settings: Array<Setting> = [
 				setting: "discordAvatarUrl",
 				keyboardType: "url",
 				placeholder: "https://example.com/avatar.png",
+				description: "The avatar for the webhook",
 			},
 			{
 				type: "save",
@@ -1098,6 +1217,8 @@ export const settings: Array<Setting> = [
 						setting: "discordOnUploadWebhookUrl",
 						keyboardType: "url",
 						placeholder: "https://discord.com/api/webhooks/...",
+						description:
+							"The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used",
 					},
 					{
 						type: "input",
@@ -1105,6 +1226,8 @@ export const settings: Array<Setting> = [
 						setting: "discordOnUploadUsername",
 						keyboardType: "default",
 						placeholder: "Zipline Uploads",
+						description:
+							"The username to send notifications as. If this is left blank, the main username will be used",
 					},
 					{
 						type: "input",
@@ -1112,6 +1235,8 @@ export const settings: Array<Setting> = [
 						setting: "discordOnUploadAvatarUrl",
 						keyboardType: "url",
 						placeholder: "https://example.com/uploadAvatar.png",
+						description:
+							"The avatar for the webhook. If this is left blank, the main avatar will be used",
 					},
 					{
 						type: "input",
@@ -1119,12 +1244,16 @@ export const settings: Array<Setting> = [
 						setting: "discordOnUploadContent",
 						keyboardType: "default",
 						multiline: true,
+						description:
+							"The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out",
 					},
 					{
 						type: "switch",
 						name: "Embed",
 						setting: "discordOnUploadEmbed",
 						setType: "upload",
+						description:
+							"Send the notification as an embed. This will allow for more customization below.",
 					},
 					{
 						type: "category",
@@ -1137,43 +1266,53 @@ export const settings: Array<Setting> = [
 								name: "Title",
 								setting: "discordOnUploadEmbed.title",
 								keyboardType: "default",
+								description: "The title of the embed",
 							},
 							{
 								type: "input",
 								name: "Description",
 								setting: "discordOnUploadEmbed.description",
 								keyboardType: "default",
+								description: "The description of the embed",
 							},
 							{
 								type: "input",
 								name: "Footer",
 								setting: "discordOnUploadEmbed.footer",
 								keyboardType: "default",
+								description: "The footer of the embed",
 							},
 							{
 								type: "colorPicker",
 								name: "Color",
 								setting: "discordOnUploadEmbed.color",
+								description: "The color of the embed",
 							},
 							{
 								type: "switch",
 								name: "Thumbnail",
 								setting: "discordOnUploadEmbed.thumbnail",
+								description:
+									"Show the thumbnail (it will show the file if it's an image) in the embed",
 							},
 							{
 								type: "switch",
 								name: "Image/Video",
 								setting: "discordOnUploadEmbed.imageOrVideo",
+								description: "Show the image or video in the embed",
 							},
 							{
 								type: "switch",
 								name: "Timestamp",
 								setting: "discordOnUploadEmbed.timestamp",
+								description: "Show the timestamp in the embed",
 							},
 							{
 								type: "switch",
 								name: "URL",
 								setting: "discordOnUploadEmbed.url",
+								description:
+									"Makes the title clickable and links to the URL of the file",
 							},
 						],
 					},
@@ -1194,6 +1333,8 @@ export const settings: Array<Setting> = [
 						setting: "discordOnShortenWebhookUrl",
 						keyboardType: "url",
 						placeholder: "https://discord.com/api/webhooks/...",
+						description:
+							"The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used",
 					},
 					{
 						type: "input",
@@ -1201,6 +1342,8 @@ export const settings: Array<Setting> = [
 						setting: "discordOnShortenUsername",
 						keyboardType: "default",
 						placeholder: "Zipline Shortens",
+						description:
+							"The username to send notifications as. If this is left blank, the main username will be used",
 					},
 					{
 						type: "input",
@@ -1208,6 +1351,8 @@ export const settings: Array<Setting> = [
 						setting: "discordOnShortenAvatarUrl",
 						keyboardType: "url",
 						placeholder: "https://example.com/shortenAvatar.png",
+						description:
+							"The avatar for the webhook. If this is left blank, the main avatar will be used",
 					},
 					{
 						type: "input",
@@ -1215,11 +1360,15 @@ export const settings: Array<Setting> = [
 						setting: "discordOnShortenContent",
 						keyboardType: "default",
 						multiline: true,
+						description:
+							"The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out",
 					},
 					{
 						type: "switch",
 						name: "Embed",
 						setting: "discordOnShortenEmbed",
+						description:
+							"Send the notification as an embed. This will allow for more customization below.",
 					},
 					{
 						type: "category",
@@ -1232,33 +1381,40 @@ export const settings: Array<Setting> = [
 								name: "Title",
 								setting: "discordOnShortenEmbed.title",
 								keyboardType: "default",
+								description: "The title of the embed",
 							},
 							{
 								type: "input",
 								name: "Description",
 								setting: "discordOnShortenEmbed.description",
 								keyboardType: "default",
+								description: "The description of the embed",
 							},
 							{
 								type: "input",
 								name: "Footer",
 								setting: "discordOnShortenEmbed.footer",
 								keyboardType: "default",
+								description: "The footer of the embed",
 							},
 							{
 								type: "colorPicker",
 								name: "Color",
 								setting: "discordOnShortenEmbed.color",
+								description: "The color of the embed",
 							},
 							{
 								type: "switch",
 								name: "Timestamp",
 								setting: "discordOnShortenEmbed.timestamp",
+								description: "Show the timestamp in the embed",
 							},
 							{
 								type: "switch",
 								name: "URL",
 								setting: "discordOnShortenEmbed.url",
+								description:
+									"Makes the title clickable and links to the URL of the file",
 							},
 						],
 					},

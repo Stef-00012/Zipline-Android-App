@@ -106,6 +106,8 @@ export default function Files() {
 	const url = db.get("url") as DashURL | null;
 
 	const [name, setName] = useState<string | null>(null);
+	const [allowUploads, setAllowUploads] = useState<boolean>(false);
+	const [folderId, setFolderId] = useState<string | null>(null);
 	const [isFolder, setIsFolder] = useState<boolean>(false);
 
 	const [focusedFile, setFocusedFile] = useState<APIFile | null>(null);
@@ -153,6 +155,8 @@ export default function Files() {
 			if (typeof folder === "string") return router.replace("/+not-found");
 
 			setName(folder.name);
+			setAllowUploads(folder.allowUploads);
+			setFolderId(folder.id);
 
 			setIsFolder(true);
 			return setFiles({
@@ -566,48 +570,54 @@ export default function Files() {
 								/>
 
 								{!name && (
-									<>
-										<Button
-											onPress={() => {
-												setTagsMenuOpen(true);
-											}}
-											icon="sell"
-											color="transparent"
-											iconColor={files ? "#2d3f70" : "#2d3f7055"}
-											borderColor="#222c47"
-											borderWidth={2}
-											iconSize={30}
-											disabled={!files}
-											padding={4}
-											rippleColor="#283557"
-											margin={{
-												left: 2,
-												right: 2,
-											}}
-										/>
-
-										<Button
-											onPress={() => {
-												router.replace("/upload/file");
-											}}
-											icon="upload-file"
-											color="transparent"
-											iconColor={files ? "#2d3f70" : "#2d3f7055"}
-											borderColor="#222c47"
-											borderWidth={2}
-											iconSize={30}
-											disabled={!files}
-											padding={4}
-											rippleColor="#283557"
-											margin={{
-												left: 2,
-												right: 2,
-											}}
-										/>
-									</>
+									<Button
+										onPress={() => {
+											setTagsMenuOpen(true);
+										}}
+										icon="sell"
+										color="transparent"
+										iconColor={files ? "#2d3f70" : "#2d3f7055"}
+										borderColor="#222c47"
+										borderWidth={2}
+										iconSize={30}
+										disabled={!files}
+										padding={4}
+										rippleColor="#283557"
+										margin={{
+											left: 2,
+											right: 2,
+										}}
+									/>
 								)}
 							</>
 						)}
+
+						<Button
+							onPress={() => {
+								const url = isFolder
+									? (`/folders/upload?folderId=${folderId}` as `/folders/upload?folderId=${string | null}`)
+									: "/upload/file";
+
+								router.replace(url);
+							}}
+							icon="upload-file"
+							color="transparent"
+							iconColor={
+								(files && !isFolder) || (isFolder && allowUploads)
+									? "#2d3f70"
+									: "#2d3f7055"
+							}
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							disabled={!files || (isFolder && !allowUploads)}
+							padding={4}
+							rippleColor="#283557"
+							margin={{
+								left: 2,
+								right: 2,
+							}}
+						/>
 
 						<Button
 							onPress={() => {

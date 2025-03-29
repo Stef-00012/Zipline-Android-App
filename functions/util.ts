@@ -154,3 +154,6 @@ export function getRippleColor(color: string, fraction = 0.4) {
 
 	return rgbaToHex(newRed, newGreen, newBlue);
 }
+export function getMetricsDifference(first: number, last: number): number {
+	return Math.round(((first - last) / last) * 100) || 0;
+}

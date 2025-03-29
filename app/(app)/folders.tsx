@@ -25,6 +25,7 @@ import {
 export type FolderActions =
 	| "viewFiles"
 	| "visibility"
+	| "uploadPolicy"
 	| "edit"
 	| "copyUrl"
 	| "delete";
@@ -66,7 +67,14 @@ export default function Folders() {
 	const dashUrl = db.get("url") as DashURL | null;
 
 	const [sortKey, setSortKey] = useState<{
-		id: "name" | "public" | "allowUploads" | "createdAt" | "updatedAt" | "files" | "id";
+		id:
+			| "name"
+			| "public"
+			| "allowUploads"
+			| "createdAt"
+			| "updatedAt"
+			| "files"
+			| "id";
 		sortOrder: "asc" | "desc";
 	}>({
 		id: "createdAt",
@@ -133,8 +141,8 @@ export default function Folders() {
 					ToastAndroid.SHORT,
 				);
 			}
-			
-			case "uploasPolicy": {
+
+			case "uploadPolicy": {
 				const folderId = folder.id;
 
 				const success = await editFolder(folderId, {
@@ -413,9 +421,9 @@ export default function Folders() {
 												sortable: true,
 											},
 											{
-											    row: "Uploads?",
-											    id: "allowUploads",
-											    sortable: true,
+												row: "Uploads?",
+												id: "allowUploads",
+												sortable: true,
 											},
 											{
 												row: "Created",
@@ -524,7 +532,7 @@ export default function Folders() {
 														{folder.public ? "Yes" : "No"}
 													</Text>
 												);
-												
+
 												const allowUploads = (
 													<Text key={folder.id} style={styles.rowText}>
 														{folder.allowUploads ? "Yes" : "No"}
@@ -600,16 +608,18 @@ export default function Folders() {
 																onAction("visibility", folder);
 															}}
 														/>
-														
+
 														<Button
 															icon={folder.allowUploads ? "block" : "share"}
-															color={folder.allowUploads ? "#323ea8" : "#343a40"}
+															color={
+																folder.allowUploads ? "#323ea8" : "#343a40"
+															}
 															iconSize={20}
 															width={32}
 															height={32}
 															padding={6}
 															onPress={async () => {
-																onAction("uploasPolicy", folder);
+																onAction("uploadPolicy", folder);
 															}}
 														/>
 

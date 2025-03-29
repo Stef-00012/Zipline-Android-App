@@ -42,7 +42,7 @@ export default function ServerSettings() {
 	}, []);
 
 	const [saveSettings, setSaveSettings] = useState<SaveSettings | null>(null);
-	const [saving, setSaving] = useState<boolean>(false)
+	const [saving, setSaving] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (settings) {
@@ -223,7 +223,7 @@ export default function ServerSettings() {
 
 	async function handleSave(category: SaveCategories) {
 		setSaveError(null);
-		setSaving(true)
+		setSaving(true);
 
 		if (!saveSettings) return setSaving(false);
 		let settingsToSave: Partial<APISettings> = {};
@@ -463,30 +463,30 @@ export default function ServerSettings() {
 				break;
 			}
 		}
-		
+
 		if (Object.keys(settingsToSave).length <= 0) {
-			setSaveError(["Something went wrong..."])
-			return setSaving(false)
+			setSaveError(["Something went wrong..."]);
+			return setSaving(false);
 		}
-		
+
 		const success = await updateSettings(settingsToSave);
-		
+
 		if (Array.isArray(success)) {
 			setSaveError(success);
-			setSaving(false)
+			setSaving(false);
 		}
-		
+
 		const reloadSuccess = await reloadSettings();
-		
+
 		if (typeof reloadSuccess === "string") {
 			setSaveError([`Error while reloading: ${reloadSuccess}`]);
-			setSaving(false)
+			setSaving(false);
 		}
 
 		const newSettings = await getSettings();
 
 		setSettings(typeof newSettings === "string" ? null : newSettings);
-		setSaving(false)
+		setSaving(false);
 
 		return ToastAndroid.show(
 			"Successfully saved the settings",
@@ -522,6 +522,12 @@ export default function ServerSettings() {
 					>
 						<Text style={styles.headerText}>{setting.name}</Text>
 
+						{setting.description && (
+							<Text style={styles.headerDescription}>
+								{setting.description}
+							</Text>
+						)}
+
 						{setting.children.map((childSetting) =>
 							renderSetting(childSetting),
 						)}
@@ -534,6 +540,7 @@ export default function ServerSettings() {
 					<TextInput
 						key={setting.setting}
 						title={setting.name}
+						description={setting.description}
 						password={setting.passwordInput}
 						disabled={saving}
 						keyboardType={setting.keyboardType}
@@ -579,6 +586,7 @@ export default function ServerSettings() {
 						title={setting.name}
 						key={setting.setting}
 						data={setting.options}
+						description={setting.description}
 						disabled={saving}
 						onSelect={(selectedItem) => {
 							setSaveSettings((prev) => {
@@ -601,6 +609,7 @@ export default function ServerSettings() {
 					<Switch
 						key={setting.setting}
 						disabled={saving}
+						description={setting.description}
 						onValueChange={() =>
 							setSaveSettings((prev) => {
 								return {
@@ -625,7 +634,12 @@ export default function ServerSettings() {
 								justifyContent: "space-between",
 							}}
 						>
-							<Text style={styles.externalLinkTitle}>External Links</Text>
+							<View>
+								<Text style={styles.externalLinkTitle}>External Links</Text>
+								<Text style={styles.externalLinkDescription}>
+									The external links to show in the footer.
+								</Text>
+							</View>
 
 							<Button
 								color="#323ea8"
@@ -643,6 +657,7 @@ export default function ServerSettings() {
 								}}
 							/>
 						</View>
+
 						<View
 							style={{
 								...styles.settingGroup,
@@ -739,6 +754,7 @@ export default function ServerSettings() {
 				return (
 					<ColorPicker
 						title={setting.name}
+						description={setting.description}
 						disabled={saving}
 						initialColor={saveSettings?.[setting.setting] as string | undefined}
 						onSelectColor={(color) => {
@@ -774,15 +790,15 @@ export default function ServerSettings() {
 	}
 
 	useEffect(() => {
-		console.log(saveError, !saveError || saveError.length <= 0)
-	}, [saveError])
+		console.log(saveError, !saveError || saveError.length <= 0);
+	}, [saveError]);
 
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.mainContainer}>
 				<Popup
 					onClose={() => {
-						setSaveError(null)
+						setSaveError(null);
 					}}
 					hidden={!saveError || saveError.length <= 0}
 				>
@@ -791,7 +807,9 @@ export default function ServerSettings() {
 
 						<ScrollView style={styles.popupScrollView}>
 							{saveError?.map((error) => (
-								<Text key={error} style={styles.errorText}>{error}</Text>
+								<Text key={error} style={styles.errorText}>
+									{error}
+								</Text>
 							))}
 						</ScrollView>
 
@@ -800,9 +818,6 @@ export default function ServerSettings() {
 						</Text>
 					</View>
 				</Popup>
-
-
-
 
 				{/* <Popup
 					onClose={() => {

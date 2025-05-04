@@ -11,6 +11,7 @@ import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
 import Table from "@/components/Table";
+import SkeletonTable from "@/components/skeleton/Table";
 import type {
 	APIFile,
 	APIRecentFiles,
@@ -311,6 +312,34 @@ export default function Home() {
 									))
 								}
 							</ScrollView>
+							
+							<View style={{
+								marginTop: 7
+							}}>
+								<Skeleton colors={colors} width="20%" height={28} />
+							</View>
+							
+							<View
+								style={{
+									...styles.scrollView,
+									...styles.fileTypesContainer,
+								}}
+							>
+								<SkeletonTable
+									headerRow={[
+										{
+											row: "File Type",
+										},
+										{
+											row: "Count",
+										},
+									]}
+									rowWidth={[250, 150]}
+									rows={[...Array(10).keys()].map((index) => {
+									    return ["55%", 30]
+									})}
+								/>
+							</View>
 						</ScrollView>
 					</Skeleton.Group>
 				</View>

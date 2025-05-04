@@ -35,5 +35,9 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] Add skeleton loading to all pages; Currently done:
+- [ ] Add skeleton loading to all pages; Currently done:
     - Home
+    - Metrics
+    - Folders
+    - Files
+    - URLs

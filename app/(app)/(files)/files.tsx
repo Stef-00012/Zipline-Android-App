@@ -46,6 +46,9 @@ import {
 	View,
 } from "react-native";
 import ColorPicker from "@/components/ColorPicker";
+import SkeletonTable from "@/components/skeleton/Table";
+import { Skeleton } from "moti/skeleton";
+import { colors } from "@/constants/skeleton";
 
 export default function Files() {
 	const router = useRouter();
@@ -1177,30 +1180,58 @@ export default function Files() {
 									})}
 								/>
 							) : (
-								<>
-									<ScrollView showsVerticalScrollIndicator={false}>
-										{files.page.map((file) => (
-											<View key={file.id} style={styles.imageContainer}>
-												<FileDisplay
-													uri={`${url}/raw/${file.name}`}
-													width={filesWidth - 50}
-													originalName={file.originalName}
-													name={file.name}
-													autoHeight
-													passwordProtected={file.password}
-													file={file}
-													onPress={() => setFocusedFile(file)}
-												/>
-											</View>
-										))}
-									</ScrollView>
-								</>
+								<ScrollView showsVerticalScrollIndicator={false}>
+									{files.page.map((file) => (
+										<View key={file.id} style={styles.imageContainer}>
+											<FileDisplay
+												uri={`${url}/raw/${file.name}`}
+												width={filesWidth - 50}
+												originalName={file.originalName}
+												name={file.name}
+												autoHeight
+												passwordProtected={file.password}
+												file={file}
+												onPress={() => setFocusedFile(file)}
+											/>
+										</View>
+									))}
+								</ScrollView>
 							)}
 						</>
 					) : (
-						<View style={styles.loadingContainer}>
-							<Text style={styles.loadingText}>Loading...</Text>
-						</View>
+						<>
+							{compactModeEnabled ? (
+								<SkeletonTable
+									headerRow={[
+										"Name",
+										"Tags",
+										"Type",
+										"Size",
+										"Created At",
+										"Favorite",
+										"ID",
+										"Actions",
+									]}
+									rowWidth={[150, 150, 150, 80, 130, 100, 220, 170]}
+									rows={[...Array(10).keys()].map(() => {
+										return [80, 40, 60, 60, 90, 20, 120, 150];
+									})}
+									rowHeight={55}
+									disableAnimations
+								/>
+							) : (
+								<ScrollView showsVerticalScrollIndicator={false}>
+									{[...Array(4).keys()].map(index => (
+										<View key={index} style={{
+											marginVertical: 5,
+											marginHorizontal: 5
+										}}>
+											<Skeleton colors={colors} width="100%" height={250} />
+										</View>
+									))}
+								</ScrollView>
+							)}
+						</>
 					)}
 				</ScrollView>
 

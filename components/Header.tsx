@@ -11,6 +11,8 @@ import Sidebar from "@/components/Sidebar";
 import type React from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { getRippleColor } from "@/functions/util";
+import { Skeleton } from "moti/skeleton";
+import { colors } from "@/constants/skeleton";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter();
@@ -25,13 +27,7 @@ export default function Header({ children }: PropsWithChildren) {
 
 	useEffect(() => {
 		if (!avatar || !user) {
-			(async () => {
-				const avatar = await getCurrentUserAvatar();
-				const user = await getCurrentUser();
-
-				setAvatar(avatar);
-				setUser(typeof user === "string" ? null : user);
-			})();
+			fetchUser()
 		}
 	}, [avatar, user]);
 
@@ -103,7 +99,43 @@ export default function Header({ children }: PropsWithChildren) {
 					</View>
 				</View>
 			) : (
-				<View />
+				<View
+					style={{
+						marginBottom: 70,
+					}}
+				>
+					<Skeleton.Group show={!user}>
+						<View style={styles.header}>
+							<View style={styles.headerLeft}>
+								<IconButton
+									disabled
+									icon={() => (
+										<MaterialIcons name="menu" color={"#ffffff77"} size={40} />
+									)}
+									android_ripple={{
+										color: getRippleColor("#0c101c")
+									}}
+									onPress={() => {
+										setSidebarOpen((prev) => !prev);
+									}}
+								/>
+							</View>
+
+							<Stack>
+								<View>
+									<View
+										style={{
+											padding: 10,
+											borderRadius: 10
+										}}
+									>
+										<Skeleton colors={colors} height={36} width={80} />
+									</View>
+								</View>
+							</Stack>
+						</View>
+					</Skeleton.Group>
+				</View>
 			)}
 			<Sidebar
 				open={sidebarOpen}

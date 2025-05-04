@@ -257,24 +257,31 @@ export default function Home() {
 			) : (
 				<View style={styles.mainContainer}>
 					<Skeleton.Group show={!user}>
-						<ScrollView style={{
-							marginTop: 5
-						}}>
-							<View>
-								<Skeleton colors={colors} width="70%" height={28} />
+						<ScrollView
+							style={{
+								marginTop: 5,
+							}}
+						>
+							<View
+								style={{
+									flexDirection: "row",
+								}}
+							>
+								<Text style={styles.mainHeader}>Welcome back, </Text>
+								<Skeleton colors={colors} width="60%" height={36} />
 							</View>
 
-							<View style={{
-								marginTop: 5
-							}}>
-								<Skeleton colors={colors} width="50%" height={16} />
+							<View
+								style={{
+									marginTop: 5,
+								}}
+							>
+								<Text style={styles.subHeader}>
+									You have ## files uploaded.
+								</Text>
 							</View>
 
-							<View style={{
-								marginTop: 7
-							}}>
-								<Skeleton colors={colors} width="30%" height={28} />
-							</View>
+							<Text style={styles.headerText}>Recent Files</Text>
 
 							<ScrollView horizontal style={styles.scrollView}>
 								{[1, 2, 3].map((file) => (
@@ -289,11 +296,7 @@ export default function Home() {
 								))}
 							</ScrollView>
 
-							<View style={{
-								marginTop: 7
-							}}>
-								<Skeleton colors={colors} width="20%" height={28} />
-							</View>
+							<Text style={styles.headerText}>Stats</Text>
 
 							<ScrollView
 								horizontal
@@ -301,24 +304,35 @@ export default function Home() {
 									...styles.scrollView,
 								}}
 							>
-								{
-									[1, 2, 3, 4, 5, 6, 7, 8].map(stat => (
-										<View key={stat} style={{
-											marginHorizontal: 4,
-											marginVertical: 7.5
-										}}>
-											<Skeleton colors={colors} width={170} height={100} />
+								{[
+									["Files Uploaded:", 60],
+									["Favorite Files:", 50],
+									["Storage Used:", 90],
+									["Average Storage Used:", 70],
+									["File Views:", 50],
+									["File Average Views:", 50],
+									["Links Created:", 60],
+									["Total Link View:", 50],
+								].map((stat) => (
+									<View key={stat[0]} style={styles.statContainer}>
+										<Text style={styles.subHeaderText}>{stat[0]}</Text>
+										<View
+											style={{
+												marginTop: 5,
+											}}
+										>
+											<Skeleton
+												colors={colors}
+												width={stat[1] as number}
+												height={36}
+											/>
 										</View>
-									))
-								}
+									</View>
+								))}
 							</ScrollView>
-							
-							<View style={{
-								marginTop: 7
-							}}>
-								<Skeleton colors={colors} width="20%" height={28} />
-							</View>
-							
+
+							<Text style={styles.headerText}>File Types</Text>
+
 							<View
 								style={{
 									...styles.scrollView,
@@ -326,17 +340,10 @@ export default function Home() {
 								}}
 							>
 								<SkeletonTable
-									headerRow={[
-										{
-											row: "File Type",
-										},
-										{
-											row: "Count",
-										},
-									]}
+									headerRow={["File Type", "Count"]}
 									rowWidth={[250, 150]}
-									rows={[...Array(10).keys()].map((index) => {
-									    return ["55%", 30]
+									rows={[...Array(4).keys()].map(() => {
+										return ["55%", 30];
 									})}
 								/>
 							</View>

@@ -24,6 +24,9 @@ import {
 	type StatsProps,
 } from "@/functions/zipline/stats";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Skeleton } from "moti/skeleton";
+import { colors } from "@/constants/skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
 
 export default function Metrics() {
 	useAuth();
@@ -222,7 +225,7 @@ export default function Metrics() {
 										difference: statsDifferences.files,
 									},
 									{
-										title: "URLs",
+										title: "URLs:",
 										amount: mainStat.data.urls,
 										difference: statsDifferences.urls,
 									},
@@ -656,8 +659,166 @@ export default function Metrics() {
 						</ScrollView>
 					</View>
 				) : (
-					<View style={styles.loadingContainer}>
-						<Text style={styles.loadingText}>Loading...</Text>
+					<View style={styles.mainContainer}>
+						<Skeleton.Group show={!filteredStats || !mainStat}>
+							<ScrollView style={{ height: "93%" }}>
+								<ScrollView horizontal style={styles.scrollView}>
+									{[
+										"Files:",
+										"URLs:",
+										"Storage Used:",
+										"Users:",
+										"File Views:",
+										"URL Views:",
+									].map((stat) => (
+										<View key={stat} style={styles.statContainer}>
+											<Text style={styles.subHeaderText}>{stat}</Text>
+
+											<View style={styles.statContainerData}>
+												<Skeleton colors={colors} height={36} width={60} />
+												<View style={{
+													width: 5
+												}} />
+												<View style={{
+													marginTop: 9
+												}}>
+													<Skeleton colors={colors} height={27} width={40} />
+												</View>
+											</View>
+										</View>
+									))}
+								</ScrollView>
+
+								{userSpecificMetrics && (
+									<>
+										<View
+											style={{
+												...styles.chartContainer,
+												padding: 0,
+											}}
+										>
+											<SkeletonTable
+												headerRow={[
+													"User",
+													"URLs",
+													"Views",
+												]}
+												rowWidth={[190, 100, 100]}
+												rows={[[80, 50]]}
+											/>
+										</View>
+
+										<View
+											style={{
+												...styles.chartContainer,
+												padding: 0,
+											}}
+										>
+											<SkeletonTable
+												headerRow={[
+													"User",
+													"Files",
+													"Storage Used",
+													"Views",
+												]}
+												rowWidth={[150, 60, 130, 50]}
+												rows={[[70, 50, 100, 50]]}
+											/>
+										</View>
+
+										<View
+											style={{
+												...styles.chartContainer,
+												padding: 0,
+											}}
+										>
+											<SkeletonTable
+												headerRow={[
+													"Type",
+													"Files",
+												]}
+												rowWidth={[tableTypeWidth, tableFilesWidth]}
+												rows={[...Array(4).keys()].map(() => {
+													return ["55%", 30];
+												})}
+											/>
+										</View>
+									</>
+								)}
+
+								<View style={styles.chartContainer}>
+									<View style={styles.pieChartContainer}>
+										<Skeleton colors={colors} radius="round" width={250} height={250} />
+									</View>
+
+									<View style={{
+										flexDirection: "row",
+										marginTop: 10
+									}}>
+										{[...Array(5).keys()].map((index) => (
+											<View key={index} style={{
+												marginHorizontal: 2.5
+											}}>
+												<Skeleton colors={colors} width={60} height={16} />
+											</View>
+										))}
+									</View>
+								</View>
+
+								<View style={styles.chartContainer}>
+									<Text style={styles.chartTitle}>Count</Text>
+
+									<Skeleton colors={colors} width="100%" height={220} />
+
+									<ChartLegend
+										data={[
+											{
+												label: "Files",
+												color: "#323ea8",
+											},
+											{
+												label: "URLs",
+												color: "#2f9e44",
+											},
+										]}
+									/>
+								</View>
+
+								<View style={styles.chartContainer}>
+									<Text style={styles.chartTitle}>Views</Text>
+
+									<Skeleton colors={colors} width="100%" height={220} />
+
+									<ChartLegend
+										data={[
+											{
+												label: "File Views",
+												color: "#323ea8",
+											},
+											{
+												label: "URL Views",
+												color: "#2f9e44",
+											},
+										]}
+									/>
+								</View>
+
+								<View style={styles.chartContainer}>
+									<Text style={styles.chartTitle}>Storage Used</Text>
+
+									<Skeleton colors={colors} width="100%" height={220} />
+
+									<ChartLegend
+										data={[
+											{
+												label: "Storage Used",
+												color: "#323ea8",
+											},
+										]}
+									/>
+								</View>
+							</ScrollView>
+						</Skeleton.Group>
 					</View>
 				)}
 			</View>

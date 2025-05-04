@@ -53,11 +53,13 @@ export default function Layout() {
 								</Host>
 							</Header>
 						) : (
-							<View style={styles.noInternetContainer}>
-								<Text style={styles.noInternetText}>
-									No internet connection.
-								</Text>
-							</View>
+							<Header>
+								<View style={styles.noInternetContainer}>
+									<Text style={styles.noInternetText}>
+										No internet connection.
+									</Text>
+								</View>
+							</Header>
 						)}
 					</GestureHandlerRootView>
 				</KeyboardProvider>

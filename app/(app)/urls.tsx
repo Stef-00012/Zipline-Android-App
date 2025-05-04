@@ -24,6 +24,9 @@ import {
 	editURL,
 	getURLs,
 } from "@/functions/zipline/urls";
+import SkeletonTable from "@/components/skeleton/Table";
+import { Skeleton } from "moti/skeleton";
+import { colors } from "@/constants/skeleton";
 
 export type URLActions =
 	| "copyShortLink"
@@ -140,8 +143,8 @@ export default function Urls() {
 		switch (type) {
 			case "copyShortLink": {
 				const urlDest = url.vanity
-					? `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute}/${url.vanity}`
-					: `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute}/${url.code}`;
+					? `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.vanity}`
+					: `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.code}`;
 
 				const saved = await Clipboard.setStringAsync(urlDest);
 
@@ -455,13 +458,13 @@ export default function Urls() {
 							}}
 							icon="add-link"
 							color="transparent"
-							iconColor={urls && settings && dashUrl ? "#2d3f70" : "#2d3f7055"}
+							iconColor={urls && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
 							borderWidth={2}
 							iconSize={30}
 							padding={4}
 							rippleColor="#283557"
-							disabled={!urls || !dashUrl || !settings}
+							disabled={!urls || !dashUrl}
 							margin={{
 								left: 2,
 								right: 2,
@@ -479,13 +482,13 @@ export default function Urls() {
 							}}
 							icon={compactModeEnabled ? "view-module" : "view-agenda"}
 							color="transparent"
-							iconColor={urls && settings && dashUrl ? "#2d3f70" : "#2d3f7055"}
+							iconColor={urls && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
 							borderWidth={2}
 							iconSize={30}
 							padding={4}
 							rippleColor="#283557"
-							disabled={!urls || !dashUrl || !settings}
+							disabled={!urls || !dashUrl}
 							margin={{
 								left: 2,
 								right: 2,
@@ -532,7 +535,7 @@ export default function Urls() {
 
 				<View style={{ flex: 1 }}>
 					<View style={styles.urlsContainer}>
-						{urls && settings && dashUrl ? (
+						{urls && dashUrl ? (
 							<>
 								{compactModeEnabled ? (
 									<Table
@@ -644,7 +647,7 @@ export default function Urls() {
 													<Link
 														key={url.id}
 														href={
-															`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.code}` as ExternalPathString
+															`${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.code}` as ExternalPathString
 														}
 														style={{
 															...styles.rowText,
@@ -661,7 +664,7 @@ export default function Urls() {
 															<Link
 																key={url.id}
 																href={
-																	`${dashUrl}${settings.urlsRoute === "/" ? "" : settings.urlsRoute}/${url.vanity}` as ExternalPathString
+																	`${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.vanity}` as ExternalPathString
 																}
 																style={{
 																	...styles.rowText,
@@ -783,7 +786,7 @@ export default function Urls() {
 											<LargeURLView
 												key={url.id}
 												url={url}
-												urlsRoute={settings.urlsRoute}
+												urlsRoute={settings?.urlsRoute || "/go"}
 												dashUrl={dashUrl}
 												onAction={onAction}
 											/>
@@ -792,9 +795,40 @@ export default function Urls() {
 								)}
 							</>
 						) : (
-							<View style={styles.loadingContainer}>
-								<Text style={styles.loadingText}>Loading...</Text>
-							</View>
+							<>
+								{compactModeEnabled ? (
+									<SkeletonTable
+										headerRow={[
+											"Code",
+											"Vanity",
+											"Destination",
+											"Views",
+											"Max Views",
+											"Created",
+											"Enabled",
+											"ID",
+											"Actions",
+										]}
+										rowWidth={[100, 120, 300, 110, 140, 130, 100, 220, 130]}
+										rows={[...Array(12).keys()].map(() => {
+											return [60, 50,  200,  30,  30,  70,  40, 180, 90];
+										})}
+										rowHeight={55}
+										disableAnimations
+									/>
+								) : (
+									<ScrollView showsVerticalScrollIndicator={false}>
+										{[...Array(4).keys()].map(index => (
+											<View key={index} style={{
+												marginVertical: 5,
+												marginHorizontal: 5
+											}}>
+												<Skeleton colors={colors} width="100%" height={200} />
+											</View>
+										))}
+									</ScrollView>
+								)}
+							</>
 						)}
 					</View>
 				</View>

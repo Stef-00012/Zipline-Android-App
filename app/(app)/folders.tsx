@@ -21,6 +21,9 @@ import {
 	editFolder,
 	getFolders,
 } from "@/functions/zipline/folders";
+import SkeletonTable from "@/components/skeleton/Table";
+import { Skeleton } from "moti/skeleton";
+import { colors } from "@/constants/skeleton";
 
 export type FolderActions =
 	| "viewFiles"
@@ -675,9 +678,39 @@ export default function Folders() {
 								)}
 							</>
 						) : (
-							<View style={styles.loadingContainer}>
-								<Text style={styles.loadingText}>Loading...</Text>
-							</View>
+							<>
+								{compactModeEnabled ? (
+									<SkeletonTable
+										headerRow={[
+											"Name",
+											"Public",
+											"Uploads?",
+											"Created",
+											"Last Updated At",
+											"Files",
+											"ID",
+											"Actions",
+										]}
+										rowWidth={[140, 90, 110, 140, 150, 100, 220, 252]}
+										rows={[...Array(12).keys()].map(() => {
+											return [80, 30, 30, 90, 90, 40, 120, 200];
+										})}
+										rowHeight={55}
+										disableAnimations
+									/>
+								) : (
+									<ScrollView showsVerticalScrollIndicator={false}>
+										{[...Array(4).keys()].map(index => (
+											<View key={index} style={{
+												marginVertical: 5,
+												marginHorizontal: 5
+											}}>
+												<Skeleton colors={colors} width="100%" height={200} />
+											</View>
+										))}
+									</ScrollView>
+								)}
+							</>
 						)}
 					</View>
 				</View>

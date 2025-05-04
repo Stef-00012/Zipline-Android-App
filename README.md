@@ -35,7 +35,5 @@ This will create an apk but won't automatically install
 
 # TODO
 
-- [x] Add folder upload + upload button in folder view
-- [x] Add description to settings like Zipline does
-- [x] Add upload policy to folder large view
-- [x] Add increase/decrease percetage in metrics
+- [x] Add skeleton loading to all pages; Currently done:
+    - Home

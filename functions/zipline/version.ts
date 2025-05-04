@@ -27,7 +27,28 @@ export async function getVersion(): Promise<APIVersion | string> {
 			  }
 			| undefined;
 
-		if (data) return data.error;
+		if (data && data.statusCode !== 403) return data.error;
+
+		// start: temp fix for non-admins
+		try {
+			const res = await axios.head(`${url}/api/server/settings`, {
+				headers: {
+					Authorization: token,
+				},
+			});
+
+			if (res.status !== 404) return {
+				version: "4.0.0"
+			}
+		} catch (e) {
+			const error = e as AxiosError;
+
+			if (error.status !== 404) return {
+				version: "4.0.0"
+			}
+		}
+
+		// end: temp fix for non-admins
 
 		return "Something went wrong...";
 	}

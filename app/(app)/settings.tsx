@@ -129,7 +129,9 @@ export default function UserSettings() {
 			const avatar = await getCurrentUserAvatar();
 			const exports = await getUserExports();
 			const zeroByteFiles = await getZeroByteFiles();
+			console.log("a")
 			const versionData = await getVersion();
+			console.log(versionData)
 
 			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
@@ -141,6 +143,7 @@ export default function UserSettings() {
 			setZiplineVersion(
 				typeof versionData === "string" ? null : versionData.version,
 			);
+
 		})();
 	}, []);
 

@@ -167,7 +167,7 @@ export default function Login() {
 						db.set("token", token);
 
 						const versionData = await getVersion();
-							
+							console.log(versionData, token)
 						if (
 							typeof versionData === "string" ||
 							semver.lt(versionData.version, "4.0.0")

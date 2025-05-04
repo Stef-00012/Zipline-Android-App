@@ -10,7 +10,8 @@
     "run:android": "expo run:android",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "android": "expo run:android"
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "jest": {
     "preset": "jest-expo"
@@ -38,6 +39,7 @@
     "expo-splash-screen": "^0.29.21",
     "expo-status-bar": "^2.0.1",
     "expo-system-ui": "^4.0.8",
+    "moti": "^0.30.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "^0.77.0",

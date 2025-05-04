@@ -18,6 +18,8 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
+import { Skeleton } from "moti/skeleton";
+import { colors } from "@/constants/skeleton";
 
 // ------------------------ DEV -------------------------
 
@@ -252,8 +254,65 @@ export default function Home() {
 					)}
 				</ScrollView>
 			) : (
-				<View style={styles.loadingContainer}>
-					<Text style={styles.loadingText}>Loading...</Text>
+				<View style={styles.mainContainer}>
+					<Skeleton.Group show={!user}>
+						<ScrollView style={{
+							marginTop: 5
+						}}>
+							<View>
+								<Skeleton colors={colors} width="70%" height={28} />
+							</View>
+
+							<View style={{
+								marginTop: 5
+							}}>
+								<Skeleton colors={colors} width="50%" height={16} />
+							</View>
+
+							<View style={{
+								marginTop: 7
+							}}>
+								<Skeleton colors={colors} width="30%" height={28} />
+							</View>
+
+							<ScrollView horizontal style={styles.scrollView}>
+								{[1, 2, 3].map((file) => (
+									<View key={file} style={styles.recentFileContainer}>
+										<Skeleton
+											colors={colors}
+											width={200}
+											height={200}
+											radius={10}
+										/>
+									</View>
+								))}
+							</ScrollView>
+
+							<View style={{
+								marginTop: 7
+							}}>
+								<Skeleton colors={colors} width="20%" height={28} />
+							</View>
+
+							<ScrollView
+								horizontal
+								style={{
+									...styles.scrollView,
+								}}
+							>
+								{
+									[1, 2, 3, 4, 5, 6, 7, 8].map(stat => (
+										<View key={stat} style={{
+											marginHorizontal: 4,
+											marginVertical: 7.5
+										}}>
+											<Skeleton colors={colors} width={170} height={100} />
+										</View>
+									))
+								}
+							</ScrollView>
+						</ScrollView>
+					</Skeleton.Group>
 				</View>
 			)}
 		</View>

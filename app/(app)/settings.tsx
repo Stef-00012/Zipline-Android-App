@@ -43,6 +43,9 @@ import {
 import ColorPicker from "@/components/ColorPicker";
 import { getVersion } from "@/functions/zipline/version";
 import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTextInput from "@/components/skeleton/TextInput";
+import SkeletonTable from "@/components/skeleton/Table";
+import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -142,7 +145,6 @@ export default function UserSettings() {
 			setZiplineVersion(
 				typeof versionData === "string" ? null : versionData.version,
 			);
-
 		})();
 	}, []);
 
@@ -742,7 +744,7 @@ export default function UserSettings() {
 								<Switch
 									title="Embed"
 									description="Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
-									disabled={!viewEmbed || !viewEnabled}
+									disabled={!viewEnabled}
 									value={viewEmbed || false}
 									onValueChange={() => setViewEmbed((prev) => !prev)}
 								/>
@@ -1259,8 +1261,349 @@ export default function UserSettings() {
 						</KeyboardAwareScrollView>
 					</View>
 				) : (
-					<View style={styles.loadingContainer}>
-						<Text style={styles.loadingText}>Loading...</Text>
+					<View style={styles.settingsContainer}>
+						<KeyboardAwareScrollView style={styles.scrollView}>
+							{/* User Info */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>User Info</Text>
+								<Skeleton height={14} width="60%" />
+
+								<SkeletonTextInput
+									title="Token:"
+									sideButtonIcon="content-copy"
+									skeletonWidth="80%"
+								/>
+
+								<SkeletonTextInput
+									title="Username:"
+									skeletonWidth={50}
+								/>
+
+								<SkeletonTextInput
+									title="Password:"
+									description="Leave blank to keep the same password"
+									skeletonWidth="40%"
+								/>
+
+								<Button
+									disabled
+									onPress={() => {}}
+									color="#373d79"
+									textColor="gray"
+									text="Save"
+									icon="save"
+									iconColor="gray"
+									margin={{
+										top: 10,
+									}}
+								/>
+							</View>
+
+							{/* Avatar */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>Avatar</Text>
+
+								<Button
+									color="transparent"
+									disabled
+									borderWidth={2}
+									borderColor="#222c47"
+									margin={{
+										top: 5,
+									}}
+									textColor="gray"
+									text="Select an Avatar..."
+									onPress={async () => {}}
+								/>
+
+								<View style={styles.avatarPreviewContainer}>
+									<Text style={styles.avatarPreviewHeader}>Avatar Preview</Text>
+									<Skeleton width={150} height={50} />
+								</View>
+
+								<Button
+									text="Save"
+									color="#181c28"
+									textColor="gray"
+									height="auto"
+									width="28.33%"
+									margin={{
+										left: "2.5%",
+										right: "2.5%",
+										top: 10,
+									}}
+									disabled
+									onPress={() => {}}
+								/>
+							</View>
+
+							{/* Viewing Files */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>Viewing Files</Text>
+								<Text style={styles.headerDescription}>
+									All text fields support using variables.
+								</Text>
+
+								<Switch
+									title="Enable View Routes"
+									value={false}
+									disabled
+									onValueChange={() => {}}
+									description="Enable viewing files through customizable view-routes"
+								/>
+
+								<Switch
+									title="Show Mimetype"
+									disabled
+									value={false}
+									onValueChange={() => {}}
+									description="Show the mimetype of the file in the view-route"
+								/>
+
+								<SkeletonTextInput
+									title="View Content:"
+									description="Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable."
+									skeletonWidth="50%"
+								/>
+
+								<Select
+									title="View Content Alignment:"
+									description="Change the alignment of the content within view-routes"
+									disabled
+									data={alignments}
+									onSelect={() => {}}
+									placeholder="Select Alignment..."
+								/>
+
+								<Switch
+									title="Embed"
+									description="Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
+									disabled
+									value={false}
+									onValueChange={() => {}}
+								/>
+
+								<SkeletonTextInput
+									title="Embed Title:"
+									skeletonWidth="30%"
+								/>
+
+								<SkeletonTextInput
+									title="Embed Description:"
+									skeletonWidth="40%"
+								/>
+
+								<SkeletonTextInput
+									title="Embed Site Name:"
+									skeletonWidth="40%"
+								/>
+
+								{/* --remember TO DO */}
+								<SkeletonColorPicker
+									title="Embed Color"
+								/>
+								{/* TO DO */}
+
+								<Button
+									onPress={() => handleSave("viewingFiles")}
+									color="#373d79"
+									disabled
+									text="Save"
+									icon="save"
+									textColor="gray"
+									iconColor="gray"
+									margin={{
+										top: 10,
+									}}
+								/>
+							</View>
+
+							{/* Export Files */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>Export Files</Text>
+
+								<Button
+									onPress={async () => {}}
+									color="#373d79"
+									disabled
+									text="New Export"
+									textColor="gray"
+									margin={{
+										top: 10,
+									}}
+								/>
+
+								<View style={styles.exportsContainer}>
+									<SkeletonTable
+										headerRow={[
+											"ID",
+											"Started On",
+											"Files",
+											"Size",
+											"Actions",
+										]}
+										rowWidth={[230, 130, 60, 90, 90]}
+										rows={[...Array(4).keys()].map(() => {
+											return [170, 80, 30, 50, 70]
+										})}
+										disableAnimations
+									/>
+								</View>
+							</View>
+
+							{/* Server Actions */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>Server Actions</Text>
+								<Text style={styles.headerDescription}>
+									Helpful scripts and tools for server management.
+								</Text>
+
+								<View style={styles.serverActionButtonRow}>
+									<Button
+										onPress={async () => {}}
+										color="#373d79"
+										textColor="gray"
+										disabled
+										text="Clear Zero Byte Files"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
+
+									<Button
+										onPress={() => setClearTempFilesPopupOpen(true)}
+										color="#373d79"
+										textColor="gray"
+										disabled
+										text="Clear Temp Files"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
+								</View>
+
+								<View style={styles.serverActionButtonRow}>
+									<Button
+										onPress={() => setRequerySizeOfFilesPopupOpen(true)}
+										color="#373d79"
+										textColor="gray"
+										disabled
+										text="Requery Size of Files"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
+
+									<Button
+										onPress={() => setGenerateThumbnailsPopupOpen(true)}
+										color="#373d79"
+										textColor="gray"
+										disabled
+										text="Generate Thumbnails"
+										width="45%"
+										margin={{
+											left: "2.5%",
+											right: "2.5%",
+											top: 10,
+										}}
+									/>
+								</View>
+							</View>
+
+							{/* App Settings */}
+							<View style={styles.settingGroup}>
+								<Text style={styles.headerText}>App Settings</Text>
+
+								<View
+									style={{
+										flexDirection: "row",
+									}}
+								>
+									<Text style={styles.subHeaderText}>App Version: </Text>
+									<Skeleton width={45} height={15} />
+								</View>
+
+								<View
+									style={{
+										flexDirection: "row",
+									}}
+								>
+									<Text style={styles.subHeaderText}>Zipline Version: </Text>
+									<Skeleton width={40} height={15} />
+								</View>
+
+								<Switch
+									title="Disable Update Alert"
+									value={false}
+									disabled
+									onValueChange={() => {}}
+								/>
+
+								<Button
+									onPress={async () => {}}
+									color="#373d79"
+									text="Check for Updates"
+									textColor="gray"
+									disabled
+									margin={{
+										top: 10,
+									}}
+								/>
+
+								<Button
+									onPress={() => {}}
+									color="#181c28"
+									disabled
+									text="Change Export Download Folder"
+									textColor="gray"
+									margin={{
+										top: 10,
+									}}
+								/>
+
+								<Button
+									onPress={() => {}}
+									color="#181c28"
+									disabled
+									textColor="gray"
+									text="Change File Download Folder"
+									margin={{
+										top: 10,
+									}}
+								/>
+
+								<Button
+									onPress={() => {}}
+									color="#181c28"
+									textColor="gray"
+									disabled
+									text="Change Updates Download Folder"
+									margin={{
+										top: 10,
+									}}
+								/>
+
+								<Button
+									onPress={() => {}}
+									color="#CF423877"
+									text="Logout"
+									disabled
+									textColor="gray"
+									margin={{
+										top: 10,
+									}}
+								/>
+							</View>
+						</KeyboardAwareScrollView>
 					</View>
 				)}
 			</View>

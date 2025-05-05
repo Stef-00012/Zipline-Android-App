@@ -1,12 +1,13 @@
-import type { ReactNode } from "react";
+import type { ReactElement } from "react";
 import { colors } from "@/constants/skeleton";
 import { Skeleton as NativeSkeleton } from "moti/skeleton";
+import { type DimensionValue, View } from "react-native";
 
 interface Props {
-    children?: ReactNode;
+    children?: ReactElement | null;
     disableAnimation?: boolean;
-    width?: Size;
-    height?: Size;
+    width?: DimensionValue;
+    height?: DimensionValue;
     radius?: "round" | "square" | number;
 }
 
@@ -16,10 +17,10 @@ function Skeleton({
     width,
     height,
     radius,
-}) {
+}: Props) {
     if (disableAnimation) {
         if (radius === "square") radius = 0;
-        else if (radius === "round") radius = "50%"
+        else if (radius === "round") radius = 9999;
         
         return (
             <View

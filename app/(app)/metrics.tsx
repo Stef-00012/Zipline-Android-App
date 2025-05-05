@@ -24,8 +24,7 @@ import {
 	type StatsProps,
 } from "@/functions/zipline/stats";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Skeleton } from "moti/skeleton";
-import { colors } from "@/constants/skeleton";
+import Skeleton from "@/components/skeleton/Skeleton";
 import SkeletonTable from "@/components/skeleton/Table";
 
 export default function Metrics() {
@@ -675,14 +674,14 @@ export default function Metrics() {
 											<Text style={styles.subHeaderText}>{stat}</Text>
 
 											<View style={styles.statContainerData}>
-												<Skeleton colors={colors} height={36} width={60} />
+												<Skeleton height={36} width={60} />
 												<View style={{
 													width: 5
 												}} />
 												<View style={{
 													marginTop: 9
 												}}>
-													<Skeleton colors={colors} height={27} width={40} />
+													<Skeleton height={27} width={40} />
 												</View>
 											</View>
 										</View>
@@ -748,7 +747,7 @@ export default function Metrics() {
 
 								<View style={styles.chartContainer}>
 									<View style={styles.pieChartContainer}>
-										<Skeleton colors={colors} radius="round" width={250} height={250} />
+										<Skeleton radius="round" width={250} height={250} />
 									</View>
 
 									<View style={{
@@ -759,7 +758,7 @@ export default function Metrics() {
 											<View key={index} style={{
 												marginHorizontal: 2.5
 											}}>
-												<Skeleton colors={colors} width={60} height={16} />
+												<Skeleton width={60} height={16} />
 											</View>
 										))}
 									</View>
@@ -768,7 +767,7 @@ export default function Metrics() {
 								<View style={styles.chartContainer}>
 									<Text style={styles.chartTitle}>Count</Text>
 
-									<Skeleton colors={colors} width="100%" height={220} />
+									<Skeleton width="100%" height={220} />
 
 									<ChartLegend
 										data={[
@@ -787,7 +786,7 @@ export default function Metrics() {
 								<View style={styles.chartContainer}>
 									<Text style={styles.chartTitle}>Views</Text>
 
-									<Skeleton colors={colors} width="100%" height={220} />
+									<Skeleton width="100%" height={220} />
 
 									<ChartLegend
 										data={[
@@ -806,7 +805,7 @@ export default function Metrics() {
 								<View style={styles.chartContainer}>
 									<Text style={styles.chartTitle}>Storage Used</Text>
 
-									<Skeleton colors={colors} width="100%" height={220} />
+									<Skeleton width="100%" height={220} />
 
 									<ChartLegend
 										data={[

@@ -42,6 +42,7 @@ import {
 } from "@/functions/zipline/user";
 import ColorPicker from "@/components/ColorPicker";
 import { getVersion } from "@/functions/zipline/version";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -129,11 +130,9 @@ export default function UserSettings() {
 			const avatar = await getCurrentUserAvatar();
 			const exports = await getUserExports();
 			const zeroByteFiles = await getZeroByteFiles();
-			console.log("a")
 			const versionData = await getVersion();
-			console.log(versionData)
 
-			setUser(typeof user === "string" ? null : user);
+// 			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
 			setCurrentAvatar(avatar || undefined);
 			setExports(typeof exports === "string" ? null : exports);

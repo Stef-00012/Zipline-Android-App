@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
 import Table from "@/components/Table";
 import SkeletonTable from "@/components/skeleton/Table";
+import Skeleton from "@/components/skeleton/Skeleton";
 import type {
 	APIFile,
 	APIRecentFiles,
@@ -19,8 +20,6 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
-import { Skeleton } from "moti/skeleton";
-import { colors } from "@/constants/skeleton";
 
 // ------------------------ DEV -------------------------
 
@@ -268,7 +267,7 @@ export default function Home() {
 								}}
 							>
 								<Text style={styles.mainHeader}>Welcome back, </Text>
-								<Skeleton colors={colors} width="60%" height={36} />
+								<Skeleton width="60%" height={36} />
 							</View>
 
 							<View
@@ -287,7 +286,6 @@ export default function Home() {
 								{[1, 2, 3].map((file) => (
 									<View key={file} style={styles.recentFileContainer}>
 										<Skeleton
-											colors={colors}
 											width={200}
 											height={200}
 											radius={10}
@@ -322,7 +320,6 @@ export default function Home() {
 											}}
 										>
 											<Skeleton
-												colors={colors}
 												width={stat[1] as number}
 												height={36}
 											/>
@@ -345,6 +342,7 @@ export default function Home() {
 									rows={[...Array(4).keys()].map(() => {
 										return ["55%", 30];
 									})}
+									disableAnimations
 								/>
 							</View>
 						</ScrollView>

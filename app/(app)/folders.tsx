@@ -22,8 +22,7 @@ import {
 	getFolders,
 } from "@/functions/zipline/folders";
 import SkeletonTable from "@/components/skeleton/Table";
-import { Skeleton } from "moti/skeleton";
-import { colors } from "@/constants/skeleton";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export type FolderActions =
 	| "viewFiles"
@@ -705,7 +704,7 @@ export default function Folders() {
 												marginVertical: 5,
 												marginHorizontal: 5
 											}}>
-												<Skeleton colors={colors} width="100%" height={200} />
+												<Skeleton width="100%" height={200} />
 											</View>
 										))}
 									</ScrollView>

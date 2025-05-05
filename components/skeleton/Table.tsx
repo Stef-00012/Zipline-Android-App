@@ -78,17 +78,16 @@ export default function SkeletonTable({
 									<>
 										{disableAnimations ? (
 											<View
-											// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-											key={index}
-											style={{
-												backgroundColor: colors[1],
-												height: 14,
-												width: data,
-												borderRadius: 8
-											}}
-										/>
+    											// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+    											key={index}
+    											style={{
+    												backgroundColor: colors[1],
+    												height: 14,
+    												width: data,
+    												borderRadius: 8
+    											}}
+    										/>
 										) : (
-											
 											<Skeleton
 												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 												key={index}

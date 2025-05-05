@@ -25,8 +25,7 @@ import {
 	getURLs,
 } from "@/functions/zipline/urls";
 import SkeletonTable from "@/components/skeleton/Table";
-import { Skeleton } from "moti/skeleton";
-import { colors } from "@/constants/skeleton";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export type URLActions =
 	| "copyShortLink"
@@ -823,7 +822,7 @@ export default function Urls() {
 												marginVertical: 5,
 												marginHorizontal: 5
 											}}>
-												<Skeleton colors={colors} width="100%" height={200} />
+												<Skeleton width="100%" height={200} />
 											</View>
 										))}
 									</ScrollView>

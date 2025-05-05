@@ -345,6 +345,7 @@ export default function Home() {
 									rows={[...Array(4).keys()].map(() => {
 										return ["55%", 30];
 									})}
+									disableAnimations
 								/>
 							</View>
 						</ScrollView>

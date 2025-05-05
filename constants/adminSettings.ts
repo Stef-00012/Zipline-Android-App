@@ -5,7 +5,7 @@ import type {
 	UploadEmbed,
 } from "@/types/zipline";
 import type { SelectProps } from "@/components/Select";
-import type { KeyboardType } from "react-native";
+import type { DimensionValue, KeyboardType } from "react-native";
 
 export const defaultUploadEmbed: UploadEmbed = {
 	imageOrVideo: false,
@@ -362,6 +362,7 @@ interface Input {
 	type: "input";
 	name: string;
 	description?: string;
+	skeletonWidth: DimensionValue;
 }
 
 interface Switch {
@@ -428,6 +429,7 @@ export const settings: Array<Setting> = [
 				placeholder: "example.com",
 				description:
 					"The domain to use when generating URLs. This value should not include the protocol.",
+				skeletonWidth: "40%",
 			},
 			{
 				type: "input",
@@ -437,6 +439,7 @@ export const settings: Array<Setting> = [
 				placeholder: "/tmp/zipline",
 				description:
 					"The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.",
+				skeletonWidth: "60%",
 			},
 			{
 				type: "save",
@@ -464,6 +467,7 @@ export const settings: Array<Setting> = [
 				displayType: "bytes",
 				description:
 					"Maximum size of an upload before it is split into chunks.",
+				skeletonWidth: 50,
 			},
 			{
 				type: "input",
@@ -473,6 +477,7 @@ export const settings: Array<Setting> = [
 				placeholder: "25mb",
 				displayType: "bytes",
 				description: "Size of each chunk.",
+				skeletonWidth: 40,
 			},
 			{
 				type: "save",
@@ -494,6 +499,7 @@ export const settings: Array<Setting> = [
 				placeholder: "30m",
 				displayType: "time",
 				description: "How often to check and delete expired files.",
+				skeletonWidth: 40,
 			},
 			{
 				type: "input",
@@ -503,6 +509,7 @@ export const settings: Array<Setting> = [
 				placeholder: "30m",
 				displayType: "time",
 				description: "How often to check and clear expired/used invites.",
+				skeletonWidth: 50,
 			},
 			{
 				type: "input",
@@ -513,6 +520,7 @@ export const settings: Array<Setting> = [
 				displayType: "time",
 				description:
 					"How often to check and delete files that have reached max views.",
+				skeletonWidth: 50,
 			},
 			{
 				type: "input",
@@ -523,6 +531,7 @@ export const settings: Array<Setting> = [
 				displayType: "time",
 				description:
 					"How often to check and generate thumbnails for video files.",
+				skeletonWidth: 40,
 			},
 			// {
 			// 	type: "input",
@@ -564,6 +573,7 @@ export const settings: Array<Setting> = [
 				setting: "mfaTotpIssuer",
 				placeholder: "Zipline",
 				description: "The issuer to use for the TOTP token.",
+				skeletonWidth: "40%",
 			},
 			{
 				type: "save",
@@ -650,6 +660,7 @@ export const settings: Array<Setting> = [
 				placeholder: "Enter a number...",
 				description:
 					"Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.",
+				skeletonWidth: 30,
 			},
 			{
 				type: "save",
@@ -669,6 +680,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					"The route to use for file uploads. Requires a server restart.",
+				skeletonWidth: 45,
 			},
 			{
 				type: "input",
@@ -677,6 +689,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "numeric",
 				description:
 					"The length of the file name (for randomly generated names).",
+				skeletonWidth: 40,
 			},
 			{
 				type: "switch",
@@ -706,6 +719,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				joinString: ", ",
 				description: "Extensions to disable, separated by commas.",
+				skeletonWidth: "70%",
 			},
 			{
 				type: "input",
@@ -714,6 +728,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				displayType: "bytes",
 				description: "The maximum file size allowed.",
+				skeletonWidth: 40,
 			},
 			{
 				type: "input",
@@ -721,6 +736,7 @@ export const settings: Array<Setting> = [
 				setting: "filesDefaultExpiration",
 				keyboardType: "default",
 				description: "The default expiration time for files.",
+				skeletonWidth: 50,
 			},
 			{
 				type: "input",
@@ -728,6 +744,7 @@ export const settings: Array<Setting> = [
 				setting: "filesDefaultDateFormat",
 				keyboardType: "default",
 				description: "The default date format to use.",
+				skeletonWidth: "40%",
 			},
 			{
 				type: "input",
@@ -736,6 +753,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "numeric",
 				description:
 					"The number of adjectives to use for the random-words/gfycat format.",
+				skeletonWidth: 30,
 			},
 			{
 				type: "input",
@@ -743,6 +761,7 @@ export const settings: Array<Setting> = [
 				setting: "filesRandomWordsSeparator",
 				placeholder: "-",
 				description: "The separator to use for the random-words/gfycat format.",
+				skeletonWidth: "20%",
 			},
 			{
 				type: "save",
@@ -762,6 +781,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					"The route to use for short URLs. Requires a server restart.",
+				skeletonWidth: 40,
 			},
 			{
 				type: "input",
@@ -770,6 +790,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "numeric",
 				description:
 					"The length of the short URL (for randomly generated names).",
+				skeletonWidth: 30,
 			},
 			{
 				type: "save",
@@ -794,6 +815,7 @@ export const settings: Array<Setting> = [
 				setting: "invitesLength",
 				keyboardType: "numeric",
 				description: "The length of the invite code.",
+				skeletonWidth: 30,
 			},
 			{
 				type: "save",
@@ -826,6 +848,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "numeric",
 				description:
 					"The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.",
+				skeletonWidth: 40,
 			},
 			{
 				type: "input",
@@ -833,6 +856,7 @@ export const settings: Array<Setting> = [
 				setting: "ratelimitWindow",
 				keyboardType: "numeric",
 				description: "The window in seconds to allow the max requests.",
+				skeletonWidth: 50,
 			},
 			{
 				type: "input",
@@ -842,6 +866,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					"A comma-separated list of IP addresses to bypass the ratelimit.",
+				skeletonWidth: "70%",
 			},
 			{
 				type: "save",
@@ -861,6 +886,7 @@ export const settings: Array<Setting> = [
 				setting: "websiteTitle",
 				keyboardType: "default",
 				description: "The title of the website in browser tabs and at the top.",
+				skeletonWidth: "40%",
 			},
 			{
 				type: "input",
@@ -869,6 +895,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "url",
 				description:
 					"The URL to use for the title logo. This is placed to the left of the title.",
+				skeletonWidth: "60%",
 			},
 			{
 				type: "externalUrls",
@@ -879,6 +906,7 @@ export const settings: Array<Setting> = [
 				setting: "websiteLoginBackground",
 				keyboardType: "url",
 				description: "The URL to use for the login background.",
+				skeletonWidth: "70%",
 			},
 			{
 				type: "switch",
@@ -893,6 +921,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					"The path to use for the default avatar. This must be a path to an image, not a URL.",
+				skeletonWidth: "55%",
 			},
 			{
 				type: "input",
@@ -901,6 +930,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					"Path to a Markdown (.md) file to use for the terms of service.",
+				skeletonWidth: "40%",
 			},
 			{
 				type: "input",
@@ -908,6 +938,7 @@ export const settings: Array<Setting> = [
 				setting: "websiteThemeDefault",
 				keyboardType: "default",
 				description: "The default theme to use for the website.",
+				skeletonWidth: "35%",
 			},
 			{
 				type: "input",
@@ -916,6 +947,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					'The dark theme to use for the website when the default theme is "system".',
+				skeletonWidth: "40%",
 			},
 			{
 				type: "input",
@@ -924,6 +956,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				description:
 					'The light theme to use for the website when the default theme is "system".',
+				skeletonWidth: "35%",
 			},
 			{
 				type: "save",
@@ -962,6 +995,7 @@ export const settings: Array<Setting> = [
 						name: "Discord Client ID",
 						setting: "oauthDiscordClientId",
 						keyboardType: "default",
+						skeletonWidth: "40%",
 					},
 					{
 						type: "input",
@@ -969,6 +1003,7 @@ export const settings: Array<Setting> = [
 						setting: "oauthDiscordClientSecret",
 						keyboardType: "default",
 						passwordInput: true,
+						skeletonWidth: "80%",
 					},
 					{
 						type: "input",
@@ -977,6 +1012,7 @@ export const settings: Array<Setting> = [
 						keyboardType: "default",
 						description:
 							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
+						skeletonWidth: "70%",
 					},
 				],
 			},
@@ -990,6 +1026,7 @@ export const settings: Array<Setting> = [
 						name: "Google Client ID",
 						setting: "oauthGoogleClientId",
 						keyboardType: "default",
+						skeletonWidth: "40%",
 					},
 					{
 						type: "input",
@@ -997,6 +1034,7 @@ export const settings: Array<Setting> = [
 						setting: "oauthGoogleClientSecret",
 						keyboardType: "default",
 						passwordInput: true,
+						skeletonWidth: "80%",
 					},
 					{
 						type: "input",
@@ -1005,6 +1043,7 @@ export const settings: Array<Setting> = [
 						keyboardType: "default",
 						description:
 							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
+						skeletonWidth: "70%",
 					},
 				],
 			},
@@ -1018,6 +1057,7 @@ export const settings: Array<Setting> = [
 						name: "GitHub Client ID",
 						setting: "oauthGithubClientId",
 						keyboardType: "default",
+						skeletonWidth: "40%",
 					},
 					{
 						type: "input",
@@ -1025,6 +1065,7 @@ export const settings: Array<Setting> = [
 						setting: "oauthGithubClientSecret",
 						keyboardType: "default",
 						passwordInput: true,
+						skeletonWidth: "80%",
 					},
 					{
 						type: "input",
@@ -1033,6 +1074,7 @@ export const settings: Array<Setting> = [
 						keyboardType: "default",
 						description:
 							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
+						skeletonWidth: "70%",
 					},
 				],
 			},
@@ -1046,6 +1088,7 @@ export const settings: Array<Setting> = [
 						name: "OIDC Client ID",
 						setting: "oauthOidcClientId",
 						keyboardType: "default",
+						skeletonWidth: "40%",
 					},
 					{
 						type: "input",
@@ -1053,24 +1096,28 @@ export const settings: Array<Setting> = [
 						setting: "oauthOidcClientSecret",
 						keyboardType: "default",
 						passwordInput: true,
+						skeletonWidth: "80%",
 					},
 					{
 						type: "input",
 						name: "OIDC Authorize URL",
 						setting: "oauthOidcAuthorizeUrl",
 						keyboardType: "default",
+						skeletonWidth: "70%",
 					},
 					{
 						type: "input",
 						name: "OIDC Token URL",
 						setting: "oauthOidcTokenUrl",
 						keyboardType: "default",
+						skeletonWidth: "65%",
 					},
 					{
 						type: "input",
 						name: "OIDC Userinfo URL",
 						setting: "oauthOidcUserinfoUrl",
 						keyboardType: "default",
+						skeletonWidth: "75%",
 					},
 					{
 						type: "input",
@@ -1079,6 +1126,7 @@ export const settings: Array<Setting> = [
 						keyboardType: "default",
 						description:
 							"The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
+						skeletonWidth: "70%",
 					},
 				],
 			},
@@ -1107,6 +1155,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				placeholder: "Zipline",
 				description: "The title for the PWA",
+				skeletonWidth: "40%",
 			},
 			{
 				type: "input",
@@ -1115,6 +1164,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				placeholder: "Zipline",
 				description: "The short name for the PWA",
+				skeletonWidth: "30%",
 			},
 			{
 				type: "input",
@@ -1123,6 +1173,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				placeholder: "Zipline",
 				description: "The description for the PWA",
+				skeletonWidth: "60%",
 			},
 			{
 				type: "input",
@@ -1131,6 +1182,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				placeholder: "#000000",
 				description: "The theme color for the PWA",
+				skeletonWidth: 70,
 			},
 			{
 				type: "colorPicker",
@@ -1157,6 +1209,7 @@ export const settings: Array<Setting> = [
 				placeholder: "https://example.com/upload",
 				description:
 					"The URL to send a POST request to when a file is uploaded.",
+				skeletonWidth: "80%",
 			},
 			{
 				type: "input",
@@ -1166,6 +1219,7 @@ export const settings: Array<Setting> = [
 				placeholder: "https://example.com/shorten",
 				description:
 					"The URL to send a POST request to when a URL is shortened.",
+				skeletonWidth: "80%",
 			},
 			{
 				type: "save",
@@ -1185,6 +1239,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "url",
 				placeholder: "https://discord.com/api/webhooks/...",
 				description: "The Discord webhook URL to send notifications to",
+				skeletonWidth: "80%",
 			},
 			{
 				type: "input",
@@ -1193,6 +1248,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "default",
 				placeholder: "Zipline",
 				description: "The username to send notifications as",
+				skeletonWidth: "30%",
 			},
 			{
 				type: "input",
@@ -1201,6 +1257,7 @@ export const settings: Array<Setting> = [
 				keyboardType: "url",
 				placeholder: "https://example.com/avatar.png",
 				description: "The avatar for the webhook",
+				skeletonWidth: "60%",
 			},
 			{
 				type: "save",
@@ -1219,6 +1276,7 @@ export const settings: Array<Setting> = [
 						placeholder: "https://discord.com/api/webhooks/...",
 						description:
 							"The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used",
+						skeletonWidth: "80%",
 					},
 					{
 						type: "input",
@@ -1228,6 +1286,7 @@ export const settings: Array<Setting> = [
 						placeholder: "Zipline Uploads",
 						description:
 							"The username to send notifications as. If this is left blank, the main username will be used",
+						skeletonWidth: "30%",
 					},
 					{
 						type: "input",
@@ -1237,6 +1296,7 @@ export const settings: Array<Setting> = [
 						placeholder: "https://example.com/uploadAvatar.png",
 						description:
 							"The avatar for the webhook. If this is left blank, the main avatar will be used",
+						skeletonWidth: "60%",
 					},
 					{
 						type: "input",
@@ -1246,6 +1306,7 @@ export const settings: Array<Setting> = [
 						multiline: true,
 						description:
 							"The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out",
+						skeletonWidth: "55%",
 					},
 					{
 						type: "switch",
@@ -1267,6 +1328,7 @@ export const settings: Array<Setting> = [
 								setting: "discordOnUploadEmbed.title",
 								keyboardType: "default",
 								description: "The title of the embed",
+								skeletonWidth: "25%",
 							},
 							{
 								type: "input",
@@ -1274,6 +1336,7 @@ export const settings: Array<Setting> = [
 								setting: "discordOnUploadEmbed.description",
 								keyboardType: "default",
 								description: "The description of the embed",
+								skeletonWidth: "60%",
 							},
 							{
 								type: "input",
@@ -1281,6 +1344,7 @@ export const settings: Array<Setting> = [
 								setting: "discordOnUploadEmbed.footer",
 								keyboardType: "default",
 								description: "The footer of the embed",
+								skeletonWidth: "45%",
 							},
 							{
 								type: "colorPicker",
@@ -1335,6 +1399,7 @@ export const settings: Array<Setting> = [
 						placeholder: "https://discord.com/api/webhooks/...",
 						description:
 							"The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used",
+						skeletonWidth: "80%",
 					},
 					{
 						type: "input",
@@ -1344,6 +1409,7 @@ export const settings: Array<Setting> = [
 						placeholder: "Zipline Shortens",
 						description:
 							"The username to send notifications as. If this is left blank, the main username will be used",
+						skeletonWidth: "30%",
 					},
 					{
 						type: "input",
@@ -1353,6 +1419,7 @@ export const settings: Array<Setting> = [
 						placeholder: "https://example.com/shortenAvatar.png",
 						description:
 							"The avatar for the webhook. If this is left blank, the main avatar will be used",
+						skeletonWidth: "60%",
 					},
 					{
 						type: "input",
@@ -1362,6 +1429,7 @@ export const settings: Array<Setting> = [
 						multiline: true,
 						description:
 							"The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out",
+						skeletonWidth: "35%",
 					},
 					{
 						type: "switch",
@@ -1382,6 +1450,7 @@ export const settings: Array<Setting> = [
 								setting: "discordOnShortenEmbed.title",
 								keyboardType: "default",
 								description: "The title of the embed",
+								skeletonWidth: "30%",
 							},
 							{
 								type: "input",
@@ -1389,6 +1458,7 @@ export const settings: Array<Setting> = [
 								setting: "discordOnShortenEmbed.description",
 								keyboardType: "default",
 								description: "The description of the embed",
+								skeletonWidth: "60%",
 							},
 							{
 								type: "input",
@@ -1396,6 +1466,7 @@ export const settings: Array<Setting> = [
 								setting: "discordOnShortenEmbed.footer",
 								keyboardType: "default",
 								description: "The footer of the embed",
+								skeletonWidth: "45%",
 							},
 							{
 								type: "colorPicker",

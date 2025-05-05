@@ -24,6 +24,9 @@ import type {
 } from "@/constants/adminSettings";
 import Popup from "@/components/Popup";
 import ColorPicker from "@/components/ColorPicker";
+import SkeletonTextInput from "@/components/skeleton/TextInput";
+import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
@@ -506,7 +509,11 @@ export default function ServerSettings() {
 
 	const [newUrlError, setNewUrlError] = useState<string | null>(null);
 
-	function renderSetting(setting: Setting) {
+	useEffect(() => {
+		console.log(saveSettings);
+	}, [saveSettings]);
+
+	function renderSetting(setting: Setting, skeleton = false) {
 		switch (setting.type) {
 			case "category": {
 				return (
@@ -529,13 +536,24 @@ export default function ServerSettings() {
 						)}
 
 						{setting.children.map((childSetting) =>
-							renderSetting(childSetting),
+							renderSetting(childSetting, skeleton),
 						)}
 					</View>
 				);
 			}
 
 			case "input": {
+				if (skeleton)
+					return (
+						<SkeletonTextInput
+							key={setting.setting}
+							title={setting.name}
+							description={setting.description}
+							skeletonWidth={setting.skeletonWidth}
+							disableAnimation
+						/>
+					);
+
 				return (
 					<TextInput
 						key={setting.setting}
@@ -587,7 +605,7 @@ export default function ServerSettings() {
 						key={setting.setting}
 						data={setting.options}
 						description={setting.description}
-						disabled={saving}
+						disabled={skeleton || saving}
 						onSelect={(selectedItem) => {
 							setSaveSettings((prev) => {
 								return {
@@ -597,9 +615,13 @@ export default function ServerSettings() {
 							});
 						}}
 						placeholder={setting.placeholder}
-						defaultValue={setting.options.find(
-							(option) => option.value === setting.defaultValue,
-						)}
+						defaultValue={
+							skeleton
+								? undefined
+								: setting.options.find(
+										(option) => option.value === setting.defaultValue,
+									)
+						}
 					/>
 				);
 			}
@@ -608,7 +630,7 @@ export default function ServerSettings() {
 				return (
 					<Switch
 						key={setting.setting}
-						disabled={saving}
+						disabled={skeleton || saving}
 						description={setting.description}
 						onValueChange={() =>
 							setSaveSettings((prev) => {
@@ -618,7 +640,7 @@ export default function ServerSettings() {
 								} as SaveSettings;
 							})
 						}
-						value={!!saveSettings?.[setting.setting]}
+						value={skeleton ? false : !!saveSettings?.[setting.setting]}
 						title={setting.name}
 					/>
 				);
@@ -642,8 +664,9 @@ export default function ServerSettings() {
 							</View>
 
 							<Button
-								color="#323ea8"
-								disabled={saving}
+								color={skeleton || saving ? "#373d79" : "#323ea8"}
+								iconColor={skeleton || saving ? "gray" : "white"}
+								disabled={skeleton || saving}
 								onPress={() => {
 									setCreateNewUrl(true);
 								}}
@@ -669,81 +692,104 @@ export default function ServerSettings() {
 								showsVerticalScrollIndicator={false}
 								nestedScrollEnabled
 							>
-								{(
-									JSON.parse(
-										saveSettings?.websiteExternalLinks || "[]",
-									) as Array<ExternalLink>
-								).map((url, index) => (
-									<ExternalUrl
-										externalUrl={url}
-										key={`${url.url}-${index}`}
-										id={index}
-										disabled={saving}
-										onChange={(type, id) => {
-											switch (type) {
-												case "delete": {
-													const newUrls: Array<ExternalLink> = JSON.parse(
+								{skeleton ? (
+									<>
+										{[...Array(2).keys()].map((index) => (
+											<View
+												key={index}
+												style={{
+													marginVertical: 5,
+												}}
+											>
+												<Skeleton width="100%" height={100} />
+											</View>
+										))}
+									</>
+								) : (
+									<>
+										{(
+											JSON.parse(
+												saveSettings?.websiteExternalLinks || "[]",
+											) as Array<ExternalLink>
+										).map((url, index) => (
+											<ExternalUrl
+												externalUrl={url}
+												key={`${url.url}-${index}`}
+												id={index}
+												disabled={saving}
+												onChange={(type, id) => {
+													switch (type) {
+														case "delete": {
+															const newUrls: Array<ExternalLink> = JSON.parse(
+																saveSettings?.websiteExternalLinks || "[]",
+															);
+
+															const name = newUrls[id].name;
+
+															newUrls.splice(id, 1);
+
+															setSaveSettings((prev) => {
+																if (!prev) return prev;
+
+																return {
+																	...prev,
+																	websiteExternalLinks: JSON.stringify(newUrls),
+																};
+															});
+
+															return ToastAndroid.show(
+																`Deleted the external URL ${name}`,
+																ToastAndroid.SHORT,
+															);
+														}
+
+														case "edit": {
+															const urls: Array<ExternalLink> = JSON.parse(
+																saveSettings?.websiteExternalLinks || "[]",
+															);
+
+															setEditUrlIndex(id);
+															setEditUrlName(urls[id].name);
+															setEditUrlURL(urls[id].url);
+														}
+													}
+												}}
+												onMove={(type, id) => {
+													const urls: Array<ExternalLink> = JSON.parse(
 														saveSettings?.websiteExternalLinks || "[]",
 													);
 
-													const name = newUrls[id].name;
+													switch (type) {
+														case "down": {
+															[urls[id], urls[id + 1]] = [
+																urls[id + 1],
+																urls[id],
+															];
 
-													newUrls.splice(id, 1);
+															break;
+														}
+
+														case "up": {
+															[urls[id], urls[id - 1]] = [
+																urls[id - 1],
+																urls[id],
+															];
+														}
+													}
 
 													setSaveSettings((prev) => {
 														if (!prev) return prev;
 
 														return {
 															...prev,
-															websiteExternalLinks: JSON.stringify(newUrls),
+															websiteExternalLinks: JSON.stringify(urls),
 														};
 													});
-
-													return ToastAndroid.show(
-														`Deleted the external URL ${name}`,
-														ToastAndroid.SHORT,
-													);
-												}
-
-												case "edit": {
-													const urls: Array<ExternalLink> = JSON.parse(
-														saveSettings?.websiteExternalLinks || "[]",
-													);
-
-													setEditUrlIndex(id);
-													setEditUrlName(urls[id].name);
-													setEditUrlURL(urls[id].url);
-												}
-											}
-										}}
-										onMove={(type, id) => {
-											const urls: Array<ExternalLink> = JSON.parse(
-												saveSettings?.websiteExternalLinks || "[]",
-											);
-
-											switch (type) {
-												case "down": {
-													[urls[id], urls[id + 1]] = [urls[id + 1], urls[id]];
-
-													break;
-												}
-
-												case "up": {
-													[urls[id], urls[id - 1]] = [urls[id - 1], urls[id]];
-												}
-											}
-
-											setSaveSettings((prev) => {
-												if (!prev) return prev;
-
-												return {
-													...prev,
-													websiteExternalLinks: JSON.stringify(urls),
-												};
-											});
-										}}
-									/>
-								))}
+												}}
+											/>
+										))}
+									</>
+								)}
 							</ScrollView>
 						</View>
 					</>
@@ -751,6 +797,14 @@ export default function ServerSettings() {
 			}
 
 			case "colorPicker": {
+				if (skeleton)
+					return (
+						<SkeletonColorPicker
+							title={setting.name}
+							description={setting.description}
+						/>
+					);
+
 				return (
 					<ColorPicker
 						title={setting.name}
@@ -773,11 +827,11 @@ export default function ServerSettings() {
 				return (
 					<Button
 						key={setting.category}
-						disabled={saving}
+						disabled={skeleton || saving}
 						onPress={() => handleSave(setting.category)}
-						color={saving ? "#373d79" : "#323ea8"}
-						textColor={saving ? "gray" : "white"}
-						iconColor={saving ? "gray" : "white"}
+						color={skeleton || saving ? "#373d79" : "#323ea8"}
+						textColor={skeleton || saving ? "gray" : "white"}
+						iconColor={skeleton || saving ? "gray" : "white"}
 						text="Save"
 						icon="save"
 						margin={{
@@ -1056,11 +1110,14 @@ export default function ServerSettings() {
 					<View style={styles.settingsContainer}>
 						<KeyboardAwareScrollView style={styles.scrollView}>
 							{zlSettings.map((setting) => renderSetting(setting))}
+							<View />
 						</KeyboardAwareScrollView>
 					</View>
 				) : (
-					<View style={styles.loadingContainer}>
-						<Text style={styles.loadingText}>Loading...</Text>
+					<View style={styles.settingsContainer}>
+						<KeyboardAwareScrollView style={styles.scrollView}>
+							{zlSettings.map((setting) => renderSetting(setting, true))}
+						</KeyboardAwareScrollView>
 					</View>
 				)}
 			</View>

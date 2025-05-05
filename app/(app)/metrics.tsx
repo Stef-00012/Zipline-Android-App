@@ -675,12 +675,16 @@ export default function Metrics() {
 
 											<View style={styles.statContainerData}>
 												<Skeleton height={36} width={60} />
-												<View style={{
-													width: 5
-												}} />
-												<View style={{
-													marginTop: 9
-												}}>
+												<View
+													style={{
+														width: 5,
+													}}
+												/>
+												<View
+													style={{
+														marginTop: 9,
+													}}
+												>
 													<Skeleton height={27} width={40} />
 												</View>
 											</View>
@@ -697,11 +701,7 @@ export default function Metrics() {
 											}}
 										>
 											<SkeletonTable
-												headerRow={[
-													"User",
-													"URLs",
-													"Views",
-												]}
+												headerRow={["User", "URLs", "Views"]}
 												rowWidth={[190, 100, 100]}
 												rows={[[80, 50]]}
 											/>
@@ -714,12 +714,7 @@ export default function Metrics() {
 											}}
 										>
 											<SkeletonTable
-												headerRow={[
-													"User",
-													"Files",
-													"Storage Used",
-													"Views",
-												]}
+												headerRow={["User", "Files", "Storage Used", "Views"]}
 												rowWidth={[150, 60, 130, 50]}
 												rows={[[70, 50, 100, 50]]}
 											/>
@@ -732,10 +727,7 @@ export default function Metrics() {
 											}}
 										>
 											<SkeletonTable
-												headerRow={[
-													"Type",
-													"Files",
-												]}
+												headerRow={["Type", "Files"]}
 												rowWidth={[tableTypeWidth, tableFilesWidth]}
 												rows={[...Array(4).keys()].map(() => {
 													return ["55%", 30];
@@ -750,14 +742,19 @@ export default function Metrics() {
 										<Skeleton radius="round" width={250} height={250} />
 									</View>
 
-									<View style={{
-										flexDirection: "row",
-										marginTop: 10
-									}}>
+									<View
+										style={{
+											flexDirection: "row",
+											marginTop: 10,
+										}}
+									>
 										{[...Array(5).keys()].map((index) => (
-											<View key={index} style={{
-												marginHorizontal: 2.5
-											}}>
+											<View
+												key={index}
+												style={{
+													marginHorizontal: 2.5,
+												}}
+											>
 												<Skeleton width={60} height={16} />
 											</View>
 										))}

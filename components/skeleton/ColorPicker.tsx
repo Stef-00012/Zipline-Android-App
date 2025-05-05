@@ -12,7 +12,6 @@ export default function SkeletonColorPicker({
 	description,
 	title,
 }: CustomColorPickerProps) {
-
 	return (
 		<>
 			{title && (

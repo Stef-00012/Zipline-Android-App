@@ -131,14 +131,14 @@ export default function Login() {
 								);
 
 							const versionData = await getVersion();
-							
+
 							if (
 								typeof versionData === "string" ||
 								semver.lt(versionData.version, "4.0.0")
 							) {
 								await db.del("url");
 								await db.del("token");
-				
+
 								return setError("You must use Zipline v4.0.0 or greater");
 							}
 
@@ -167,14 +167,14 @@ export default function Login() {
 						db.set("token", token);
 
 						const versionData = await getVersion();
-							console.log(versionData, token)
+
 						if (
 							typeof versionData === "string" ||
 							semver.lt(versionData.version, "4.0.0")
 						) {
 							await db.del("url");
 							await db.del("token");
-			
+
 							return setError("You must use Zipline v4.0.0 or greater");
 						}
 

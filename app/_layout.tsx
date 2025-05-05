@@ -9,7 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Header from "@/components/Header";
-import { Host } from 'react-native-portalize';
+import { Host } from "react-native-portalize";
 
 export default function Layout() {
 	const router = useRouter();

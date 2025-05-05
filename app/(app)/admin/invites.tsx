@@ -20,6 +20,8 @@ import {
 	deleteInvite,
 	getInvites,
 } from "@/functions/zipline/invites";
+import SkeletonTable from "@/components/skeleton/Table";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export type InviteActions = "copy" | "delete";
 
@@ -32,7 +34,9 @@ export default function Invites() {
 	const [showSearch, setShowSearch] = useState<boolean>(false);
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
-	const [searchKey, setSearchKey] = useState<"code" | "inviter" | "maxUses" | "uses" | "id">("code");
+	const [searchKey, setSearchKey] = useState<
+		"code" | "inviter" | "maxUses" | "uses" | "id"
+	>("code");
 
 	const [invites, setInvites] = useState<APIInvites | null>(null);
 
@@ -275,7 +279,11 @@ export default function Invites() {
 						<TextInput
 							placeholder="Search..."
 							defaultValue={searchPlaceholder}
-							keyboardType={(searchKey === "maxUses" || searchKey === "uses") ? "numeric" : "default"}
+							keyboardType={
+								searchKey === "maxUses" || searchKey === "uses"
+									? "numeric"
+									: "default"
+							}
 							onValueChange={(text) => setSearchPlaceholder(text)}
 							onSubmitEditing={(event) => {
 								const searchText = event.nativeEvent.text;
@@ -299,13 +307,13 @@ export default function Invites() {
 												row: "Code",
 												id: "code",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Created By",
 												id: "inviter",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Created",
@@ -326,19 +334,19 @@ export default function Invites() {
 												row: "Max Uses",
 												id: "maxUses",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Uses",
 												id: "uses",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "ID",
 												id: "id",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Actions",
@@ -363,7 +371,8 @@ export default function Invites() {
 														? folder[searchKey].username
 														: folder[searchKey];
 
-												if (searchKey === "maxUses" && !filterKey) filterKey = "0"
+												if (searchKey === "maxUses" && !filterKey)
+													filterKey = "0";
 
 												return String(filterKey)
 													.toLowerCase()
@@ -466,7 +475,7 @@ export default function Invites() {
 														{invite.maxUses || "Unlimited"}
 													</Text>
 												);
-												
+
 												const id = (
 													<Text key={invite.id} style={styles.rowText}>
 														{invite.id}
@@ -528,9 +537,43 @@ export default function Invites() {
 								)}
 							</>
 						) : (
-							<View style={styles.loadingContainer}>
-								<Text style={styles.loadingText}>Loading...</Text>
-							</View>
+							<>
+								{compactModeEnabled ? (
+									<SkeletonTable
+										headerRow={[
+											"Code",
+											"Created By",
+											"Created",
+											"Last Updated",
+											"Expires",
+											"Max Uses",
+											"Uses",
+											"ID",
+											"Actions",
+										]}
+										rowWidth={[100, 140, 130, 140, 130, 130, 100, 220, 90]}
+										rows={[...Array(12).keys()].map(() => {
+											return [60, 50, 70, 70, 70, 40, 40, 180, 60];
+										})}
+										rowHeight={55}
+										disableAnimations
+									/>
+								) : (
+									<ScrollView showsVerticalScrollIndicator={false}>
+										{[...Array(4).keys()].map((index) => (
+											<View
+												key={index}
+												style={{
+													marginVertical: 5,
+													marginHorizontal: 5,
+												}}
+											>
+												<Skeleton width="100%" height={200} />
+											</View>
+										))}
+									</ScrollView>
+								)}
+							</>
 						)}
 					</View>
 				</View>

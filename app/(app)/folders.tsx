@@ -699,11 +699,14 @@ export default function Folders() {
 									/>
 								) : (
 									<ScrollView showsVerticalScrollIndicator={false}>
-										{[...Array(4).keys()].map(index => (
-											<View key={index} style={{
-												marginVertical: 5,
-												marginHorizontal: 5
-											}}>
+										{[...Array(4).keys()].map((index) => (
+											<View
+												key={index}
+												style={{
+													marginVertical: 5,
+													marginHorizontal: 5,
+												}}
+											>
 												<Skeleton width="100%" height={200} />
 											</View>
 										))}

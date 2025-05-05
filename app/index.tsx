@@ -54,7 +54,7 @@ export default function Home() {
 	// 		// db.del("url")
 	// 		// db.del("token")
 
-	// 		// router.replace("/test");
+	// 		// router.replace("/admin/settings");
 	// 	}
 	// });
 
@@ -285,11 +285,7 @@ export default function Home() {
 							<ScrollView horizontal style={styles.scrollView}>
 								{[1, 2, 3].map((file) => (
 									<View key={file} style={styles.recentFileContainer}>
-										<Skeleton
-											width={200}
-											height={200}
-											radius={10}
-										/>
+										<Skeleton width={200} height={200} radius={10} />
 									</View>
 								))}
 							</ScrollView>
@@ -319,10 +315,7 @@ export default function Home() {
 												marginTop: 5,
 											}}
 										>
-											<Skeleton
-												width={stat[1] as number}
-												height={36}
-											/>
+											<Skeleton width={stat[1] as number} height={36} />
 										</View>
 									</View>
 								))}

@@ -1274,10 +1274,7 @@ export default function UserSettings() {
 									skeletonWidth="80%"
 								/>
 
-								<SkeletonTextInput
-									title="Username:"
-									skeletonWidth={50}
-								/>
+								<SkeletonTextInput title="Username:" skeletonWidth={50} />
 
 								<SkeletonTextInput
 									title="Password:"
@@ -1383,10 +1380,7 @@ export default function UserSettings() {
 									onValueChange={() => {}}
 								/>
 
-								<SkeletonTextInput
-									title="Embed Title:"
-									skeletonWidth="30%"
-								/>
+								<SkeletonTextInput title="Embed Title:" skeletonWidth="30%" />
 
 								<SkeletonTextInput
 									title="Embed Description:"
@@ -1399,9 +1393,7 @@ export default function UserSettings() {
 								/>
 
 								{/* --remember TO DO */}
-								<SkeletonColorPicker
-									title="Embed Color"
-								/>
+								<SkeletonColorPicker title="Embed Color" />
 								{/* TO DO */}
 
 								<Button
@@ -1435,16 +1427,10 @@ export default function UserSettings() {
 
 								<View style={styles.exportsContainer}>
 									<SkeletonTable
-										headerRow={[
-											"ID",
-											"Started On",
-											"Files",
-											"Size",
-											"Actions",
-										]}
+										headerRow={["ID", "Started On", "Files", "Size", "Actions"]}
 										rowWidth={[230, 130, 60, 90, 90]}
 										rows={[...Array(4).keys()].map(() => {
-											return [170, 80, 30, 50, 70]
+											return [170, 80, 30, 50, 70];
 										})}
 										disableAnimations
 									/>

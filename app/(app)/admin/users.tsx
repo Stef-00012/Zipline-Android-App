@@ -30,6 +30,8 @@ import type {
 	APIUsersNoIncl,
 	DashURL,
 } from "@/types/zipline";
+import SkeletonTable from "@/components/skeleton/Table";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export type UserActions = "viewFiles" | "edit" | "delete";
 
@@ -801,7 +803,7 @@ export default function Users() {
 												row: "Username",
 												id: "username",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Role",
@@ -822,7 +824,7 @@ export default function Users() {
 												row: "ID",
 												id: "id",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Actions",
@@ -926,7 +928,7 @@ export default function Users() {
 														)}
 													</Text>
 												);
-												
+
 												const id = (
 													<Text key={user.id} style={styles.rowText}>
 														{user.id}
@@ -998,9 +1000,41 @@ export default function Users() {
 								)}
 							</>
 						) : (
-							<View style={styles.loadingContainer}>
-								<Text style={styles.loadingText}>Loading...</Text>
-							</View>
+							<>
+								{compactModeEnabled ? (
+									<SkeletonTable
+										headerRow={[
+											"Avatar",
+											"Username",
+											"Role",
+											"Created",
+											"Last Updated",
+											"ID",
+											"Actions",
+										]}
+										rowWidth={[80, 140, 100, 130, 140, 220, 130]}
+										rows={[...Array(12).keys()].map(() => {
+											return [50, 60, 50, 80, 80, 180, 100];
+										})}
+										rowHeight={55}
+										disableAnimations
+									/>
+								) : (
+									<ScrollView showsVerticalScrollIndicator={false}>
+										{[...Array(4).keys()].map((index) => (
+											<View
+												key={index}
+												style={{
+													marginVertical: 5,
+													marginHorizontal: 5,
+												}}
+											>
+												<Skeleton width="100%" height={200} />
+											</View>
+										))}
+									</ScrollView>
+								)}
+							</>
 						)}
 					</View>
 				</View>

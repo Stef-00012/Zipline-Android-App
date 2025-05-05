@@ -112,9 +112,22 @@ export default function Urls() {
 	}, [searchTerm]);
 
 	async function fetchURls(force = false) {
-		if (!force && searchKey && searchKey !== "vanity" && searchKey !== "destination") return;
-		if (force && searchKey && searchKey !== "code" && searchKey !== "vanity" && searchKey !== "destination") setSearchKey(undefined)
-		
+		if (
+			!force &&
+			searchKey &&
+			searchKey !== "vanity" &&
+			searchKey !== "destination"
+		)
+			return;
+		if (
+			force &&
+			searchKey &&
+			searchKey !== "code" &&
+			searchKey !== "vanity" &&
+			searchKey !== "destination"
+		)
+			setSearchKey(undefined);
+
 		const urls = await getURLs({
 			searchField: searchKey as "code" | "vanity" | "destination",
 			searchQuery: searchTerm,
@@ -303,7 +316,7 @@ export default function Urls() {
 								setNewUrlPassword(null);
 								setNewUrlEnabled(true);
 
-								await fetchURls(true)
+								await fetchURls(true);
 
 								setCreateNewUrl(false);
 
@@ -561,13 +574,13 @@ export default function Urls() {
 												row: "Views",
 												id: "views",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Max Views",
 												id: "maxViews",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Created",
@@ -583,7 +596,7 @@ export default function Urls() {
 												row: "ID",
 												id: "id",
 												sortable: true,
-												searchable: true
+												searchable: true,
 											},
 											{
 												row: "Actions",
@@ -604,10 +617,11 @@ export default function Urls() {
 										rows={urls
 											.filter((invite) => {
 												if (!searchKey) return invite;
-												
+
 												let filterKey = invite[searchKey];
 
-												if (searchKey === "maxViews" && !filterKey) filterKey = "0"
+												if (searchKey === "maxViews" && !filterKey)
+													filterKey = "0";
 
 												return String(filterKey)
 													.toLowerCase()
@@ -817,11 +831,14 @@ export default function Urls() {
 									/>
 								) : (
 									<ScrollView showsVerticalScrollIndicator={false}>
-										{[...Array(4).keys()].map(index => (
-											<View key={index} style={{
-												marginVertical: 5,
-												marginHorizontal: 5
-											}}>
+										{[...Array(4).keys()].map((index) => (
+											<View
+												key={index}
+												style={{
+													marginVertical: 5,
+													marginHorizontal: 5,
+												}}
+											>
 												<Skeleton width="100%" height={200} />
 											</View>
 										))}

@@ -41,3 +41,4 @@ This will create an apk but won't automatically install
     - Folders
     - Files
     - URLs
+    - User Settings

@@ -811,7 +811,7 @@ export default function Urls() {
 										]}
 										rowWidth={[100, 120, 300, 110, 140, 130, 100, 220, 130]}
 										rows={[...Array(12).keys()].map(() => {
-											return [60, 50,  200,  30,  30,  70,  40, 180, 90];
+											return [60, 50, 200, 30, 30, 70, 40, 180, 90];
 										})}
 										rowHeight={55}
 										disableAnimations

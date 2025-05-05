@@ -132,7 +132,7 @@ export default function UserSettings() {
 			const zeroByteFiles = await getZeroByteFiles();
 			const versionData = await getVersion();
 
-// 			setUser(typeof user === "string" ? null : user);
+			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
 			setCurrentAvatar(avatar || undefined);
 			setExports(typeof exports === "string" ? null : exports);

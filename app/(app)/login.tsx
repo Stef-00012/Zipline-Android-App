@@ -132,9 +132,16 @@ export default function Login() {
 
 							const versionData = await getVersion();
 
+							const serverVersion =
+								typeof versionData === "string"
+									? "0.0.0"
+									: "version" in versionData
+										? versionData.version
+										: versionData.details?.version;
+
 							if (
-								typeof versionData === "string" ||
-								semver.lt(versionData.version, "4.0.0")
+								typeof serverVersion === "string" ||
+								semver.lt(serverVersion, "4.0.0")
 							) {
 								await db.del("url");
 								await db.del("token");
@@ -168,9 +175,16 @@ export default function Login() {
 
 						const versionData = await getVersion();
 
+						const serverVersion =
+							typeof versionData === "string"
+								? "0.0.0"
+								: "version" in versionData
+									? versionData.version
+									: versionData.details?.version;
+
 						if (
-							typeof versionData === "string" ||
-							semver.lt(versionData.version, "4.0.0")
+							typeof serverVersion === "string" ||
+							semver.lt(serverVersion, "4.0.0")
 						) {
 							await db.del("url");
 							await db.del("token");

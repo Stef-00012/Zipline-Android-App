@@ -135,6 +135,13 @@ export default function UserSettings() {
 			const zeroByteFiles = await getZeroByteFiles();
 			const versionData = await getVersion();
 
+			const serverVersion =
+				typeof versionData === "string"
+					? null
+					: "version" in versionData
+						? versionData.version
+						: versionData.details?.version;
+
 			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
 			setCurrentAvatar(avatar || undefined);
@@ -142,9 +149,7 @@ export default function UserSettings() {
 			setZeroByteFiles(
 				typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length,
 			);
-			setZiplineVersion(
-				typeof versionData === "string" ? null : versionData.version,
-			);
+			setZiplineVersion(serverVersion);
 		})();
 	}, []);
 

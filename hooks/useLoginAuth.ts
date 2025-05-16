@@ -23,10 +23,14 @@ export const useLoginAuth = () => {
 
 		const versionData = await getVersion();
 
-		if (
-			typeof versionData === "string" ||
-			semver.lt(versionData.version, "4.0.0")
-		)
+		const serverVersion =
+			typeof versionData === "string"
+				? "0.0.0"
+				: "version" in versionData
+					? versionData.version
+					: versionData.details?.version;
+
+		if (typeof versionData === "string" || semver.lt(serverVersion, "4.0.0"))
 			return;
 
 		router.replace("/");

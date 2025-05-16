@@ -37,15 +37,17 @@ export async function getVersion(): Promise<APIVersion | string> {
 				},
 			});
 
-			if (res.status !== 404) return {
-				version: "4.0.0"
-			}
+			if (res.status !== 404)
+				return {
+					version: "4.0.0",
+				};
 		} catch (e) {
 			const error = e as AxiosError;
 
-			if (error.status !== 404) return {
-				version: "4.0.0"
-			}
+			if (error.status !== 404)
+				return {
+					version: "4.0.0",
+				};
 		}
 
 		// end: temp fix for non-admins

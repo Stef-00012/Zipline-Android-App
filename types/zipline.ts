@@ -440,6 +440,44 @@ export interface Preset {
 	name: string;
 }
 
-export interface APIVersion {
+export type APIVersion = OldV4APIVersion | NewV4APIVersion;
+
+export interface OldV4APIVersion {
 	version: string;
+}
+
+export interface NewV4APIVersion {
+	data: APIVersionData;
+	details: APIVersionDetails;
+}
+
+interface APIVersionDetails {
+	version: string;
+	sha: string;
+}
+
+interface APIVersionData {
+	latest: APIVersionDataLatest;
+	isUpstream: boolean;
+	isRelease: boolean;
+	isLatest: false;
+	version: APIVersionDataVersion;
+}
+
+interface APIVersionDataLatest {
+	tag: string;
+	url: string;
+	commit: APIVersionDataLatestCommit;
+}
+
+interface APIVersionDataLatestCommit {
+	sha: string;
+	url: string;
+	pull: boolean;
+}
+
+interface APIVersionDataVersion {
+	tag: string;
+	sha: string;
+	url: string;
 }

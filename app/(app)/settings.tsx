@@ -1,5 +1,5 @@
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import type { APIExports, APISelfUser, DashURL } from "@/types/zipline";
+import type { APIExports, APISelfUser, APIVersion, DashURL } from "@/types/zipline";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { convertToBytes, getFileDataURI } from "@/functions/util";
 import { getTokenWithToken } from "@/functions/zipline/auth";
@@ -46,6 +46,7 @@ import Skeleton from "@/components/skeleton/Skeleton";
 import SkeletonTextInput from "@/components/skeleton/TextInput";
 import SkeletonTable from "@/components/skeleton/Table";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
+import VersionDisplay from "@/components/VersionDisplay";
 
 export default function UserSettings() {
 	const router = useRouter();
@@ -122,7 +123,7 @@ export default function UserSettings() {
 	const [generateThumbnailsRerun, setGenerateThumbnailsRerun] =
 		useState<boolean>(false);
 
-	const [ziplineVersion, setZiplineVersion] = useState<string | null>(null);
+	const [ziplineVersion, setZiplineVersion] = useState<APIVersion | null>(null);
 
 	const url = db.get("url") as DashURL;
 
@@ -135,13 +136,6 @@ export default function UserSettings() {
 			const zeroByteFiles = await getZeroByteFiles();
 			const versionData = await getVersion();
 
-			const serverVersion =
-				typeof versionData === "string"
-					? null
-					: "version" in versionData
-						? versionData.version
-						: versionData.details?.version;
-
 			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
 			setCurrentAvatar(avatar || undefined);
@@ -149,7 +143,7 @@ export default function UserSettings() {
 			setZeroByteFiles(
 				typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length,
 			);
-			setZiplineVersion(serverVersion);
+			setZiplineVersion(typeof versionData === "string" ? null : versionData);
 		})();
 	}, []);
 
@@ -1104,9 +1098,12 @@ export default function UserSettings() {
 								</Text>
 
 								{ziplineVersion && (
-									<Text style={styles.subHeaderText}>
-										Zipline Version: {ziplineVersion}
-									</Text>
+									<View
+									style={styles.versionContainer}
+								>
+									<Text style={styles.subHeaderText}>Zipline Version: </Text>
+									<VersionDisplay versionData={ziplineVersion} userRole={user.role} />
+								</View>
 								)}
 
 								<Switch

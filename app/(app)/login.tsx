@@ -179,9 +179,7 @@ export default function Login() {
 								? "0.0.0"
 								: "version" in versionData
 									? versionData.version
-									: versionData.details?.version;
-
-						console.log(serverVersion)
+									: versionData.details.version;
 
 						if (
 							semver.lt(serverVersion, "4.0.0")

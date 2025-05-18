@@ -1,7 +1,7 @@
 import type { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "@/styles/components/textInput";
 import Button from "@/components/Button";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import {
 	type TextInputSubmitEditingEventData,
 	type TextInputChangeEventData,
@@ -19,7 +19,7 @@ interface Props {
 	value?: string;
 	defaultValue?: string;
 	title?: string;
-	description?: string;
+	description?: string | ReactNode;
 	id?: string;
 	onPasswordToggle?: (
 		visibile: boolean,

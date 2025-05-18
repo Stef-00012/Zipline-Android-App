@@ -12,7 +12,7 @@ import type { APISettings, ExternalLink } from "@/types/zipline";
 import ExternalUrl from "@/components/ExternalUrl";
 import { styles } from "@/styles/admin/settings";
 import TextInput from "@/components/TextInput";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import Select from "@/components/Select";
 import Switch from "@/components/Switch";
@@ -27,8 +27,11 @@ import ColorPicker from "@/components/ColorPicker";
 import SkeletonTextInput from "@/components/skeleton/TextInput";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import Skeleton from "@/components/skeleton/Skeleton";
+import { parseMarkdownLinks } from "@/functions/componentUtil";
 
-const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
+// const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
+const urlRegex = /http(s)?:\/\/(.+)\.(.+)/;
+const hyperlinkRegex = /\[(?<text>[^\]]+)\]\((?<url>http(s)?:\/\/[^\)]+\.[^\)]+)\)/gmi;
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");
@@ -102,6 +105,8 @@ export default function ServerSettings() {
 				featuresThumbnailsEnabled: settings.featuresThumbnailsEnabled,
 				featuresThumbnailsNumberThreads:
 					settings.featuresThumbnailsNumberThreads,
+				featuresVersionChecking: settings.featuresVersionChecking,
+				featuresVersionAPI: settings.featuresVersionAPI,
 
 				filesRoute: settings.filesRoute,
 				filesLength: settings.filesLength,
@@ -289,6 +294,8 @@ export default function ServerSettings() {
 					featuresMetricsAdminOnly: saveSettings.featuresMetricsAdminOnly,
 					featuresMetricsShowUserSpecific:
 						saveSettings.featuresMetricsShowUserSpecific,
+					featuresVersionAPI: saveSettings.featuresVersionAPI,
+					featuresVersionChecking: saveSettings.featuresVersionChecking
 				};
 
 				break;
@@ -514,6 +521,13 @@ export default function ServerSettings() {
 	}, [saveSettings]);
 
 	function renderSetting(setting: Setting, skeleton = false) {
+		let description: ReactNode;
+
+		if ((setting.type !== "category" && setting.type !== "externalUrls" && setting.type !== "save") && typeof setting.description === "string")
+			description = <Text>{parseMarkdownLinks(setting.description, {
+				color: "#575db5"
+			})}</Text>
+
 		switch (setting.type) {
 			case "category": {
 				return (
@@ -548,7 +562,7 @@ export default function ServerSettings() {
 						<SkeletonTextInput
 							key={setting.setting}
 							title={setting.name}
-							description={setting.description}
+							description={description}
 							skeletonWidth={setting.skeletonWidth}
 							disableAnimation
 						/>
@@ -558,7 +572,7 @@ export default function ServerSettings() {
 					<TextInput
 						key={setting.setting}
 						title={setting.name}
-						description={setting.description}
+						description={description}
 						password={setting.passwordInput}
 						disabled={saving}
 						keyboardType={setting.keyboardType}

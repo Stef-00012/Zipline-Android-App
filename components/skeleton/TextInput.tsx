@@ -3,10 +3,11 @@ import { styles } from "@/styles/components/textInput";
 import Button from "@/components/Button";
 import { type ColorValue, View, Text, type DimensionValue } from "react-native";
 import Skeleton from "@/components/skeleton/Skeleton";
+import type { ReactNode } from "react";
 
 interface Props {
 	title?: string;
-	description?: string;
+	description?: string | ReactNode;
 	sideButtonColor?: ColorValue;
 	sideButtonIconColor?: ColorValue;
 	sideButtonIcon?: keyof typeof MaterialIcons.glyphMap;

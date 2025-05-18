@@ -57,6 +57,8 @@ export const settingNames: Partial<Record<SettingPath, string>> = {
 	featuresMetricsShowUserSpecific: "Show User Specific Metrics",
 	featuresThumbnailsEnabled: "Enable Thumbnails",
 	featuresThumbnailsNumberThreads: "Thumbnails Number Threads",
+	featuresVersionChecking: "Version Checking",
+	featuresVersionAPI: "Version API URL",
 
 	filesRoute: "Route",
 	filesLength: "Length",
@@ -186,6 +188,8 @@ export interface SaveSettings {
 	featuresMetricsShowUserSpecific: boolean;
 	featuresThumbnailsEnabled: boolean;
 	featuresThumbnailsNumberThreads: number;
+	featuresVersionChecking: boolean,
+	featuresVersionAPI: string,
 
 	filesRoute: string;
 	filesLength: number;
@@ -661,6 +665,22 @@ export const settings: Array<Setting> = [
 				description:
 					"Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.",
 				skeletonWidth: 30,
+			},
+			{
+				type: "switch",
+				name: "Version Checking",
+				setting: "featuresVersionChecking",
+				description: "Enable version checking for the server. This will check for updates and display the status on the sidebar to all users.",
+			},
+			{
+				type: "input",
+				name: "Version API URL",
+				setting: "featuresVersionAPI",
+				keyboardType: "url",
+				placeholder: "https://zipline-version.diced.sh",
+				description:
+					"The URL of the version checking server. The default is [https://zipline-version.diced.sh](https://zipline-version.diced.sh). Visit the [GitHub](https://github.com/diced/zipline-version-worker) to host your own version checking server.",
+				skeletonWidth: "65%",
 			},
 			{
 				type: "save",

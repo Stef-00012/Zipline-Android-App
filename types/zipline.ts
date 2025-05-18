@@ -204,6 +204,8 @@ export interface APISettings {
 	featuresMetricsEnabled: boolean;
 	featuresMetricsAdminOnly: boolean;
 	featuresMetricsShowUserSpecific: boolean;
+	featuresVersionChecking: boolean,
+	featuresVersionAPI: string,
 	invitesEnabled: boolean;
 	invitesLength: number;
 	websiteTitle: string;

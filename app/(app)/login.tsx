@@ -140,7 +140,6 @@ export default function Login() {
 										: versionData.details?.version;
 
 							if (
-								typeof serverVersion === "string" ||
 								semver.lt(serverVersion, "4.0.0")
 							) {
 								await db.del("url");
@@ -182,8 +181,9 @@ export default function Login() {
 									? versionData.version
 									: versionData.details?.version;
 
+						console.log(serverVersion)
+
 						if (
-							typeof serverVersion === "string" ||
 							semver.lt(serverVersion, "4.0.0")
 						) {
 							await db.del("url");

@@ -839,6 +839,7 @@ export default function ServerSettings() {
 							text="Add a Domain"
 							icon="add"
 							iconColor={skeleton || saving ? "gray" : "white"}
+							textColor={skeleton || saving ? "gray" : "white"}
 							disabled={skeleton || saving || settings?.tampered.includes("domains")}
 							margin={{
 								left: 10,
@@ -866,15 +867,7 @@ export default function ServerSettings() {
 									showsVerticalScrollIndicator={false}
 									nestedScrollEnabled
 								>
-									{skeleton ? (
-										<View
-											style={{
-												marginVertical: 5,
-											}}
-										>
-											<Skeleton width="100%" height={100} />
-										</View>
-									) : (
+									{!skeleton && (
 										// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 										<>
 											{(
@@ -967,10 +960,6 @@ export default function ServerSettings() {
 			}
 		}
 	}
-
-	useEffect(() => {
-		console.log(saveError, !saveError || saveError.length <= 0);
-	}, [saveError]);
 
 	return (
 		<View style={styles.mainContainer}>

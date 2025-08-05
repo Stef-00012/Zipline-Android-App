@@ -7,7 +7,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { settings as zlSettings } from "@/constants/adminSettings";
 import { convertToBytes, convertToTime } from "@/functions/util";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import { View, Text, ToastAndroid, ScrollView } from "react-native";
+import { View, Text, ToastAndroid, ScrollView, Pressable } from "react-native";
 import type { APISettings, ExternalLink } from "@/types/zipline";
 import ExternalUrl from "@/components/ExternalUrl";
 import { styles } from "@/styles/admin/settings";
@@ -28,10 +28,9 @@ import SkeletonTextInput from "@/components/skeleton/TextInput";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import Skeleton from "@/components/skeleton/Skeleton";
 import { parseMarkdownLinks } from "@/functions/componentUtil";
+import Domain from "@/components/Domain";
 
-// const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 const urlRegex = /http(s)?:\/\/(.+)\.(.+)/;
-const hyperlinkRegex = /\[(?<text>[^\]]+)\]\((?<url>http(s)?:\/\/[^\)]+\.[^\)]+)\)/gmi;
 
 export default function ServerSettings() {
 	useAuth("SUPERADMIN");
@@ -53,188 +52,192 @@ export default function ServerSettings() {
 	useEffect(() => {
 		if (settings) {
 			setSaveSettings({
-				coreReturnHttpsUrls: settings.coreReturnHttpsUrls,
-				coreDefaultDomain: settings.coreDefaultDomain,
-				coreTempDirectory: settings.coreTempDirectory,
+				coreReturnHttpsUrls: settings.settings.coreReturnHttpsUrls,
+				coreDefaultDomain: settings.settings.coreDefaultDomain,
+				coreTempDirectory: settings.settings.coreTempDirectory,
 
-				chunksEnabled: settings.chunksEnabled,
+				chunksEnabled: settings.settings.chunksEnabled,
 				chunksMax:
-					convertToBytes(settings.chunksMax, {
+					convertToBytes(settings.settings.chunksMax, {
 						unitSeparator: " ",
-					}) || settings.chunksMax,
+					}) || settings.settings.chunksMax,
 				chunksSize:
-					convertToBytes(settings.chunksSize, {
+					convertToBytes(settings.settings.chunksSize, {
 						unitSeparator: " ",
-					}) || settings.chunksSize,
+					}) || settings.settings.chunksSize,
 
 				tasksDeleteInterval:
-					convertToTime(settings.tasksDeleteInterval, {
+					convertToTime(settings.settings.tasksDeleteInterval, {
 						useAbbreviations: true,
-					}) || settings.tasksDeleteInterval,
+					}) || settings.settings.tasksDeleteInterval,
 				tasksClearInvitesInterval:
-					convertToTime(settings.tasksClearInvitesInterval, {
+					convertToTime(settings.settings.tasksClearInvitesInterval, {
 						useAbbreviations: true,
-					}) || settings.tasksClearInvitesInterval,
+					}) || settings.settings.tasksClearInvitesInterval,
 				tasksMaxViewsInterval:
-					convertToTime(settings.tasksMaxViewsInterval, {
+					convertToTime(settings.settings.tasksMaxViewsInterval, {
 						useAbbreviations: true,
-					}) || settings.tasksMaxViewsInterval,
+					}) || settings.settings.tasksMaxViewsInterval,
 				tasksThumbnailsInterval:
-					convertToTime(settings.tasksThumbnailsInterval, {
+					convertToTime(settings.settings.tasksThumbnailsInterval, {
 						useAbbreviations: true,
-					}) || settings.tasksThumbnailsInterval,
+					}) || settings.settings.tasksThumbnailsInterval,
 				tasksMetricsInterval:
-					convertToTime(settings.tasksMetricsInterval, {
+					convertToTime(settings.settings.tasksMetricsInterval, {
 						useAbbreviations: true,
-					}) || settings.tasksMetricsInterval,
+					}) || settings.settings.tasksMetricsInterval,
 
-				mfaPasskeys: settings.mfaPasskeys,
-				mfaTotpEnabled: settings.mfaTotpEnabled,
-				mfaTotpIssuer: settings.mfaTotpIssuer,
+				mfaPasskeys: settings.settings.mfaPasskeys,
+				mfaTotpEnabled: settings.settings.mfaTotpEnabled,
+				mfaTotpIssuer: settings.settings.mfaTotpIssuer,
 
-				featuresImageCompression: settings.featuresImageCompression,
-				featuresRobotsTxt: settings.featuresRobotsTxt,
-				featuresHealthcheck: settings.featuresHealthcheck,
-				featuresUserRegistration: settings.featuresUserRegistration,
-				featuresOauthRegistration: settings.featuresOauthRegistration,
-				featuresDeleteOnMaxViews: settings.featuresDeleteOnMaxViews,
-				featuresMetricsEnabled: settings.featuresMetricsEnabled,
-				featuresMetricsAdminOnly: settings.featuresMetricsAdminOnly,
+				featuresImageCompression: settings.settings.featuresImageCompression,
+				featuresRobotsTxt: settings.settings.featuresRobotsTxt,
+				featuresHealthcheck: settings.settings.featuresHealthcheck,
+				featuresUserRegistration: settings.settings.featuresUserRegistration,
+				featuresOauthRegistration: settings.settings.featuresOauthRegistration,
+				featuresDeleteOnMaxViews: settings.settings.featuresDeleteOnMaxViews,
+				featuresMetricsEnabled: settings.settings.featuresMetricsEnabled,
+				featuresMetricsAdminOnly: settings.settings.featuresMetricsAdminOnly,
 				featuresMetricsShowUserSpecific:
-					settings.featuresMetricsShowUserSpecific,
-				featuresThumbnailsEnabled: settings.featuresThumbnailsEnabled,
+					settings.settings.featuresMetricsShowUserSpecific,
+				featuresThumbnailsEnabled: settings.settings.featuresThumbnailsEnabled,
 				featuresThumbnailsNumberThreads:
-					settings.featuresThumbnailsNumberThreads,
-				featuresVersionChecking: settings.featuresVersionChecking,
-				featuresVersionAPI: settings.featuresVersionAPI,
+					settings.settings.featuresThumbnailsNumberThreads,
+				featuresVersionChecking: settings.settings.featuresVersionChecking,
+				featuresVersionAPI: settings.settings.featuresVersionAPI,
 
-				filesRoute: settings.filesRoute,
-				filesLength: settings.filesLength,
-				filesAssumeMimetypes: settings.filesAssumeMimetypes,
-				filesRemoveGpsMetadata: settings.filesRemoveGpsMetadata,
-				filesDefaultFormat: settings.filesDefaultFormat,
-				filesDisabledExtensions: settings.filesDisabledExtensions.join(", "),
+				filesRoute: settings.settings.filesRoute,
+				filesLength: settings.settings.filesLength,
+				filesAssumeMimetypes: settings.settings.filesAssumeMimetypes,
+				filesRemoveGpsMetadata: settings.settings.filesRemoveGpsMetadata,
+				filesDefaultFormat: settings.settings.filesDefaultFormat,
+				filesDisabledExtensions: settings.settings.filesDisabledExtensions.join(", "),
 				filesMaxFileSize:
-					convertToBytes(settings.filesMaxFileSize, {
+					convertToBytes(settings.settings.filesMaxFileSize, {
 						unitSeparator: " ",
-					}) || settings.filesMaxFileSize,
-				filesDefaultExpiration: settings.filesDefaultExpiration,
-				filesDefaultDateFormat: settings.filesDefaultDateFormat,
-				filesRandomWordsNumAdjectives: settings.filesRandomWordsNumAdjectives,
-				filesRandomWordsSeparator: settings.filesRandomWordsSeparator,
+					}) || settings.settings.filesMaxFileSize,
+				filesDefaultExpiration: settings.settings.filesDefaultExpiration,
+				filesDefaultDateFormat: settings.settings.filesDefaultDateFormat,
+				filesRandomWordsNumAdjectives: settings.settings.filesRandomWordsNumAdjectives,
+				filesRandomWordsSeparator: settings.settings.filesRandomWordsSeparator,
 
-				urlsRoute: settings.urlsRoute,
-				urlsLength: settings.urlsLength,
+				urlsRoute: settings.settings.urlsRoute,
+				urlsLength: settings.settings.urlsLength,
 
-				invitesEnabled: settings.invitesEnabled,
-				invitesLength: settings.invitesLength,
+				invitesEnabled: settings.settings.invitesEnabled,
+				invitesLength: settings.settings.invitesLength,
 
-				ratelimitEnabled: settings.ratelimitEnabled,
-				ratelimitAdminBypass: settings.ratelimitAdminBypass,
-				ratelimitMax: settings.ratelimitMax,
-				ratelimitWindow: settings.ratelimitWindow,
-				ratelimitAllowList: settings.ratelimitAllowList.join(", "),
+				ratelimitEnabled: settings.settings.ratelimitEnabled,
+				ratelimitAdminBypass: settings.settings.ratelimitAdminBypass,
+				ratelimitMax: settings.settings.ratelimitMax,
+				ratelimitWindow: settings.settings.ratelimitWindow,
+				ratelimitAllowList: settings.settings.ratelimitAllowList.join(", "),
 
-				websiteTitle: settings.websiteTitle,
-				websiteTitleLogo: settings.websiteTitleLogo,
+				websiteTitle: settings.settings.websiteTitle,
+				websiteTitleLogo: settings.settings.websiteTitleLogo,
 				websiteExternalLinks:
-					JSON.stringify(settings.websiteExternalLinks, null, 2) || "",
-				websiteLoginBackground: settings.websiteLoginBackground,
-				websiteLoginBackgroundBlur: settings.websiteLoginBackgroundBlur,
-				websiteDefaultAvatar: settings.websiteDefaultAvatar,
-				websiteTos: settings.websiteTos,
-				websiteThemeDefault: settings.websiteThemeDefault,
-				websiteThemeDark: settings.websiteThemeDark,
-				websiteThemeLight: settings.websiteThemeLight,
+					JSON.stringify(settings.settings.websiteExternalLinks, null, 2) || "",
+				websiteLoginBackground: settings.settings.websiteLoginBackground,
+				websiteLoginBackgroundBlur: settings.settings.websiteLoginBackgroundBlur,
+				websiteDefaultAvatar: settings.settings.websiteDefaultAvatar,
+				websiteTos: settings.settings.websiteTos,
+				websiteThemeDefault: settings.settings.websiteThemeDefault,
+				websiteThemeDark: settings.settings.websiteThemeDark,
+				websiteThemeLight: settings.settings.websiteThemeLight,
 
-				oauthBypassLocalLogin: settings.oauthBypassLocalLogin,
-				oauthLoginOnly: settings.oauthLoginOnly,
+				oauthBypassLocalLogin: settings.settings.oauthBypassLocalLogin,
+				oauthLoginOnly: settings.settings.oauthLoginOnly,
 
-				oauthDiscordClientId: settings.oauthDiscordClientId,
-				oauthDiscordClientSecret: settings.oauthDiscordClientSecret,
-				oauthDiscordRedirectUri: settings.oauthDiscordRedirectUri,
+				oauthDiscordClientId: settings.settings.oauthDiscordClientId,
+				oauthDiscordClientSecret: settings.settings.oauthDiscordClientSecret,
+				oauthDiscordRedirectUri: settings.settings.oauthDiscordRedirectUri,
+				oauthDiscordAllowedIds: settings.settings.oauthDiscordAllowedIds.join(", "),
+				oauthDiscordDeniedIds: settings.settings.oauthDiscordDeniedIds.join(", "),
 
-				oauthGoogleClientId: settings.oauthGoogleClientId,
-				oauthGoogleClientSecret: settings.oauthGoogleClientSecret,
-				oauthGoogleRedirectUri: settings.oauthGoogleRedirectUri,
+				oauthGoogleClientId: settings.settings.oauthGoogleClientId,
+				oauthGoogleClientSecret: settings.settings.oauthGoogleClientSecret,
+				oauthGoogleRedirectUri: settings.settings.oauthGoogleRedirectUri,
 
-				oauthGithubClientId: settings.oauthGithubClientId,
-				oauthGithubClientSecret: settings.oauthGithubClientSecret,
-				oauthGithubRedirectUri: settings.oauthGithubRedirectUri,
+				oauthGithubClientId: settings.settings.oauthGithubClientId,
+				oauthGithubClientSecret: settings.settings.oauthGithubClientSecret,
+				oauthGithubRedirectUri: settings.settings.oauthGithubRedirectUri,
 
-				oauthOidcClientId: settings.oauthOidcClientId,
-				oauthOidcClientSecret: settings.oauthOidcClientSecret,
-				oauthOidcAuthorizeUrl: settings.oauthOidcAuthorizeUrl,
-				oauthOidcTokenUrl: settings.oauthOidcTokenUrl,
-				oauthOidcUserinfoUrl: settings.oauthOidcUserinfoUrl,
-				oauthOidcRedirectUri: settings.oauthOidcRedirectUri,
+				oauthOidcClientId: settings.settings.oauthOidcClientId,
+				oauthOidcClientSecret: settings.settings.oauthOidcClientSecret,
+				oauthOidcAuthorizeUrl: settings.settings.oauthOidcAuthorizeUrl,
+				oauthOidcTokenUrl: settings.settings.oauthOidcTokenUrl,
+				oauthOidcUserinfoUrl: settings.settings.oauthOidcUserinfoUrl,
+				oauthOidcRedirectUri: settings.settings.oauthOidcRedirectUri,
 
-				pwaEnabled: settings.pwaEnabled,
-				pwaTitle: settings.pwaTitle,
-				pwaShortName: settings.pwaShortName,
-				pwaDescription: settings.pwaDescription,
-				pwaThemeColor: settings.pwaThemeColor,
-				pwaBackgroundColor: settings.pwaBackgroundColor,
+				pwaEnabled: settings.settings.pwaEnabled,
+				pwaTitle: settings.settings.pwaTitle,
+				pwaShortName: settings.settings.pwaShortName,
+				pwaDescription: settings.settings.pwaDescription,
+				pwaThemeColor: settings.settings.pwaThemeColor,
+				pwaBackgroundColor: settings.settings.pwaBackgroundColor,
 
-				httpWebhookOnUpload: settings.httpWebhookOnUpload,
-				httpWebhookOnShorten: settings.httpWebhookOnShorten,
+				httpWebhookOnUpload: settings.settings.httpWebhookOnUpload,
+				httpWebhookOnShorten: settings.settings.httpWebhookOnShorten,
 
-				discordWebhookUrl: settings.discordWebhookUrl,
-				discordUsername: settings.discordUsername,
-				discordAvatarUrl: settings.discordAvatarUrl,
+				domains: JSON.stringify(settings.settings.domains),
 
-				discordOnUploadWebhookUrl: settings.discordOnUploadWebhookUrl,
-				discordOnUploadAvatarUrl: settings.discordOnUploadAvatarUrl,
-				discordOnUploadUsername: settings.discordOnUploadUsername,
-				discordOnUploadContent: settings.discordOnUploadContent,
-				discordOnUploadEmbed: !!settings.discordOnUploadEmbed,
+				discordWebhookUrl: settings.settings.discordWebhookUrl,
+				discordUsername: settings.settings.discordUsername,
+				discordAvatarUrl: settings.settings.discordAvatarUrl,
+
+				discordOnUploadWebhookUrl: settings.settings.discordOnUploadWebhookUrl,
+				discordOnUploadAvatarUrl: settings.settings.discordOnUploadAvatarUrl,
+				discordOnUploadUsername: settings.settings.discordOnUploadUsername,
+				discordOnUploadContent: settings.settings.discordOnUploadContent,
+				discordOnUploadEmbed: !!settings.settings.discordOnUploadEmbed,
 
 				"discordOnUploadEmbed.color":
-					settings.discordOnUploadEmbed?.color ?? null,
+					settings.settings.discordOnUploadEmbed?.color ?? null,
 				"discordOnUploadEmbed.description":
-					settings.discordOnUploadEmbed?.description ?? null,
+					settings.settings.discordOnUploadEmbed?.description ?? null,
 				"discordOnUploadEmbed.footer":
-					settings.discordOnUploadEmbed?.footer ?? null,
+					settings.settings.discordOnUploadEmbed?.footer ?? null,
 				"discordOnUploadEmbed.imageOrVideo":
-					settings.discordOnUploadEmbed?.imageOrVideo ?? false,
+					settings.settings.discordOnUploadEmbed?.imageOrVideo ?? false,
 				"discordOnUploadEmbed.thumbnail":
-					settings.discordOnUploadEmbed?.thumbnail ?? false,
+					settings.settings.discordOnUploadEmbed?.thumbnail ?? false,
 				"discordOnUploadEmbed.timestamp":
-					settings.discordOnUploadEmbed?.timestamp ?? false,
+					settings.settings.discordOnUploadEmbed?.timestamp ?? false,
 				"discordOnUploadEmbed.title":
-					settings.discordOnUploadEmbed?.title ?? null,
-				"discordOnUploadEmbed.url": settings.discordOnUploadEmbed?.url ?? false,
+					settings.settings.discordOnUploadEmbed?.title ?? null,
+				"discordOnUploadEmbed.url": settings.settings.discordOnUploadEmbed?.url ?? false,
 
-				discordOnShortenWebhookUrl: settings.discordOnShortenWebhookUrl,
-				discordOnShortenUsername: settings.discordOnShortenUsername,
-				discordOnShortenAvatarUrl: settings.discordOnShortenAvatarUrl,
-				discordOnShortenContent: settings.discordOnShortenContent,
-				discordOnShortenEmbed: !!settings.discordOnShortenEmbed,
+				discordOnShortenWebhookUrl: settings.settings.discordOnShortenWebhookUrl,
+				discordOnShortenUsername: settings.settings.discordOnShortenUsername,
+				discordOnShortenAvatarUrl: settings.settings.discordOnShortenAvatarUrl,
+				discordOnShortenContent: settings.settings.discordOnShortenContent,
+				discordOnShortenEmbed: !!settings.settings.discordOnShortenEmbed,
 
 				"discordOnShortenEmbed.color":
-					settings.discordOnShortenEmbed?.color ?? null,
+					settings.settings.discordOnShortenEmbed?.color ?? null,
 				"discordOnShortenEmbed.description":
-					settings.discordOnShortenEmbed?.description ?? null,
+					settings.settings.discordOnShortenEmbed?.description ?? null,
 				"discordOnShortenEmbed.footer":
-					settings.discordOnShortenEmbed?.footer ?? null,
+					settings.settings.discordOnShortenEmbed?.footer ?? null,
 				"discordOnShortenEmbed.timestamp":
-					settings.discordOnShortenEmbed?.timestamp ?? false,
+					settings.settings.discordOnShortenEmbed?.timestamp ?? false,
 				"discordOnShortenEmbed.title":
-					settings.discordOnShortenEmbed?.title ?? null,
+					settings.settings.discordOnShortenEmbed?.title ?? null,
 				"discordOnShortenEmbed.url":
-					settings.discordOnShortenEmbed?.url ?? false,
+					settings.settings.discordOnShortenEmbed?.url ?? false,
 			});
 		}
 	}, [settings]);
 
-	const [saveError, setSaveError] = useState<Array<string> | null>(null);
+	const [saveError, setSaveError] = useState<string[] | null>(null);
 
 	async function handleSave(category: SaveCategories) {
 		setSaveError(null);
 		setSaving(true);
 
 		if (!saveSettings) return setSaving(false);
-		let settingsToSave: Partial<APISettings> = {};
+		let settingsToSave: Partial<APISettings["settings"]> = {};
 
 		switch (category) {
 			case "core": {
@@ -366,9 +369,9 @@ export default function ServerSettings() {
 
 				try {
 					settingsToSave.websiteExternalLinks = JSON.parse(
-						saveSettings.websiteExternalLinks || "",
+						saveSettings.websiteExternalLinks || "[]",
 					);
-				} catch (e) {}
+				} catch (_e) {}
 
 				break;
 			}
@@ -378,6 +381,8 @@ export default function ServerSettings() {
 					oauthBypassLocalLogin: saveSettings.oauthBypassLocalLogin,
 					oauthLoginOnly: saveSettings.oauthLoginOnly,
 					oauthDiscordClientId: saveSettings.oauthDiscordClientId,
+					oauthDiscordAllowedIds: saveSettings.oauthDiscordAllowedIds.split(", "),
+					oauthDiscordDeniedIds: saveSettings.oauthDiscordDeniedIds.split(", "),
 					oauthDiscordClientSecret: saveSettings.oauthDiscordClientSecret,
 					oauthDiscordRedirectUri: saveSettings.oauthDiscordRedirectUri,
 					oauthGoogleClientId: saveSettings.oauthGoogleClientId,
@@ -414,6 +419,14 @@ export default function ServerSettings() {
 				settingsToSave = {
 					httpWebhookOnUpload: saveSettings.httpWebhookOnUpload,
 					httpWebhookOnShorten: saveSettings.httpWebhookOnShorten,
+				};
+
+				break;
+			}
+
+			case "domains": {
+				settingsToSave = {
+					domains: JSON.parse(saveSettings.domains) || "[]",
 				};
 
 				break;
@@ -516,6 +529,13 @@ export default function ServerSettings() {
 
 	const [newUrlError, setNewUrlError] = useState<string | null>(null);
 
+	const [addNewDomain, setAddNewDomain] = useState<boolean>(false);
+	const [newDomain, setNewDomain] = useState<string | null>(null)
+
+	const [newDomainError, setNewDomainError] = useState<string | null>(null);
+
+	const [showTamperedKeys, setShowTamperedKeys] = useState<boolean>(false);
+
 	useEffect(() => {
 		console.log(saveSettings);
 	}, [saveSettings]);
@@ -523,7 +543,7 @@ export default function ServerSettings() {
 	function renderSetting(setting: Setting, skeleton = false) {
 		let description: ReactNode;
 
-		if ((setting.type !== "category" && setting.type !== "externalUrls" && setting.type !== "save") && typeof setting.description === "string")
+		if ((setting.type !== "category" && setting.type !== "externalUrls" && setting.type !== "domain" && setting.type !== "save") && typeof setting.description === "string")
 			description = <Text>{parseMarkdownLinks(setting.description, {
 				color: "#575db5"
 			})}</Text>
@@ -574,7 +594,7 @@ export default function ServerSettings() {
 						title={setting.name}
 						description={description}
 						password={setting.passwordInput}
-						disabled={saving}
+						disabled={saving || settings?.tampered.includes(setting.setting as keyof APISettings["settings"])}
 						keyboardType={setting.keyboardType}
 						onValueChange={(content) =>
 							setSaveSettings((prev) => {
@@ -619,7 +639,7 @@ export default function ServerSettings() {
 						key={setting.setting}
 						data={setting.options}
 						description={setting.description}
-						disabled={skeleton || saving}
+						disabled={skeleton || saving || settings?.tampered.includes(setting.setting as keyof APISettings["settings"])}
 						onSelect={(selectedItem) => {
 							setSaveSettings((prev) => {
 								return {
@@ -644,7 +664,7 @@ export default function ServerSettings() {
 				return (
 					<Switch
 						key={setting.setting}
-						disabled={skeleton || saving}
+						disabled={skeleton || saving || settings?.tampered.includes(setting.setting as keyof APISettings["settings"])}
 						description={setting.description}
 						onValueChange={() =>
 							setSaveSettings((prev) => {
@@ -678,9 +698,9 @@ export default function ServerSettings() {
 							</View>
 
 							<Button
-								color={skeleton || saving ? "#373d79" : "#323ea8"}
-								iconColor={skeleton || saving ? "gray" : "white"}
-								disabled={skeleton || saving}
+								color={(skeleton || saving || settings?.tampered.includes("websiteExternalLinks")) ? "#373d79" : "#323ea8"}
+								iconColor={(skeleton || saving || settings?.tampered.includes("websiteExternalLinks")) ? "gray" : "white"}
+								disabled={skeleton || saving || settings?.tampered.includes("websiteExternalLinks")}
 								onPress={() => {
 									setCreateNewUrl(true);
 								}}
@@ -707,6 +727,7 @@ export default function ServerSettings() {
 								nestedScrollEnabled
 							>
 								{skeleton ? (
+									// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 									<>
 										{[...Array(2).keys()].map((index) => (
 											<View
@@ -720,21 +741,22 @@ export default function ServerSettings() {
 										))}
 									</>
 								) : (
+									// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 									<>
 										{(
 											JSON.parse(
 												saveSettings?.websiteExternalLinks || "[]",
-											) as Array<ExternalLink>
+											) as ExternalLink[]
 										).map((url, index) => (
 											<ExternalUrl
 												externalUrl={url}
 												key={`${url.url}-${index}`}
 												id={index}
-												disabled={saving}
+												disabled={saving || settings?.tampered.includes("websiteExternalLinks")}
 												onChange={(type, id) => {
 													switch (type) {
 														case "delete": {
-															const newUrls: Array<ExternalLink> = JSON.parse(
+															const newUrls: ExternalLink[] = JSON.parse(
 																saveSettings?.websiteExternalLinks || "[]",
 															);
 
@@ -758,7 +780,7 @@ export default function ServerSettings() {
 														}
 
 														case "edit": {
-															const urls: Array<ExternalLink> = JSON.parse(
+															const urls: ExternalLink[] = JSON.parse(
 																saveSettings?.websiteExternalLinks || "[]",
 															);
 
@@ -769,7 +791,7 @@ export default function ServerSettings() {
 													}
 												}}
 												onMove={(type, id) => {
-													const urls: Array<ExternalLink> = JSON.parse(
+													const urls: ExternalLink[] = JSON.parse(
 														saveSettings?.websiteExternalLinks || "[]",
 													);
 
@@ -808,6 +830,95 @@ export default function ServerSettings() {
 						</View>
 					</>
 				);
+			}
+
+			case "domain": {
+				return (
+					<>
+						<Button
+							text="Add a Domain"
+							icon="add"
+							iconColor={skeleton || saving ? "gray" : "white"}
+							disabled={skeleton || saving || settings?.tampered.includes("domains")}
+							margin={{
+								left: 10,
+								right: 10,
+								top: 5,
+								bottom: 10,
+							}}
+							onPress={() => {
+								setAddNewDomain(true);
+							}}
+							color={skeleton || saving ? "#373d79" : "#323ea8"}
+						/>
+
+						{(JSON.parse(
+							saveSettings?.domains || "[]",
+						) as string[]).length > 0 && (
+							<View
+								style={{
+									...styles.settingGroup,
+									marginTop: 0,
+								}}
+							>
+								<ScrollView
+									style={styles.externalUrlsScrollView}
+									showsVerticalScrollIndicator={false}
+									nestedScrollEnabled
+								>
+									{skeleton ? (
+										<View
+											style={{
+												marginVertical: 5,
+											}}
+										>
+											<Skeleton width="100%" height={100} />
+										</View>
+									) : (
+										// biome-ignore lint/complexity/noUselessFragments: The fragment is required
+										<>
+											{(
+												JSON.parse(
+													saveSettings?.domains || "[]",
+												) as string[]
+											).map((domain, index) => (
+												<Domain
+													// biome-ignore lint/suspicious/noArrayIndexKey: index is the only unique identifier here
+													key={index}
+													domain={domain}
+													disabled={saving || settings?.tampered.includes("domains")}
+													onDelete={() => {
+														const newDomains: string[] = JSON.parse(
+															saveSettings?.domains || "[]",
+														);
+
+														const domainIndex = newDomains.indexOf(domain);
+
+														newDomains.splice(domainIndex, 1);
+
+														setSaveSettings((prev) => {
+															if (!prev) return prev;
+
+															return {
+																...prev,
+																domains: JSON.stringify(newDomains),
+															};
+														});
+
+														return ToastAndroid.show(
+															`Deleted the Domain ${domain}`,
+															ToastAndroid.SHORT,
+														);
+													}}
+												/>
+											))}
+										</>
+									)}
+								</ScrollView>
+							</View>
+						)}
+					</>
+				)
 			}
 
 			case "colorPicker": {
@@ -887,29 +998,6 @@ export default function ServerSettings() {
 					</View>
 				</Popup>
 
-				{/* <Popup
-					onClose={() => {
-						setSaveError(null)
-					}}
-					hidden={!saveError || saveError.length <= 0}
-				>
-					<View style={styles.popupContent}>
-						<Text style={styles.headerText}>Failed Files</Text>
-
-						<ScrollView style={styles.popupScrollView}>
-							{saveError?.map((error) => (
-								<Text key={error} style={styles.errorText}>{error}</Text>
-							))}
-						</ScrollView>
-
-						<Text
-							style={styles.popupSubHeaderText}
-						>
-							Press outside to close this popup
-						</Text>
-					</View>
-				</Popup> */}
-
 				<Popup
 					hidden={editUrlIndex < 0}
 					onClose={() => {
@@ -945,8 +1033,8 @@ export default function ServerSettings() {
 
 						<Button
 							color="#323ea8"
-							text="Save"
-							icon="save"
+							text="Edit"
+							icon="edit"
 							margin={{
 								top: 10,
 							}}
@@ -959,7 +1047,7 @@ export default function ServerSettings() {
 								if (!urlRegex.test(editUrlURL))
 									return setEditUrlError("Please insert a valid URL");
 
-								const newUrls: Array<ExternalLink> = JSON.parse(
+								const newUrls: ExternalLink[] = JSON.parse(
 									saveSettings?.websiteExternalLinks || "[]",
 								);
 
@@ -1027,8 +1115,8 @@ export default function ServerSettings() {
 
 						<Button
 							color="#323ea8"
-							text="Save"
-							icon="save"
+							text="Add"
+							icon="add"
 							margin={{
 								top: 10,
 							}}
@@ -1040,7 +1128,7 @@ export default function ServerSettings() {
 								if (!urlRegex.test(newUrlURL))
 									return setNewUrlError("Please insert a valid URL");
 
-								const newUrls: Array<ExternalLink> = JSON.parse(
+								const newUrls: ExternalLink[] = JSON.parse(
 									saveSettings?.websiteExternalLinks || "[]",
 								);
 
@@ -1068,6 +1156,90 @@ export default function ServerSettings() {
 								setCreateNewUrl(false);
 							}}
 						/>
+
+						<Text style={styles.popupSubHeaderText}>
+							Press outside to close this popup
+						</Text>
+					</View>
+				</Popup>
+
+				<Popup
+					hidden={!addNewDomain}
+					onClose={() => {
+						setAddNewDomain(false);
+						setNewDomain(null);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Add New Domain</Text>
+						{newDomainError && <Text style={styles.errorText}>{newDomainError}</Text>}
+
+						<TextInput
+							title="Domain:"
+							onValueChange={(content) => {
+								setNewDomain(content);
+							}}
+							value={newDomain || ""}
+							placeholder="google.com"
+						/>
+
+						<Button
+							color="#323ea8"
+							text="Add"
+							icon="add"
+							margin={{
+								top: 10,
+							}}
+							onPress={async () => {
+								setNewDomainError(null);
+
+								if (!newDomain) return setNewDomainError("Please insert a domain");
+
+								const newDomains: string[] = JSON.parse(
+									saveSettings?.domains || "[]",
+								);
+
+								newDomains.push(newDomain);
+
+								setSaveSettings((prev) => {
+									if (!prev) return prev;
+
+									return {
+										...prev,
+										domains: JSON.stringify(newDomains),
+									};
+								});
+
+								ToastAndroid.show(
+									`Added the domain "${newDomain}"`,
+									ToastAndroid.SHORT,
+								);
+
+								setNewDomain(null);
+								setAddNewDomain(false);
+							}}
+						/>
+
+						<Text style={styles.popupSubHeaderText}>
+							Press outside to close this popup
+						</Text>
+					</View>
+				</Popup>
+
+				<Popup
+					hidden={!showTamperedKeys}
+					onClose={() => {
+						setShowTamperedKeys(false);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Overridden Settings</Text>
+
+						<View>
+							{settings?.tampered.map(setting => (
+								<Text key={setting} style={styles.tamperedSettingText}>- {setting}</Text>
+							))}
+						</View>
 
 						<Text style={styles.popupSubHeaderText}>
 							Press outside to close this popup
@@ -1108,21 +1280,33 @@ export default function ServerSettings() {
 							/>
 						</View>
 					</View>
-
-					{/* {saveError && (
-						<View>
-							{saveError.map((error) => (
-								<Text style={styles.errorText} key={error}>
-									{error}
-								</Text>
-							))}
-						</View>
-					)} */}
 				</View>
 
 				{saveSettings ? (
 					<View style={styles.settingsContainer}>
 						<KeyboardAwareScrollView style={styles.scrollView}>
+							{(settings && settings.tampered.length > 0) && (
+								<View style={styles.tamperedSettingsWarning}>
+									<Text style={styles.tamperedSettingTitle}>Environment Variable Settings</Text>
+
+									<Text style={styles.tamperedSettingText}>
+										<Text style={styles.tamperedSettingCount}>{settings.tampered.length}</Text>{" "}
+										setting{settings.tampered.length > 1 ? "s have" : " has"} been set{" "}
+										via environment variables, therefore any changes made to {settings.tampered.length > 1 ? "them" : "it"} on this page will not take effect{" "}
+										unless the environment variable corresponding to the setting is removed. If you prefer using{" "}
+										environment variables, you can ignore this message. Click{" "}
+										
+										<Pressable onPress={() => {
+											setShowTamperedKeys(true)
+										}}>
+											<Text style={styles.tamperedSettingsLink}>here</Text>
+										</Pressable>{" "}
+										
+										to view the list of overridden settings.
+									</Text>
+								</View>
+							)}
+							
 							{zlSettings.map((setting) => renderSetting(setting))}
 							<View />
 						</KeyboardAwareScrollView>

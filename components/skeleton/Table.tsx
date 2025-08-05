@@ -6,9 +6,9 @@ import { ScrollView, Text, View, type DimensionValue } from "react-native";
 import type { ReactNode } from "react";
 
 interface Props {
-	headerRow: Array<ReactNode>;
-	rows: Array<Array<DimensionValue>>;
-	rowWidth: Array<number>;
+	headerRow: ReactNode[];
+	rows: DimensionValue[][];
+	rowWidth: number[];
 	rowHeight?: DimensionValue;
 	disableAnimations?: boolean;
 }
@@ -22,7 +22,7 @@ export default function SkeletonTable({
 }: Props) {
 	const updatedHeaderRow = headerRow.map((row, index) => (
 		<Text
-			// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+			// biome-ignore lint/suspicious/noArrayIndexKey: index is the only unique identifier here
 			key={index}
 			style={{
 				...styles.rowText,
@@ -78,7 +78,7 @@ export default function SkeletonTable({
 									<>
 										{disableAnimations ? (
 											<View
-												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+												// biome-ignore lint/suspicious/noArrayIndexKey: index is the only unique identifier here
 												key={index}
 												style={{
 													backgroundColor: colors[1],
@@ -89,7 +89,7 @@ export default function SkeletonTable({
 											/>
 										) : (
 											<Skeleton
-												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+												// biome-ignore lint/suspicious/noArrayIndexKey: index is the only unique identifier here
 												key={index}
 												colors={colors}
 												height={14}
@@ -102,7 +102,7 @@ export default function SkeletonTable({
 
 							return (
 								<Row
-									// biome-ignore lint/suspicious/noArrayIndexKey: .
+									// biome-ignore lint/suspicious/noArrayIndexKey: index is the only unique identifier here
 									key={index}
 									data={rowData}
 									widthArr={rowWidth}

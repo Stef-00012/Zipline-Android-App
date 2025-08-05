@@ -77,7 +77,7 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build Android App
+      - name: Build Android App APK
         run: eas build --clear-cache --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
 
       - name: Upload APK Artifact
@@ -86,10 +86,13 @@ jobs:
           name: app-release
           path: ${{ github.workspace }}/app-release.apk
 
+      - name: Build Android App AAB
+        run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-release.aab
+
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "app-release.apk"
+          artifacts: "app-release.apk,app-release.aab"
           artifactContentType: application/vnd.android.package-archive
           tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
           generateReleaseNotes: true

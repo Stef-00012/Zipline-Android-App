@@ -16,9 +16,9 @@ interface RowSort {
 }
 
 interface Props {
-	headerRow: Array<HeaderRow>;
-	rows: Array<Array<ReactNode>>;
-	rowWidth: Array<number>;
+	headerRow: HeaderRow[];
+	rows: ReactNode[][];
+	rowWidth: number[];
 	sortKey?: {
 		id: string;
 		sortOrder: "asc" | "desc";

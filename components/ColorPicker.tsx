@@ -6,7 +6,6 @@ import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
-import type React from "react";
 import NativeColorPicker, {
 	type returnedResults,
 	HSLSaturationSlider,
@@ -28,10 +27,10 @@ type PanelType = "saturation" | "brightness" | "hsl-saturation";
 type PanelComponent = "panel1" | "panel2" | "panel3" | "panel4" | "panel5";
 
 interface CustomColorPickerProps {
-	defaultInputFormats?: Array<"HEX" | "RGB" | "HSL" | "HWB" | "HSV">;
+	defaultInputFormats?: ("HEX" | "RGB" | "HSL" | "HWB" | "HSV")[];
 	onSelectColor: (color: returnedResults) => void;
 	previewHideInitialColor?: boolean;
-	defaultColors?: Array<string>;
+	defaultColors?: string[];
 	showHSLSaturation?: boolean;
 	previewHideText?: boolean;
 	showBrightness?: boolean;

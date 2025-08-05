@@ -39,16 +39,16 @@ export default function FolderUpload() {
 
 	const [folder, setFolder] = useState<APIFolder | null>(null);
 
-	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>([]);
+	const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
 	const [uploadedFiles, setUploadedFiles] = useState<
 		APIUploadResponse["files"]
 	>([]);
 	const [failedUploads, setFailedUploads] = useState<
-		Array<{
+		({
 			uri: string;
 			name: string;
 			error: string;
-		}>
+		})[]
 	>([]);
 
 	const [overrideDomain, setOverrideDomain] =
@@ -86,7 +86,7 @@ export default function FolderUpload() {
 			const settings = await getSettings();
 
 			if (typeof settings !== "string") {
-				setDefaultFormat(settings.filesDefaultFormat);
+				setDefaultFormat(settings.settings.filesDefaultFormat);
 			}
 		})();
 	}, []);
@@ -265,7 +265,7 @@ export default function FolderUpload() {
 
 						if (output.canceled || !output.assets) return;
 
-						const newSelectedFiles: Array<SelectedFile> = output.assets
+						const newSelectedFiles: SelectedFile[] = output.assets
 							.map((file) => ({
 								name: file.name,
 								uri: file.uri,

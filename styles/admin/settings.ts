@@ -112,4 +112,24 @@ export const styles = StyleSheet.create({
 		flexShrink: 1,
 		maxHeight: 400,
 	},
+	tamperedSettingsWarning: {
+		backgroundColor: "#2E1A24",
+		padding: 10,
+		margin: 10,
+		borderRadius: 8
+	},
+	tamperedSettingTitle: {
+		color: "#F7A4A4",
+		fontWeight: "bold"
+	},
+	tamperedSettingText: {
+		color: "#ffffff"
+	},
+	tamperedSettingCount: {
+		fontWeight: "bold",
+	},
+	tamperedSettingsLink: {
+		color: "#4F529D",
+		marginBottom: -5
+	}
 });

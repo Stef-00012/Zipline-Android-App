@@ -129,8 +129,8 @@ export async function deleteFile(id: string): Promise<APIFile | string> {
 }
 
 interface UpdateFileTagsOptions {
-	add?: Array<string>;
-	remove?: Array<string>;
+	add?: string[];
+	remove?: string[];
 }
 // PATCH /api/user/files/[id]
 export async function updateFileTags(
@@ -188,7 +188,7 @@ export interface EditFileOptions {
 	password?: string | null;
 	type?: string;
 	favorite?: boolean;
-	tags?: Array<APITag["id"]>;
+	tags?: APITag["id"][];
 }
 // PATCH /api/user/files/[id]
 export async function editFile(
@@ -233,7 +233,7 @@ export interface UploadFileOptions {
 	text?: boolean;
 	maxViews?: number;
 	compression?: number;
-	format?: APISettings["filesDefaultFormat"];
+	format?: APISettings["settings"]["filesDefaultFormat"];
 	password?: string;
 	filename?: string;
 	folder?: string;
@@ -249,7 +249,7 @@ export async function uploadFiles(
 	},
 	options: UploadFileOptions = {},
 	onProgress?: (uploadProgressData: UploadProgressData) => void,
-): Promise<Array<APIUploadFile> | string> {
+): Promise<APIUploadFile[] | string> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -326,7 +326,7 @@ export async function uploadFiles(
 }
 
 interface BulkEditFilesOptions {
-	files: Array<APIFile["id"]>;
+	files: APIFile["id"][];
 	favorite?: boolean;
 	folder?: string;
 	remove?: boolean;

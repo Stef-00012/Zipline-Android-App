@@ -48,7 +48,7 @@ export default function UploadText({
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
-	const [presets, setPresets] = useState<Array<Preset>>(
+	const [presets, setPresets] = useState<Preset[]>(
 		JSON.parse(stringifiedPresets),
 	);
 
@@ -73,10 +73,10 @@ export default function UploadText({
 	const [fileExtension, setFileExtension] = useState<string>("txt");
 
 	const [folders, setFolders] = useState<
-		Array<{
+		({
 			label: string;
 			value: string;
-		}>
+		})[]
 	>([]);
 
 	const [defaultFormat, setDefaultFormat] = useState<string>("random");
@@ -107,7 +107,7 @@ export default function UploadText({
 			const settings = await getSettings();
 
 			if (typeof settings !== "string") {
-				setDefaultFormat(settings.filesDefaultFormat);
+				setDefaultFormat(settings.settings.filesDefaultFormat);
 			}
 
 			if (typeof folders === "string") return setFolders([]);
@@ -266,7 +266,7 @@ export default function UploadText({
 									"A preset with this name already exists",
 								);
 
-							const newPresets: Array<Preset> = [
+							const newPresets: Preset[] = [
 								...presets,
 								{
 									compression: compression,
@@ -328,7 +328,7 @@ export default function UploadText({
 							if (editPresetName.length <= 0)
 								return setEditPresetError("Please add a preset name");
 
-							const newPresets: Array<Preset> = presets;
+							const newPresets: Preset[] = presets;
 
 							const presetIndex = newPresets.findIndex(
 								(preset) => preset.name === presetToEdit,

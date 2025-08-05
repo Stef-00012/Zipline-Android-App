@@ -1,6 +1,5 @@
 import type {
 	APISettings,
-	ExternalLink,
 	ShortenEmbed,
 	UploadEmbed,
 } from "@/types/zipline";
@@ -232,6 +231,8 @@ export interface SaveSettings {
 	oauthDiscordClientId: string | null;
 	oauthDiscordClientSecret: string | null;
 	oauthDiscordRedirectUri: string | null;
+	oauthDiscordAllowedIds: string;
+	oauthDiscordDeniedIds: string;
 
 	oauthGoogleClientId: string | null;
 	oauthGoogleClientSecret: string | null;
@@ -257,6 +258,8 @@ export interface SaveSettings {
 
 	httpWebhookOnUpload: string | null;
 	httpWebhookOnShorten: string | null;
+
+	domains: string;
 
 	discordWebhookUrl: string | null;
 	discordUsername: string | null;
@@ -314,7 +317,7 @@ export const formats: SelectProps["data"] = [
 	},
 ];
 
-export type SettingPath<T extends keyof APISettings = keyof APISettings> =
+export type SettingPath<T extends keyof APISettings["settings"] = keyof APISettings["settings"]> =
 	T extends "discordOnUploadEmbed"
 		? T | `${T}.${keyof UploadEmbed}`
 		: T extends "discordOnShortenEmbed"
@@ -335,12 +338,13 @@ export type SaveCategories =
 	| "oauth"
 	| "pwa"
 	| "httpWebhooks"
+	| "domains"
 	| "discordWebhook"
 	| "discordOnUploadWebhook"
 	| "discordOnShortenWebhook";
 
 interface Category {
-	children: Array<Setting>;
+	children: Setting[];
 	type: "category";
 	if?: SettingPath;
 	name: string;
@@ -404,16 +408,21 @@ interface ExternalUrl {
 	type: "externalUrls";
 }
 
+interface Domain {
+	type: "domain";
+}
+
 export type Setting =
 	| Category
 	| Input
 	| Switch
 	| Select
 	| ExternalUrl
+	| Domain
 	| ColorPicker
 	| Save;
 
-export const settings: Array<Setting> = [
+export const settings: Setting[] = [
 	{
 		type: "category",
 		name: "Core",
@@ -1027,6 +1036,22 @@ export const settings: Array<Setting> = [
 					},
 					{
 						type: "input",
+						name: "Discord Allowed IDs",
+						setting: "oauthDiscordAllowedIds",
+						keyboardType: "default",
+						description: "A comma-separated list of Discord user IDs that are allowed to log in. Leave empty to disable allow list.",
+						skeletonWidth: "60%"
+					},
+					{
+						type: "input",
+						name: "Discord Denied IDs",
+						setting: "oauthDiscordDeniedIds",
+						keyboardType: "default",
+						description: "A comma-separated list of Discord user IDs that are denied from logging in. Leave empty to disable deny list.",
+						skeletonWidth: "60%"
+					},
+					{
+						type: "input",
 						name: "Discord Redirect URI",
 						setting: "oauthDiscordRedirectUri",
 						keyboardType: "default",
@@ -1196,13 +1221,10 @@ export const settings: Array<Setting> = [
 				skeletonWidth: "60%",
 			},
 			{
-				type: "input",
+				type: "colorPicker",
 				name: "Theme Color",
 				setting: "pwaThemeColor",
-				keyboardType: "default",
-				placeholder: "#000000",
 				description: "The theme color for the PWA",
-				skeletonWidth: 70,
 			},
 			{
 				type: "colorPicker",
@@ -1244,6 +1266,20 @@ export const settings: Array<Setting> = [
 			{
 				type: "save",
 				category: "httpWebhooks",
+			},
+		],
+	},
+	{
+		type: "category",
+		name: "Domains",
+		category: "domainsCategory",
+		children: [
+			{
+				type: "domain",
+			},
+			{
+				type: "save",
+				category: "domains",
 			},
 		],
 	},

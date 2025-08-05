@@ -42,3 +42,5 @@ yarn-error.*
 # misc
 biome.json
 package-lock.json
+
+shell.nix

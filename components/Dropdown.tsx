@@ -3,7 +3,6 @@ import { useState, useRef } from "react";
 import Button from "@/components/Button";
 import {
 	View,
-	Text,
 	TouchableOpacity,
 	Dimensions,
 	Modal,
@@ -31,7 +30,7 @@ interface DropdownPosition {
 }
 
 interface Props {
-	data: Array<Item>;
+	data: Item[];
 
 	containerStyle?: StyleProp<ViewStyle>;
 

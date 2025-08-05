@@ -37,12 +37,12 @@ export async function getSettings(): Promise<APISettings | string> {
 interface APIIssue {
 	code: string;
 	message: string;
-	path: Array<string>;
+	path: string[];
 }
 // PATCH /api/server/settings
 export async function updateSettings(
-	settings: Partial<APISettings> = {},
-): Promise<APISettings | Array<string>> {
+	settings: Partial<APISettings["settings"]> = {},
+): Promise<APISettings | string[]> {
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -61,7 +61,7 @@ export async function updateSettings(
 
 		const data = error.response?.data as
 			| {
-					issues: Array<APIIssue>;
+					issues: APIIssue[];
 					statusCode: number;
 			  }
 			| undefined;

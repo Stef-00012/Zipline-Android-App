@@ -12,11 +12,11 @@ import {
 } from "react-native";
 
 export interface SelectProps {
-	data: Array<{
+	data: ({
 		label: string;
 		value: string;
 		[key: string]: string | number | boolean | null;
-	}>;
+	})[];
 	placeholder: string;
 	onSelect: (selectedItem: SelectProps["data"], id?: SelectProps["id"]) => void;
 	showScrollIndicator?: boolean;
@@ -98,7 +98,7 @@ export default function Select({
 		return [];
 	}
 
-	function handleSelect(item: SelectProps["data"][0], index: number) {
+	function handleSelect(item: SelectProps["data"][0], _index: number) {
 		if (multiple) {
 			setSelectedItems((prevItems) => {
 				const isSelected = prevItems.some(
@@ -202,7 +202,7 @@ export default function Select({
 							<FlatList
 								data={data}
 								style={styles.openSelectContainer}
-								keyExtractor={(item, index) => index.toString()}
+								keyExtractor={(_item, index) => index.toString()}
 								showsVerticalScrollIndicator={showScrollIndicator}
 								renderItem={({ item, index }) => (
 									<TouchableOpacity

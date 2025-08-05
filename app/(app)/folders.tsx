@@ -407,6 +407,7 @@ export default function Folders() {
 				<View style={{ flex: 1 }}>
 					<View style={{ ...styles.foldersContainer, flex: 1 }}>
 						{folders && dashUrl ? (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<Table
@@ -677,6 +678,7 @@ export default function Folders() {
 								)}
 							</>
 						) : (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<SkeletonTable

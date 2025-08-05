@@ -8,6 +8,7 @@ import { searchKeyNames } from "@/constants/files";
 import FileDisplay from "@/components/FileDisplay";
 import { isLightColor } from "@/functions/color";
 import TextInput from "@/components/TextInput";
+import * as FileSystem from "expo-file-system";
 import { styles } from "@/styles/files/files";
 import CheckBox from "@/components/CheckBox";
 import { useEffect, useState } from "react";
@@ -18,7 +19,6 @@ import Select from "@/components/Select";
 import Button from "@/components/Button";
 import Table from "@/components/Table";
 import Popup from "@/components/Popup";
-import React from "react";
 import {
 	bulkEditFiles,
 	deleteFile,
@@ -86,7 +86,7 @@ export default function Files() {
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
 	const [searchKey, setSearchKey] = useState<GetFilesOptions["searchField"]>();
 
-	const [selectedFiles, setSelectedFiles] = useState<Array<APIFile["id"]>>([]);
+	const [selectedFiles, setSelectedFiles] = useState<(APIFile["id"])[]>([]);
 
 	const [tags, setTags] = useState<APITags | null>(null);
 	const [tagsMenuOpen, setTagsMenuOpen] = useState<boolean>(false);
@@ -894,6 +894,7 @@ export default function Files() {
 					onLayout={(event) => setFilesWidth(event.nativeEvent.layout.width)}
 				>
 					{files && dashUrl ? (
+						// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 						<>
 							{compactModeEnabled ? (
 								<Table
@@ -989,8 +990,8 @@ export default function Files() {
 										id: sortKey.id as string,
 										sortOrder: sortKey.sortOrder || "desc",
 									}}
-									rowWidth={[30, 150, 150, 150, 80, 130, 100, 220, 170]}
-									rows={files.page.map((file, index) => {
+									rowWidth={[30, 150, 150, 150, 80, 130, 100, 220, 213]}
+									rows={files.page.map((file) => {
 										const checkbox = (
 											<CheckBox
 												disabled={isFolder}
@@ -1126,6 +1127,70 @@ export default function Files() {
 												/>
 
 												<Button
+													icon="file-download"
+													color="#343a40"
+													onPress={async () => {
+														const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
+														
+														let savedFileDownloadUri = db.get("fileDownloadPath");
+					
+														if (!savedFileDownloadUri) {
+															const permissions =
+																await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+					
+															if (!permissions.granted)
+																return ToastAndroid.show(
+																	"The permission to save the file was not granted",
+																	ToastAndroid.SHORT,
+																);
+					
+															db.set("fileDownloadPath", permissions.directoryUri);
+															savedFileDownloadUri = permissions.directoryUri;
+														}
+					
+														ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
+					
+														const saveUri =
+															await FileSystem.StorageAccessFramework.createFileAsync(
+																savedFileDownloadUri,
+																file.name,
+																file.type,
+															);
+					
+														const downloadResult = await FileSystem.downloadAsync(
+															downloadUrl,
+															`${FileSystem.cacheDirectory}/${file.name}`,
+														);
+					
+														if (!downloadResult.uri)
+															return ToastAndroid.show(
+																"Something went wrong while downloading the file",
+																ToastAndroid.SHORT,
+															);
+					
+														const base64File = await FileSystem.readAsStringAsync(
+															downloadResult.uri,
+															{
+																encoding: FileSystem.EncodingType.Base64,
+															},
+														);
+					
+														await FileSystem.writeAsStringAsync(saveUri, base64File, {
+															encoding: FileSystem.EncodingType.Base64,
+														});
+					
+														ToastAndroid.show(
+															"Successfully downloaded the file",
+															ToastAndroid.SHORT,
+														);
+													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+
+												<Button
 													icon="delete"
 													color="#CF4238"
 													onPress={async () => {
@@ -1151,20 +1216,6 @@ export default function Files() {
 												/>
 											</View>
 										);
-
-										let rowStyle = styles.row;
-
-										if (index === 0)
-											rowStyle = {
-												...styles.row,
-												...styles.firstRow,
-											};
-
-										if (index === files.page.length - 1)
-											rowStyle = {
-												...styles.row,
-												...styles.lastRow,
-											};
 
 										return [
 											checkbox,
@@ -1199,6 +1250,7 @@ export default function Files() {
 							)}
 						</>
 					) : (
+						// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 						<>
 							{compactModeEnabled ? (
 								<SkeletonTable
@@ -1212,7 +1264,7 @@ export default function Files() {
 										"ID",
 										"Actions",
 									]}
-									rowWidth={[150, 150, 150, 80, 130, 100, 220, 170]}
+									rowWidth={[150, 150, 150, 80, 130, 100, 220, 213]}
 									rows={[...Array(10).keys()].map(() => {
 										return [80, 40, 60, 60, 90, 20, 120, 150];
 									})}

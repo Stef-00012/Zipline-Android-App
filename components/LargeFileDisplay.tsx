@@ -14,7 +14,6 @@ import * as db from "@/functions/database";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
-import React from "react";
 import axios from "axios";
 import {
 	removeFileFromFolder,

@@ -1,4 +1,3 @@
-import type { IconProps } from "@react-native-material/core";
 import type MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 interface SidebarOptionButton {
@@ -14,7 +13,7 @@ interface SidebarOptionButton {
 
 interface SidebarOptionSelect {
 	icon: keyof typeof MaterialIcons.glyphMap;
-	subMenus: Array<SidebarOption>;
+	subMenus: SidebarOption[];
 	invitesRoute: boolean;
 	adminOnly: boolean;
 	superAdminOnly: boolean;
@@ -25,7 +24,7 @@ interface SidebarOptionSelect {
 
 export type SidebarOption = SidebarOptionButton | SidebarOptionSelect;
 
-export const sidebarOptions: Array<SidebarOption> = [
+export const sidebarOptions: SidebarOption[] = [
 	{
 		route: "/",
 		name: "Home",

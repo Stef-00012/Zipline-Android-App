@@ -28,11 +28,11 @@ export interface APIUser {
 	updatedAt: string;
 	role: "SUPERADMIN" | "ADMIN" | "USER";
 	view: APIUserView;
-	oauthProviders: Array<OAuthProvider>;
+	oauthProviders: OAuthProvider[];
 	totpSecret: string | null;
-	passkeys: Array<Passkey>;
+	passkeys: Passkey[];
 	quota: APIUserQuota | null;
-	sessions: Array<string>;
+	sessions: string[];
 	avatar: string | null;
 }
 
@@ -91,7 +91,7 @@ export interface PasskeyReg {
 }
 
 export interface PasskeyRegResponse {
-	transports: Array<string>;
+	transports: string[];
 	clientDataJSON: string;
 	attestationObject: string;
 }
@@ -100,7 +100,7 @@ export interface PasskeyRegClientExtensionResults {
 	credProps: unknown | null;
 }
 
-export type APIRecentFiles = Array<APIFile>;
+export type APIRecentFiles = APIFile[];
 
 export interface APIFile {
 	createdAt: string;
@@ -116,7 +116,7 @@ export interface APIFile {
 	maxViews: number | null;
 	folderId: string | null;
 	thumbnail: string | null;
-	tags: Array<APITag>;
+	tags: APITag[];
 	password: boolean;
 	url: string;
 }
@@ -143,9 +143,9 @@ export interface APIUploadFile {
 }
 
 export interface APIUploadResponse {
-	files: Array<APIUploadFile>;
+	files: APIUploadFile[];
 	partialSuccess?: boolean;
-	assumedMimetypes: Array<boolean>;
+	assumedMimetypes: boolean[];
 	deletesAt?: string;
 }
 
@@ -169,101 +169,107 @@ export interface APITransactionResult {
 }
 
 export interface APISettings {
-	coreReturnHttpsUrls: boolean;
-	coreDefaultDomain: string | null;
-	coreTempDirectory: string;
-	chunksEnabled: boolean;
-	chunksMax: number | string;
-	chunksSize: number | string;
-	tasksDeleteInterval: number | string;
-	tasksClearInvitesInterval: number | string;
-	tasksMaxViewsInterval: number | string;
-	tasksThumbnailsInterval: number | string;
-	tasksMetricsInterval: number | string;
-	filesRoute: string;
-	filesLength: number;
-	filesDefaultFormat: "random" | "uuid" | "date" | "name" | "gfycat";
-	filesDisabledExtensions: Array<string>;
-	filesMaxFileSize: number | string;
-	filesDefaultExpiration: string | null;
-	filesAssumeMimetypes: boolean;
-	filesDefaultDateFormat: string;
-	filesRemoveGpsMetadata: boolean;
-	filesRandomWordsNumAdjectives: number;
-	filesRandomWordsSeparator: string;
-	urlsRoute: string;
-	urlsLength: number;
-	featuresImageCompression: boolean;
-	featuresRobotsTxt: boolean;
-	featuresHealthcheck: boolean;
-	featuresUserRegistration: boolean;
-	featuresOauthRegistration: boolean;
-	featuresDeleteOnMaxViews: boolean;
-	featuresThumbnailsEnabled: boolean;
-	featuresThumbnailsNumberThreads: number;
-	featuresMetricsEnabled: boolean;
-	featuresMetricsAdminOnly: boolean;
-	featuresMetricsShowUserSpecific: boolean;
-	featuresVersionChecking: boolean,
-	featuresVersionAPI: string,
-	invitesEnabled: boolean;
-	invitesLength: number;
-	websiteTitle: string;
-	websiteTitleLogo: string | null;
-	websiteExternalLinks: Array<ExternalLink>;
-	websiteLoginBackground: string | null;
-	websiteLoginBackgroundBlur: boolean;
-	websiteDefaultAvatar: string | null;
-	websiteTos: string | null;
-	websiteThemeDefault: string;
-	websiteThemeDark: string;
-	websiteThemeLight: string;
-	oauthBypassLocalLogin: boolean;
-	oauthLoginOnly: boolean;
-	oauthDiscordClientId: string | null;
-	oauthDiscordClientSecret: string | null;
-	oauthDiscordRedirectUri: string | null;
-	oauthGoogleClientId: string | null;
-	oauthGoogleClientSecret: string | null;
-	oauthGoogleRedirectUri: string | null;
-	oauthGithubClientId: string | null;
-	oauthGithubClientSecret: string | null;
-	oauthGithubRedirectUri: string | null;
-	oauthOidcClientId: string | null;
-	oauthOidcClientSecret: string | null;
-	oauthOidcAuthorizeUrl: string | null;
-	oauthOidcTokenUrl: string | null;
-	oauthOidcUserinfoUrl: string | null;
-	oauthOidcRedirectUri: string | null;
-	mfaTotpEnabled: boolean;
-	mfaTotpIssuer: string;
-	mfaPasskeys: boolean;
-	ratelimitEnabled: boolean;
-	ratelimitMax: number;
-	ratelimitWindow: number | null;
-	ratelimitAdminBypass: boolean;
-	ratelimitAllowList: Array<string>;
-	httpWebhookOnUpload: string | null;
-	httpWebhookOnShorten: string | null;
-	discordWebhookUrl: string | null;
-	discordUsername: string | null;
-	discordAvatarUrl: string | null;
-	discordOnUploadWebhookUrl: string | null;
-	discordOnUploadUsername: string | null;
-	discordOnUploadAvatarUrl: string | null;
-	discordOnUploadContent: string | null;
-	discordOnUploadEmbed: UploadEmbed | null;
-	discordOnShortenWebhookUrl: string | null;
-	discordOnShortenUsername: string | null;
-	discordOnShortenAvatarUrl: string | null;
-	discordOnShortenContent: string | null;
-	discordOnShortenEmbed: ShortenEmbed | null;
-	pwaEnabled: boolean;
-	pwaTitle: string;
-	pwaShortName: string;
-	pwaDescription: string;
-	pwaThemeColor: string;
-	pwaBackgroundColor: string;
+	settings: {
+		coreReturnHttpsUrls: boolean;
+		coreDefaultDomain: string | null;
+		coreTempDirectory: string;
+		chunksEnabled: boolean;
+		chunksMax: number | string;
+		chunksSize: number | string;
+		tasksDeleteInterval: number | string;
+		tasksClearInvitesInterval: number | string;
+		tasksMaxViewsInterval: number | string;
+		tasksThumbnailsInterval: number | string;
+		tasksMetricsInterval: number | string;
+		filesRoute: string;
+		filesLength: number;
+		filesDefaultFormat: "random" | "uuid" | "date" | "name" | "gfycat";
+		filesDisabledExtensions: string[]; // ???
+		filesMaxFileSize: number | string;
+		filesDefaultExpiration: string | null;
+		filesAssumeMimetypes: boolean;
+		filesDefaultDateFormat: string;
+		filesRemoveGpsMetadata: boolean;
+		filesRandomWordsNumAdjectives: number;
+		filesRandomWordsSeparator: string;
+		urlsRoute: string;
+		urlsLength: number;
+		featuresImageCompression: boolean;
+		featuresRobotsTxt: boolean;
+		featuresHealthcheck: boolean;
+		featuresUserRegistration: boolean;
+		featuresOauthRegistration: boolean;
+		featuresDeleteOnMaxViews: boolean;
+		featuresThumbnailsEnabled: boolean;
+		featuresThumbnailsNumberThreads: number;
+		featuresMetricsEnabled: boolean;
+		featuresMetricsAdminOnly: boolean;
+		featuresMetricsShowUserSpecific: boolean;
+		featuresVersionChecking: boolean,
+		featuresVersionAPI: string,
+		invitesEnabled: boolean;
+		invitesLength: number;
+		websiteTitle: string;
+		websiteTitleLogo: string | null;
+		websiteExternalLinks: ExternalLink[];
+		websiteLoginBackground: string | null;
+		websiteLoginBackgroundBlur: boolean;
+		websiteDefaultAvatar: string | null;
+		websiteTos: string | null;
+		websiteThemeDefault: string;
+		websiteThemeDark: string;
+		websiteThemeLight: string;
+		oauthBypassLocalLogin: boolean;
+		oauthLoginOnly: boolean;
+		oauthDiscordClientId: string | null;
+		oauthDiscordClientSecret: string | null;
+		oauthDiscordRedirectUri: string | null;
+		oauthDiscordAllowedIds: string[]; // +++
+		oauthDiscordDeniedIds: string[]; // +++
+		oauthGoogleClientId: string | null;
+		oauthGoogleClientSecret: string | null;
+		oauthGoogleRedirectUri: string | null;
+		oauthGithubClientId: string | null;
+		oauthGithubClientSecret: string | null;
+		oauthGithubRedirectUri: string | null;
+		oauthOidcClientId: string | null;
+		oauthOidcClientSecret: string | null;
+		oauthOidcAuthorizeUrl: string | null;
+		oauthOidcTokenUrl: string | null;
+		oauthOidcUserinfoUrl: string | null;
+		oauthOidcRedirectUri: string | null;
+		mfaTotpEnabled: boolean;
+		mfaTotpIssuer: string;
+		mfaPasskeys: boolean;
+		ratelimitEnabled: boolean;
+		ratelimitMax: number;
+		ratelimitWindow: number | null;
+		ratelimitAdminBypass: boolean;
+		ratelimitAllowList: string[];
+		httpWebhookOnUpload: string | null;
+		httpWebhookOnShorten: string | null;
+		discordWebhookUrl: string | null;
+		discordUsername: string | null;
+		discordAvatarUrl: string | null;
+		discordOnUploadWebhookUrl: string | null;
+		discordOnUploadUsername: string | null;
+		discordOnUploadAvatarUrl: string | null;
+		discordOnUploadContent: string | null;
+		discordOnUploadEmbed: UploadEmbed | null; // check embed
+		discordOnShortenWebhookUrl: string | null;
+		discordOnShortenUsername: string | null;
+		discordOnShortenAvatarUrl: string | null;
+		discordOnShortenContent: string | null;
+		discordOnShortenEmbed: ShortenEmbed | null; // check embed
+		pwaEnabled: boolean;
+		pwaTitle: string;
+		pwaShortName: string;
+		pwaDescription: string;
+		pwaThemeColor: string;
+		pwaBackgroundColor: string;
+		domains: string[]; // +++
+	},
+	tampered: (keyof APISettings["settings"])[];
 }
 
 export interface ExternalLink {
@@ -295,9 +301,9 @@ export type APIUserNoIncl = Omit<
 	sessions: [];
 };
 
-export type APIUsersNoIncl = Array<APIUserNoIncl>;
+export type APIUsersNoIncl = APIUserNoIncl[];
 
-export type APIUsers = Array<APIUser>;
+export type APIUsers = APIUser[];
 
 export interface APIURL {
 	id: string;
@@ -313,7 +319,7 @@ export interface APIURL {
 	userId: string;
 }
 
-export type APIURLs = Array<APIURL>;
+export type APIURLs = APIURL[];
 
 export interface APIFolder {
 	id: string;
@@ -322,15 +328,15 @@ export interface APIFolder {
 	name: string;
 	public: boolean;
 	userId: string;
-	files: Array<APIFile>;
+	files: APIFile[];
 	allowUploads: boolean;
 }
 
 export type APIFolderNoIncl = Omit<APIFolder, "files">;
 
-export type APIFolders = Array<APIFolder>;
+export type APIFolders = APIFolder[];
 
-export type APIFoldersNoIncl = Array<APIFolderNoIncl>;
+export type APIFoldersNoIncl = APIFolderNoIncl[];
 
 export interface APITag {
 	id: string;
@@ -338,17 +344,17 @@ export interface APITag {
 	updatedAt: string;
 	name: string;
 	color: string;
-	files: Array<TagFile>;
+	files: TagFile[];
 }
 
-export type APITags = Array<APITag>;
+export type APITags = APITag[];
 
 export interface TagFile {
 	id: string;
 }
 
 export interface APIFiles {
-	page: Array<APIFile>;
+	page: APIFile[];
 	total: number;
 	pages: number;
 }
@@ -360,7 +366,7 @@ export interface APIStat {
 	data: APIStatData;
 }
 
-export type APIStats = Array<APIStat>;
+export type APIStats = APIStat[];
 
 export interface APIStatData {
 	users: number;
@@ -369,9 +375,9 @@ export interface APIStatData {
 	urls: number;
 	urlViews: number;
 	storage: number;
-	filesUsers: Array<APIStatUserFile>;
-	urlsUsers: Array<APIStatUserURL>;
-	types: Array<APIStatFileType>;
+	filesUsers: APIStatUserFile[];
+	urlsUsers: APIStatUserURL[];
+	types: APIStatFileType[];
 }
 
 export interface APIStatUserFile {
@@ -410,7 +416,7 @@ export interface APIInviteInvier {
 	role: APIUser["role"];
 }
 
-export type APIInvites = Array<APIInvite>;
+export type APIInvites = APIInvite[];
 
 export interface APIExport {
 	id: string;
@@ -423,7 +429,7 @@ export interface APIExport {
 	userId: string;
 }
 
-export type APIExports = Array<APIExport>;
+export type APIExports = APIExport[];
 
 export interface ServerActionResponse {
 	status: string;

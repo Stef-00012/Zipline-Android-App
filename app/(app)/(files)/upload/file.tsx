@@ -33,7 +33,7 @@ export interface SelectedFile {
 
 interface Props {
 	showFileSelector?: boolean;
-	defaultFiles?: Array<SelectedFile>;
+	defaultFiles?: SelectedFile[];
 	fromShareIntent?: boolean;
 }
 
@@ -49,22 +49,22 @@ export default function UploadFile({
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
-	const [presets, setPresets] = useState<Array<Preset>>(
+	const [presets, setPresets] = useState<Preset[]>(
 		JSON.parse(stringifiedPresets),
 	);
 
-	const [selectedFiles, setSelectedFiles] = useState<Array<SelectedFile>>(
+	const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>(
 		defaultFiles || [],
 	);
 	const [uploadedFiles, setUploadedFiles] = useState<
 		APIUploadResponse["files"]
 	>([]);
 	const [failedUploads, setFailedUploads] = useState<
-		Array<{
+		({
 			uri: string;
 			name: string;
 			error: string;
-		}>
+		})[]
 	>([]);
 
 	const [overrideDomain, setOverrideDomain] =
@@ -81,10 +81,10 @@ export default function UploadFile({
 	const [folder, setFolder] = useState<UploadFileOptions["folder"]>();
 
 	const [folders, setFolders] = useState<
-		Array<{
+		({
 			label: string;
 			value: string;
-		}>
+		})[]
 	>([]);
 
 	const [defaultFormat, setDefaultFormat] = useState<string>("random");
@@ -111,7 +111,7 @@ export default function UploadFile({
 			const settings = await getSettings();
 
 			if (typeof settings !== "string") {
-				setDefaultFormat(settings.filesDefaultFormat);
+				setDefaultFormat(settings.settings.filesDefaultFormat);
 			}
 
 			if (typeof folders === "string") return setFolders([]);
@@ -281,7 +281,7 @@ export default function UploadFile({
 									"A preset with this name already exists",
 								);
 
-							const newPresets: Array<Preset> = [
+							const newPresets: Preset[] = [
 								...presets,
 								{
 									compression: compression,
@@ -343,7 +343,7 @@ export default function UploadFile({
 							if (editPresetName.length <= 0)
 								return setEditPresetError("Please add a preset name");
 
-							const newPresets: Array<Preset> = presets;
+							const newPresets: Preset[] = presets;
 
 							const presetIndex = newPresets.findIndex(
 								(preset) => preset.name === presetToEdit,
@@ -436,7 +436,7 @@ export default function UploadFile({
 
 							if (output.canceled || !output.assets) return;
 
-							const newSelectedFiles: Array<SelectedFile> = output.assets
+							const newSelectedFiles: SelectedFile[] = output.assets
 								.map((file) => ({
 									name: file.name,
 									uri: file.uri,

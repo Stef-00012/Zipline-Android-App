@@ -1,4 +1,4 @@
-import type { APIFile, ServerActionResponse } from "@/types/zipline";
+import type { ServerActionResponse } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
 
@@ -36,10 +36,10 @@ export async function clearZeroByteFiles(): Promise<
 
 export async function getZeroByteFiles(): Promise<
 	| {
-			files: Array<{
+			files: ({
 				id: string;
 				name: string;
-			}>;
+			})[];
 	  }
 	| string
 > {

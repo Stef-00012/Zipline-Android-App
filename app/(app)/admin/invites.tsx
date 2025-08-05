@@ -299,6 +299,7 @@ export default function Invites() {
 				<View style={{ flex: 1 }}>
 					<View style={{ ...styles.invitesContainer, flex: 1 }}>
 						{invites && dashUrl ? (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<Table
@@ -420,7 +421,7 @@ export default function Invites() {
 
 												return sortKey.sortOrder === "desc" ? -result : result;
 											})
-											.map((invite, index) => {
+											.map((invite) => {
 												const code = (
 													<Text key={invite.id} style={styles.rowText}>
 														{invite.code}
@@ -537,6 +538,7 @@ export default function Invites() {
 								)}
 							</>
 						) : (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<SkeletonTable

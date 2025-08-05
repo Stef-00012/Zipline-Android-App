@@ -1,5 +1,10 @@
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import type { APIExports, APISelfUser, APIVersion, DashURL } from "@/types/zipline";
+import type {
+	APIExports,
+	APISelfUser,
+	APIVersion,
+	DashURL,
+} from "@/types/zipline";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { convertToBytes, getFileDataURI } from "@/functions/util";
 import { getTokenWithToken } from "@/functions/zipline/auth";
@@ -845,7 +850,7 @@ export default function UserSettings() {
 												},
 											]}
 											rowWidth={[230, 130, 60, 90, 90]}
-											rows={exports.map((zlExport, index) => {
+											rows={exports.map((zlExport) => {
 												const id = (
 													<Text key={zlExport.id} style={styles.rowText}>
 														{zlExport.id}
@@ -999,20 +1004,6 @@ export default function UserSettings() {
 													</View>
 												);
 
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === exports.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
-
 												return [id, startedOn, files, size, actions];
 											})}
 										/>
@@ -1098,12 +1089,13 @@ export default function UserSettings() {
 								</Text>
 
 								{ziplineVersion && (
-									<View
-									style={styles.versionContainer}
-								>
-									<Text style={styles.subHeaderText}>Zipline Version: </Text>
-									<VersionDisplay versionData={ziplineVersion} userRole={user.role} />
-								</View>
+									<View style={styles.versionContainer}>
+										<Text style={styles.subHeaderText}>Zipline Version: </Text>
+										<VersionDisplay
+											versionData={ziplineVersion}
+											userRole={user.role}
+										/>
+									</View>
 								)}
 
 								<Switch

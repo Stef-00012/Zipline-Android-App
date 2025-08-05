@@ -9,9 +9,11 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		fontSize: 28,
 		color: "white",
+		marginHorizontal: 10,
 	},
 	subHeader: {
 		color: "gray",
+		marginHorizontal: 10,
 	},
 	subHeaderNumber: {
 		fontWeight: "bold",

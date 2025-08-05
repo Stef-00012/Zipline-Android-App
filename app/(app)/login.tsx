@@ -10,7 +10,6 @@ import { useRouter } from "expo-router";
 import { styles } from "@/styles/login";
 import { useState } from "react";
 import semver from "semver";
-import React from "react";
 
 export default function Login() {
 	const router = useRouter();
@@ -139,9 +138,7 @@ export default function Login() {
 										? versionData.version
 										: versionData.details?.version;
 
-							if (
-								semver.lt(serverVersion, "4.0.0")
-							) {
+							if (semver.lt(serverVersion, "4.0.0")) {
 								await db.del("url");
 								await db.del("token");
 
@@ -181,9 +178,7 @@ export default function Login() {
 									? versionData.version
 									: versionData.details.version;
 
-						if (
-							semver.lt(serverVersion, "4.0.0")
-						) {
+						if (semver.lt(serverVersion, "4.0.0")) {
 							await db.del("url");
 							await db.del("token");
 

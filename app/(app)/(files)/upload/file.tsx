@@ -60,11 +60,11 @@ export default function UploadFile({
 		APIUploadResponse["files"]
 	>([]);
 	const [failedUploads, setFailedUploads] = useState<
-		({
+		{
 			uri: string;
 			name: string;
 			error: string;
-		})[]
+		}[]
 	>([]);
 
 	const [overrideDomain, setOverrideDomain] =
@@ -81,10 +81,10 @@ export default function UploadFile({
 	const [folder, setFolder] = useState<UploadFileOptions["folder"]>();
 
 	const [folders, setFolders] = useState<
-		({
+		{
 			label: string;
 			value: string;
-		})[]
+		}[]
 	>([]);
 
 	const [defaultFormat, setDefaultFormat] = useState<string>("random");

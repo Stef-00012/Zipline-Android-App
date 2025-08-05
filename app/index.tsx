@@ -41,6 +41,7 @@ export default function Home() {
 
 	const [focusedFile, setFocusedFile] = useState<APIFile | null>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		handleAuth();
 	}, []);

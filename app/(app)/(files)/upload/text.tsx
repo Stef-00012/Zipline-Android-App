@@ -73,10 +73,10 @@ export default function UploadText({
 	const [fileExtension, setFileExtension] = useState<string>("txt");
 
 	const [folders, setFolders] = useState<
-		({
+		{
 			label: string;
 			value: string;
-		})[]
+		}[]
 	>([]);
 
 	const [defaultFormat, setDefaultFormat] = useState<string>("random");

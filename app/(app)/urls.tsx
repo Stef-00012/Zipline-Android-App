@@ -155,8 +155,8 @@ export default function Urls() {
 		switch (type) {
 			case "copyShortLink": {
 				const urlDest = url.vanity
-					? `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.vanity}`
-					: `${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.code}`;
+					? `${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.vanity}`
+					: `${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.code}`;
 
 				const saved = await Clipboard.setStringAsync(urlDest);
 
@@ -548,6 +548,7 @@ export default function Urls() {
 				<View style={{ flex: 1 }}>
 					<View style={styles.urlsContainer}>
 						{urls && dashUrl ? (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<Table
@@ -660,7 +661,7 @@ export default function Urls() {
 													<Link
 														key={url.id}
 														href={
-															`${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.code}` as ExternalPathString
+															`${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.code}` as ExternalPathString
 														}
 														style={{
 															...styles.rowText,
@@ -677,7 +678,7 @@ export default function Urls() {
 															<Link
 																key={url.id}
 																href={
-																	`${dashUrl}${settings?.urlsRoute === "/" ? "" : settings?.urlsRoute || "/go"}/${url.vanity}` as ExternalPathString
+																	`${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.vanity}` as ExternalPathString
 																}
 																style={{
 																	...styles.rowText,
@@ -799,7 +800,7 @@ export default function Urls() {
 											<LargeURLView
 												key={url.id}
 												url={url}
-												urlsRoute={settings?.urlsRoute || "/go"}
+												urlsRoute={settings?.settings.urlsRoute || "/go"}
 												dashUrl={dashUrl}
 												onAction={onAction}
 											/>
@@ -808,6 +809,7 @@ export default function Urls() {
 								)}
 							</>
 						) : (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<SkeletonTable

@@ -44,11 +44,11 @@ export default function FolderUpload() {
 		APIUploadResponse["files"]
 	>([]);
 	const [failedUploads, setFailedUploads] = useState<
-		({
+		{
 			uri: string;
 			name: string;
 			error: string;
-		})[]
+		}[]
 	>([]);
 
 	const [overrideDomain, setOverrideDomain] =

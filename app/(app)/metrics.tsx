@@ -17,7 +17,6 @@ import { styles } from "@/styles/metrics";
 import Button from "@/components/Button";
 import Table from "@/components/Table";
 import { add } from "date-fns";
-import React from "react";
 import {
 	filterStats,
 	getStats,
@@ -65,6 +64,7 @@ export default function Metrics() {
 		endDate: new Date(),
 	});
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		updateStats({
 			from: range.startDate as string,
@@ -99,7 +99,7 @@ export default function Metrics() {
 		setUserSpecificMetrics(
 			typeof settings === "string"
 				? false
-				: settings.featuresMetricsShowUserSpecific,
+				: settings.settings.featuresMetricsShowUserSpecific,
 		);
 
 		if (typeof stats === "string") return setStats(null);
@@ -328,7 +328,7 @@ export default function Metrics() {
 												},
 											]}
 											rowWidth={[190, 100, 100]}
-											rows={mainStat.data.urlsUsers.map((userUrl, index) => {
+											rows={mainStat.data.urlsUsers.map((userUrl) => {
 												const username = (
 													<Text key={userUrl.username} style={styles.rowText}>
 														{userUrl.username}
@@ -346,20 +346,6 @@ export default function Metrics() {
 														{userUrl.views}
 													</Text>
 												);
-
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === mainStat.data.types.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
 
 												return [username, urls, views];
 											})}
@@ -388,7 +374,7 @@ export default function Metrics() {
 												},
 											]}
 											rowWidth={[150, 60, 130, 50]}
-											rows={mainStat.data.filesUsers.map((userFile, index) => {
+											rows={mainStat.data.filesUsers.map((userFile) => {
 												const username = (
 													<Text key={userFile.username} style={styles.rowText}>
 														{userFile.username}
@@ -415,20 +401,6 @@ export default function Metrics() {
 													</Text>
 												);
 
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === mainStat.data.types.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
-
 												return [username, files, storageUsed, views];
 											})}
 										/>
@@ -450,7 +422,7 @@ export default function Metrics() {
 												},
 											]}
 											rowWidth={[tableTypeWidth, tableFilesWidth]}
-											rows={mainStat.data.types.map((typeData, index) => {
+											rows={mainStat.data.types.map((typeData) => {
 												const type = (
 													<Text key={typeData.type} style={styles.rowText}>
 														{typeData.type}
@@ -462,20 +434,6 @@ export default function Metrics() {
 														{typeData.sum}
 													</Text>
 												);
-
-												let rowStyle = styles.row;
-
-												if (index === 0)
-													rowStyle = {
-														...styles.row,
-														...styles.firstRow,
-													};
-
-												if (index === mainStat.data.types.length - 1)
-													rowStyle = {
-														...styles.row,
-														...styles.lastRow,
-													};
 
 												return [type, files];
 											})}

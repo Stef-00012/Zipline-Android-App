@@ -792,6 +792,7 @@ export default function Users() {
 				<View style={{ flex: 1 }}>
 					<View style={{ ...styles.usersContainer, flex: 1 }}>
 						{users && dashUrl ? (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<Table
@@ -880,7 +881,7 @@ export default function Users() {
 
 												return sortKey.sortOrder === "desc" ? -result : result;
 											})
-											.map((user, index) => {
+											.map((user) => {
 												const avatar = user.avatar ? (
 													<Image
 														key={user.id}
@@ -1000,6 +1001,7 @@ export default function Users() {
 								)}
 							</>
 						) : (
+							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 							<>
 								{compactModeEnabled ? (
 									<SkeletonTable

@@ -112,14 +112,16 @@ export default function ServerSettings() {
 				filesAssumeMimetypes: settings.settings.filesAssumeMimetypes,
 				filesRemoveGpsMetadata: settings.settings.filesRemoveGpsMetadata,
 				filesDefaultFormat: settings.settings.filesDefaultFormat,
-				filesDisabledExtensions: settings.settings.filesDisabledExtensions.join(", "),
+				filesDisabledExtensions:
+					settings.settings.filesDisabledExtensions.join(", "),
 				filesMaxFileSize:
 					convertToBytes(settings.settings.filesMaxFileSize, {
 						unitSeparator: " ",
 					}) || settings.settings.filesMaxFileSize,
 				filesDefaultExpiration: settings.settings.filesDefaultExpiration,
 				filesDefaultDateFormat: settings.settings.filesDefaultDateFormat,
-				filesRandomWordsNumAdjectives: settings.settings.filesRandomWordsNumAdjectives,
+				filesRandomWordsNumAdjectives:
+					settings.settings.filesRandomWordsNumAdjectives,
 				filesRandomWordsSeparator: settings.settings.filesRandomWordsSeparator,
 
 				urlsRoute: settings.settings.urlsRoute,
@@ -139,7 +141,8 @@ export default function ServerSettings() {
 				websiteExternalLinks:
 					JSON.stringify(settings.settings.websiteExternalLinks, null, 2) || "",
 				websiteLoginBackground: settings.settings.websiteLoginBackground,
-				websiteLoginBackgroundBlur: settings.settings.websiteLoginBackgroundBlur,
+				websiteLoginBackgroundBlur:
+					settings.settings.websiteLoginBackgroundBlur,
 				websiteDefaultAvatar: settings.settings.websiteDefaultAvatar,
 				websiteTos: settings.settings.websiteTos,
 				websiteThemeDefault: settings.settings.websiteThemeDefault,
@@ -152,8 +155,10 @@ export default function ServerSettings() {
 				oauthDiscordClientId: settings.settings.oauthDiscordClientId,
 				oauthDiscordClientSecret: settings.settings.oauthDiscordClientSecret,
 				oauthDiscordRedirectUri: settings.settings.oauthDiscordRedirectUri,
-				oauthDiscordAllowedIds: settings.settings.oauthDiscordAllowedIds.join(", "),
-				oauthDiscordDeniedIds: settings.settings.oauthDiscordDeniedIds.join(", "),
+				oauthDiscordAllowedIds:
+					settings.settings.oauthDiscordAllowedIds.join(", "),
+				oauthDiscordDeniedIds:
+					settings.settings.oauthDiscordDeniedIds.join(", "),
 
 				oauthGoogleClientId: settings.settings.oauthGoogleClientId,
 				oauthGoogleClientSecret: settings.settings.oauthGoogleClientSecret,
@@ -206,9 +211,11 @@ export default function ServerSettings() {
 					settings.settings.discordOnUploadEmbed?.timestamp ?? false,
 				"discordOnUploadEmbed.title":
 					settings.settings.discordOnUploadEmbed?.title ?? null,
-				"discordOnUploadEmbed.url": settings.settings.discordOnUploadEmbed?.url ?? false,
+				"discordOnUploadEmbed.url":
+					settings.settings.discordOnUploadEmbed?.url ?? false,
 
-				discordOnShortenWebhookUrl: settings.settings.discordOnShortenWebhookUrl,
+				discordOnShortenWebhookUrl:
+					settings.settings.discordOnShortenWebhookUrl,
 				discordOnShortenUsername: settings.settings.discordOnShortenUsername,
 				discordOnShortenAvatarUrl: settings.settings.discordOnShortenAvatarUrl,
 				discordOnShortenContent: settings.settings.discordOnShortenContent,
@@ -298,7 +305,7 @@ export default function ServerSettings() {
 					featuresMetricsShowUserSpecific:
 						saveSettings.featuresMetricsShowUserSpecific,
 					featuresVersionAPI: saveSettings.featuresVersionAPI,
-					featuresVersionChecking: saveSettings.featuresVersionChecking
+					featuresVersionChecking: saveSettings.featuresVersionChecking,
 				};
 
 				break;
@@ -381,7 +388,8 @@ export default function ServerSettings() {
 					oauthBypassLocalLogin: saveSettings.oauthBypassLocalLogin,
 					oauthLoginOnly: saveSettings.oauthLoginOnly,
 					oauthDiscordClientId: saveSettings.oauthDiscordClientId,
-					oauthDiscordAllowedIds: saveSettings.oauthDiscordAllowedIds.split(", "),
+					oauthDiscordAllowedIds:
+						saveSettings.oauthDiscordAllowedIds.split(", "),
 					oauthDiscordDeniedIds: saveSettings.oauthDiscordDeniedIds.split(", "),
 					oauthDiscordClientSecret: saveSettings.oauthDiscordClientSecret,
 					oauthDiscordRedirectUri: saveSettings.oauthDiscordRedirectUri,
@@ -530,7 +538,7 @@ export default function ServerSettings() {
 	const [newUrlError, setNewUrlError] = useState<string | null>(null);
 
 	const [addNewDomain, setAddNewDomain] = useState<boolean>(false);
-	const [newDomain, setNewDomain] = useState<string | null>(null)
+	const [newDomain, setNewDomain] = useState<string | null>(null);
 
 	const [newDomainError, setNewDomainError] = useState<string | null>(null);
 
@@ -543,10 +551,20 @@ export default function ServerSettings() {
 	function renderSetting(setting: Setting, skeleton = false) {
 		let description: ReactNode;
 
-		if ((setting.type !== "category" && setting.type !== "externalUrls" && setting.type !== "domain" && setting.type !== "save") && typeof setting.description === "string")
-			description = <Text>{parseMarkdownLinks(setting.description, {
-				color: "#575db5"
-			})}</Text>
+		if (
+			setting.type !== "category" &&
+			setting.type !== "externalUrls" &&
+			setting.type !== "domain" &&
+			setting.type !== "save" &&
+			typeof setting.description === "string"
+		)
+			description = (
+				<Text>
+					{parseMarkdownLinks(setting.description, {
+						color: "#575db5",
+					})}
+				</Text>
+			);
 
 		switch (setting.type) {
 			case "category": {
@@ -594,7 +612,12 @@ export default function ServerSettings() {
 						title={setting.name}
 						description={description}
 						password={setting.passwordInput}
-						disabled={saving || settings?.tampered.includes(setting.setting as keyof APISettings["settings"])}
+						disabled={
+							saving ||
+							settings?.tampered.includes(
+								setting.setting as keyof APISettings["settings"],
+							)
+						}
 						keyboardType={setting.keyboardType}
 						onValueChange={(content) =>
 							setSaveSettings((prev) => {
@@ -639,7 +662,13 @@ export default function ServerSettings() {
 						key={setting.setting}
 						data={setting.options}
 						description={setting.description}
-						disabled={skeleton || saving || settings?.tampered.includes(setting.setting as keyof APISettings["settings"])}
+						disabled={
+							skeleton ||
+							saving ||
+							settings?.tampered.includes(
+								setting.setting as keyof APISettings["settings"],
+							)
+						}
 						onSelect={(selectedItem) => {
 							setSaveSettings((prev) => {
 								return {
@@ -664,7 +693,13 @@ export default function ServerSettings() {
 				return (
 					<Switch
 						key={setting.setting}
-						disabled={skeleton || saving || settings?.tampered.includes(setting.setting as keyof APISettings["settings"])}
+						disabled={
+							skeleton ||
+							saving ||
+							settings?.tampered.includes(
+								setting.setting as keyof APISettings["settings"],
+							)
+						}
 						description={setting.description}
 						onValueChange={() =>
 							setSaveSettings((prev) => {
@@ -698,9 +733,25 @@ export default function ServerSettings() {
 							</View>
 
 							<Button
-								color={(skeleton || saving || settings?.tampered.includes("websiteExternalLinks")) ? "#373d79" : "#323ea8"}
-								iconColor={(skeleton || saving || settings?.tampered.includes("websiteExternalLinks")) ? "gray" : "white"}
-								disabled={skeleton || saving || settings?.tampered.includes("websiteExternalLinks")}
+								color={
+									skeleton ||
+									saving ||
+									settings?.tampered.includes("websiteExternalLinks")
+										? "#373d79"
+										: "#323ea8"
+								}
+								iconColor={
+									skeleton ||
+									saving ||
+									settings?.tampered.includes("websiteExternalLinks")
+										? "gray"
+										: "white"
+								}
+								disabled={
+									skeleton ||
+									saving ||
+									settings?.tampered.includes("websiteExternalLinks")
+								}
 								onPress={() => {
 									setCreateNewUrl(true);
 								}}
@@ -752,7 +803,10 @@ export default function ServerSettings() {
 												externalUrl={url}
 												key={`${url.url}-${index}`}
 												id={index}
-												disabled={saving || settings?.tampered.includes("websiteExternalLinks")}
+												disabled={
+													saving ||
+													settings?.tampered.includes("websiteExternalLinks")
+												}
 												onChange={(type, id) => {
 													switch (type) {
 														case "delete": {
@@ -840,7 +894,9 @@ export default function ServerSettings() {
 							icon="add"
 							iconColor={skeleton || saving ? "gray" : "white"}
 							textColor={skeleton || saving ? "gray" : "white"}
-							disabled={skeleton || saving || settings?.tampered.includes("domains")}
+							disabled={
+								skeleton || saving || settings?.tampered.includes("domains")
+							}
 							margin={{
 								left: 10,
 								right: 10,
@@ -853,9 +909,8 @@ export default function ServerSettings() {
 							color={skeleton || saving ? "#373d79" : "#323ea8"}
 						/>
 
-						{(JSON.parse(
-							saveSettings?.domains || "[]",
-						) as string[]).length > 0 && (
+						{(JSON.parse(saveSettings?.domains || "[]") as string[]).length >
+							0 && (
 							<View
 								style={{
 									...styles.settingGroup,
@@ -871,15 +926,15 @@ export default function ServerSettings() {
 										// biome-ignore lint/complexity/noUselessFragments: The fragment is required
 										<>
 											{(
-												JSON.parse(
-													saveSettings?.domains || "[]",
-												) as string[]
+												JSON.parse(saveSettings?.domains || "[]") as string[]
 											).map((domain, index) => (
 												<Domain
 													// biome-ignore lint/suspicious/noArrayIndexKey: index is the only unique identifier here
 													key={index}
 													domain={domain}
-													disabled={saving || settings?.tampered.includes("domains")}
+													disabled={
+														saving || settings?.tampered.includes("domains")
+													}
 													onDelete={() => {
 														const newDomains: string[] = JSON.parse(
 															saveSettings?.domains || "[]",
@@ -911,7 +966,7 @@ export default function ServerSettings() {
 							</View>
 						)}
 					</>
-				)
+				);
 			}
 
 			case "colorPicker": {
@@ -1161,7 +1216,9 @@ export default function ServerSettings() {
 				>
 					<View style={styles.popupContent}>
 						<Text style={styles.mainHeaderText}>Add New Domain</Text>
-						{newDomainError && <Text style={styles.errorText}>{newDomainError}</Text>}
+						{newDomainError && (
+							<Text style={styles.errorText}>{newDomainError}</Text>
+						)}
 
 						<TextInput
 							title="Domain:"
@@ -1182,7 +1239,8 @@ export default function ServerSettings() {
 							onPress={async () => {
 								setNewDomainError(null);
 
-								if (!newDomain) return setNewDomainError("Please insert a domain");
+								if (!newDomain)
+									return setNewDomainError("Please insert a domain");
 
 								const newDomains: string[] = JSON.parse(
 									saveSettings?.domains || "[]",
@@ -1225,8 +1283,10 @@ export default function ServerSettings() {
 						<Text style={styles.mainHeaderText}>Overridden Settings</Text>
 
 						<View>
-							{settings?.tampered.map(setting => (
-								<Text key={setting} style={styles.tamperedSettingText}>- {setting}</Text>
+							{settings?.tampered.map((setting) => (
+								<Text key={setting} style={styles.tamperedSettingText}>
+									- {setting}
+								</Text>
 							))}
 						</View>
 
@@ -1274,28 +1334,35 @@ export default function ServerSettings() {
 				{saveSettings ? (
 					<View style={styles.settingsContainer}>
 						<KeyboardAwareScrollView style={styles.scrollView}>
-							{(settings && settings.tampered.length > 0) && (
+							{settings && settings.tampered.length > 0 && (
 								<View style={styles.tamperedSettingsWarning}>
-									<Text style={styles.tamperedSettingTitle}>Environment Variable Settings</Text>
+									<Text style={styles.tamperedSettingTitle}>
+										Environment Variable Settings
+									</Text>
 
 									<Text style={styles.tamperedSettingText}>
-										<Text style={styles.tamperedSettingCount}>{settings.tampered.length}</Text>{" "}
-										setting{settings.tampered.length > 1 ? "s have" : " has"} been set{" "}
-										via environment variables, therefore any changes made to {settings.tampered.length > 1 ? "them" : "it"} on this page will not take effect{" "}
-										unless the environment variable corresponding to the setting is removed. If you prefer using{" "}
-										environment variables, you can ignore this message. Click{" "}
-										
-										<Pressable onPress={() => {
-											setShowTamperedKeys(true)
-										}}>
+										<Text style={styles.tamperedSettingCount}>
+											{settings.tampered.length}
+										</Text>{" "}
+										setting{settings.tampered.length > 1 ? "s have" : " has"}{" "}
+										been set via environment variables, therefore any changes
+										made to {settings.tampered.length > 1 ? "them" : "it"} on
+										this page will not take effect unless the environment
+										variable corresponding to the setting is removed. If you
+										prefer using environment variables, you can ignore this
+										message. Click{" "}
+										<Pressable
+											onPress={() => {
+												setShowTamperedKeys(true);
+											}}
+										>
 											<Text style={styles.tamperedSettingsLink}>here</Text>
 										</Pressable>{" "}
-										
 										to view the list of overridden settings.
 									</Text>
 								</View>
 							)}
-							
+
 							{zlSettings.map((setting) => renderSetting(setting))}
 							<View />
 						</KeyboardAwareScrollView>

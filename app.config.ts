@@ -23,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			monochromeImage: "./assets/images/monochromatic-adaptive-icon.png",
 			backgroundColor: "#121317",
 		},
+		version: appVersion,
 		package: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
 	},
 	androidStatusBar: {

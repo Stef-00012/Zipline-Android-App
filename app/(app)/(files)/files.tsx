@@ -86,7 +86,7 @@ export default function Files() {
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>("");
 	const [searchKey, setSearchKey] = useState<GetFilesOptions["searchField"]>();
 
-	const [selectedFiles, setSelectedFiles] = useState<(APIFile["id"])[]>([]);
+	const [selectedFiles, setSelectedFiles] = useState<APIFile["id"][]>([]);
 
 	const [tags, setTags] = useState<APITags | null>(null);
 	const [tagsMenuOpen, setTagsMenuOpen] = useState<boolean>(false);
@@ -1131,54 +1131,67 @@ export default function Files() {
 													color="#343a40"
 													onPress={async () => {
 														const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
-														
-														let savedFileDownloadUri = db.get("fileDownloadPath");
-					
+
+														let savedFileDownloadUri =
+															db.get("fileDownloadPath");
+
 														if (!savedFileDownloadUri) {
 															const permissions =
 																await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-					
+
 															if (!permissions.granted)
 																return ToastAndroid.show(
 																	"The permission to save the file was not granted",
 																	ToastAndroid.SHORT,
 																);
-					
-															db.set("fileDownloadPath", permissions.directoryUri);
+
+															db.set(
+																"fileDownloadPath",
+																permissions.directoryUri,
+															);
 															savedFileDownloadUri = permissions.directoryUri;
 														}
-					
-														ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
-					
+
+														ToastAndroid.show(
+															"Downloading...",
+															ToastAndroid.SHORT,
+														);
+
 														const saveUri =
 															await FileSystem.StorageAccessFramework.createFileAsync(
 																savedFileDownloadUri,
 																file.name,
 																file.type,
 															);
-					
-														const downloadResult = await FileSystem.downloadAsync(
-															downloadUrl,
-															`${FileSystem.cacheDirectory}/${file.name}`,
-														);
-					
+
+														const downloadResult =
+															await FileSystem.downloadAsync(
+																downloadUrl,
+																`${FileSystem.cacheDirectory}/${file.name}`,
+															);
+
 														if (!downloadResult.uri)
 															return ToastAndroid.show(
 																"Something went wrong while downloading the file",
 																ToastAndroid.SHORT,
 															);
-					
-														const base64File = await FileSystem.readAsStringAsync(
-															downloadResult.uri,
+
+														const base64File =
+															await FileSystem.readAsStringAsync(
+																downloadResult.uri,
+																{
+																	encoding: FileSystem.EncodingType.Base64,
+																},
+															);
+
+														await FileSystem.writeAsStringAsync(
+															saveUri,
+															base64File,
 															{
 																encoding: FileSystem.EncodingType.Base64,
 															},
 														);
-					
-														await FileSystem.writeAsStringAsync(saveUri, base64File, {
-															encoding: FileSystem.EncodingType.Base64,
-														});
-					
+
 														ToastAndroid.show(
 															"Successfully downloaded the file",
 															ToastAndroid.SHORT,

@@ -27,7 +27,7 @@ export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 
 			if (
 				typeof versionData === "string" ||
-				semver.lt(serverVersion, "4.0.0")
+				semver.lt(serverVersion, "4.2.0")
 			) {
 				await db.del("url");
 				await db.del("token");

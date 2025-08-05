@@ -138,11 +138,11 @@ export default function Login() {
 										? versionData.version
 										: versionData.details?.version;
 
-							if (semver.lt(serverVersion, "4.0.0")) {
+							if (semver.lt(serverVersion, "4.2.0")) {
 								await db.del("url");
 								await db.del("token");
 
-								return setError("You must use Zipline v4.0.0 or greater");
+								return setError("You must use Zipline v4.2.0 or greater");
 							}
 
 							return router.replace("/");
@@ -178,11 +178,11 @@ export default function Login() {
 									? versionData.version
 									: versionData.details.version;
 
-						if (semver.lt(serverVersion, "4.0.0")) {
+						if (semver.lt(serverVersion, "4.2.0")) {
 							await db.del("url");
 							await db.del("token");
 
-							return setError("You must use Zipline v4.0.0 or greater");
+							return setError("You must use Zipline v4.2.0 or greater");
 						}
 
 						return router.replace("/");

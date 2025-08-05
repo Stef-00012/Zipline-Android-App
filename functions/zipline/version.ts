@@ -39,14 +39,14 @@ export async function getVersion(): Promise<APIVersion | string> {
 
 			if (res.status !== 404)
 				return {
-					version: "4.0.0",
+					version: "4.2.0",
 				};
 		} catch (e) {
 			const error = e as AxiosError;
 
 			if (error.status !== 404)
 				return {
-					version: "4.0.0",
+					version: "4.2.0",
 				};
 		}
 

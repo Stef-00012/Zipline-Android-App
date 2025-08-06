@@ -16,7 +16,7 @@ on:
       - app.config.ts
       - package.json
       - eas.json
-      - .github/workflows/apk-build.yml
+      - .github/workflows/app-build.yml
 
   workflow_dispatch: 
 

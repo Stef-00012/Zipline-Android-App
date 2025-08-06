@@ -1,5 +1,8 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
-import { version as appVersion } from "./package.json"
+import {
+	version as appVersion,
+	versionCode as appVersionCode
+} from "./package.json"
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 
@@ -23,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			monochromeImage: "./assets/images/monochromatic-adaptive-icon.png",
 			backgroundColor: "#121317",
 		},
-		versionCode: 2,
+		versionCode: appVersionCode,
 		version: appVersion,
 		package: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
 	},

@@ -86,14 +86,14 @@ jobs:
           name: app-release
           path: ${{ github.workspace }}/app-release.apk
 
-      # - name: Build Android App AAB
-      #   run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-release.aab
+      - name: Build Android App AAB
+        run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-release.aab
 
-      # - name: Upload APK Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: app-release
-      #     path: ${{ github.workspace }}/app-release.aab
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: ${{ github.workspace }}/app-release.aab
 
       - name: Publish Release
         uses: ncipollo/release-action@v1

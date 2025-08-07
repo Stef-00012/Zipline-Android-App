@@ -431,7 +431,7 @@ export default function UploadFile({
 							const output = await DocumentPicker.getDocumentAsync({
 								type: "*/*",
 								multiple: true,
-								copyToCacheDirectory: true,
+								copyToCacheDirectory: false,
 							});
 
 							if (output.canceled || !output.assets) return;

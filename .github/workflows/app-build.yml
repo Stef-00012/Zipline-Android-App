@@ -83,16 +83,16 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: app-apk-release
           path: ${{ github.workspace }}/app-release.apk
 
       - name: Build Android App AAB
         run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-release.aab
 
-      - name: Upload APK Artifact
+      - name: Upload AAB Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: app-aab-release
           path: ${{ github.workspace }}/app-release.aab
 
       - name: Publish Release

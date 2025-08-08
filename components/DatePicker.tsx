@@ -3,24 +3,17 @@ import { styles } from "@/styles/components/datePicker";
 import Button from "@/components/Button";
 import type { ReactNode } from "react";
 import Popup from "@/components/Popup";
-import type {
-	DatePickerMultipleProps,
-	DatePickerRangeProps,
-	DatePickerSingleProps
-} from "react-native-ui-datepicker/lib/typescript/datetime-picker";
 
-type Props = (
-	| DatePickerMultipleProps
-	| DatePickerRangeProps
-	| DatePickerSingleProps
-) & {
+type DateTimePickerProps = Parameters<typeof DateTimePicker>[0];
+
+type Props = DateTimePickerProps & {
 	open: boolean;
 	onClose: () => void | Promise<void>;
 	children?: ReactNode;
 };
 
 export default function DatePicker(props: Props) {
-	const { open, onClose, children, ...datePickerProps } = props;
+	const { open, onClose, children: _children, ...datePickerProps } = props;
 
 	const defaultProps = {
 		monthContainerStyle: styles.monthContainerStyle,

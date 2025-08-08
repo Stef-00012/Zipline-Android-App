@@ -29,10 +29,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		versionCode: appVersionCode,
 		version: appVersion,
 		package: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
-	},
-	androidStatusBar: {
-		barStyle: "light-content",
-		backgroundColor: "#0c101c",
+		scheme: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
+		newArchEnabled: true,
+		edgeToEdgeEnabled: true,
 	},
 	plugins: [
 		"expo-router",

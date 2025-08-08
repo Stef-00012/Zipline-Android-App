@@ -42,9 +42,9 @@ export default function Layout() {
 					}),
 			}}
 		>
-			<StatusBar style="light" backgroundColor="#0c101c" />
+			<StatusBar style="light" />
 
-			<SafeAreaView style={{ flex: 1 }}>
+			<SafeAreaView style={{ flex: 1, backgroundColor: "#0c101c" }}>
 				<KeyboardProvider>
 					<GestureHandlerRootView>
 						{hasInternet ? (

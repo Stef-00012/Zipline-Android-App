@@ -169,7 +169,10 @@ export function luminance(color: string): number {
 	return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
 }
 
-export function isLightColor(color: string, luminanceThreshold = 0.179): boolean {
+export function isLightColor(
+	color: string,
+	luminanceThreshold = 0.179,
+): boolean {
 	if (color.startsWith("var(")) {
 		return false;
 	}

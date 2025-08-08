@@ -79,7 +79,7 @@ export async function getCurrentUserAvatar(): Promise<string | null> {
 		});
 
 		return res.data;
-	} catch (e) {
+	} catch (_e) {
 		return null;
 	}
 }

@@ -1,8 +1,4 @@
-import type {
-	APISettings,
-	ShortenEmbed,
-	UploadEmbed,
-} from "@/types/zipline";
+import type { APISettings, ShortenEmbed, UploadEmbed } from "@/types/zipline";
 import type { SelectProps } from "@/components/Select";
 import type { DimensionValue, KeyboardType } from "react-native";
 
@@ -187,8 +183,8 @@ export interface SaveSettings {
 	featuresMetricsShowUserSpecific: boolean;
 	featuresThumbnailsEnabled: boolean;
 	featuresThumbnailsNumberThreads: number;
-	featuresVersionChecking: boolean,
-	featuresVersionAPI: string,
+	featuresVersionChecking: boolean;
+	featuresVersionAPI: string;
 
 	filesRoute: string;
 	filesLength: number;
@@ -317,12 +313,13 @@ export const formats: SelectProps["data"] = [
 	},
 ];
 
-export type SettingPath<T extends keyof APISettings["settings"] = keyof APISettings["settings"]> =
-	T extends "discordOnUploadEmbed"
-		? T | `${T}.${keyof UploadEmbed}`
-		: T extends "discordOnShortenEmbed"
-			? T | `${T}.${keyof ShortenEmbed}`
-			: T;
+export type SettingPath<
+	T extends keyof APISettings["settings"] = keyof APISettings["settings"],
+> = T extends "discordOnUploadEmbed"
+	? T | `${T}.${keyof UploadEmbed}`
+	: T extends "discordOnShortenEmbed"
+		? T | `${T}.${keyof ShortenEmbed}`
+		: T;
 
 export type SaveCategories =
 	| "core"
@@ -679,7 +676,8 @@ export const settings: Setting[] = [
 				type: "switch",
 				name: "Version Checking",
 				setting: "featuresVersionChecking",
-				description: "Enable version checking for the server. This will check for updates and display the status on the sidebar to all users.",
+				description:
+					"Enable version checking for the server. This will check for updates and display the status on the sidebar to all users.",
 			},
 			{
 				type: "input",
@@ -1039,16 +1037,18 @@ export const settings: Setting[] = [
 						name: "Discord Allowed IDs",
 						setting: "oauthDiscordAllowedIds",
 						keyboardType: "default",
-						description: "A comma-separated list of Discord user IDs that are allowed to log in. Leave empty to disable allow list.",
-						skeletonWidth: "60%"
+						description:
+							"A comma-separated list of Discord user IDs that are allowed to log in. Leave empty to disable allow list.",
+						skeletonWidth: "60%",
 					},
 					{
 						type: "input",
 						name: "Discord Denied IDs",
 						setting: "oauthDiscordDeniedIds",
 						keyboardType: "default",
-						description: "A comma-separated list of Discord user IDs that are denied from logging in. Leave empty to disable deny list.",
-						skeletonWidth: "60%"
+						description:
+							"A comma-separated list of Discord user IDs that are denied from logging in. Leave empty to disable deny list.",
+						skeletonWidth: "60%",
 					},
 					{
 						type: "input",

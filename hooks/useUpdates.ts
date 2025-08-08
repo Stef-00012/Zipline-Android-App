@@ -18,6 +18,7 @@ export function useAppUpdates() {
 	// const [downloadProgress, setDownloadProgress] = useState<number>(0);
 	// const [downloadSize, setDownloadSize] = useState<number>(0);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		setIsUpdateAvailable(false);
 
@@ -79,8 +80,7 @@ export function useAppUpdates() {
 				// 1000 * 60 * 30 = 30 minutes
 				if (
 					!lastUpdateAlert ||
-					new Date().getTime() - new Date(lastUpdateAlert).getTime() >
-						1000 * 60 * 30 ||
+					Date.now() - new Date(lastUpdateAlert).getTime() > 1000 * 60 * 30 ||
 					!latestUpdateAlertVersion ||
 					semver.gt(coercedVersion, latestUpdateAlertVersion)
 				) {
@@ -110,7 +110,7 @@ export function useAppUpdates() {
 				nextVersion: null,
 				currentVersion: appVersion,
 			};
-		} catch (e) {
+		} catch (_e) {
 			setIsChecking(false);
 			setIsUpdateAvailable(false);
 

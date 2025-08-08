@@ -4,5 +4,5 @@ export const searchKeyNames = {
 	destination: "Destination",
 	views: "Views",
 	maxViews: "Max Views",
-	id: "ID"
+	id: "ID",
 };

@@ -48,9 +48,9 @@ export const dates: SelectProps["data"] = [
 ];
 
 export const searchKeyNames = {
-    code: "Code",
-    maxUses: "Max Uses",
-    uses: "Uses",
-    id: "ID",
-	inviter: "Inviter"
-}
+	code: "Code",
+	maxUses: "Max Uses",
+	uses: "Uses",
+	id: "ID",
+	inviter: "Inviter",
+};

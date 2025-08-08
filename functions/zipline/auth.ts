@@ -27,7 +27,7 @@ export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 		if (res.status === 200) return data.role;
 
 		return false;
-	} catch (e) {
+	} catch (_e) {
 		return false;
 	}
 }

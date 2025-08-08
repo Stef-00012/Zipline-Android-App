@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
 import NativeColorPicker, {
-	type returnedResults,
+	type ColorFormatsObject,
 	HSLSaturationSlider,
 	BrightnessSlider,
 	LuminanceSlider,
@@ -28,7 +28,7 @@ type PanelComponent = "panel1" | "panel2" | "panel3" | "panel4" | "panel5";
 
 interface CustomColorPickerProps {
 	defaultInputFormats?: ("HEX" | "RGB" | "HSL" | "HWB" | "HSV")[];
-	onSelectColor: (color: returnedResults) => void;
+	onSelectColor: (color: ColorFormatsObject) => void;
 	previewHideInitialColor?: boolean;
 	defaultColors?: string[];
 	showHSLSaturation?: boolean;
@@ -91,7 +91,7 @@ export default function ColorPicker({
 }: CustomColorPickerProps) {
 	const [showPicker, setShowPicker] = useState<boolean>(false);
 	const [color, setColor] = useState<string>(initialColor || "#ffffff");
-	const [selectedColorData, setSelectedColorData] = useState<returnedResults>();
+	const [selectedColorData, setSelectedColorData] = useState<ColorFormatsObject>();
 	const [panelType, setPanelType] = useState<PanelType>();
 	const [panelComponent, setPanelComponent] =
 		useState<PanelComponent>("panel1");

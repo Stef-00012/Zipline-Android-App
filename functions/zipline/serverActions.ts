@@ -36,10 +36,10 @@ export async function clearZeroByteFiles(): Promise<
 
 export async function getZeroByteFiles(): Promise<
 	| {
-			files: ({
+			files: {
 				id: string;
 				name: string;
-			})[];
+			}[];
 	  }
 	| string
 > {

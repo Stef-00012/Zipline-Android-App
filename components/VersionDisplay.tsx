@@ -26,7 +26,7 @@ export default function VersionDisplay({ versionData, userRole }: Props) {
 				setVersionChecking(
 					typeof serverSettings === "string"
 						? false
-						: serverSettings.featuresVersionChecking,
+						: serverSettings.settings.featuresVersionChecking,
 				);
 			}
 		})();

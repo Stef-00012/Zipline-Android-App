@@ -142,7 +142,9 @@ export default function Login() {
 								await db.del("url");
 								await db.del("token");
 
-								return setError("You must use Zipline v4.2.0 or greater and have 'Version checking' feature enabled");
+								return setError(
+									"You must use Zipline v4.2.0 or greater and have 'Version checking' feature enabled",
+								);
 							}
 
 							return router.replace("/");
@@ -182,7 +184,9 @@ export default function Login() {
 							await db.del("url");
 							await db.del("token");
 
-							return setError("You must use Zipline v4.2.0 or greater and have 'Version checking' feature enabled");
+							return setError(
+								"You must use Zipline v4.2.0 or greater and have 'Version checking' feature enabled",
+							);
 						}
 
 						return router.replace("/");

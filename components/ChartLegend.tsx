@@ -2,10 +2,10 @@ import { Text, View, type ColorValue } from "react-native";
 import { styles } from "@/styles/components/chartLegend";
 
 interface Props {
-	data: ({
+	data: {
 		label: string;
 		color: ColorValue;
-	})[];
+	}[];
 }
 
 export default function ChartLegend({ data }: Props) {

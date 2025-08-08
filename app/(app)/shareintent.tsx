@@ -6,6 +6,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { styles } from "@/styles/shareIntent";
 import { useAuth } from "@/hooks/useAuth";
 import { View } from "react-native";
+import { File } from "expo-file-system/next";
 
 export default function ShareIntent() {
 	const router = useRouter();
@@ -44,12 +45,17 @@ export default function ShareIntent() {
 			{shareIntent.files && (
 				<UploadFile
 					fromShareIntent
-					defaultFiles={shareIntent.files.map((file) => ({
-						name: file.fileName,
-						uri: file.path,
-						size: file.size || undefined,
-						mimetype: file.mimeType,
-					}))}
+					defaultFiles={shareIntent.files.map((file) => {
+						const fileInstance = new File(file.path);
+
+						return {
+							name: file.fileName,
+							uri: file.path,
+							instance: fileInstance,
+							size: file.size || fileInstance.size || undefined,
+							mimetype: file.mimeType || fileInstance.type || undefined,
+						};
+					})}
 					showFileSelector={false}
 				/>
 			)}

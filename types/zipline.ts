@@ -205,8 +205,8 @@ export interface APISettings {
 		featuresMetricsEnabled: boolean;
 		featuresMetricsAdminOnly: boolean;
 		featuresMetricsShowUserSpecific: boolean;
-		featuresVersionChecking: boolean,
-		featuresVersionAPI: string,
+		featuresVersionChecking: boolean;
+		featuresVersionAPI: string;
 		invitesEnabled: boolean;
 		invitesLength: number;
 		websiteTitle: string;
@@ -268,7 +268,7 @@ export interface APISettings {
 		pwaThemeColor: string;
 		pwaBackgroundColor: string;
 		domains: string[]; // +++
-	},
+	};
 	tampered: (keyof APISettings["settings"])[];
 }
 

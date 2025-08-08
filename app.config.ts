@@ -1,8 +1,8 @@
 import type { ExpoConfig, ConfigContext } from "expo/config";
 import {
 	version as appVersion,
-	versionCode as appVersionCode
-} from "./package.json"
+	versionCode as appVersionCode,
+} from "./package.json";
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 

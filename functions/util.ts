@@ -25,7 +25,7 @@ export function guessExtension(
 	if (!mimetype) return "application/octet-stream";
 
 	const mime = Object.entries(mimetypes).find(
-		([key, value]) => value === mimetype,
+		([_key, value]) => value === mimetype,
 	) as [keyof Mimetypes, Mimetypes[keyof Mimetypes]] | undefined;
 	if (!mime) return "application/octet-stream";
 

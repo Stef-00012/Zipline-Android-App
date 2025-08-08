@@ -116,20 +116,20 @@ export const styles = StyleSheet.create({
 		backgroundColor: "#2E1A24",
 		padding: 10,
 		margin: 10,
-		borderRadius: 8
+		borderRadius: 8,
 	},
 	tamperedSettingTitle: {
 		color: "#F7A4A4",
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	tamperedSettingText: {
-		color: "#ffffff"
+		color: "#ffffff",
 	},
 	tamperedSettingCount: {
 		fontWeight: "bold",
 	},
 	tamperedSettingsLink: {
 		color: "#4F529D",
-		marginBottom: -5
-	}
+		marginBottom: -5,
+	},
 });

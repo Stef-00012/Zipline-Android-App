@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 		marginVertical: 5,
 		padding: 5,
-        flexDirection: "row"
+		flexDirection: "row",
 	},
 	propertyText: {
 		color: "white",

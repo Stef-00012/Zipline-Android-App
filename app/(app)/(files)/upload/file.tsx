@@ -23,10 +23,12 @@ import Select from "@/components/Select";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
+import { File } from "expo-file-system/next";
 
 export interface SelectedFile {
 	name: string;
 	uri: string;
+	instance: File;
 	mimetype?: string;
 	size?: number;
 }
@@ -431,18 +433,23 @@ export default function UploadFile({
 							const output = await DocumentPicker.getDocumentAsync({
 								type: "*/*",
 								multiple: true,
-								copyToCacheDirectory: false,
+								copyToCacheDirectory: true, // temporary
 							});
 
 							if (output.canceled || !output.assets) return;
 
 							const newSelectedFiles: SelectedFile[] = output.assets
-								.map((file) => ({
-									name: file.name,
-									uri: file.uri,
-									mimetype: file.mimeType,
-									size: file.size,
-								}))
+								.map((file) => {
+									const fileInstance = new File(file.uri);
+
+									return {
+										name: file.name,
+										uri: file.uri,
+										instance: fileInstance,
+										mimetype: file.mimeType || fileInstance.type || undefined,
+										size: file.size || fileInstance.size || undefined,
+									};
+								})
 								.filter(
 									(newFile) =>
 										!selectedFiles.find(
@@ -779,6 +786,7 @@ export default function UploadFile({
 
 							const fileData = {
 								uri: fileInfo.uri || file.uri,
+								blob: file.instance.blob(),
 								mimetype,
 							};
 

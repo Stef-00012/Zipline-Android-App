@@ -11,16 +11,17 @@ export const useShareIntent = (skipRedirect = false) => {
         setIsMounted(true);
     }, []);
 
-	if (skipRedirect) return resetShareIntent;
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: .
+	
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
-		if (isMounted && hasShareIntent) {
+		if (isMounted && hasShareIntent && !skipRedirect) {
 			router.replace({
 				pathname: "/shareintent",
 			});
 		}
-	}, [hasShareIntent, isMounted]);
+	}, [hasShareIntent, isMounted, skipRedirect]);
+
+	if (skipRedirect) return resetShareIntent;
 
 	return resetShareIntent;
 };

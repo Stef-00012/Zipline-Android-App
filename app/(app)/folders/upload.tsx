@@ -27,6 +27,7 @@ import { guessExtension } from "@/functions/util";
 import type { Mimetypes } from "@/types/mimetypes";
 import { styles } from "@/styles/folders/upload";
 import * as db from "@/functions/database";
+import { File } from "expo-file-system/next";
 
 export default function FolderUpload() {
 	const router = useRouter();
@@ -266,12 +267,17 @@ export default function FolderUpload() {
 						if (output.canceled || !output.assets) return;
 
 						const newSelectedFiles: SelectedFile[] = output.assets
-							.map((file) => ({
-								name: file.name,
-								uri: file.uri,
-								mimetype: file.mimeType,
-								size: file.size,
-							}))
+							.map((file) => {
+								const fileInstance = new File(file.uri);
+
+								return {
+									name: file.name,
+									uri: file.uri,
+									instance: fileInstance,
+									mimetype: file.mimeType || fileInstance.type || undefined,
+									size: file.size || fileInstance.size || undefined,
+								};
+							})
 							.filter(
 								(newFile) =>
 									!selectedFiles.find(

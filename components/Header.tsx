@@ -8,7 +8,6 @@ import { styles } from "@/styles/components/header";
 import UserAvatar from "@/components/UserAvatar";
 import { View, Pressable } from "react-native";
 import Sidebar from "@/components/Sidebar";
-import type React from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { getRippleColor } from "@/functions/util";
 import { Skeleton } from "moti/skeleton";
@@ -25,22 +24,24 @@ export default function Header({ children }: PropsWithChildren) {
 
 	const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		if (!avatar || !user) {
-			fetchUser()
+			fetchUser();
 		}
 	}, [avatar, user]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
-		let interval: NodeJS.Timeout | undefined;
+		let intervalId: NodeJS.Timeout | string | number | undefined;
 		if (!user) {
-			interval = setInterval(fetchUser, 5000);
+			intervalId = setInterval(fetchUser, 5000);
 		}
 
-		if (user && interval) clearInterval(interval);
+		if (user && intervalId) clearInterval(intervalId);
 
 		return () => {
-			if (interval) clearInterval(interval);
+			if (intervalId) clearInterval(intervalId);
 		};
 	}, [user]);
 
@@ -67,7 +68,7 @@ export default function Header({ children }: PropsWithChildren) {
 									<MaterialIcons name="menu" color={"#fff"} size={40} />
 								)}
 								android_ripple={{
-									color: getRippleColor("#0c101c")
+									color: getRippleColor("#0c101c"),
 								}}
 								onPress={() => {
 									setSidebarOpen((prev) => !prev);
@@ -84,7 +85,7 @@ export default function Header({ children }: PropsWithChildren) {
 									disabled={pathname === "/settings"}
 									style={{
 										padding: 10,
-										borderRadius: 10
+										borderRadius: 10,
 									}}
 									onPress={() => {
 										resetShareIntent();
@@ -113,7 +114,7 @@ export default function Header({ children }: PropsWithChildren) {
 										<MaterialIcons name="menu" color={"#ffffff77"} size={40} />
 									)}
 									android_ripple={{
-										color: getRippleColor("#0c101c")
+										color: getRippleColor("#0c101c"),
 									}}
 									onPress={() => {
 										setSidebarOpen((prev) => !prev);
@@ -126,7 +127,7 @@ export default function Header({ children }: PropsWithChildren) {
 									<View
 										style={{
 											padding: 10,
-											borderRadius: 10
+											borderRadius: 10,
 										}}
 									>
 										<Skeleton colors={colors} height={36} width={80} />

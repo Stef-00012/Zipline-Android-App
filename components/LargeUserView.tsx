@@ -14,7 +14,11 @@ interface Props {
 	onAction: (type: UserActions, user: APIUserNoIncl) => Promise<void> | void;
 }
 
-export default function LargeUserView({ user, dashUrl, onAction }: Props) {
+export default function LargeUserView({
+	user,
+	dashUrl: _dashUrl,
+	onAction,
+}: Props) {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.titleContainer}>

@@ -19,7 +19,7 @@ export async function del(key: string): Promise<boolean> {
 		await SecureStore.deleteItemAsync(key);
 
 		return true;
-	} catch (e) {
+	} catch (_e) {
 		return false;
 	}
 }

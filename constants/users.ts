@@ -44,5 +44,5 @@ export const templateUser: APIUser = {
 
 export const searchKeyNames = {
 	username: "Username",
-	id: "ID"
-}
+	id: "ID",
+};

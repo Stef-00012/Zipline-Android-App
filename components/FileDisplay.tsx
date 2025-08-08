@@ -16,7 +16,7 @@ interface Props {
 	width: number;
 	file?: APIFile;
 	height?: number;
-	mimetype?: string;
+	mimetype?: string | null;
 	openable?: boolean;
 	maxHeight?: number;
 	autoHeight?: boolean;

@@ -12,11 +12,11 @@ import {
 } from "react-native";
 
 export interface SelectProps {
-	data: ({
+	data: {
 		label: string;
 		value: string;
 		[key: string]: string | number | boolean | null;
-	})[];
+	}[];
 	placeholder: string;
 	onSelect: (selectedItem: SelectProps["data"], id?: SelectProps["id"]) => void;
 	showScrollIndicator?: boolean;

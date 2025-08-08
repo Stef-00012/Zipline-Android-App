@@ -112,7 +112,7 @@ export async function createFolder(
 }
 
 interface FolderEditOptions {
-    allowUploads?: boolean;
+	allowUploads?: boolean;
 	public?: boolean;
 	name?: string;
 }
@@ -120,7 +120,7 @@ interface FolderEditOptions {
 // PATCH /api/user/folders/[id]
 export async function editFolder(
 	id: string,
-	options: FolderEditOptions = {}
+	options: FolderEditOptions = {},
 ): Promise<APIFolder | string> {
 	const token = db.get("token");
 	const url = db.get("url");
@@ -128,15 +128,11 @@ export async function editFolder(
 	if (!url || !token) return "Invalid token or URL";
 
 	try {
-		const res = await axios.patch(
-			`${url}/api/user/folders/${id}`,
-			options,
-			{
-				headers: {
-					Authorization: token,
-				},
+		const res = await axios.patch(`${url}/api/user/folders/${id}`, options, {
+			headers: {
+				Authorization: token,
 			},
-		);
+		});
 
 		return res.data;
 	} catch (e) {

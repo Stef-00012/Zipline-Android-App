@@ -1,3 +1,4 @@
+import { minimumVersion } from "@/constants/auth";
 import { isAuthenticated } from "@/functions/zipline/auth";
 import { getVersion } from "@/functions/zipline/version";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -30,7 +31,7 @@ export const useLoginAuth = () => {
 					? versionData.version
 					: versionData.details?.version;
 
-		if (typeof versionData === "string" || semver.lt(serverVersion, "4.2.0"))
+		if (typeof versionData === "string" || semver.lt(serverVersion, minimumVersion))
 			return;
 
 		router.replace("/");

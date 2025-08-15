@@ -3,7 +3,7 @@ import { getVersion } from "@/functions/zipline/version";
 import { useFocusEffect, useRouter } from "expo-router";
 import type { APIUser } from "@/types/zipline";
 import * as db from "@/functions/database";
-import { roles } from "@/constants/auth";
+import { minimumVersion, roles } from "@/constants/auth";
 import semver from "semver";
 
 export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
@@ -27,7 +27,7 @@ export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 
 			if (
 				typeof versionData === "string" ||
-				semver.lt(serverVersion, "4.2.0")
+				semver.lt(serverVersion, minimumVersion)
 			) {
 				await db.del("url");
 				await db.del("token");

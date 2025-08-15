@@ -1,6 +1,7 @@
 import type { APIVersion } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
+import { minimumVersion } from "@/constants/auth";
 
 // GET /api/version
 export async function getVersion(): Promise<APIVersion | string> {
@@ -39,14 +40,14 @@ export async function getVersion(): Promise<APIVersion | string> {
 
 			if (res.status !== 404)
 				return {
-					version: "4.2.0",
+					version: minimumVersion,
 				};
 		} catch (e) {
 			const error = e as AxiosError;
 
 			if (error.status !== 404)
 				return {
-					version: "4.2.0",
+					version: minimumVersion,
 				};
 		}
 

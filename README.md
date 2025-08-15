@@ -32,13 +32,3 @@ Or directly download it from [here](https://github.com/Stef-00012/zipline-androi
 3. `eas build --clear-cache --platform android --profile preview`
 
 This will create an apk but won't automatically install
-
-# TODO
-
-- [ ] Add skeleton loading to all pages; Currently done:
-    - Home
-    - Metrics
-    - Folders
-    - Files
-    - URLs
-    - User Settings

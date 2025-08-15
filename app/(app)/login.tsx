@@ -10,6 +10,7 @@ import { useRouter } from "expo-router";
 import { styles } from "@/styles/login";
 import { useState } from "react";
 import semver from "semver";
+import { minimumVersion } from "@/constants/auth";
 
 export default function Login() {
 	const router = useRouter();
@@ -138,12 +139,12 @@ export default function Login() {
 										? versionData.version
 										: versionData.details?.version;
 
-							if (semver.lt(serverVersion, "4.2.0")) {
+							if (semver.lt(serverVersion, minimumVersion)) {
 								await db.del("url");
 								await db.del("token");
 
 								return setError(
-									"You must use Zipline v4.2.0 or greater and have 'Version checking' feature enabled",
+									`You must use Zipline v${minimumVersion} or greater and have 'Version checking' feature enabled`,
 								);
 							}
 
@@ -180,12 +181,12 @@ export default function Login() {
 									? versionData.version
 									: versionData.details.version;
 
-						if (semver.lt(serverVersion, "4.2.0")) {
+						if (semver.lt(serverVersion, minimumVersion)) {
 							await db.del("url");
 							await db.del("token");
 
 							return setError(
-								"You must use Zipline v4.2.0 or greater and have 'Version checking' feature enabled",
+								`You must use Zipline v${minimumVersion} or greater and have 'Version checking' feature enabled`,
 							);
 						}
 

@@ -436,7 +436,7 @@ export default function UploadFile({
 								copyToCacheDirectory: true, // temporary
 							});
 
-							if (output.canceled || !output.assets) return;
+							if (output.canceled || output.assets?.length <= 0) return;
 
 							const newSelectedFiles: SelectedFile[] = output.assets
 								.map((file) => {

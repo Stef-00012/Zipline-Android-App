@@ -6,7 +6,7 @@ import { Text, View, ScrollView } from "react-native";
 import { useAppUpdates } from "@/hooks/useUpdates";
 import FileDisplay from "@/components/FileDisplay";
 import { convertToBytes } from "@/functions/util";
-import { useEffect, useState } from "react";
+import { /*useContext,*/ useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
@@ -20,6 +20,8 @@ import type {
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
+// import { AuthContext } from "@/contexts/AuthProvider";
+// import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 // ------------------------ DEV -------------------------
 
@@ -30,6 +32,18 @@ import type {
 export default function Home() {
 	useAuth();
 	useShareIntent();
+
+	// const { role, updateAuth, serverVersion } = useContext(AuthContext)
+	// const { webSettings, publicSettings, updateSettings } = useContext(ZiplineContext)
+
+	// useEffect(() => {
+	// 	console.info(role, serverVersion)
+
+	// 	console.debug({
+	// 		webSettings,
+	// 		publicSettings,
+	// 	})
+	// }, [webSettings, publicSettings])
 
 	useAppUpdates();
 

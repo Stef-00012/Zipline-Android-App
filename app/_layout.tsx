@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Header from "@/components/Header";
 import { Host } from "react-native-portalize";
+import AuthProvider from "@/contexts/AuthProvider";
+import ZiplineProvider from "@/contexts/ZiplineProvider";
 
 export default function Layout() {
 	const router = useRouter();
@@ -47,30 +49,34 @@ export default function Layout() {
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#0c101c" }}>
 				<KeyboardProvider>
 					<GestureHandlerRootView>
-						{hasInternet ? (
-							// biome-ignore lint/complexity/noUselessFragments: The fragment is required
-							<>
-								{pathname === "/login" ? (
-									<Host>
-										<Slot />
-									</Host>
+						<AuthProvider>
+							<ZiplineProvider>
+								{hasInternet ? (
+									// biome-ignore lint/complexity/noUselessFragments: The fragment is required
+									<>
+										{pathname === "/login" ? (
+											<Host>
+												<Slot />
+											</Host>
+										) : (
+											<Header>
+												<Host>
+													<Slot />
+												</Host>
+											</Header>
+										)}
+									</>
 								) : (
 									<Header>
-										<Host>
-											<Slot />
-										</Host>
+										<View style={styles.noInternetContainer}>
+											<Text style={styles.noInternetText}>
+												No internet connection.
+											</Text>
+										</View>
 									</Header>
 								)}
-							</>
-						) : (
-							<Header>
-								<View style={styles.noInternetContainer}>
-									<Text style={styles.noInternetText}>
-										No internet connection.
-									</Text>
-								</View>
-							</Header>
-						)}
+							</ZiplineProvider>
+						</AuthProvider>
 					</GestureHandlerRootView>
 				</KeyboardProvider>
 			</SafeAreaView>

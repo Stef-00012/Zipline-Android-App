@@ -32,3 +32,12 @@ Or directly download it from [here](https://github.com/Stef-00012/zipline-androi
 3. `eas build --clear-cache --platform android --profile preview`
 
 This will create an apk but won't automatically install
+
+# To-DO
+- [ ] Try to allow chunked uploads
+- [ ] Try to improve popups (kinda ugly that thy can't go over the header)
+- [ ] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
+- [ ] try to make animations smoother
+- [ ] Fix recent files section having no height when there is no recent file
+- [ ] Remove `useAuth` hook and instead use the `AuthContext` context to avoid fetching user login data on every page change
+- [ ] Move public API settings to `ZiplineContext` to avoid fetching them on every page change

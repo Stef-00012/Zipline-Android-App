@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	slug: "zipline",
 	version: appVersion,
 	orientation: "portrait",
-	icon: "./assets/images/icon.png",
+	icon: `./assets/images${IS_DEV ? "/dev" : ""}/icon.png`,
 	scheme: "zipline",
 	newArchEnabled: true,
 	userInterfaceStyle: "automatic",
@@ -22,8 +22,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	},
 	android: {
 		adaptiveIcon: {
-			foregroundImage: "./assets/images/adaptive-icon.png",
-			monochromeImage: "./assets/images/monochromatic-adaptive-icon.png",
+			foregroundImage: `./assets/images${IS_DEV ? "/dev" : ""}/adaptive-icon.png`,
+			monochromeImage: `./assets/images${IS_DEV ? "/dev" : ""}/monochromatic-adaptive-icon.png`,
 			backgroundColor: "#121317",
 		},
 		versionCode: appVersionCode,
@@ -45,7 +45,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		[
 			"expo-splash-screen",
 			{
-				image: "./assets/images/splash-icon.png",
+				image: `./assets/images${IS_DEV ? "/dev" : ""}/splash-icon.png`,
 				imageWidth: 300,
 				resizeMode: "contain",
 				backgroundColor: "#121317",

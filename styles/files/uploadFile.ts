@@ -18,6 +18,15 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "gray",
 	},
+	fileLimitText: {
+		textAlign: "center",
+		marginTop: 7
+	},
+	text: {
+		color: "#ffffff",
+		marginTop: 5,
+		marginHorizontal: 10
+	},
 	scrollView: {
 		marginTop: 10,
 		borderStyle: "solid",

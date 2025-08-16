@@ -1,43 +1,16 @@
-import { isAuthenticated } from "@/functions/zipline/auth";
-import { getVersion } from "@/functions/zipline/version";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import type { APIUser } from "@/types/zipline";
-import * as db from "@/functions/database";
-import { minimumVersion, roles } from "@/constants/auth";
-import semver from "semver";
+import { roles } from "@/constants/auth";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthProvider";
 
 export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 	const router = useRouter();
+
+	const { role } = useContext(AuthContext)
+
 	const minimumPosition = roles[minimumRole];
+	const userPosition = role ? roles[role] : 0;
 
-	useFocusEffect(() => {
-		(async () => {
-			const authenticated = await isAuthenticated();
-
-			if (!authenticated) return router.replace("/login");
-
-			const versionData = await getVersion();
-
-			const serverVersion =
-				typeof versionData === "string"
-					? "0.0.0"
-					: "version" in versionData
-						? versionData.version
-						: versionData.details?.version;
-
-			if (
-				typeof versionData === "string" ||
-				semver.lt(serverVersion, minimumVersion)
-			) {
-				await db.del("url");
-				await db.del("token");
-
-				return router.replace("/login");
-			}
-
-			const userPosition = roles[authenticated];
-
-			if (userPosition < minimumPosition) return router.replace("/");
-		})();
-	});
+	if (userPosition < minimumPosition) return router.replace("/");
 };

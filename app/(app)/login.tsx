@@ -1,19 +1,20 @@
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { getVersion } from "@/functions/zipline/version";
-import { useLoginAuth } from "@/hooks/useLoginAuth";
 import TextInput from "@/components/TextInput";
 import * as db from "@/functions/database";
 import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import { styles } from "@/styles/login";
-import { useState } from "react";
+import { useContext, /*useEffect,*/ useState } from "react";
 import semver from "semver";
 import { minimumVersion } from "@/constants/auth";
+import { AuthContext } from "@/contexts/AuthProvider";
 
 export default function Login() {
 	const router = useRouter();
+	const { updateAuth, updateUser } = useContext(AuthContext) 
 
 	const [error, setError] = useState<string>();
 	const [tokenLogin, setTokenLogin] = useState<boolean>(false);
@@ -36,7 +37,13 @@ export default function Login() {
 
 	const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 
-	useLoginAuth();
+	// // biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
+	// useEffect(() => {
+	// 	if (role) {
+	// 		updateAuth();
+	// 		router.replace("/");
+	// 	}
+	// }, [role])
 
 	return (
 		<KeyboardAvoidingView behavior="height" style={styles.loginContainer}>
@@ -148,11 +155,15 @@ export default function Login() {
 								);
 							}
 
+							await updateAuth();
+							await updateUser();
+
 							return router.replace("/");
 						}
 
 						if (!inputtedPassword)
 							return setError("Please insert your password");
+
 						if (!inputtedUsername)
 							return setError("Please insert your username");
 
@@ -189,6 +200,9 @@ export default function Login() {
 								`You must use Zipline v${minimumVersion} or greater and have 'Version checking' feature enabled`,
 							);
 						}
+
+						await updateAuth();
+						await updateUser();
 
 						return router.replace("/");
 					}}

@@ -111,7 +111,7 @@ export default function TextInput({
 					<NativeTextInput
 						showSoftInputOnFocus={showSoftInputOnFocus}
 						multiline={multiline}
-						secureTextEntry
+						secureTextEntry={!displayPassword}
 						onChange={(event) => onChange(event, id)}
 						onSubmitEditing={(event) => onSubmitEditing(event, id)}
 						maxLength={maxLength}
@@ -125,7 +125,6 @@ export default function TextInput({
 						contextMenuHidden={disableContext}
 						onChangeText={(text) => onValueChange(text, id)}
 						value={value}
-						keyboardType={displayPassword ? "visible-password" : "default"}
 						placeholder={placeholder}
 						placeholderTextColor="#222c47"
 						returnKeyType={returnKeyType}

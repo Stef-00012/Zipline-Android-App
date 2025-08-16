@@ -115,7 +115,6 @@ export async function reloadSettings(): Promise<true | string> {
 }
 
 export async function getPublicSettings(): Promise<APIPublicSettings | string> {
-	console.debug("Fetching public settings...");
 	const token = db.get("token");
 	const url = db.get("url");
 
@@ -146,7 +145,6 @@ export async function getPublicSettings(): Promise<APIPublicSettings | string> {
 }
 
 export async function getWebSettings(): Promise<APIWebSettings | string> {
-	console.debug("Getting web settings");
 	const token = db.get("token");
 	const url = db.get("url");
 

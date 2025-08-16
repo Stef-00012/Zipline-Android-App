@@ -1,13 +1,13 @@
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import type {
 	APIExports,
-	APISelfUser,
 	APIVersion,
 	DashURL,
 } from "@/types/zipline";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { convertToBytes, getFileDataURI } from "@/functions/util";
 import { getTokenWithToken } from "@/functions/zipline/auth";
+import { useState, useEffect, useContext } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { version as appVersion } from "@/package.json";
 import * as DocumentPicker from "expo-document-picker";
@@ -16,7 +16,6 @@ import { alignments } from "@/constants/settings";
 import UserAvatar from "@/components/UserAvatar";
 import TextInput from "@/components/TextInput";
 import * as FileSystem from "expo-file-system";
-import { useState, useEffect } from "react";
 import * as Clipboard from "expo-clipboard";
 import { styles } from "@/styles/settings";
 import * as db from "@/functions/database";
@@ -24,7 +23,6 @@ import { useAuth } from "@/hooks/useAuth";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Select from "@/components/Select";
-import { useRouter } from "expo-router";
 import Popup from "@/components/Popup";
 import Table from "@/components/Table";
 import {
@@ -42,8 +40,6 @@ import {
 import {
 	editCurrentUser,
 	type EditUserOptions,
-	getCurrentUser,
-	getCurrentUserAvatar,
 } from "@/functions/zipline/user";
 import ColorPicker from "@/components/ColorPicker";
 import { getVersion } from "@/functions/zipline/version";
@@ -52,9 +48,10 @@ import SkeletonTextInput from "@/components/skeleton/TextInput";
 import SkeletonTable from "@/components/skeleton/Table";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import VersionDisplay from "@/components/VersionDisplay";
+import { AuthContext } from "@/contexts/AuthProvider";
 
 export default function UserSettings() {
-	const router = useRouter();
+	const { updateAuth, updateUser, user, avatar: currentAvatar } = useContext(AuthContext)
 
 	const {
 		checkForUpdates,
@@ -73,11 +70,11 @@ export default function UserSettings() {
 		db.get("disableUpdateAlert") === "true",
 	);
 
-	const [user, setUser] = useState<APISelfUser | null>(null);
+	// const [user, setUser] = useState<APISelfUser | null>(null);
 	const [token, setToken] = useState<string | null>(null);
-	const [currentAvatar, setCurrentAvatar] = useState<string | undefined>(
-		undefined,
-	);
+	// const [currentAvatar, setCurrentAvatar] = useState<string | undefined>(
+	// 	undefined,
+	// );
 	const [exports, setExports] = useState<APIExports | null>([]);
 	const [zeroByteFiles, setZeroByteFiles] = useState<number>(0);
 
@@ -134,16 +131,12 @@ export default function UserSettings() {
 
 	useEffect(() => {
 		(async () => {
-			const user = await getCurrentUser();
 			const token = await getTokenWithToken();
-			const avatar = await getCurrentUserAvatar();
 			const exports = await getUserExports();
 			const zeroByteFiles = await getZeroByteFiles();
 			const versionData = await getVersion();
 
-			setUser(typeof user === "string" ? null : user);
 			setToken(typeof token === "string" ? null : token.token);
-			setCurrentAvatar(avatar || undefined);
 			setExports(typeof exports === "string" ? null : exports);
 			setZeroByteFiles(
 				typeof zeroByteFiles === "string" ? 0 : zeroByteFiles.files.length,
@@ -644,9 +637,8 @@ export default function UserSettings() {
 												if (typeof success === "string")
 													return setSaveError(success);
 
-												const newUserAvatar = await getCurrentUserAvatar();
+												await updateUser()
 
-												setCurrentAvatar(newUserAvatar || undefined);
 												setAvatar(undefined);
 												setAvatarName(null);
 
@@ -678,9 +670,8 @@ export default function UserSettings() {
 											if (typeof success === "string")
 												return setSaveError(success);
 
-											const newUserAvatar = await getCurrentUserAvatar();
+											await updateUser();
 
-											setCurrentAvatar(newUserAvatar || undefined);
 											setAvatar(undefined);
 											setAvatarName(null);
 
@@ -1093,7 +1084,6 @@ export default function UserSettings() {
 										<Text style={styles.subHeaderText}>Zipline Version: </Text>
 										<VersionDisplay
 											versionData={ziplineVersion}
-											userRole={user.role}
 										/>
 									</View>
 								)}
@@ -1243,7 +1233,7 @@ export default function UserSettings() {
 										await db.del("url");
 										await db.del("token");
 
-										router.replace("/login");
+										updateAuth()
 									}}
 									color="#CF4238"
 									text="Logout"

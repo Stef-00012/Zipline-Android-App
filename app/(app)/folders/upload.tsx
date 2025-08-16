@@ -6,11 +6,10 @@ import {
 } from "expo-router";
 import { getFolder } from "@/functions/zipline/folders";
 import { ScrollView, Text, ToastAndroid, View } from "react-native";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import type { APIFolder, APIUploadResponse, DashURL } from "@/types/zipline";
 import type { SelectedFile } from "@/app/(app)/(files)/upload/file";
 import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
-import { getSettings } from "@/functions/zipline/settings";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import * as DocumentPicker from "expo-document-picker";
 import Popup from "@/components/Popup";
@@ -28,9 +27,11 @@ import type { Mimetypes } from "@/types/mimetypes";
 import { styles } from "@/styles/folders/upload";
 import * as db from "@/functions/database";
 import { File } from "expo-file-system/next";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 export default function FolderUpload() {
 	const router = useRouter();
+	const { webSettings } = useContext(ZiplineContext)
 
 	const searchParams = useLocalSearchParams<{
 		folderId?: string;
@@ -63,7 +64,10 @@ export default function FolderUpload() {
 	const [maxViews, setMaxViews] = useState<UploadFileOptions["maxViews"]>();
 	const [fileName, setFileName] = useState<UploadFileOptions["filename"]>();
 	const [password, setPassword] = useState<UploadFileOptions["password"]>();
-	const [defaultFormat, setDefaultFormat] = useState<string>("random");
+
+	const defaultFormat = webSettings
+		? webSettings.config.files.defaultFormat
+		: "random";
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -83,12 +87,6 @@ export default function FolderUpload() {
 			if (!folder.allowUploads) return router.replace("/+not-found");
 
 			setFolder(folder);
-
-			const settings = await getSettings();
-
-			if (typeof settings !== "string") {
-				setDefaultFormat(settings.settings.filesDefaultFormat);
-			}
 		})();
 	}, []);
 

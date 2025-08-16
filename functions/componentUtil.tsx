@@ -42,7 +42,6 @@ export function parseMarkdownLinks(
 	if (lastIndex < input.length) {
 		parts.push(input.slice(lastIndex));
 	}
-	console.log(<Text>{parts}</Text>);
 
 	return <Text>{parts}</Text>;
 }

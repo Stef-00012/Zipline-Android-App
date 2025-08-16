@@ -6,7 +6,6 @@ import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIUploadResponse, Preset } from "@/types/zipline";
 import { guessExtension, guessMimetype } from "@/functions/util";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
-import { getSettings } from "@/functions/zipline/settings";
 import { getFolders } from "@/functions/zipline/folders";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
@@ -14,7 +13,7 @@ import type { Mimetypes } from "@/types/mimetypes";
 import { styles } from "@/styles/files/uploadText";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,6 +21,7 @@ import Select from "@/components/Select";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 interface SelectedFile {
 	name: string;
@@ -41,10 +41,11 @@ export default function UploadText({
 	defaultText,
 	fromShareIntent = false,
 }: Props) {
-	const router = useRouter();
-
 	useAuth();
+	
+	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
+	const { webSettings } = useContext(ZiplineContext)
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
@@ -79,7 +80,9 @@ export default function UploadText({
 		}[]
 	>([]);
 
-	const [defaultFormat, setDefaultFormat] = useState<string>("random");
+	const defaultFormat = webSettings
+		? webSettings.config.files.defaultFormat
+		: "random"
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -104,11 +107,6 @@ export default function UploadText({
 	useEffect(() => {
 		(async () => {
 			const folders = await getFolders(true);
-			const settings = await getSettings();
-
-			if (typeof settings !== "string") {
-				setDefaultFormat(settings.settings.filesDefaultFormat);
-			}
 
 			if (typeof folders === "string") return setFolders([]);
 
@@ -657,8 +655,6 @@ export default function UploadText({
 							const preset = selectePreset[0].value;
 
 							const presetToUse = presets.find((pres) => pres.name === preset);
-
-							console.log(presetToUse);
 
 							if (!presetToUse)
 								return ToastAndroid.show("Invalid Preset", ToastAndroid.SHORT);

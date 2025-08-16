@@ -3,7 +3,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShareIntentProvider } from "expo-share-intent";
 import NetInfo from "@react-native-community/netinfo";
-import { Slot, usePathname, useRouter } from "expo-router";
+import { Slot, useRouter } from "expo-router";
 import { styles } from "@/styles/noInternet";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -15,7 +15,6 @@ import ZiplineProvider from "@/contexts/ZiplineProvider";
 
 export default function Layout() {
 	const router = useRouter();
-	const pathname = usePathname();
 	const [hasInternet, setHasInternet] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -52,20 +51,11 @@ export default function Layout() {
 						<AuthProvider>
 							<ZiplineProvider>
 								{hasInternet ? (
-									// biome-ignore lint/complexity/noUselessFragments: The fragment is required
-									<>
-										{pathname === "/login" ? (
-											<Host>
-												<Slot />
-											</Host>
-										) : (
-											<Header>
-												<Host>
-													<Slot />
-												</Host>
-											</Header>
-										)}
-									</>
+									<Header>
+										<Host>
+											<Slot />
+										</Host>
+									</Header>
 								) : (
 									<Header>
 										<View style={styles.noInternetContainer}>

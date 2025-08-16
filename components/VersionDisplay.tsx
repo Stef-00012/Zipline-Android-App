@@ -1,36 +1,35 @@
-import { getSettings } from "@/functions/zipline/settings";
 import { styles } from "@/styles/components/versionDisplay";
-import type { APIUser, APIVersion } from "@/types/zipline";
-import { useEffect, useState } from "react";
+import type { /*APIUser,*/ APIVersion } from "@/types/zipline";
+import { /*useContext, useEffect,*/ useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Popup from "./Popup";
 import { type ExternalPathString, Link } from "expo-router";
-import Table from "./Table";
+// import Table from "./Table";
 import Button from "./Button";
 import { openURL } from "expo-linking";
+// import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 interface Props {
 	versionData: APIVersion;
-	userRole: APIUser["role"];
 }
 
-export default function VersionDisplay({ versionData, userRole }: Props) {
-	const [versionChecking, setVersionChecking] = useState(false);
+export default function VersionDisplay({ versionData }: Props) {
+	// const [versionChecking, setVersionChecking] = useState(false);
 	const [popupOpen, setPopupOpen] = useState(false);
 
-	useEffect(() => {
-		(async () => {
-			if (userRole === "SUPERADMIN" && "version" in versionData) {
-				const serverSettings = await getSettings();
+	// const { webSettings } = useContext(ZiplineContext)
 
-				setVersionChecking(
-					typeof serverSettings === "string"
-						? false
-						: serverSettings.settings.featuresVersionChecking,
-				);
-			}
-		})();
-	}, [userRole, versionData]);
+	// useEffect(() => {
+	// 	(async () => {
+	// 		if ("version" in versionData) {
+	// 			setVersionChecking(
+	// 				webSettings
+	// 					? webSettings.config.features.versionChecking
+	// 					: false
+	// 			);
+	// 		}
+	// 	})();
+	// }, [versionData, webSettings]);
 
 	if ("version" in versionData) {
 		return (

@@ -1,9 +1,7 @@
-import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
-import { type PropsWithChildren, useEffect, useState } from "react";
+import { type PropsWithChildren, useContext, useState } from "react";
 import { Stack, IconButton } from "@react-native-material/core";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { usePathname, useRouter } from "expo-router";
-import type { APISelfUser } from "@/types/zipline";
 import { styles } from "@/styles/components/header";
 import UserAvatar from "@/components/UserAvatar";
 import { View, Pressable } from "react-native";
@@ -12,49 +10,24 @@ import { useShareIntent } from "@/hooks/useShareIntent";
 import { getRippleColor } from "@/functions/util";
 import { Skeleton } from "moti/skeleton";
 import { colors } from "@/constants/skeleton";
+import { AuthContext } from "@/contexts/AuthProvider";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter();
 	const pathname = usePathname();
 
 	const resetShareIntent = useShareIntent(true);
-
-	const [avatar, setAvatar] = useState<string | null>(null);
-	const [user, setUser] = useState<APISelfUser | null>(null);
+	const { avatar, user } = useContext(AuthContext)
 
 	const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
-	useEffect(() => {
-		if (!avatar || !user) {
-			fetchUser();
-		}
-	}, [avatar, user]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
-	useEffect(() => {
-		let intervalId: NodeJS.Timeout | string | number | undefined;
-		if (!user) {
-			intervalId = setInterval(fetchUser, 5000);
-		}
-
-		if (user && intervalId) clearInterval(intervalId);
-
-		return () => {
-			if (intervalId) clearInterval(intervalId);
-		};
-	}, [user]);
-
-	async function fetchUser() {
-		const avatar = await getCurrentUserAvatar();
-		const user = await getCurrentUser();
-
-		setAvatar(avatar);
-		setUser(typeof user === "string" ? null : user);
-	}
-
 	return (
-		<View style={styles.headerContainer}>
+		<View style={{
+			...styles.headerContainer,
+			...(pathname === "/login" && {
+				display: "none"
+			})
+		}}>
 			{user ? (
 				<View
 					style={{

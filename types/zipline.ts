@@ -527,100 +527,106 @@ export interface APIPublicSettings {
 }
 
 export interface APIWebSettings {
-	chunks: {
-		max: string;
-		size: string;
-		enabled: boolean;
-	};
-	tasks: {
-		deleteInterval: string;
-		clearInvitesInterval: string;
-		maxViewsInterval: string;
-		thumbnailsInterval: string;
-		metricsInterval: string;
-	};
-	files: {
-		route: string;
-		length: number;
-		defaultFormat:
-			| "random"
-			| "date"
-			| "uuid"
-			| "name"
-			| "gfycat"
-			| "random-words";
-		disabledExtensions: string[];
-		maxFileSize: string;
-		defaultExpiration: string | null;
-		assumeMimetypes: boolean;
-		defaultDateFormat: string;
-		removeGpsMetadata: boolean;
-		randomWordsNumAdjectives: number;
-		randomWordsSeparator: string;
-	};
-	urls: {
-		route: string;
-		length: number;
-	};
-	features: {
-		imageCompression: boolean;
-		robotsTxt: boolean;
-		healthcheck: boolean;
-		userRegistration: boolean;
-		oauthRegistration: boolean;
-		deleteOnMaxViews: boolean;
-		thumbnails: {
+	config: {
+		chunks: {
+			max: string;
+			size: string;
 			enabled: boolean;
-			num_threads: number;
 		};
-		metrics: {
+		tasks: {
+			deleteInterval: string;
+			clearInvitesInterval: string;
+			maxViewsInterval: string;
+			thumbnailsInterval: string;
+			metricsInterval: string;
+		};
+		files: {
+			route: string;
+			length: number;
+			defaultFormat: "uuid" | "date" | "random" | "name" | "gfycat" | "random-words";
+			disabledExtensions: string[];
+			maxFileSize: string;
+			defaultExpiration: string | null;
+			assumeMimetypes: boolean;
+			defaultDateFormat: string;
+			removeGpsMetadata: boolean;
+			randomWordsNumAdjectives: number;
+			randomWordsSeparator: string;
+		};
+		urls: {
+			route: string;
+			length: number;
+		};
+		features: {
+			imageCompression: boolean;
+			robotsTxt: boolean;
+			healthcheck: boolean;
+			userRegistration: boolean;
+			oauthRegistration: boolean;
+			deleteOnMaxViews: boolean;
+			thumbnails: {
+				enabled: boolean;
+				num_threads: number;
+			};
+			metrics: {
+				enabled: boolean;
+				adminOnly: boolean;
+				showUserSpecific: boolean;
+			};
+			versionChecking: boolean;
+			versionAPI: string;
+		};
+		invites: {
 			enabled: boolean;
-			adminOnly: boolean;
-			showUserSpecific: boolean;
+			length: number;
 		};
-		versionChecking: boolean;
-		versionAPI: string;
-	};
-	invites: {
-		enabled: boolean;
-		length: number;
-	};
-	website: {
-		title: string;
-		titleLogo: string | null;
-		externalLinks: Array<{
-			name: string;
-			url: string;
-		}>;
-		loginBackground: string | null;
-		loginBackgroundBlur: boolean;
-		defaultAvatar: string | null;
-		theme: {
-			default: string;
-			dark: string;
-			light: string;
+		website: {
+			title: string;
+			titleLogo: string | null;
+			externalLinks: {
+				name: string;
+				url: string;
+			}[];
+			loginBackground: string | null;
+			loginBackgroundBlur: boolean;
+			defaultAvatar: string | null;
+			theme: {
+				default: string;
+				dark: string;
+				light: string;
+			};
+			tos: string | null;
 		};
-		tos: string | null;
-	};
-	mfa: {
-		totp: {
+		mfa: {
+			totp: {
+				enabled: boolean;
+				issuer: string;
+			};
+			passkeys: boolean;
+		};
+		pwa: {
 			enabled: boolean;
-			issuer: string;
+			title: string;
+			shortName: string;
+			description: string;
+			themeColor: string;
+			backgroundColor: string;
 		};
-		passkeys: boolean;
+		oauthEnabled: {
+			discord: boolean;
+			github: boolean;
+			google: boolean;
+			oidc: boolean;
+		};
+		oauth: {
+			bypassLocalLogin: boolean;
+			loginOnly: boolean;
+		};
+		version: string;
 	};
-	pwa: {
-		enabled: boolean;
-		title: string;
-		shortName: string;
-		description: string;
-		themeColor: string;
-		backgroundColor: string;
-	};
-	oauthEnabled: boolean;
-	oauth: {
-		bypassLocalLogin: boolean;
-		loginOnly: boolean;
-	};
-	version: string;
-};
+	codeMap: {
+		ext: string;
+		mime: string;
+		name: string;
+	}[];
+}

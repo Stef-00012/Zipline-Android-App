@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/functions/zipline/auth";
 import { getVersion } from "@/functions/zipline/version";
 import * as db from "@/functions/database";
-import { APIUser } from "@/types/zipline";
+import { APISelfUser, APIUser } from "@/types/zipline";
 import { usePathname, useRouter } from "expo-router";
 import semver from "semver";
 import React, {
@@ -12,6 +12,7 @@ import React, {
 	useEffect,
 } from "react";
 import { minimumVersion } from "@/constants/auth";
+import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
 
 interface Props {
 	children: React.ReactNode;
@@ -19,14 +20,20 @@ interface Props {
 
 interface AuthData {
     role: APIUser["role"] | false;
+    user: APISelfUser | null;
+    avatar: string | null;
     serverVersion: string;
     updateAuth: () => Promise<void>;
+    updateUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthData>({
 	role: false,
+    user: null,
+    avatar: null,
     serverVersion: "0.0.0",
 	updateAuth: async () => {},
+	updateUser: async () => {},
 });
 
 export default function AuthProvider({ children }: Props) {
@@ -36,9 +43,12 @@ export default function AuthProvider({ children }: Props) {
 	const [role, setRole] = useState<APIUser["role"] | false>(false);
     const [version, setVersion] = useState<string>("0.0.0");
 
+    const [user, setUser] = useState<APISelfUser | null>(null);
+    const [avatar, setAvatar] = useState<string | null>(null);
+
     const updateAuth = useCallback(async () => {
         const userRole = await isAuthenticated();
-        const versionData = await getVersion()
+        const versionData = await getVersion();
 
         const serverVersion =
             typeof versionData === "string"
@@ -67,14 +77,26 @@ export default function AuthProvider({ children }: Props) {
         setVersion(serverVersion)
     }, [])
 
+    const updateUser = useCallback(async () => {
+        const currentUser = await getCurrentUser();
+        const currentUserAvatar = await getCurrentUserAvatar();
+
+        setUser(typeof currentUser === "string" ? null : currentUser);
+        setAvatar(currentUserAvatar)
+    }, [])
+
     const authData = useMemo<AuthData>(() => ({
         role,
+        user,
+        avatar,
         updateAuth,
+        updateUser,
         serverVersion: version,
     }), [role, updateAuth]);
 
 	useEffect(() => {
-		updateAuth()
+		updateAuth();
+        updateUser();
 	}, []);
 
 	return <AuthContext.Provider value={authData}>{children}</AuthContext.Provider>;

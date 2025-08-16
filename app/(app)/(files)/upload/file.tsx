@@ -4,7 +4,6 @@ import { type ExternalPathString, Link, useRouter } from "expo-router";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { Preset, APIUploadResponse } from "@/types/zipline";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
-import { getSettings } from "@/functions/zipline/settings";
 import { getFolders } from "@/functions/zipline/folders";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
@@ -12,10 +11,10 @@ import { dates, formats } from "@/constants/upload";
 import type { Mimetypes } from "@/types/mimetypes";
 import FileDisplay from "@/components/FileDisplay";
 import { styles } from "@/styles/files/uploadFile";
-import { guessExtension } from "@/functions/util";
+import { convertToBytes, guessExtension } from "@/functions/util";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +23,8 @@ import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
 import { File } from "expo-file-system/next";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import bytes from "bytes";
 
 export interface SelectedFile {
 	name: string;
@@ -44,10 +45,15 @@ export default function UploadFile({
 	defaultFiles,
 	fromShareIntent = false,
 }: Props) {
-	const router = useRouter();
-
 	useAuth();
+	
+	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
+	const { webSettings } = useContext(ZiplineContext)
+
+	const maxFileSize = webSettings
+		? webSettings.config.files.maxFileSize
+		: "99TB"
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
@@ -58,6 +64,7 @@ export default function UploadFile({
 	const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>(
 		defaultFiles || [],
 	);
+	const [removedFiles, setRemovedFiles] = useState<SelectedFile[]>([]);
 	const [uploadedFiles, setUploadedFiles] = useState<
 		APIUploadResponse["files"]
 	>([]);
@@ -89,7 +96,9 @@ export default function UploadFile({
 		}[]
 	>([]);
 
-	const [defaultFormat, setDefaultFormat] = useState<string>("random");
+	const defaultFormat = webSettings
+		? webSettings.config.files.defaultFormat
+		: "random"
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -108,13 +117,27 @@ export default function UploadFile({
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
 
 	useEffect(() => {
+		const bytesMaxFileSize = bytes(maxFileSize) || 0
+
+		const removedFiles: SelectedFile[] = [];
+
+		for (const file of selectedFiles) {
+			if (file.size && file.size > bytesMaxFileSize) {
+				removedFiles.push(file)
+			}
+		}
+
+		if (removedFiles.length > 0) {
+			const newSelectedFiles = selectedFiles.filter((file) => removedFiles.every((removedFile) => removedFile.uri !== file.uri))
+
+			setSelectedFiles(newSelectedFiles)
+			setRemovedFiles(removedFiles)
+		}
+	}, [selectedFiles, maxFileSize])
+
+	useEffect(() => {
 		(async () => {
 			const folders = await getFolders(true);
-			const settings = await getSettings();
-
-			if (typeof settings !== "string") {
-				setDefaultFormat(settings.settings.filesDefaultFormat);
-			}
 
 			if (typeof folders === "string") return setFolders([]);
 
@@ -368,6 +391,17 @@ export default function UploadFile({
 				</View>
 			</Popup>
 
+			<Popup onClose={() => setRemovedFiles([])} hidden={removedFiles.length <= 0}>
+				<View>
+					<Text style={styles.headerText}>Removed Files</Text>
+					<Text style={styles.subHeaderText}>Some files have been removed because they exceed the limit of {convertToBytes(maxFileSize)}.</Text>
+
+					{removedFiles.map((file) => (
+						<Text style={styles.text} key={file.uri}>{file.name} ({file.size ? convertToBytes(file.size) : "Unknown Size"})</Text>
+					))}
+				</View>
+			</Popup>
+
 			<View>
 				<View style={styles.header}>
 					<View>
@@ -426,6 +460,15 @@ export default function UploadFile({
 
 			{showFileSelector && (
 				<View>
+					<Text style={{
+						...styles.subHeaderText,
+						...styles.fileLimitText
+					}}>
+						{convertToBytes(maxFileSize, {
+							unitSeparator: " "
+						})} limit per file
+					</Text>
+
 					<Button
 						width="90%"
 						disabled={uploading}
@@ -661,8 +704,6 @@ export default function UploadFile({
 							const preset = selectePreset[0].value;
 
 							const presetToUse = presets.find((pres) => pres.name === preset);
-
-							console.log(presetToUse);
 
 							if (!presetToUse)
 								return ToastAndroid.show("Invalid Preset", ToastAndroid.SHORT);

@@ -1,19 +1,20 @@
 import { type SidebarOption, sidebarOptions } from "@/constants/sidebar";
 import { type RelativePathString, usePathname } from "expo-router";
-import { getSettings } from "@/functions/zipline/settings";
 import { Animated, View, Dimensions } from "react-native";
-import { getCurrentUser } from "@/functions/zipline/user";
 import { styles } from "@/styles/components/sidebar";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import {
 	type Dispatch,
 	type SetStateAction,
+	useContext,
 	useEffect,
 	useRef,
 	useState,
 } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { AuthContext } from "@/contexts/AuthProvider";
 
 interface Props {
 	open: boolean;
@@ -29,6 +30,9 @@ export default function Sidebar({
 	const router = useRouter();
 
 	const resetShareIntent = useShareIntent(true);
+	const { webSettings } = useContext(ZiplineContext)
+
+	const { role } = useContext(AuthContext)
 
 	const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
 	const animatedHeights = useRef<Record<string, Animated.Value>>({}).current;
@@ -36,29 +40,23 @@ export default function Sidebar({
 	const screenWidth = Dimensions.get("window").width;
 	const translateX = useRef(new Animated.Value(-screenWidth)).current;
 
-	const [invitesEnabled, setInvitesEnabled] = useState<boolean>(false);
+	const invitesEnabled = webSettings
+		? webSettings.config.invites.enabled
+		: false
+
 	const [isAdmin, setIsAdmin] = useState<boolean>(false);
 	const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		(async () => {
-			const settings = await getSettings();
-			const user = await getCurrentUser();
-
-			if (typeof settings !== "string" && settings.settings.invitesEnabled)
-				setInvitesEnabled(true);
-			else setInvitesEnabled(false);
-
-			if (typeof user !== "string") {
-				if (user.role === "USER") {
-					setIsAdmin(false);
-					setIsSuperAdmin(false);
-				}
-
-				if (["ADMIN", "SUPERADMIN"].includes(user.role)) setIsAdmin(true);
-				if (user.role === "SUPERADMIN") setIsSuperAdmin(true);
+			if (role === "USER") {
+				setIsAdmin(false);
+				setIsSuperAdmin(false);
 			}
+
+			if (["ADMIN", "SUPERADMIN"].includes(role || "NOT_LOGGED")) setIsAdmin(true);
+			if (role === "SUPERADMIN") setIsSuperAdmin(true);
 		})();
 	}, [open]);
 

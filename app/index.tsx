@@ -1,4 +1,4 @@
-import { getRecentFiles, getCurrentUser } from "@/functions/zipline/user";
+import { getRecentFiles } from "@/functions/zipline/user";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { getUserStats } from "@/functions/zipline/stats";
 import { useShareIntent } from "@/hooks/useShareIntent";
@@ -6,7 +6,7 @@ import { Text, View, ScrollView } from "react-native";
 import { useAppUpdates } from "@/hooks/useUpdates";
 import FileDisplay from "@/components/FileDisplay";
 import { convertToBytes } from "@/functions/util";
-import { /*useContext,*/ useEffect, useState } from "react";
+import { /*useContext,*/ useContext, useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
@@ -16,12 +16,10 @@ import Skeleton from "@/components/skeleton/Skeleton";
 import type {
 	APIFile,
 	APIRecentFiles,
-	APISelfUser,
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
-// import { AuthContext } from "@/contexts/AuthProvider";
-// import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { AuthContext } from "@/contexts/AuthProvider";
 
 // ------------------------ DEV -------------------------
 
@@ -33,23 +31,13 @@ export default function Home() {
 	useAuth();
 	useShareIntent();
 
-	// const { role, updateAuth, serverVersion } = useContext(AuthContext)
-	// const { webSettings, publicSettings, updateSettings } = useContext(ZiplineContext)
-
-	// useEffect(() => {
-	// 	console.info(role, serverVersion)
-
-	// 	console.debug({
-	// 		webSettings,
-	// 		publicSettings,
-	// 	})
-	// }, [webSettings, publicSettings])
-
 	useAppUpdates();
+
+	const { user } = useContext(AuthContext)
 
 	const url = db.get("url") as DashURL | null;
 
-	const [user, setUser] = useState<APISelfUser | null>(null);
+	// const [user, setUser] = useState<APISelfUser | null>(null);
 	const [stats, setStats] = useState<APIUserStats | null>();
 	const [recentFiles, setRecentFiles] = useState<APIRecentFiles | null>();
 
@@ -76,11 +64,9 @@ export default function Home() {
 	// --------------- END DEV ----------------
 
 	async function handleAuth() {
-		const user = await getCurrentUser();
 		const stats = await getUserStats();
 		const recentFiles = await getRecentFiles();
 
-		setUser(typeof user === "string" ? null : user);
 		setStats(typeof stats === "string" ? null : stats);
 		setRecentFiles(typeof recentFiles === "string" ? null : recentFiles);
 	}
@@ -155,21 +141,25 @@ export default function Home() {
 						<View>
 							<Text style={styles.headerText}>Recent Files</Text>
 
-							<ScrollView horizontal style={styles.scrollView}>
-								{recentFiles.map((file) => (
-									<View key={file.id} style={styles.recentFileContainer}>
-										<FileDisplay
-											uri={`${url}/raw/${file.name}`}
-											originalName={file.originalName}
-											name={file.name}
-											width={200}
-											height={200}
-											passwordProtected={file.password}
-											onPress={() => setFocusedFile(file)}
-										/>
-									</View>
-								))}
-							</ScrollView>
+							{recentFiles.length > 0 ? (
+								<ScrollView horizontal style={styles.scrollView}>
+									{recentFiles.map((file) => (
+										<View key={file.id} style={styles.recentFileContainer}>
+											<FileDisplay
+												uri={`${url}/raw/${file.name}`}
+												originalName={file.originalName}
+												name={file.name}
+												width={200}
+												height={200}
+												passwordProtected={file.password}
+												onPress={() => setFocusedFile(file)}
+											/>
+										</View>
+									))}
+								</ScrollView>
+							) : (
+								<Text style={styles.subHeader}>You have no recent files. The last three files you uploaded will appear here.</Text>
+							)}
 						</View>
 					)}
 
@@ -240,31 +230,33 @@ export default function Home() {
 								</ScrollView>
 							</View>
 
-							<View>
-								<Text style={styles.headerText}>File Types</Text>
+							{recentFiles && recentFiles.length > 0 && (
+								<View>
+									<Text style={styles.headerText}>File Types</Text>
 
-								<View
-									style={{
-										...styles.scrollView,
-										...styles.fileTypesContainer,
-									}}
-								>
-									<Table
-										headerRow={[
-											{
-												row: "File Type",
-											},
-											{
-												row: "Count",
-											},
-										]}
-										rowWidth={[250, 150]}
-										rows={Object.entries(stats.sortTypeCount).sort(
-											(a, b) => b[1] - a[1],
-										)}
-									/>
+									<View
+										style={{
+											...styles.scrollView,
+											...styles.fileTypesContainer,
+										}}
+									>
+										<Table
+											headerRow={[
+												{
+													row: "File Type",
+												},
+												{
+													row: "Count",
+												},
+											]}
+											rowWidth={[250, 150]}
+											rows={Object.entries(stats.sortTypeCount).sort(
+												(a, b) => b[1] - a[1],
+											)}
+										/>
+									</View>
 								</View>
-							</View>
+							)}
 						</>
 					)}
 				</ScrollView>

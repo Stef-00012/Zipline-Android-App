@@ -112,7 +112,11 @@ export function convertToBytes(
 		return bytes(Number.parseFloat(value), options);
 	}
 
-	return value;
+	const rawBytes = bytes(value)
+
+	if (!rawBytes) return value;
+
+	return bytes(rawBytes, options)
 }
 
 export function convertToTime(

@@ -1,9 +1,4 @@
-import { isAuthenticated } from "@/functions/zipline/auth";
-import { getVersion } from "@/functions/zipline/version";
-import * as db from "@/functions/database";
-import { APIPublicSettings, APIUser, APIWebSettings } from "@/types/zipline";
-import { usePathname, useRouter } from "expo-router";
-import semver from "semver";
+import { APIPublicSettings, APIWebSettings } from "@/types/zipline";
 import React, {
     createContext,
     useState,
@@ -11,7 +6,6 @@ import React, {
     useMemo,
     useEffect,
 } from "react";
-import { minimumVersion } from "@/constants/auth";
 import { getPublicSettings, getWebSettings } from "@/functions/zipline/settings";
 
 interface Props {

@@ -1,13 +1,12 @@
-import type { APISettings, APIURLs, DashURL } from "@/types/zipline";
+import type { APIURLs, DashURL } from "@/types/zipline";
 import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import { type ExternalPathString, Link } from "expo-router";
-import { getSettings } from "@/functions/zipline/settings";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import LargeURLView from "@/components/LargeURLView";
 import { timeDifference } from "@/functions/util";
 import { searchKeyNames } from "@/constants/urls";
 import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +25,7 @@ import {
 } from "@/functions/zipline/urls";
 import SkeletonTable from "@/components/skeleton/Table";
 import Skeleton from "@/components/skeleton/Skeleton";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 export type URLActions =
 	| "copyShortLink"
@@ -38,11 +38,17 @@ const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 export default function Urls() {
 	useAuth();
 	useShareIntent();
+	const { webSettings } = useContext(ZiplineContext)
 
 	const urlsCompactView = db.get("urlsCompactView");
 
+	const urlsRoute = webSettings
+		? webSettings.config.urls.route === "/"
+			? ""
+			: webSettings.config.urls.route
+		: "/go";
+
 	const [urls, setUrls] = useState<APIURLs | null>(null);
-	const [settings, setSettings] = useState<APISettings | null>(null);
 
 	const [createNewUrl, setCreateNewUrl] = useState<boolean>(false);
 
@@ -98,14 +104,6 @@ export default function Urls() {
 
 	const dashUrl = db.get("url") as DashURL | null;
 
-	useEffect(() => {
-		(async () => {
-			const settings = await getSettings();
-
-			setSettings(typeof settings === "string" ? null : settings);
-		})();
-	}, []);
-
 	// biome-ignore lint/correctness/useExhaustiveDependencies: should only trigger when search term changes
 	useEffect(() => {
 		fetchURls();
@@ -155,8 +153,8 @@ export default function Urls() {
 		switch (type) {
 			case "copyShortLink": {
 				const urlDest = url.vanity
-					? `${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.vanity}`
-					: `${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.code}`;
+					? `${dashUrl}${urlsRoute}/${url.vanity}`
+					: `${dashUrl}${urlsRoute}/${url.code}`;
 
 				const saved = await Clipboard.setStringAsync(urlDest);
 
@@ -661,7 +659,7 @@ export default function Urls() {
 													<Link
 														key={url.id}
 														href={
-															`${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.code}` as ExternalPathString
+															`${dashUrl}${urlsRoute}/${url.code}` as ExternalPathString
 														}
 														style={{
 															...styles.rowText,
@@ -678,7 +676,7 @@ export default function Urls() {
 															<Link
 																key={url.id}
 																href={
-																	`${dashUrl}${settings?.settings.urlsRoute === "/" ? "" : settings?.settings.urlsRoute || "/go"}/${url.vanity}` as ExternalPathString
+																	`${dashUrl}${urlsRoute}/${url.vanity}` as ExternalPathString
 																}
 																style={{
 																	...styles.rowText,
@@ -800,7 +798,7 @@ export default function Urls() {
 											<LargeURLView
 												key={url.id}
 												url={url}
-												urlsRoute={settings?.settings.urlsRoute || "/go"}
+												urlsRoute={urlsRoute}
 												dashUrl={dashUrl}
 												onAction={onAction}
 											/>

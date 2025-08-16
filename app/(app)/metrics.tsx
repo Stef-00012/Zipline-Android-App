@@ -6,12 +6,11 @@ import {
 	getMetricsDifference,
 } from "@/functions/util";
 import type { DateType } from "react-native-ui-datepicker";
-import { getSettings } from "@/functions/zipline/settings";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import ChartLegend from "@/components/ChartLegend";
 import DatePicker from "@/components/DatePicker";
 import type { APIStats } from "@/types/zipline";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/metrics";
 import Button from "@/components/Button";
@@ -25,10 +24,12 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import Skeleton from "@/components/skeleton/Skeleton";
 import SkeletonTable from "@/components/skeleton/Table";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 export default function Metrics() {
 	useAuth();
 	useShareIntent();
+	const { webSettings } = useContext(ZiplineContext)
 
 	const [stats, setStats] = useState<APIStats | null>();
 	const [userSpecificMetrics, setUserSpecificMetrics] =
@@ -94,12 +95,11 @@ export default function Metrics() {
 			to,
 			all,
 		});
-		const settings = await getSettings();
 
 		setUserSpecificMetrics(
-			typeof settings === "string"
-				? false
-				: settings.settings.featuresMetricsShowUserSpecific,
+			webSettings
+				? webSettings.config.features.metrics.showUserSpecific
+				: false
 		);
 
 		if (typeof stats === "string") return setStats(null);

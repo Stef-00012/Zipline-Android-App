@@ -544,10 +544,6 @@ export default function ServerSettings() {
 
 	const [showTamperedKeys, setShowTamperedKeys] = useState<boolean>(false);
 
-	useEffect(() => {
-		console.log(saveSettings);
-	}, [saveSettings]);
-
 	function renderSetting(setting: Setting, skeleton = false) {
 		let description: ReactNode;
 

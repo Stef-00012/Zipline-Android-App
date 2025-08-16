@@ -13,6 +13,8 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		fontSize: 15,
 		borderRadius: 6,
+		paddingTop: 0,
+		paddingBottom: 0,
 	},
 	textInputSideButton: {
 		flex: 1,

@@ -33,11 +33,15 @@ Or directly download it from [here](https://github.com/Stef-00012/zipline-androi
 
 This will create an apk but won't automatically install
 
-# To-DO
+# TO-DO
+- [x] ~~Remove~~ Update `useAuth` hook ~~and instead~~ to use the `AuthContext` context to avoid fetching user login data on every page change
+- [x] Fix recent files section having no height when there is no recent file
+- [x] Fix password input not hiding the password
+- [x] Fix text inputs content not being vertically centered
+- [x] Move public API settings to `ZiplineContext` to avoid fetching them on every page change (i think done in all places)
+- [x] When selecting files through share intent, make sure they are smaller than the `maxFileSize` (I think done)
+- [ ] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
 - [ ] Try to allow chunked uploads
 - [ ] Try to improve popups (kinda ugly that thy can't go over the header)
-- [ ] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
-- [ ] try to make animations smoother
-- [ ] Fix recent files section having no height when there is no recent file
-- [ ] Remove `useAuth` hook and instead use the `AuthContext` context to avoid fetching user login data on every page change
-- [ ] Move public API settings to `ZiplineContext` to avoid fetching them on every page change
+- [ ] Try to make animations smoother
+- [ ] Try to fix app blocking/freezing when large files are selected through share intent

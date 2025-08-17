@@ -26,13 +26,18 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Check Commit Message
+      - name: Check Commit Message for status
         id: check_commit_message
         run: |
           if echo "${{ github.event.head_commit.message }}" | grep -q '^\[nobuild\]'; then
             echo "skip=true" >> $GITHUB_OUTPUT
+            echo "pre=false" >> $GITHUB_OUTPUT
+          elif echo "${{ github.event.head_commit.message }}" | grep -q '^\[pre\]'; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "pre=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
+            echo "pre=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Fail job if skip is true
@@ -98,6 +103,7 @@ jobs:
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
+          prerelease: ${{ steps.check_commit_message.outputs.pre }}
           artifacts: "app-release.apk,app-release.aab"
           artifactContentType: application/vnd.android.package-archive
           tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"

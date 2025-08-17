@@ -113,5 +113,5 @@ jobs:
           prerelease: ${{ steps.check_commit_message.outputs.pre }}
           artifacts: "${{ steps.check_commit_message.outputs.pre == 'false' && 'app-release.apk,app-release.aab' || 'app-release.apk' }}"
           artifactContentType: application/vnd.android.package-archive
-          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
+          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}${{ steps.check_commit_message.outputs.pre == 'true' && '-pre' || '' }}"
           generateReleaseNotes: true

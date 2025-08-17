@@ -92,9 +92,11 @@ jobs:
           path: ${{ github.workspace }}/app-release.apk
 
       - name: Build Android App AAB
+        if: steps.check_commit_message.outputs.pre == 'false'
         run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-release.aab
 
       - name: Upload AAB Artifact
+        if: steps.check_commit_message.outputs.pre == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: app-aab-release
@@ -104,7 +106,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: ${{ steps.check_commit_message.outputs.pre }}
-          artifacts: "app-release.apk,app-release.aab"
+          artifacts: "${{ steps.check_commit_message.outputs.pre == 'false' && 'app-release.apk,app-release.aab' || 'app-release.apk' }}"
           artifactContentType: application/vnd.android.package-archive
           tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
           generateReleaseNotes: true

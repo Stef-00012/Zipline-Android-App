@@ -46,6 +46,11 @@ jobs:
           echo "Skipping build due to commit message starting with [nobuild]" 
           exit 1
 
+      - name: Alert if pre-release is true
+        if: steps.check_commit_message.outputs.pre == 'true'
+        run: |
+          echo "Building a pre-release version"
+
       - name: Setup Repo
         uses: actions/checkout@v4
 

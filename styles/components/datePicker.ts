@@ -25,4 +25,19 @@ export const styles = StyleSheet.create({
 	todayTextStyle: {
 		fontWeight: "bold",
 	},
+	monthSelectorLabel: {
+		color: "white",
+		fontWeight: "bold"
+	},
+	yearSelectorLabel: {
+		color: "white",
+		fontWeight: "bold"
+	},
+	weekdayLabel: {
+		color: "gray",
+		fontWeight: "bold"
+	},
+	dayLabel: {
+		color: "white"
+	},
 });

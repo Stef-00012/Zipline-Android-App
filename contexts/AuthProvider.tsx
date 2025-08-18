@@ -81,11 +81,6 @@ export default function AuthProvider({ children }: Props) {
         const currentUser = await getCurrentUser();
         const currentUserAvatar = await getCurrentUserAvatar();
 
-        console.log({
-            currentUser,
-            currentUserAvatar
-        })
-
         setUser(typeof currentUser === "string" ? null : currentUser);
         setAvatar(currentUserAvatar)
     }, [])

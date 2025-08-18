@@ -22,7 +22,7 @@ import Select from "@/components/Select";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
-import { File } from "expo-file-system/next";
+import { Directory, File, Paths } from "expo-file-system/next";
 import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import bytes from "bytes";
 
@@ -75,6 +75,8 @@ export default function UploadFile({
 			error: string;
 		}[]
 	>([]);
+
+	const [isCopying, setIsCopying] = useState<boolean>(false)
 
 	const [overrideDomain, setOverrideDomain] =
 		useState<UploadFileOptions["overrideDomain"]>();
@@ -428,6 +430,8 @@ export default function UploadFile({
 					</View>
 				</View>
 
+				{isCopying && <Text style={styles.copyText}>Preparing your files... This may take a few moments</Text>}
+
 				<ScrollView
 					horizontal
 					style={{
@@ -446,6 +450,7 @@ export default function UploadFile({
 								openable={false}
 								onPress={() => {
 									if (uploading) return;
+
 									setSelectedFiles((alreadySelectedFiles) =>
 										alreadySelectedFiles.filter(
 											(selectedFile) => selectedFile.uri !== file.uri,
@@ -471,12 +476,12 @@ export default function UploadFile({
 
 					<Button
 						width="90%"
-						disabled={uploading}
+						disabled={uploading || isCopying}
 						onPress={async () => {
 							const output = await DocumentPicker.getDocumentAsync({
 								type: "*/*",
 								multiple: true,
-								copyToCacheDirectory: true, // temporary
+								copyToCacheDirectory: false,
 							});
 
 							if (output.canceled || output.assets?.length <= 0) return;
@@ -502,14 +507,36 @@ export default function UploadFile({
 										),
 								);
 
+							const cacheDir = new Directory(Paths.cache)
+
+							setIsCopying(true)
+
+							for (const file of newSelectedFiles) {
+								const fileSAFURI = file.uri;
+								const outputURI = `${cacheDir.uri}/${file.name}`
+
+								const outputFile = await FileSystem.getInfoAsync(outputURI)
+
+								if (outputFile.exists) await FileSystem.deleteAsync(outputURI)
+								
+								await FileSystem.copyAsync({
+									from: fileSAFURI,
+									to: outputURI,
+								})
+
+								file.uri = outputURI
+							}
+
+							setIsCopying(false)
+
 							setSelectedFiles((alreadySelectedFiles) => [
 								...alreadySelectedFiles,
 								...newSelectedFiles,
 							]);
 						}}
 						text="Select File(s)"
-						color={uploading ? "#373d79" : "#323ea8"}
-						textColor={uploading ? "gray" : "white"}
+						color={(uploading || isCopying) ? "#373d79" : "#323ea8"}
+						textColor={(uploading || isCopying) ? "gray" : "white"}
 						margin={{
 							left: "auto",
 							right: "auto",
@@ -527,7 +554,7 @@ export default function UploadFile({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
 					Deletes At:
@@ -535,7 +562,7 @@ export default function UploadFile({
 				<Select
 					data={dates}
 					placeholder="Select Date..."
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					onSelect={(selectedDate) => {
 						if (selectedDate.length <= 0) return;
 
@@ -553,7 +580,7 @@ export default function UploadFile({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
 					Format:
@@ -566,7 +593,7 @@ export default function UploadFile({
 						},
 						...formats,
 					]}
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					placeholder="Select Format..."
 					onSelect={(selectedFormat) => {
 						if (selectedFormat.length <= 0) return;
@@ -588,8 +615,8 @@ export default function UploadFile({
 						setCompression(compressionPercentage);
 					}}
 					keyboardType="numeric"
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					value={compression ? String(compression) : ""}
 					placeholder="0"
 				/>
@@ -604,8 +631,8 @@ export default function UploadFile({
 						setMaxViews(maxViewsAmount);
 					}}
 					keyboardType="numeric"
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					value={maxViews ? String(maxViews) : ""}
 					placeholder="0"
 				/>
@@ -613,7 +640,7 @@ export default function UploadFile({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
 					Folder:
@@ -627,7 +654,7 @@ export default function UploadFile({
 						...folders,
 					]}
 					defaultValue={folders.find((fold) => fold.value === folder)}
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					placeholder="Select Folder..."
 					onSelect={(selectedFolder) => {
 						if (selectedFolder.length <= 0) return;
@@ -645,16 +672,16 @@ export default function UploadFile({
 					title="Override Domain:"
 					onValueChange={(content) => setOverrideDomain(content)}
 					keyboardType="url"
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					value={overrideDomain || ""}
 					placeholder="example.com"
 				/>
 
 				<TextInput
 					title="Override File Name:"
-					disableContext={fileNameEnabled || !uploading}
-					disabled={!fileNameEnabled || uploading}
+					disableContext={fileNameEnabled || !uploading || isCopying}
+					disabled={!fileNameEnabled || uploading || isCopying}
 					onValueChange={(content) => setFileName(content)}
 					value={fileNameEnabled ? fileName || "" : ""}
 					placeholder="example.png"
@@ -663,8 +690,8 @@ export default function UploadFile({
 				<TextInput
 					title="Password:"
 					onValueChange={(content) => setPassword(content)}
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					password
 					value={password || ""}
 					placeholder="myPassword"
@@ -673,14 +700,14 @@ export default function UploadFile({
 				<Switch
 					title="Add Original Name"
 					value={originalName || false}
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					onValueChange={() => setOriginalName((prev) => !prev)}
 				/>
 
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
 					Preset:
@@ -696,7 +723,7 @@ export default function UploadFile({
 							label: preset.name,
 							value: preset.name,
 						}))}
-						disabled={presets.length <= 0}
+						disabled={presets.length <= 0 || uploading || isCopying}
 						placeholder="Select Preset..."
 						onSelect={(selectePreset) => {
 							if (selectePreset.length <= 0) return;
@@ -784,7 +811,8 @@ export default function UploadFile({
 						onPress={() => {
 							setSavePreset(true);
 						}}
-						color="#323ea8"
+						disabled={uploading || isCopying}
+						color={(uploading || isCopying) ? "#373d79" : "#323ea8"}
 						margin={{
 							left: "2.5%",
 							right: "2.5%",
@@ -797,7 +825,7 @@ export default function UploadFile({
 			<View>
 				<Button
 					width="90%"
-					disabled={uploading || uploadButtonDisabled}
+					disabled={uploading || uploadButtonDisabled || isCopying}
 					onPress={async () => {
 						setUploading(true);
 
@@ -876,8 +904,8 @@ export default function UploadFile({
 					text={
 						uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"
 					}
-					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
-					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
+					color={(uploading || isCopying) || uploadButtonDisabled ? "#373d79" : "#323ea8"}
+					textColor={(uploading || isCopying) || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",

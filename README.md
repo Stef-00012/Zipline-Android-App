@@ -42,7 +42,7 @@ This will create an apk but won't automatically install
 - [x] When selecting files through share intent, make sure they are smaller than the `maxFileSize` (I think done)
 - [x] Improve metrics header text & buttons layout
 - [x] Fix calendar date picker styling
-- [ ] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
+- [x] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
 - [ ] Try to allow chunked uploads
 - [ ] Try to improve popups (kinda ugly that thy can't go over the header)
 - [ ] Try to make animations smoother

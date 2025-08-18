@@ -194,8 +194,9 @@ export default function Metrics() {
 										: ""
 								}`}
 					</Text>
+				</View>
 
-					<Button
+				<Button
 						onPress={() => {
 							setDatePickerOpen(true);
 						}}
@@ -211,7 +212,6 @@ export default function Metrics() {
 						disabled={!filteredStats || !mainStat}
 						textColor={filteredStats && mainStat ? "white" : "gray"}
 					/>
-				</View>
 
 				{filteredStats && mainStat ? (
 					<View>

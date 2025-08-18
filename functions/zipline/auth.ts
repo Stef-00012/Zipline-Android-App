@@ -13,6 +13,7 @@ export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 	if (!token || !url) return false;
 
 	try {
+		console.log("isAuth fethcing")
 		const res = await axios.get(`${url}/api/user`, {
 			headers: {
 				Authorization: token,
@@ -21,6 +22,8 @@ export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 		});
 
 		const data: APISelfUser = res.data.user;
+
+		console.log(data)
 
 		if (!data) return false;
 

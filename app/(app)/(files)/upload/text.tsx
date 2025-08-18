@@ -1,15 +1,16 @@
 import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { avaibleTextMimetypes, dates, formats } from "@/constants/upload";
 import { type ExternalPathString, Link, useRouter } from "expo-router";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIUploadResponse, Preset } from "@/types/zipline";
 import { guessExtension, guessMimetype } from "@/functions/util";
+import Select, { type SelectProps } from "@/components/Select";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import { getFolders } from "@/functions/zipline/folders";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
 import type { Mimetypes } from "@/types/mimetypes";
+import { dates, formats } from "@/constants/upload";
 import { styles } from "@/styles/files/uploadText";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
@@ -17,7 +18,6 @@ import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
-import Select from "@/components/Select";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
@@ -47,6 +47,8 @@ export default function UploadText({
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
 	const { webSettings } = useContext(ZiplineContext)
+
+	const [mimetypes, setMimetypes] = useState<SelectProps["data"]>([])
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
@@ -106,6 +108,18 @@ export default function UploadText({
 	const [editPresetName, setEditPresetName] = useState<string>("");
 	const [editPresetError, setEditPresetError] = useState<string | null>(null);
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
+
+	useEffect(() => {
+		const mimetypeData = webSettings
+			? webSettings.codeMap
+			: []
+
+		setMimetypes(mimetypeData.map((mimetype) => ({
+			label: mimetype.name,
+			value: mimetype.ext,
+			mimetype: mimetype.mime
+		})))
+	}, [webSettings])
 
 	useEffect(() => {
 		(async () => {
@@ -428,7 +442,7 @@ export default function UploadText({
 
 							const extension = fileURI.split(".").pop() || "txt";
 							const mimetype =
-								(avaibleTextMimetypes.find(
+								(mimetypes.find(
 									(format) => format.value === extension,
 								)?.mimetype as string) ||
 								guessMimetype(extension as keyof Mimetypes);
@@ -483,10 +497,10 @@ export default function UploadText({
 					File Type:
 				</Text>
 				<Select
-					data={avaibleTextMimetypes}
+					data={mimetypes}
 					placeholder="Select File Type..."
 					disabled={uploading || isReading}
-					defaultValue={avaibleTextMimetypes.find(
+					defaultValue={mimetypes.find(
 						(format) => format.value === "txt",
 					)}
 					onSelect={(selectedType) => {

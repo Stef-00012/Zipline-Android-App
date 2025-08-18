@@ -22,6 +22,7 @@ import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
 import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { Directory, Paths } from "expo-file-system/next";
 
 interface SelectedFile {
 	name: string;
@@ -84,6 +85,8 @@ export default function UploadText({
 		? webSettings.config.files.defaultFormat
 		: "random"
 
+	const [isReading, setIsReading] = useState<boolean>(false);
+
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
 	const [uploading, setUploading] = useState<boolean>(false);
@@ -145,7 +148,7 @@ export default function UploadText({
 			>
 				{uploadedFile && (
 					<View>
-						<Text style={styles.headerText}>Uploaded Files</Text>
+						<Text style={styles.headerText}>Uploaded File</Text>
 						<ScrollView style={styles.popupScrollView}>
 							<View key={uploadedFile.id} style={styles.uploadedFileContainer}>
 								<Link
@@ -372,11 +375,13 @@ export default function UploadText({
 					</View>
 				</View>
 
+				{isReading && <Text style={styles.readText}>Reading your file... This may take a few moments</Text>}
+
 				<View style={styles.mainTextInputContainer}>
 					<TextInput
 						multiline
-						disableContext={uploading}
-						disabled={uploading}
+						disableContext={uploading || isReading}
+						disabled={uploading || isReading}
 						inputStyle={{
 							...styles.mainTextInput,
 							...(isKeyboardOpen && { height: 100 }),
@@ -391,7 +396,7 @@ export default function UploadText({
 				<View>
 					<Button
 						width="90%"
-						disabled={uploading}
+						disabled={uploading || isReading}
 						onPress={async () => {
 							const output = await DocumentPicker.getDocumentAsync({
 								type: [
@@ -409,14 +414,17 @@ export default function UploadText({
 									"application/yaml",
 									"video/vnd.dlna.mpeg-tts",
 								],
-								copyToCacheDirectory: true,
+								copyToCacheDirectory: false,
 							});
 
 							if (output.canceled || !output.assets) return;
 
 							const newSelectedFiles: SelectedFile = output.assets[0];
 
-							const fileURI = newSelectedFiles.uri;
+							let fileURI = newSelectedFiles.uri;
+							const cacheDir = new Directory(Paths.cache)
+
+							setIsReading(true)
 
 							const extension = fileURI.split(".").pop() || "txt";
 							const mimetype =
@@ -424,6 +432,19 @@ export default function UploadText({
 									(format) => format.value === extension,
 								)?.mimetype as string) ||
 								guessMimetype(extension as keyof Mimetypes);
+
+							const outputURI = `${cacheDir.uri}/upload.${extension}`
+
+							const outputFile = await FileSystem.getInfoAsync(outputURI)
+							
+							if (outputFile.exists) await FileSystem.deleteAsync(outputURI)
+							
+							await FileSystem.copyAsync({
+								from: fileURI,
+								to: outputURI,
+							})
+
+							fileURI = outputURI;
 
 							const base64 = await FileSystem.readAsStringAsync(fileURI, {
 								encoding: FileSystem.EncodingType.Base64,
@@ -434,10 +455,11 @@ export default function UploadText({
 							setText(decoded);
 							setFileType(mimetype);
 							setFileExtension(extension);
+							setIsReading(false)
 						}}
 						text="Select File"
-						color={uploading ? "#373d79" : "#323ea8"}
-						textColor={uploading ? "gray" : "white"}
+						color={(uploading || isReading) ? "#373d79" : "#323ea8"}
+						textColor={(uploading || isReading) ? "gray" : "white"}
 						margin={{
 							left: "auto",
 							right: "auto",
@@ -455,7 +477,7 @@ export default function UploadText({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isReading) && styles.inputHeaderDisabled),
 					}}
 				>
 					File Type:
@@ -463,7 +485,7 @@ export default function UploadText({
 				<Select
 					data={avaibleTextMimetypes}
 					placeholder="Select File Type..."
-					disabled={uploading}
+					disabled={uploading || isReading}
 					defaultValue={avaibleTextMimetypes.find(
 						(format) => format.value === "txt",
 					)}
@@ -478,7 +500,7 @@ export default function UploadText({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isReading) && styles.inputHeaderDisabled),
 					}}
 				>
 					Deletes At:
@@ -486,7 +508,7 @@ export default function UploadText({
 				<Select
 					data={dates}
 					placeholder="Select Date..."
-					disabled={uploading}
+					disabled={uploading || isReading}
 					onSelect={(selectedDate) => {
 						if (selectedDate.length <= 0) return;
 
@@ -504,7 +526,7 @@ export default function UploadText({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isReading) && styles.inputHeaderDisabled),
 					}}
 				>
 					Format:
@@ -517,7 +539,7 @@ export default function UploadText({
 						},
 						...formats,
 					]}
-					disabled={uploading}
+					disabled={uploading || isReading}
 					placeholder="Select Format..."
 					onSelect={(selectedFormat) => {
 						if (selectedFormat.length <= 0) return;
@@ -539,8 +561,8 @@ export default function UploadText({
 						setCompression(compressionPercentage);
 					}}
 					keyboardType="numeric"
-					disableContext={!uploading}
-					disabled={uploading}
+					disableContext={uploading || isReading}
+					disabled={uploading || isReading}
 					value={compression ? String(compression) : ""}
 					placeholder="0"
 				/>
@@ -555,8 +577,8 @@ export default function UploadText({
 						setMaxViews(maxViewsAmount);
 					}}
 					keyboardType="numeric"
-					disabled={uploading}
-					disableContext={!uploading}
+					disabled={uploading || isReading}
+					disableContext={uploading || isReading}
 					value={maxViews ? String(maxViews) : ""}
 					placeholder="0"
 				/>
@@ -564,7 +586,7 @@ export default function UploadText({
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isReading) && styles.inputHeaderDisabled),
 					}}
 				>
 					Folder:
@@ -578,7 +600,7 @@ export default function UploadText({
 						...folders,
 					]}
 					defaultValue={folders.find((fold) => fold.value === folder)}
-					disabled={uploading}
+					disabled={uploading || isReading}
 					placeholder="Select Folder..."
 					onSelect={(selectedFolder) => {
 						if (selectedFolder.length <= 0) return;
@@ -596,16 +618,16 @@ export default function UploadText({
 					title="Override Domain:"
 					onValueChange={(content) => setOverrideDomain(content)}
 					keyboardType="url"
-					disabled={uploading}
-					disableContext={!uploading}
+					disabled={uploading || isReading}
+					disableContext={uploading || isReading}
 					value={overrideDomain || ""}
 					placeholder="example.com"
 				/>
 
 				<TextInput
 					title="Override File Name:"
-					disabled={uploading}
-					disableContext={!uploading}
+					disabled={uploading || isReading}
+					disableContext={uploading || isReading}
 					onValueChange={(content) => setFileName(content)}
 					value={fileName || ""}
 					placeholder="example.png"
@@ -614,8 +636,8 @@ export default function UploadText({
 				<TextInput
 					title="Password:"
 					onValueChange={(content) => setPassword(content)}
-					disabled={uploading}
-					disableContext={!uploading}
+					disabled={uploading || isReading}
+					disableContext={uploading || isReading}
 					password
 					value={password || ""}
 					placeholder="myPassword"
@@ -624,14 +646,14 @@ export default function UploadText({
 				<Switch
 					title="Add Original Name"
 					value={originalName || false}
-					disabled={uploading}
+					disabled={uploading || isReading}
 					onValueChange={() => setOriginalName((prev) => !prev)}
 				/>
 
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isReading) && styles.inputHeaderDisabled),
 					}}
 				>
 					Preset:
@@ -748,7 +770,7 @@ export default function UploadText({
 			<View>
 				<Button
 					width="90%"
-					disabled={uploading || uploadButtonDisabled}
+					disabled={uploading || isReading || uploadButtonDisabled}
 					onPress={async () => {
 						setUploading(true);
 
@@ -797,8 +819,8 @@ export default function UploadText({
 						afterUploadCleanup();
 					}}
 					text={uploading ? "Uploading..." : "Upload File"}
-					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
-					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
+					color={uploading || isReading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
+					textColor={uploading || isReading || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",

@@ -35,6 +35,7 @@ export const styles = StyleSheet.create({
 		textAlignVertical: "center",
 		fontSize: 12,
 		marginTop: 10,
+		marginRight: 10
 	},
 	scrollView: {
 		borderStyle: "solid",

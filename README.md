@@ -40,7 +40,7 @@ This will create an apk but won't automatically install
 - [x] Fix text inputs content not being vertically centered
 - [x] Move public API settings to `ZiplineContext` to avoid fetching them on every page change (i think done in all places)
 - [x] When selecting files through share intent, make sure they are smaller than the `maxFileSize` (I think done)
-- [ ] Improve metrics header text & buttons layout
+- [x] Improve metrics header text & buttons layout
 - [ ] Fix calendar date picker styling
 - [ ] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
 - [ ] Try to allow chunked uploads

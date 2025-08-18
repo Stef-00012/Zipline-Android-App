@@ -206,7 +206,9 @@ export default function Metrics() {
 						borderColor="#222c47"
 						margin={{
 							right: 10,
-							top: 10,
+							left: 10,
+							// top: 10,
+							bottom: 10,
 						}}
 						rippleColor="#283557"
 						disabled={!filteredStats || !mainStat}

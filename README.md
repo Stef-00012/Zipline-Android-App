@@ -47,4 +47,4 @@ This will create an apk but won't automatically install
 - [x] Try to allow chunked uploads (Maybe done)
 - [x] Try to improve popups (Kinda ugly that thy can't go over the header)
 - [ ] ~~Try to make animations smoother~~ (Not sure how to improve it as i think it's caused by too many components rendered at the same time but the heavier components are required ones like text inputs or switches)
-- [ ] Try to fix app blocking/freezing when large files are selected through share intent
+- [ ] ~~Try to fix app blocking/freezing when large files are selected through share intent~~ (Seems like the lib does not have any setting about that)

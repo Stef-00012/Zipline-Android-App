@@ -45,6 +45,6 @@ This will create an apk but won't automatically install
 - [x] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
 - [x] Switch domains to a select
 - [x] Try to allow chunked uploads (Maybe done)
-- [x] Try to improve popups (kinda ugly that thy can't go over the header)
-- [ ] Try to make animations smoother
+- [x] Try to improve popups (Kinda ugly that thy can't go over the header)
+- [ ] ~~Try to make animations smoother~~ (Not sure how to improve it as i think it's caused by too many components rendered at the same time but the heavier components are required ones like text inputs or switches)
 - [ ] Try to fix app blocking/freezing when large files are selected through share intent

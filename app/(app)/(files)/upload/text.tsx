@@ -46,7 +46,7 @@ export default function UploadText({
 	
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
-	const { webSettings } = useContext(ZiplineContext)
+	const { webSettings, publicSettings } = useContext(ZiplineContext)
 
 	const [mimetypes, setMimetypes] = useState<SelectProps["data"]>([])
 
@@ -86,6 +86,16 @@ export default function UploadText({
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random"
+
+	const domainList = publicSettings
+	? publicSettings.domains ?? []
+	: []
+
+const domains = domainList
+	.map((domain) => ({
+		label: domain,
+		value: domain
+	}))
 
 	const [isReading, setIsReading] = useState<boolean>(false);
 
@@ -628,14 +638,35 @@ export default function UploadText({
 					maxHeight={400}
 				/>
 
-				<TextInput
-					title="Override Domain:"
-					onValueChange={(content) => setOverrideDomain(content)}
-					keyboardType="url"
+				<Text
+					style={{
+						...styles.inputHeader,
+						...((uploading || isReading) && styles.inputHeaderDisabled),
+					}}
+				>
+					Override Domain:
+				</Text>
+				<Select
+					data={[
+						{
+							label: "Default Domain",
+							value: "defaultDomain",
+						},
+						...domains,
+					]}
+					defaultValue={domains.find((domain) => domain.value === overrideDomain)}
 					disabled={uploading || isReading}
-					disableContext={uploading || isReading}
-					value={overrideDomain || ""}
-					placeholder="example.com"
+					placeholder="Select Domain..."
+					onSelect={(selectedDomain) => {
+						if (selectedDomain.length <= 0) return;
+
+						setOverrideDomain(
+							selectedDomain[0].value === "defaultDomain"
+								? undefined
+								: selectedDomain[0].value,
+						);
+					}}
+					maxHeight={400}
 				/>
 
 				<TextInput

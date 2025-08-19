@@ -517,12 +517,14 @@ export interface APIPublicSettings {
 	tos?: string | null;
 	files: {
 		maxFileSize: string;
+		defaultFormat: "uuid" | "date" | "random" | "name" | "gfycat" | "random-words";
 	};
 	chunks: {
 		max?: string;
 		size?: string;
 		enabled?: boolean;
 	};
+	domains?: string[];
 	firstSetup: boolean;
 }
 

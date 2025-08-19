@@ -49,7 +49,7 @@ export default function UploadFile({
 	
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
-	const { webSettings } = useContext(ZiplineContext)
+	const { webSettings, publicSettings } = useContext(ZiplineContext)
 
 	const maxFileSize = webSettings
 		? webSettings.config.files.maxFileSize
@@ -101,6 +101,16 @@ export default function UploadFile({
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random"
+
+	const domainList = publicSettings
+		? publicSettings.domains ?? []
+		: []
+
+	const domains = domainList
+		.map((domain) => ({
+			label: domain,
+			value: domain
+		}))
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -668,14 +678,35 @@ export default function UploadFile({
 					maxHeight={400}
 				/>
 
-				<TextInput
-					title="Override Domain:"
-					onValueChange={(content) => setOverrideDomain(content)}
-					keyboardType="url"
-					disableContext={uploading || isCopying}
+				<Text
+					style={{
+						...styles.inputHeader,
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
+					}}
+				>
+					Override Domain:
+				</Text>
+				<Select
+					data={[
+						{
+							label: "Default Domain",
+							value: "defaultDomain",
+						},
+						...domains,
+					]}
+					defaultValue={domains.find((domain) => domain.value === overrideDomain)}
 					disabled={uploading || isCopying}
-					value={overrideDomain || ""}
-					placeholder="example.com"
+					placeholder="Select Domain..."
+					onSelect={(selectedDomain) => {
+						if (selectedDomain.length <= 0) return;
+
+						setOverrideDomain(
+							selectedDomain[0].value === "defaultDomain"
+								? undefined
+								: selectedDomain[0].value,
+						);
+					}}
+					maxHeight={400}
 				/>
 
 				<TextInput

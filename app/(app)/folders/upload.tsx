@@ -26,12 +26,12 @@ import { guessExtension } from "@/functions/util";
 import type { Mimetypes } from "@/types/mimetypes";
 import { styles } from "@/styles/folders/upload";
 import * as db from "@/functions/database";
-import { File } from "expo-file-system/next";
+import { Directory, File, Paths } from "expo-file-system/next";
 import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 export default function FolderUpload() {
 	const router = useRouter();
-	const { webSettings } = useContext(ZiplineContext)
+	const { webSettings, publicSettings } = useContext(ZiplineContext)
 
 	const searchParams = useLocalSearchParams<{
 		folderId?: string;
@@ -53,6 +53,8 @@ export default function FolderUpload() {
 		}[]
 	>([]);
 
+	const [isCopying, setIsCopying] = useState<boolean>(false);
+
 	const [overrideDomain, setOverrideDomain] =
 		useState<UploadFileOptions["overrideDomain"]>();
 	const [originalName, setOriginalName] =
@@ -68,6 +70,16 @@ export default function FolderUpload() {
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random";
+
+	const domainList = publicSettings
+		? publicSettings.domains ?? []
+		: []
+
+	const domains = domainList
+		.map((domain) => ({
+			label: domain,
+			value: domain
+		}))
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -221,6 +233,8 @@ export default function FolderUpload() {
 					</View>
 				</View>
 
+				{isCopying && <Text style={styles.copyText}>Preparing your files... This may take a few moments</Text>}
+
 				<ScrollView
 					horizontal
 					style={{
@@ -239,6 +253,7 @@ export default function FolderUpload() {
 								openable={false}
 								onPress={() => {
 									if (uploading) return;
+
 									setSelectedFiles((alreadySelectedFiles) =>
 										alreadySelectedFiles.filter(
 											(selectedFile) => selectedFile.uri !== file.uri,
@@ -254,12 +269,12 @@ export default function FolderUpload() {
 			<View>
 				<Button
 					width="90%"
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					onPress={async () => {
 						const output = await DocumentPicker.getDocumentAsync({
 							type: "*/*",
 							multiple: true,
-							copyToCacheDirectory: true,
+							copyToCacheDirectory: false,
 						});
 
 						if (output.canceled || !output.assets) return;
@@ -285,14 +300,36 @@ export default function FolderUpload() {
 									),
 							);
 
+						const cacheDir = new Directory(Paths.cache)
+						
+						setIsCopying(true)
+
+						for (const file of newSelectedFiles) {
+							const fileSAFURI = file.uri;
+							const outputURI = `${cacheDir.uri}/${file.name}`
+
+							const outputFile = await FileSystem.getInfoAsync(outputURI)
+
+							if (outputFile.exists) await FileSystem.deleteAsync(outputURI)
+							
+							await FileSystem.copyAsync({
+								from: fileSAFURI,
+								to: outputURI,
+							})
+
+							file.uri = outputURI
+						}
+
+						setIsCopying(false)
+
 						setSelectedFiles((alreadySelectedFiles) => [
 							...alreadySelectedFiles,
 							...newSelectedFiles,
 						]);
 					}}
 					text="Select File(s)"
-					color={uploading ? "#373d79" : "#323ea8"}
-					textColor={uploading ? "gray" : "white"}
+					color={(uploading || isCopying) ? "#373d79" : "#323ea8"}
+					textColor={(uploading || isCopying) ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",
@@ -328,7 +365,7 @@ export default function FolderUpload() {
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
 					Deletes At:
@@ -336,7 +373,7 @@ export default function FolderUpload() {
 				<Select
 					data={dates}
 					placeholder="Select Date..."
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					onSelect={(selectedDate) => {
 						if (selectedDate.length <= 0) return;
 
@@ -354,7 +391,7 @@ export default function FolderUpload() {
 				<Text
 					style={{
 						...styles.inputHeader,
-						...(uploading && styles.inputHeaderDisabled),
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
 					Format:
@@ -367,7 +404,7 @@ export default function FolderUpload() {
 						},
 						...formats,
 					]}
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					placeholder="Select Format..."
 					onSelect={(selectedFormat) => {
 						if (selectedFormat.length <= 0) return;
@@ -389,8 +426,8 @@ export default function FolderUpload() {
 						setCompression(compressionPercentage);
 					}}
 					keyboardType="numeric"
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					value={compression ? String(compression) : ""}
 					placeholder="0"
 				/>
@@ -405,26 +442,47 @@ export default function FolderUpload() {
 						setMaxViews(maxViewsAmount);
 					}}
 					keyboardType="numeric"
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					value={maxViews ? String(maxViews) : ""}
 					placeholder="0"
 				/>
 
-				<TextInput
-					title="Override Domain:"
-					onValueChange={(content) => setOverrideDomain(content)}
-					keyboardType="url"
-					disableContext={uploading}
-					disabled={uploading}
-					value={overrideDomain || ""}
-					placeholder="example.com"
+				<Text
+					style={{
+						...styles.inputHeader,
+						...((uploading || isCopying) && styles.inputHeaderDisabled),
+					}}
+				>
+					Override Domain:
+				</Text>
+				<Select
+					data={[
+						{
+							label: "Default Domain",
+							value: "defaultDomain",
+						},
+						...domains,
+					]}
+					defaultValue={domains.find((domain) => domain.value === overrideDomain)}
+					disabled={uploading || isCopying}
+					placeholder="Select Domain..."
+					onSelect={(selectedDomain) => {
+						if (selectedDomain.length <= 0) return;
+
+						setOverrideDomain(
+							selectedDomain[0].value === "defaultDomain"
+								? undefined
+								: selectedDomain[0].value,
+						);
+					}}
+					maxHeight={400}
 				/>
 
 				<TextInput
 					title="Override File Name:"
-					disableContext={fileNameEnabled || !uploading}
-					disabled={!fileNameEnabled || uploading}
+					disableContext={fileNameEnabled || uploading || isCopying}
+					disabled={fileNameEnabled || uploading || isCopying}
 					onValueChange={(content) => setFileName(content)}
 					value={fileNameEnabled ? fileName || "" : ""}
 					placeholder="example.png"
@@ -433,8 +491,8 @@ export default function FolderUpload() {
 				<TextInput
 					title="Password:"
 					onValueChange={(content) => setPassword(content)}
-					disableContext={uploading}
-					disabled={uploading}
+					disableContext={uploading || isCopying}
+					disabled={uploading || isCopying}
 					password
 					value={password || ""}
 					placeholder="myPassword"
@@ -443,7 +501,7 @@ export default function FolderUpload() {
 				<Switch
 					title="Add Original Name"
 					value={originalName || false}
-					disabled={uploading}
+					disabled={uploading || isCopying}
 					onValueChange={() => setOriginalName((prev) => !prev)}
 				/>
 			</KeyboardAwareScrollView>
@@ -451,7 +509,7 @@ export default function FolderUpload() {
 			<View>
 				<Button
 					width="90%"
-					disabled={uploading || uploadButtonDisabled}
+					disabled={uploading || isCopying || uploadButtonDisabled}
 					onPress={async () => {
 						setUploading(true);
 
@@ -529,8 +587,8 @@ export default function FolderUpload() {
 					text={
 						uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"
 					}
-					color={uploading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
-					textColor={uploading || uploadButtonDisabled ? "gray" : "white"}
+					color={uploading || isCopying || uploadButtonDisabled ? "#373d79" : "#323ea8"}
+					textColor={uploading || isCopying || uploadButtonDisabled ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",

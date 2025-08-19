@@ -39,6 +39,7 @@ import {
 	View,
 	BackHandler,
 } from "react-native";
+import { Portal } from "react-native-portalize";
 
 interface Props {
 	file: APIFile;
@@ -320,151 +321,176 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 				</View>
 			</Popup>
 
-			<Pressable
-				style={{
-					...styles.popupContainerOverlay,
-					...((hidden || tempHidden || !file) && { display: "none" }),
-				}}
-				onPress={(e) => {
-					if (e.target === e.currentTarget) onClose();
-				}}
-			>
-				<View style={styles.popupContainer}>
-					<Text style={styles.fileHeader}>{file.name}</Text>
+			<Portal>
+				<Pressable
+					style={{
+						...styles.popupContainerOverlay,
+						...((hidden || tempHidden || !file) && { display: "none" }),
+					}}
+					onPress={(e) => {
+						if (e.target === e.currentTarget) onClose();
+					}}
+				>
+					<View style={styles.popupContainer}>
+						<Text style={styles.fileHeader}>{file.name}</Text>
 
-					<KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-						{fileContent ? (
-							<TextInput
-								multiline
-								showDisabledStyle={false}
-								disabled
-								inputStyle={styles.textDisplay}
-								value={fileContent}
-							/>
-						) : (
-							<FileDisplay
-								passwordProtected={!!filePassword}
-								uri={`${dashUrl}/raw/${file.name}`}
-								originalName={fileOriginalName}
-								mimetype={fileType}
-								name={file.name}
-								maxHeight={500}
-								width={350}
-								file={file}
-								autoHeight
-							/>
-						)}
+						<KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+							{fileContent ? (
+								<TextInput
+									multiline
+									showDisabledStyle={false}
+									disabled
+									inputStyle={styles.textDisplay}
+									value={fileContent}
+								/>
+							) : (
+								<FileDisplay
+									passwordProtected={!!filePassword}
+									uri={`${dashUrl}/raw/${file.name}`}
+									originalName={fileOriginalName}
+									mimetype={fileType}
+									name={file.name}
+									maxHeight={500}
+									width={350}
+									file={file}
+									autoHeight
+								/>
+							)}
 
-						<View style={styles.fileInfoContainer}>
-							<MaterialIcons name="description" size={28} color="white" />
-							<View style={styles.fileInfoTextContainer}>
-								<Text style={styles.fileInfoHeader}>Type</Text>
-								<Text style={styles.fileInfoText}>{file.type}</Text>
-							</View>
-						</View>
-
-						<View style={styles.fileInfoContainer}>
-							<MaterialIcons name="sd-storage" size={28} color="white" />
-							<View style={styles.fileInfoTextContainer}>
-								<Text style={styles.fileInfoHeader}>Size</Text>
-								<Text style={styles.fileInfoText}>
-									{convertToBytes(file.size, {
-										unitSeparator: " ",
-									})}
-								</Text>
-							</View>
-						</View>
-
-						<View style={styles.fileInfoContainer}>
-							<MaterialIcons name="visibility" size={28} color="white" />
-							<View style={styles.fileInfoTextContainer}>
-								<Text style={styles.fileInfoHeader}>View</Text>
-								<Text style={styles.fileInfoText}>
-									{file.views}
-									{fileMaxViews &&
-										!Number.isNaN(fileMaxViews) &&
-										`/${fileMaxViews}`}
-								</Text>
-							</View>
-						</View>
-
-						<View style={styles.fileInfoContainer}>
-							<MaterialIcons name="file-upload" size={28} color="white" />
-							<View style={styles.fileInfoTextContainer}>
-								<Text style={styles.fileInfoHeader}>Created At</Text>
-								<Text style={styles.fileInfoText}>
-									{new Date(file.createdAt).toLocaleString()}
-								</Text>
-							</View>
-						</View>
-
-						<View style={styles.fileInfoContainer}>
-							<MaterialIcons name="autorenew" size={28} color="white" />
-							<View style={styles.fileInfoTextContainer}>
-								<Text style={styles.fileInfoHeader}>Updated At</Text>
-								<Text style={styles.fileInfoText}>
-									{new Date(file.updatedAt).toLocaleString()}
-								</Text>
-							</View>
-						</View>
-
-						{file.deletesAt && (
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="auto-delete" size={28} color="white" />
+								<MaterialIcons name="description" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
-									<Text style={styles.fileInfoHeader}>Deletes At</Text>
+									<Text style={styles.fileInfoHeader}>Type</Text>
+									<Text style={styles.fileInfoText}>{file.type}</Text>
+								</View>
+							</View>
+
+							<View style={styles.fileInfoContainer}>
+								<MaterialIcons name="sd-storage" size={28} color="white" />
+								<View style={styles.fileInfoTextContainer}>
+									<Text style={styles.fileInfoHeader}>Size</Text>
 									<Text style={styles.fileInfoText}>
-										{new Date(file.deletesAt).toLocaleString()}
+										{convertToBytes(file.size, {
+											unitSeparator: " ",
+										})}
 									</Text>
 								</View>
 							</View>
-						)}
 
-						{fileOriginalName && (
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="title" size={28} color="white" />
+								<MaterialIcons name="visibility" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
-									<Text style={styles.fileInfoHeader}>Original Name</Text>
-									<Text style={styles.fileInfoText}>{fileOriginalName}</Text>
+									<Text style={styles.fileInfoHeader}>View</Text>
+									<Text style={styles.fileInfoText}>
+										{file.views}
+										{fileMaxViews &&
+											!Number.isNaN(fileMaxViews) &&
+											`/${fileMaxViews}`}
+									</Text>
 								</View>
 							</View>
-						)}
 
-						<Text style={styles.fileInfoHeader}>Tags</Text>
-						<Select
-							placeholder="Select Tags..."
-							multiple
-							disabled={tags.length <= 0}
-							data={tags.map((tag) => ({
-								label: tag.name,
-								value: tag.id,
-								color: tag.color,
-							}))}
-							onSelect={async (selectedTags) => {
-								const newTags = selectedTags.map((tag) => tag.value);
+							<View style={styles.fileInfoContainer}>
+								<MaterialIcons name="file-upload" size={28} color="white" />
+								<View style={styles.fileInfoTextContainer}>
+									<Text style={styles.fileInfoHeader}>Created At</Text>
+									<Text style={styles.fileInfoText}>
+										{new Date(file.createdAt).toLocaleString()}
+									</Text>
+								</View>
+							</View>
 
-								const success = editFile(file.id, {
-									tags: newTags,
-								});
+							<View style={styles.fileInfoContainer}>
+								<MaterialIcons name="autorenew" size={28} color="white" />
+								<View style={styles.fileInfoTextContainer}>
+									<Text style={styles.fileInfoHeader}>Updated At</Text>
+									<Text style={styles.fileInfoText}>
+										{new Date(file.updatedAt).toLocaleString()}
+									</Text>
+								</View>
+							</View>
 
-								if (typeof success === "string")
-									return ToastAndroid.show(
-										`Error: ${success}`,
+							{file.deletesAt && (
+								<View style={styles.fileInfoContainer}>
+									<MaterialIcons name="auto-delete" size={28} color="white" />
+									<View style={styles.fileInfoTextContainer}>
+										<Text style={styles.fileInfoHeader}>Deletes At</Text>
+										<Text style={styles.fileInfoText}>
+											{new Date(file.deletesAt).toLocaleString()}
+										</Text>
+									</View>
+								</View>
+							)}
+
+							{fileOriginalName && (
+								<View style={styles.fileInfoContainer}>
+									<MaterialIcons name="title" size={28} color="white" />
+									<View style={styles.fileInfoTextContainer}>
+										<Text style={styles.fileInfoHeader}>Original Name</Text>
+										<Text style={styles.fileInfoText}>{fileOriginalName}</Text>
+									</View>
+								</View>
+							)}
+
+							<Text style={styles.fileInfoHeader}>Tags</Text>
+							<Select
+								placeholder="Select Tags..."
+								multiple
+								disabled={tags.length <= 0}
+								data={tags.map((tag) => ({
+									label: tag.name,
+									value: tag.id,
+									color: tag.color,
+								}))}
+								onSelect={async (selectedTags) => {
+									const newTags = selectedTags.map((tag) => tag.value);
+
+									const success = editFile(file.id, {
+										tags: newTags,
+									});
+
+									if (typeof success === "string")
+										return ToastAndroid.show(
+											`Error: ${success}`,
+											ToastAndroid.SHORT,
+										);
+
+									file.tags = tags.filter((tag) => newTags.includes(tag.id));
+
+									ToastAndroid.show(
+										"Successfully updated the tags",
 										ToastAndroid.SHORT,
 									);
-
-								file.tags = tags.filter((tag) => newTags.includes(tag.id));
-
-								ToastAndroid.show(
-									"Successfully updated the tags",
-									ToastAndroid.SHORT,
-								);
-							}}
-							renderItem={(item) => (
-								<View style={styles.selectRenderItemContainer}>
+								}}
+								renderItem={(item) => (
+									<View style={styles.selectRenderItemContainer}>
+										<Text
+											style={{
+												...styles.selectRenderItemText,
+												color: isLightColor(item.color as string)
+													? "black"
+													: "white",
+												backgroundColor: item.color as ColorValue,
+											}}
+										>
+											{item.label}
+										</Text>
+									</View>
+								)}
+								defaultValues={tags
+									.filter((tag) =>
+										file.tags.find((fileTag) => fileTag.id === tag.id),
+									)
+									.map((tag) => ({
+										label: tag.name,
+										value: tag.id,
+										color: tag.color,
+									}))}
+								renderSelectedItem={(item, key) => (
 									<Text
+										key={key}
 										style={{
-											...styles.selectRenderItemText,
+											...styles.selectRenderSelectedItemText,
 											color: isLightColor(item.color as string)
 												? "black"
 												: "white",
@@ -473,295 +499,272 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 									>
 										{item.label}
 									</Text>
-								</View>
-							)}
-							defaultValues={tags
-								.filter((tag) =>
-									file.tags.find((fileTag) => fileTag.id === tag.id),
-								)
-								.map((tag) => ({
-									label: tag.name,
-									value: tag.id,
-									color: tag.color,
-								}))}
-							renderSelectedItem={(item, key) => (
-								<Text
-									key={key}
-									style={{
-										...styles.selectRenderSelectedItemText,
-										color: isLightColor(item.color as string)
-											? "black"
-											: "white",
-										backgroundColor: item.color as ColorValue,
-									}}
-								>
-									{item.label}
-								</Text>
-							)}
-							maxHeight={500}
-						/>
-
-						<Text style={styles.fileInfoHeader}>Folder</Text>
-						{fileFolderId ? (
-							<Button
-								color="#e03131"
-								text={`Remove from folder "${folders.find((folder) => folder.id === file.folderId)?.name}"`}
-								onPress={async () => {
-									if (!fileFolderId) return;
-
-									const folderId = fileFolderId;
-									const fileId = file.id;
-
-									const success = removeFileFromFolder(folderId, fileId);
-
-									if (typeof success === "string")
-										return ToastAndroid.show(
-											`Error: ${success}`,
-											ToastAndroid.SHORT,
-										);
-
-									setFileFolderId(null);
-									file.folderId = null;
-
-									ToastAndroid.show(
-										"Successfully removed the file from the folder",
-										ToastAndroid.SHORT,
-									);
-								}}
-								margin={{
-									top: 5,
-								}}
-							/>
-						) : (
-							<Select
-								placeholder="Add to Folder..."
-								data={folders.map((folder) => ({
-									label: folder.name,
-									value: folder.id,
-								}))}
-								defaultValue={
-									file.folderId
-										? {
-												label: (
-													folders.find(
-														(folder) => folder.id === file.folderId,
-													) as APIFoldersNoIncl[0]
-												)?.name,
-												value: file.folderId,
-											}
-										: undefined
-								}
-								onSelect={async (selectedFolder) => {
-									if (selectedFolder.length <= 0) return;
-
-									const folderId = selectedFolder[0].value;
-									const fileId = file.id;
-
-									const success = await addFileToFolder(folderId, fileId);
-
-									if (typeof success === "string")
-										return ToastAndroid.show(
-											`Error: ${success}`,
-											ToastAndroid.SHORT,
-										);
-
-									setFileFolderId(folderId);
-									file.folderId = folderId;
-
-									ToastAndroid.show(
-										"Successfully added the file to the folder",
-										ToastAndroid.SHORT,
-									);
-								}}
-								maxHeight={400}
-							/>
-						)}
-
-						<Text style={styles.subHeaderText}>{file.id}</Text>
-
-						<View style={styles.actionButtonsContainer}>
-							<Button
-								icon="edit"
-								color="#e8590c"
-								onPress={() => {
-									setEditFilePopup(true);
-									setTempHidden(true);
-								}}
-								iconSize={20}
-								width={30}
-								height={30}
-								padding={5}
-								margin={{
-									left: 5,
-									right: 5,
-								}}
+								)}
+								maxHeight={500}
 							/>
 
-							<Button
-								icon="delete"
-								color="#e03131"
-								onPress={() => {
-									setDeleteFilePopup(true);
-									setTempHidden(true);
-								}}
-								iconSize={20}
-								width={30}
-								height={30}
-								padding={5}
-								margin={{
-									left: 5,
-									right: 5,
-								}}
-							/>
+							<Text style={styles.fileInfoHeader}>Folder</Text>
+							{fileFolderId ? (
+								<Button
+									color="#e03131"
+									text={`Remove from folder "${folders.find((folder) => folder.id === file.folderId)?.name}"`}
+									onPress={async () => {
+										if (!fileFolderId) return;
 
-							<Button
-								icon={fileFavorite ? "star" : "star-outline"}
-								color={fileFavorite ? "#f08c00" : "#343a40"}
-								onPress={async () => {
-									const success = editFile(file.id, {
-										favorite: !file.favorite,
-									});
+										const folderId = fileFolderId;
+										const fileId = file.id;
 
-									if (typeof success === "string")
-										return ToastAndroid.show(
-											`Error: ${success}`,
-											ToastAndroid.SHORT,
-										);
+										const success = removeFileFromFolder(folderId, fileId);
 
-									file.favorite = !fileFavorite;
-									setFileFavorite((prev) => !prev);
-
-									ToastAndroid.show(
-										`Successfully ${fileFavorite ? "removed from" : "added to"} favorites`,
-										ToastAndroid.SHORT,
-									);
-								}}
-								iconSize={20}
-								width={30}
-								height={30}
-								padding={5}
-								margin={{
-									left: 5,
-									right: 5,
-								}}
-							/>
-
-							<Button
-								icon="open-in-new"
-								color="#323ea8"
-								onPress={() => {
-									router.push(`${dashUrl}${file.url}` as ExternalPathString);
-								}}
-								iconSize={20}
-								width={30}
-								height={30}
-								padding={5}
-								margin={{
-									left: 5,
-									right: 5,
-								}}
-							/>
-
-							<Button
-								icon="content-copy"
-								color="#343a40"
-								onPress={async () => {
-									const url = `${dashUrl}${file.url}`;
-
-									const success = await Clipboard.setStringAsync(url);
-
-									if (!success)
-										return ToastAndroid.show(
-											"Failed to copy the URL",
-											ToastAndroid.SHORT,
-										);
-
-									ToastAndroid.show(
-										"Copied URL to clipboard",
-										ToastAndroid.SHORT,
-									);
-								}}
-								iconSize={20}
-								width={30}
-								height={30}
-								padding={5}
-								margin={{
-									left: 5,
-									right: 5,
-								}}
-							/>
-
-							<Button
-								icon="file-download"
-								color="#343a40"
-								onPress={async () => {
-									const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
-
-									let savedFileDownloadUri = db.get("fileDownloadPath");
-
-									if (!savedFileDownloadUri) {
-										const permissions =
-											await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-										if (!permissions.granted)
+										if (typeof success === "string")
 											return ToastAndroid.show(
-												"The permission to save the file was not granted",
+												`Error: ${success}`,
 												ToastAndroid.SHORT,
 											);
 
-										db.set("fileDownloadPath", permissions.directoryUri);
-										savedFileDownloadUri = permissions.directoryUri;
-									}
+										setFileFolderId(null);
+										file.folderId = null;
 
-									ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
-
-									const saveUri =
-										await FileSystem.StorageAccessFramework.createFileAsync(
-											savedFileDownloadUri,
-											file.name,
-											file.type,
-										);
-
-									const downloadResult = await FileSystem.downloadAsync(
-										downloadUrl,
-										`${FileSystem.cacheDirectory}/${file.name}`,
-									);
-
-									if (!downloadResult.uri)
-										return ToastAndroid.show(
-											"Something went wrong while downloading the file",
+										ToastAndroid.show(
+											"Successfully removed the file from the folder",
 											ToastAndroid.SHORT,
 										);
+									}}
+									margin={{
+										top: 5,
+									}}
+								/>
+							) : (
+								<Select
+									placeholder="Add to Folder..."
+									data={folders.map((folder) => ({
+										label: folder.name,
+										value: folder.id,
+									}))}
+									defaultValue={
+										file.folderId
+											? {
+													label: (
+														folders.find(
+															(folder) => folder.id === file.folderId,
+														) as APIFoldersNoIncl[0]
+													)?.name,
+													value: file.folderId,
+												}
+											: undefined
+									}
+									onSelect={async (selectedFolder) => {
+										if (selectedFolder.length <= 0) return;
 
-									const base64File = await FileSystem.readAsStringAsync(
-										downloadResult.uri,
-										{
+										const folderId = selectedFolder[0].value;
+										const fileId = file.id;
+
+										const success = await addFileToFolder(folderId, fileId);
+
+										if (typeof success === "string")
+											return ToastAndroid.show(
+												`Error: ${success}`,
+												ToastAndroid.SHORT,
+											);
+
+										setFileFolderId(folderId);
+										file.folderId = folderId;
+
+										ToastAndroid.show(
+											"Successfully added the file to the folder",
+											ToastAndroid.SHORT,
+										);
+									}}
+									maxHeight={400}
+								/>
+							)}
+
+							<Text style={styles.subHeaderText}>{file.id}</Text>
+
+							<View style={styles.actionButtonsContainer}>
+								<Button
+									icon="edit"
+									color="#e8590c"
+									onPress={() => {
+										setEditFilePopup(true);
+										setTempHidden(true);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+
+								<Button
+									icon="delete"
+									color="#e03131"
+									onPress={() => {
+										setDeleteFilePopup(true);
+										setTempHidden(true);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+
+								<Button
+									icon={fileFavorite ? "star" : "star-outline"}
+									color={fileFavorite ? "#f08c00" : "#343a40"}
+									onPress={async () => {
+										const success = editFile(file.id, {
+											favorite: !file.favorite,
+										});
+
+										if (typeof success === "string")
+											return ToastAndroid.show(
+												`Error: ${success}`,
+												ToastAndroid.SHORT,
+											);
+
+										file.favorite = !fileFavorite;
+										setFileFavorite((prev) => !prev);
+
+										ToastAndroid.show(
+											`Successfully ${fileFavorite ? "removed from" : "added to"} favorites`,
+											ToastAndroid.SHORT,
+										);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+
+								<Button
+									icon="open-in-new"
+									color="#323ea8"
+									onPress={() => {
+										router.push(`${dashUrl}${file.url}` as ExternalPathString);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+
+								<Button
+									icon="content-copy"
+									color="#343a40"
+									onPress={async () => {
+										const url = `${dashUrl}${file.url}`;
+
+										const success = await Clipboard.setStringAsync(url);
+
+										if (!success)
+											return ToastAndroid.show(
+												"Failed to copy the URL",
+												ToastAndroid.SHORT,
+											);
+
+										ToastAndroid.show(
+											"Copied URL to clipboard",
+											ToastAndroid.SHORT,
+										);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+
+								<Button
+									icon="file-download"
+									color="#343a40"
+									onPress={async () => {
+										const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
+
+										let savedFileDownloadUri = db.get("fileDownloadPath");
+
+										if (!savedFileDownloadUri) {
+											const permissions =
+												await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+											if (!permissions.granted)
+												return ToastAndroid.show(
+													"The permission to save the file was not granted",
+													ToastAndroid.SHORT,
+												);
+
+											db.set("fileDownloadPath", permissions.directoryUri);
+											savedFileDownloadUri = permissions.directoryUri;
+										}
+
+										ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
+
+										const saveUri =
+											await FileSystem.StorageAccessFramework.createFileAsync(
+												savedFileDownloadUri,
+												file.name,
+												file.type,
+											);
+
+										const downloadResult = await FileSystem.downloadAsync(
+											downloadUrl,
+											`${FileSystem.cacheDirectory}/${file.name}`,
+										);
+
+										if (!downloadResult.uri)
+											return ToastAndroid.show(
+												"Something went wrong while downloading the file",
+												ToastAndroid.SHORT,
+											);
+
+										const base64File = await FileSystem.readAsStringAsync(
+											downloadResult.uri,
+											{
+												encoding: FileSystem.EncodingType.Base64,
+											},
+										);
+
+										await FileSystem.writeAsStringAsync(saveUri, base64File, {
 											encoding: FileSystem.EncodingType.Base64,
-										},
-									);
+										});
 
-									await FileSystem.writeAsStringAsync(saveUri, base64File, {
-										encoding: FileSystem.EncodingType.Base64,
-									});
-
-									ToastAndroid.show(
-										"Successfully downloaded the file",
-										ToastAndroid.SHORT,
-									);
-								}}
-								iconSize={20}
-								width={30}
-								height={30}
-								padding={5}
-								margin={{
-									left: 5,
-									right: 5,
-								}}
-							/>
-						</View>
-					</KeyboardAwareScrollView>
-				</View>
-			</Pressable>
+										ToastAndroid.show(
+											"Successfully downloaded the file",
+											ToastAndroid.SHORT,
+										);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+								/>
+							</View>
+						</KeyboardAwareScrollView>
+					</View>
+				</Pressable>
+			</Portal>
 		</>
 	);
 }

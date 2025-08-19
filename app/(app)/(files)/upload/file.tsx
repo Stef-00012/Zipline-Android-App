@@ -98,6 +98,18 @@ export default function UploadFile({
 		}[]
 	>([]);
 
+	const chunkSize = webSettings
+		? webSettings.config.chunks.size
+		: "25mb"
+
+	const maxChunkSize = webSettings
+		? webSettings.config.chunks.max
+		: "95mb"
+
+	const chunksEnabled = webSettings
+		? webSettings.config.chunks.enabled
+		: false
+
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random"
@@ -884,14 +896,21 @@ export default function UploadFile({
 									file.uri.split(".").pop() as Mimetypes[keyof Mimetypes],
 								);
 
+							const fileURI = fileInfo.uri || file.uri
+
 							const fileData = {
-								uri: fileInfo.uri || file.uri,
-								blob: file.instance.blob(),
+								uri: fileURI,
+								blob: new File(fileURI).blob(),
 								mimetype,
 							};
 
 							const uploadedFile = await uploadFiles(
 								fileData,
+								{
+									chunksEnabled,
+									chunkSize,
+									maxChunkSize
+								},
 								{
 									compression,
 									expiresAt: deletesAt,

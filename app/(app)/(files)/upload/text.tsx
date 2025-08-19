@@ -83,6 +83,18 @@ export default function UploadText({
 		}[]
 	>([]);
 
+	const chunkSize = webSettings
+		? webSettings.config.chunks.size
+		: "25mb"
+
+	const maxChunkSize = webSettings
+		? webSettings.config.chunks.max
+		: "95mb"
+
+	const chunksEnabled = webSettings
+		? webSettings.config.chunks.enabled
+		: false
+
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random"
@@ -839,17 +851,24 @@ const domains = domainList
 							mimetype,
 						};
 
-						const uploadedFiles = await uploadFiles(fileData, {
-							compression,
-							expiresAt: deletesAt,
-							filename: fileName,
-							folder,
-							format: nameFormat,
-							maxViews,
-							originalName,
-							overrideDomain,
-							password,
-						});
+						const uploadedFiles = await uploadFiles(
+							fileData, 
+							{
+								chunksEnabled,
+								chunkSize,
+								maxChunkSize
+							}, {
+								compression,
+								expiresAt: deletesAt,
+								filename: fileName,
+								folder,
+								format: nameFormat,
+								maxViews,
+								originalName,
+								overrideDomain,
+								password,
+							}
+						);
 
 						if (typeof uploadedFiles === "string") {
 							setUploadError(uploadedFiles);

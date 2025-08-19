@@ -67,6 +67,18 @@ export default function FolderUpload() {
 	const [fileName, setFileName] = useState<UploadFileOptions["filename"]>();
 	const [password, setPassword] = useState<UploadFileOptions["password"]>();
 
+	const chunkSize = webSettings
+		? webSettings.config.chunks.size
+		: "25mb"
+
+	const maxChunkSize = webSettings
+		? webSettings.config.chunks.max
+		: "95mb"
+
+	const chunksEnabled = webSettings
+		? webSettings.config.chunks.enabled
+		: false
+
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random";
@@ -545,6 +557,11 @@ export default function FolderUpload() {
 
 							const uploadedFile = await uploadFiles(
 								fileData,
+								{
+									chunksEnabled,
+									chunkSize,
+									maxChunkSize
+								},
 								{
 									compression,
 									expiresAt: deletesAt,

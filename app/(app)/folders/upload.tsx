@@ -539,6 +539,7 @@ export default function FolderUpload() {
 
 							const fileData = {
 								uri: fileInfo.uri || file.uri,
+								blob: file.instance.blob(),
 								mimetype,
 							};
 

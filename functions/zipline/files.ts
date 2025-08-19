@@ -245,7 +245,7 @@ export interface UploadFileOptions {
 export async function uploadFiles(
 	file: {
 		uri: string;
-		// blob: Blob,
+		blob: Blob,
 		mimetype: string;
 	},
 	options: UploadFileOptions = {},

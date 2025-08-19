@@ -22,7 +22,7 @@ import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
 import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { Directory, Paths } from "expo-file-system/next";
+import { Directory, File, Paths } from "expo-file-system/next";
 
 interface SelectedFile {
 	name: string;
@@ -149,6 +149,7 @@ const domains = domainList
 	function afterUploadCleanup() {
 		setUploading(false);
 		setUploadButtonDisabled(true);
+		setText("")
 
 		setFolder(undefined);
 		setMaxViews(undefined);
@@ -834,6 +835,7 @@ const domains = domainList
 
 						const fileData = {
 							uri: fileURI,
+							blob: new File(fileURI).blob(),
 							mimetype,
 						};
 

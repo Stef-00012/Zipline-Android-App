@@ -37,6 +37,7 @@ import {
 	Pressable,
 	Text,
 	View,
+	BackHandler,
 } from "react-native";
 
 interface Props {
@@ -81,6 +82,18 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 	>(file.originalName);
 	const [editFileType, setEditFileType] = useState<string>(file.type);
 	const [editFilePassword, setEditFilePassword] = useState<string | null>(null);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
+	useEffect(() => {
+		if (!hidden) {
+			const { remove } = BackHandler.addEventListener("hardwareBackPress", () => {
+				onClose();
+				remove();
+
+				return true;
+			})
+		}
+	}, [hidden])
 
 	useEffect(() => {
 		(async () => {
@@ -637,7 +650,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								icon="open-in-new"
 								color="#323ea8"
 								onPress={() => {
-									router.replace(`${dashUrl}${file.url}` as ExternalPathString);
+									router.push(`${dashUrl}${file.url}` as ExternalPathString);
 								}}
 								iconSize={20}
 								width={30}

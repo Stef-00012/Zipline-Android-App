@@ -155,7 +155,7 @@ export default function Files() {
 		if (searchParams.folderId) {
 			const folder = await getFolder(searchParams.folderId);
 
-			if (typeof folder === "string") return router.replace("/+not-found");
+			if (typeof folder === "string") return router.push("/+not-found");
 
 			setName(folder.name);
 			setAllowUploads(folder.allowUploads);
@@ -194,7 +194,7 @@ export default function Files() {
 		if (searchParams.id) {
 			const user = await getUser(searchParams.id);
 
-			if (typeof user === "string") return router.replace("/+not-found");
+			if (typeof user === "string") return router.push("/+not-found");
 
 			fetchOptions.id = user.id;
 			setName(user.username);
@@ -601,7 +601,7 @@ export default function Files() {
 									? (`/folders/upload?folderId=${folderId}` as `/folders/upload?folderId=${string | null}`)
 									: "/upload/file";
 
-								router.replace(url);
+								router.push(url);
 							}}
 							icon="upload-file"
 							color="transparent"
@@ -1093,7 +1093,7 @@ export default function Files() {
 													icon="open-in-new"
 													color="#323ea8"
 													onPress={() => {
-														router.replace(`${dashUrl}${file.url}`);
+														router.push(`${dashUrl}${file.url}`);
 													}}
 													iconSize={20}
 													width={32}

@@ -145,7 +145,7 @@ export default function Users() {
 			case "viewFiles": {
 				const userId = user.id;
 
-				return router.replace(`/files?id=${userId}`);
+				return router.push(`/files?id=${userId}`);
 			}
 
 			case "edit": {

@@ -249,7 +249,7 @@ export default function UploadFile({
 										icon="open-in-new"
 										color="#323ea8"
 										onPress={() => {
-											router.replace(file.url as ExternalPathString);
+											router.push(file.url as ExternalPathString);
 										}}
 										iconSize={20}
 										width={32}
@@ -438,7 +438,7 @@ export default function UploadFile({
 							onPress={() => {
 								resetShareIntent();
 
-								router.replace("/files");
+								router.push("/files");
 							}}
 							icon="folder-open"
 							color="transparent"

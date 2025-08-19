@@ -228,7 +228,7 @@ const domains = domainList
 									icon="open-in-new"
 									color="#323ea8"
 									onPress={() => {
-										router.replace(uploadedFile.url as ExternalPathString);
+										router.push(uploadedFile.url as ExternalPathString);
 									}}
 									iconSize={20}
 									width={32}
@@ -398,7 +398,7 @@ const domains = domainList
 							onPress={() => {
 								resetShareIntent();
 
-								router.replace("/files");
+								router.push("/files");
 							}}
 							icon="folder-open"
 							color="transparent"

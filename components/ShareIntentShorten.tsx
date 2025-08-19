@@ -40,7 +40,7 @@ export default function ShareIntentShorten({ defaultUrl }: Props) {
 							onPress={() => {
 								resetShareIntent();
 
-								router.replace("/urls");
+								router.push("/urls");
 							}}
 							icon="link"
 							color="transparent"

@@ -6,7 +6,7 @@ import { Text, View, ScrollView } from "react-native";
 import { useAppUpdates } from "@/hooks/useUpdates";
 import FileDisplay from "@/components/FileDisplay";
 import { convertToBytes } from "@/functions/util";
-import { /*useContext,*/ useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
@@ -37,7 +37,6 @@ export default function Home() {
 
 	const url = db.get("url") as DashURL | null;
 
-	// const [user, setUser] = useState<APISelfUser | null>(null);
 	const [stats, setStats] = useState<APIUserStats | null>();
 	const [recentFiles, setRecentFiles] = useState<APIRecentFiles | null>();
 
@@ -57,7 +56,7 @@ export default function Home() {
 	// 		// db.del("url")
 	// 		// db.del("token")
 
-	// 		// router.replace("/admin/settings");
+	// 		// router.push("/admin/settings");
 	// 	}
 	// });
 

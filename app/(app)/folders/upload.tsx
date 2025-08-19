@@ -102,13 +102,13 @@ export default function FolderUpload() {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: .
 	useEffect(() => {
 		(async () => {
-			if (!searchParams.folderId) return router.replace("/+not-found");
+			if (!searchParams.folderId) return router.push("/+not-found");
 
 			const folder = await getFolder(searchParams.folderId);
 
-			if (typeof folder === "string") return router.replace("/+not-found");
+			if (typeof folder === "string") return router.push("/+not-found");
 
-			if (!folder.allowUploads) return router.replace("/+not-found");
+			if (!folder.allowUploads) return router.push("/+not-found");
 
 			setFolder(folder);
 		})();
@@ -188,7 +188,7 @@ export default function FolderUpload() {
 										icon="open-in-new"
 										color="#323ea8"
 										onPress={() => {
-											router.replace(file.url as ExternalPathString);
+											router.push(file.url as ExternalPathString);
 										}}
 										iconSize={20}
 										width={32}

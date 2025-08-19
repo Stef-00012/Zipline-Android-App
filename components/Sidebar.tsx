@@ -114,7 +114,7 @@ export default function Sidebar({
 
 						resetShareIntent();
 
-						router.replace(route);
+						router.push(route);
 					}}
 					color={isActive ? "#14192F" : "transparent"}
 					textColor={isActive ? "#6D71B1" : "white"}

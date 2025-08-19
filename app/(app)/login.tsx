@@ -41,7 +41,7 @@ export default function Login() {
 	// useEffect(() => {
 	// 	if (role) {
 	// 		updateAuth();
-	// 		router.replace("/");
+	// 		router.push("/");
 	// 	}
 	// }, [role])
 

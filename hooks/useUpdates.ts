@@ -132,7 +132,7 @@ export function useAppUpdates() {
 
 		const downloadUrl = update.downloadUrl;
 
-		router.replace(downloadUrl as ExternalPathString);
+		router.push(downloadUrl as ExternalPathString);
 
 		// let savedUpdateDownloadUri = db.get("updateDownloadPath");
 

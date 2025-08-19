@@ -171,6 +171,6 @@ export default function FileDisplay({
 	);
 
 	function onPressDefault() {
-		if (file) router.replace(`${dashUrl}${file.url}` as ExternalPathString);
+		if (file) router.push(`${dashUrl}${file.url}` as ExternalPathString);
 	}
 }

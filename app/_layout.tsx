@@ -38,7 +38,7 @@ export default function Layout() {
 				debug: true,
 				resetOnBackground: true,
 				onResetShareIntent: () =>
-					router.replace({
+					router.push({
 						pathname: "/",
 					}),
 			}}
@@ -51,11 +51,11 @@ export default function Layout() {
 						<AuthProvider>
 							<ZiplineProvider>
 								{hasInternet ? (
-									<Header>
-										<Host>
+									<Host>
+										<Header>
 											<Slot />
-										</Host>
-									</Header>
+										</Header>
+									</Host>
 								) : (
 									<Header>
 										<View style={styles.noInternetContainer}>

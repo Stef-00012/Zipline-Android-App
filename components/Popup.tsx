@@ -1,7 +1,8 @@
-import { Pressable, type StyleProp, View, type ViewStyle } from "react-native";
+import { BackHandler, Pressable, type StyleProp, View, type ViewStyle } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { styles } from "@/styles/components/popup";
 import { Portal } from "react-native-portalize";
+import { useEffect } from "react";
 
 interface Props {
 	onClose: () => void;
@@ -16,6 +17,18 @@ export default function Popup({
 	children,
 	popupStyle = {},
 }: Props) {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
+	useEffect(() => {
+		if (!hidden) {
+			const { remove } = BackHandler.addEventListener("hardwareBackPress", () => {
+				onClose();
+				remove();
+
+				return true;
+			})
+		}
+	}, [hidden])
+
 	return (
 		<Portal>
 			<Pressable

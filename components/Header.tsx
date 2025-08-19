@@ -63,7 +63,7 @@ export default function Header({ children }: PropsWithChildren) {
 									onPress={() => {
 										resetShareIntent();
 
-										router.replace("/settings");
+										router.push("/settings");
 									}}
 								>
 									<UserAvatar username={user.username} avatar={avatar} />

@@ -101,7 +101,7 @@ export default function Folders() {
 			case "viewFiles": {
 				const folderId = folder.id;
 
-				return router.replace(`/files?folderId=${folderId}`);
+				return router.push(`/files?folderId=${folderId}`);
 			}
 
 			case "copyUrl": {

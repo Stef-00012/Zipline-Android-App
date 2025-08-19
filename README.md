@@ -44,7 +44,7 @@ This will create an apk but won't automatically install
 - [x] Fix calendar date picker styling
 - [x] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
 - [x] Switch domains to a select
-- [ ] Try to allow chunked uploads
+- [x] Try to allow chunked uploads (Maybe done)
 - [ ] Try to improve popups (kinda ugly that thy can't go over the header)
 - [ ] Try to make animations smoother
 - [ ] Try to fix app blocking/freezing when large files are selected through share intent

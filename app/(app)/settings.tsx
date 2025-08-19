@@ -1233,7 +1233,7 @@ export default function UserSettings() {
 										await db.del("url");
 										await db.del("token");
 
-										updateAuth()
+										await updateAuth()
 									}}
 									color="#CF4238"
 									text="Logout"

@@ -35,10 +35,10 @@ export default function Layout() {
 		<ShareIntentProvider
 			options={{
 				scheme: "zipline",
-				debug: true,
+				// debug: __DEV__,
 				resetOnBackground: true,
 				onResetShareIntent: () =>
-					router.push({
+					router.replace({
 						pathname: "/",
 					}),
 			}}

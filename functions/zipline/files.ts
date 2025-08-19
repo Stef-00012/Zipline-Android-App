@@ -434,8 +434,6 @@ export async function uploadFiles(
 	} catch (e) {
 		const error = e as AxiosError;
 
-		console.error(e, file.uri, file)
-
 		const data = error.response?.data as
 			| {
 					error: string;

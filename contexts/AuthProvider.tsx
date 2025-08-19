@@ -57,16 +57,16 @@ export default function AuthProvider({ children }: Props) {
                     ? versionData.version
                     : versionData.details?.version;
 
-        if (!userRole) router.push("/login");
+        if (!userRole && pathname !== "/login") router.replace("/login");
 
         if (
-            typeof versionData === "string" ||
-            semver.lt(serverVersion, minimumVersion)
+            (typeof versionData === "string" ||
+            semver.lt(serverVersion, minimumVersion)) && pathname !== "/login"
         ) {
             await db.del("url");
             await db.del("token");
 
-            return router.push("/login");
+            return router.replace("/login");
         }
 
         if (pathname === "/login" && userRole && semver.gte(serverVersion, minimumVersion)) {

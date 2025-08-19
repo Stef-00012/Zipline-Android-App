@@ -43,7 +43,7 @@ This will create an apk but won't automatically install
 - [x] Improve metrics header text & buttons layout
 - [x] Fix calendar date picker styling
 - [x] Fix app freezing when selecting large files (caused by copying the file in a folder the app can access, specifically, `copyToCacheDirectory` in `app/(app)/(files)/upload/file.tsx` in `DocumentPicker.getDocumentAsync()`)
-- [ ] Switch domains to a select
+- [x] Switch domains to a select
 - [ ] Try to allow chunked uploads
 - [ ] Try to improve popups (kinda ugly that thy can't go over the header)
 - [ ] Try to make animations smoother

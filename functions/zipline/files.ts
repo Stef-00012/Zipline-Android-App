@@ -300,12 +300,6 @@ export async function uploadFiles(
 
 	try {
 		if (blob.size < (bytes(ziplineOptions.maxChunkSize) || 0)) {
-			const formData = new FormData();
-			
-			console.log("bs", blob.size)
-			formData.append("file", blob, filename);
-			console.debug(formData)
-
 			const uploadTask = FileSystem.createUploadTask(
 				`${url}/api/upload`,
 				file.uri,
@@ -350,9 +344,6 @@ export async function uploadFiles(
 			const end = Math.min(start + chunkSize, blob.size)
 
 			const chunk = blob.slice(start, end)
-			const formData = new FormData()
-
-			formData.append("file", chunk, filename)
 
 			headers["Content-Range"] = `bytes ${start}-${end - 1}/${blob.size}`
 			headers["X-Zipline-P-Filename"] = filename;
@@ -361,7 +352,7 @@ export async function uploadFiles(
 			headers["X-Zipline-P-Content-Type"] = file.mimetype || blob.type;
 			headers["X-Zipline-P-Content-Length"] = String(blob.size);
 
-			const arrayBuffer = await blob.arrayBuffer()
+			const arrayBuffer = await chunk.arrayBuffer()
 
 			const base64 = Buffer.from(arrayBuffer).toString("base64")
 

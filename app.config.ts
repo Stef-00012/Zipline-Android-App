@@ -5,10 +5,11 @@ import {
 } from "./package.json";
 
 const IS_DEV = process.env.APP_VARIANT === "development";
+const IS_PRERELEASE = process.env.APP_VARIANT === "prerelease";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
-	name: `Zipline${IS_DEV ? " (Dev)" : ""}`,
+	name: `Zipline${IS_DEV ? " (Dev)" : ""}${IS_PRERELEASE ? "(Pre)" : ""}`,
 	slug: "zipline",
 	version: appVersion,
 	orientation: "portrait",
@@ -18,7 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	userInterfaceStyle: "automatic",
 	platforms: ["android"],
 	ios: {
-		bundleIdentifier: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
+		bundleIdentifier: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}${IS_PRERELEASE ? ".pre" : ""}`,
 	},
 	android: {
 		adaptiveIcon: {
@@ -28,8 +29,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		},
 		versionCode: appVersionCode,
 		version: appVersion,
-		package: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
-		scheme: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}`,
+		package: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}${IS_PRERELEASE ? ".pre" : ""}`,
+		scheme: `com.stefdp.zipline${IS_DEV ? ".dev" : ""}${IS_PRERELEASE ? ".pre" : ""}`,
 		newArchEnabled: true,
 		edgeToEdgeEnabled: true,
 	},

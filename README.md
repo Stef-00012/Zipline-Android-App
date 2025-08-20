@@ -18,7 +18,7 @@ The app is available on the following platforms:
 </a>
 
 <a href="https://github.com/Stef-00012/zipline-android-app/releases/latest/download/app-release.apk">
-    <img src="/assets/github/image.png" alt="Get on GitHub" title="Get on GitHub" height="80">
+    <img src="/assets/github/github.png" alt="Get on GitHub" title="Get on GitHub" height="80">
 </a>
 
 </div>

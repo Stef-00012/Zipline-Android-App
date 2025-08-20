@@ -11,17 +11,13 @@ The app is available on the following platforms:
 - Google Play tore (Currently in closed testing)
 - GitHub Releases
 
-<div align="center">
-
-<a href="https://play.google.com/store/apps/details?id=com.stefdp.zipline">
-    <img src="/assets/github/google-play.png" alt="Get on Google Play" title="Get on Google Play" height="80">
+<a href="https://play.google.com/store/apps/details?id=com.stefdp.zipline" style="margin-left: 20px; margin-right: 20px;">
+<img src="/assets/github/google-play.png" alt="Get on Google Play" title="Get on Google Play" height="80">
 </a>
 
-<a href="https://github.com/Stef-00012/zipline-android-app/releases/latest/download/app-release.apk">
-    <img src="/assets/github/github.png" alt="Get on GitHub" title="Get on GitHub" height="80">
+<a href="https://github.com/Stef-00012/zipline-android-app/releases/latest/download/app-release.apk" style="margin-left: 20px; margin-right: 20px;">
+<img src="/assets/github/github.png" alt="Get on GitHub" title="Get on GitHub" height="80">
 </a>
-
-</div>
 
 # Creating a development build
 

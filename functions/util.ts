@@ -161,7 +161,3 @@ export function getRippleColor(color: string, fraction = 0.4) {
 export function getMetricsDifference(first: number, last: number): number {
 	return Math.round(((first - last) / last) * 100) || 0;
 }
-
-export function generateRandomString(): string {
-	return Math.random().toString(36).substring(2, 6);
-}

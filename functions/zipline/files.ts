@@ -8,10 +8,10 @@ import type {
 	APITag,
 	APITransactionResult,
 	APIUploadFile,
+	APIUploadPartialResponse,
 	APIUploadResponse,
 } from "@/types/zipline";
 import bytes from "bytes";
-import { generateRandomString } from "../util";
 import { Directory, Paths } from "expo-file-system/next";
 
 export interface GetFilesOptions {
@@ -298,8 +298,10 @@ export async function uploadFiles(
 	const filename = options.filename || file.uri.split("/").pop() || "android-app-upload"
 	const extension = filename.split(".").pop() || "bin"
 
+	const maxChunkSize = bytes(ziplineOptions.maxChunkSize) || 0
+
 	try {
-		if (blob.size < (bytes(ziplineOptions.maxChunkSize) || 0)) {
+		if (blob.size < maxChunkSize) {
 			const uploadTask = FileSystem.createUploadTask(
 				`${url}/api/upload`,
 				file.uri,
@@ -328,7 +330,9 @@ export async function uploadFiles(
 
 			if (!res) return "Something went wrong...";
 
-			return JSON.parse(res.body)?.files || [];
+			const fetchedData = JSON.parse(res.body) as APIUploadResponse
+
+			return fetchedData.files;
 		}
 
 		const chunkSize = bytes(ziplineOptions.chunkSize) || 0
@@ -337,7 +341,7 @@ export async function uploadFiles(
 
 		const cacheDirectory = new Directory(Paths.cache)
 
-		const identifier = generateRandomString();
+		let identifier: string | undefined;
 
 		for (let i = numberOfChunks - 1; i >= 0; i--) {
 			const start = i * chunkSize
@@ -348,9 +352,10 @@ export async function uploadFiles(
 			headers["Content-Range"] = `bytes ${start}-${end - 1}/${blob.size}`
 			headers["X-Zipline-P-Filename"] = filename;
 			headers["X-Zipline-P-Lastchunk"] = i === 0 ? "true" : "false";
-			headers["X-Zipline-P-Identifier"] = identifier;
 			headers["X-Zipline-P-Content-Type"] = file.mimetype || blob.type;
 			headers["X-Zipline-P-Content-Length"] = String(blob.size);
+			
+			if (identifier) headers["X-Zipline-P-Identifier"] = identifier;
 
 			const arrayBuffer = await chunk.arrayBuffer()
 
@@ -367,7 +372,7 @@ export async function uploadFiles(
 			)
 
 			const uploadTask = FileSystem.createUploadTask(
-				`${url}/api/upload`,
+				`${url}/api/upload/partial`,
 				chunkURI,
 				{
 					uploadType: FileSystem.FileSystemUploadType.MULTIPART,
@@ -394,7 +399,9 @@ export async function uploadFiles(
 
 			if (!res) return "Something went wrong...";
 
-			const fetchedData = JSON.parse(res.body) as APIUploadResponse
+			const fetchedData = JSON.parse(res.body) as APIUploadPartialResponse
+
+			identifier = fetchedData.partialIdentifier;
 
 			if (fetchedData.files.length > 0) {
 				return fetchedData.files

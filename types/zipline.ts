@@ -149,6 +149,11 @@ export interface APIUploadResponse {
 	deletesAt?: string;
 }
 
+export type APIUploadPartialResponse = APIUploadResponse & {
+	partialSuccess?: boolean;
+	partialIdentifier?: string;
+};
+
 export interface APIShortenResponse {
 	id: string;
 	createdAt: string;

@@ -5,6 +5,18 @@
 
 This is an android app made to manage your [Zipline V4](https://github.com/diced/zipline/tree/v4) (self-hosted) server and also upload files or shorten URLs. You can also share files to the app to upload them.
 
+# Features
+
+- Upload Files
+- Shorten URLs
+- Manage Files
+- Manage URLs
+- Manage Folders
+- View your Stats
+- Manage your own User
+- Manage Users (requires an admin account)
+- Manage Server Settings (requires a superadmin account)
+
 # Download
 
 The app is available on the following platforms:

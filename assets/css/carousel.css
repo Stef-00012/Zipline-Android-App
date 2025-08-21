@@ -137,12 +137,10 @@
 
 .carousel-gradient-left {
     left: 0;
-    /* background: linear-gradient(90deg, #181a23 85%, transparent 100%); */
 }
 
 .carousel-gradient-right {
     right: 0;
-    /* background: linear-gradient(270deg, #181a23 85%, transparent 100%); */
 }
 
 @media (max-width: 600px) {

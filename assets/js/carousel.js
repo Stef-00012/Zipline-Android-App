@@ -66,7 +66,6 @@ track.addEventListener('touchend', e => {
     startX = null;
 });
 
-// Initial state
 images.forEach((img) => {
     img.style.display = 'block'
 });

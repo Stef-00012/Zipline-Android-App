@@ -42,5 +42,6 @@ yarn-error.*
 # misc
 package-lock.json
 *.apk
+/error.log
 
 shell.nix

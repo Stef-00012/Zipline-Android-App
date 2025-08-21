@@ -6,6 +6,7 @@
   "scripts": {
     "start": "expo start",
     "start:dev": "APP_VARIANT=development EDGE_PATH=/etc/profiles/per-user/stef/bin/chromium expo start --dev-client",
+    "start:dev:clear": "APP_VARIANT=development EDGE_PATH=/etc/profiles/per-user/stef/bin/chromium expo start --dev-client --clear",
     "start:dev:atlas": "EXPO_ATLAS=true APP_VARIANT=development EDGE_PATH=/etc/profiles/per-user/stef/bin/chromium expo start --dev-client",
     "prebuild": "EXPO_NO_GIT_STATUS=1 expo prebuild --no-install --clean --platform android",
     "prebuild:dev": "EXPO_NO_GIT_STATUS=1 APP_VARIANT=development expo prebuild --no-install --clean --platform android",

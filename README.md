@@ -49,6 +49,10 @@ The app is available on the following platforms:
 
 This will create an apk but won't automatically install
 
+# Known Issues
+
+- Color picker crashes as soon as you select a color, opened an issue it the library [[alabsi91/reanimated-color-picker#97](https://github.com/alabsi91/reanimated-color-picker/issues/97)]
+
 # TO-DO
 - [x] ~~Remove~~ Update `useAuth` hook ~~and instead~~ to use the `AuthContext` context to avoid fetching user login data on every page change
 - [x] Fix recent files section having no height when there is no recent file

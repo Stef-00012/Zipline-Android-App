@@ -1,0 +1,116 @@
+@media (hover: none) and (pointer: coarse) {
+    .tooltip-content {
+        left: 50%;
+        top: 110%;
+        width: 90vw;
+        min-width: 0;
+        max-width: 320px;
+        font-size: 1rem;
+        padding: 16px 10px 10px 10px;
+        box-sizing: border-box;
+    }
+
+    .tooltip-content::before {
+        left: 50%;
+        top: -8px;
+        transform: translateX(-50%);
+    }
+}
+
+.tooltip-content::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 12px 12px 12px;
+    border-style: solid;
+    border-color: transparent transparent #121728 transparent;
+    width: 0;
+    height: 0;
+    z-index: 11;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-content {
+    visibility: hidden;
+    opacity: 0;
+    width: auto;
+    min-width: 220px;
+    max-width: 95vw;
+    background: #121728;
+    color: #fff;
+    text-align: center;
+    border-radius: 16px;
+    padding: 22px 18px 16px 18px;
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    top: 100%;
+    margin-top: 2px;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+    transition: opacity 0.2s;
+    pointer-events: auto;
+    font-size: 1.08em;
+    line-height: 1.6;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.tooltip-container:hover .tooltip-content,
+.tooltip-content:hover {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-target {
+    cursor: pointer;
+    text-decoration: underline dotted #aaa;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1.15em;
+    letter-spacing: 0.01em;
+}
+
+@media (min-width: 500px) {
+    .tooltip-content {
+        max-width: 420px;
+    }
+}
+
+@media (max-width: 500px) {
+    .tooltip-content {
+        max-width: 98vw;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+.tooltip-heading {
+    font-weight: 700;
+    font-size: 1.13em;
+    margin-bottom: 10px;
+    letter-spacing: 0.01em;
+}
+
+.tooltip-section {
+    margin-bottom: 10px;
+}
+
+.tooltip-label {
+    font-weight: 600;
+    color: #e0e0e0;
+    display: inline;
+    margin-bottom: 0;
+}
+
+.tooltip-value {
+    font-family: monospace;
+    color: #4B54A0;
+    margin-left: 4px;
+}

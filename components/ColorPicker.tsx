@@ -168,7 +168,7 @@ export default function ColorPicker({
 						thumbSize={24}
 						thumbShape="circle"
 						boundedThumb
-						onComplete={(color) => {
+						onCompleteJS={(color) => {
 							setSelectedColorData(color);
 						}}
 					>

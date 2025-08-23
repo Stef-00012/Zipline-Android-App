@@ -20,12 +20,12 @@ export const styles = StyleSheet.create({
 	},
 	fileLimitText: {
 		textAlign: "center",
-		marginTop: 7
+		marginTop: 7,
 	},
 	text: {
 		color: "#ffffff",
 		marginTop: 5,
-		marginHorizontal: 10
+		marginHorizontal: 10,
 	},
 	scrollView: {
 		marginTop: 10,
@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
 	copyText: {
 		color: "#dac614ff",
 		fontWeight: "bold",
-		textAlign: "center"
+		textAlign: "center",
 	},
 	selectText: {
 		flex: 1,
@@ -113,5 +113,13 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		width: "100%",
+	},
+	uploadButtonText: {
+		fontWeight: "bold",
+	},
+	uploadButtonChunkText: {
+		fontWeight: "bold",
+		fontSize: 10,
+		color: "dimgray",
 	},
 });

@@ -230,7 +230,7 @@ export async function editFile(
 
 interface UploadFile {
 	uri: string;
-	blob: Blob,
+	blob: Blob;
 	mimetype: string;
 }
 
@@ -257,12 +257,21 @@ interface UploadProgressData {
 	totalBytesSent: number;
 	totalBytesExpectedToSend: number;
 }
+
+interface UploadChunkData {
+	totalChunks: number;
+	currentChunk: number;
+}
+
 // POST /api/upload
 export async function uploadFiles(
 	file: UploadFile,
 	ziplineOptions: UploadZiplineOptions,
 	options: UploadFileOptions = {},
-	onProgress?: (uploadProgressData: UploadProgressData) => void,
+	onProgress?: (
+		uploadProgressData: UploadProgressData,
+		chunkData?: UploadChunkData,
+	) => void,
 ): Promise<APIUploadFile[] | string> {
 	const token = db.get("token");
 	const url = db.get("url");
@@ -295,10 +304,11 @@ export async function uploadFiles(
 	if (options.originalName) headers["X-Zipline-Original-Name"] = "true";
 	if (options.filename) headers["X-Zipline-Filename"] = options.filename;
 
-	const filename = options.filename || file.uri.split("/").pop() || "android-app-upload"
-	const extension = filename.split(".").pop() || "bin"
+	const filename =
+		options.filename || file.uri.split("/").pop() || "android-app-upload";
+	const extension = filename.split(".").pop() || "bin";
 
-	const maxChunkSize = bytes(ziplineOptions.maxChunkSize) || 0
+	const maxChunkSize = bytes(ziplineOptions.maxChunkSize) || 0;
 
 	try {
 		if (blob.size < maxChunkSize) {
@@ -330,46 +340,43 @@ export async function uploadFiles(
 
 			if (!res) return "Something went wrong...";
 
-			const fetchedData = JSON.parse(res.body) as APIUploadResponse
+			const fetchedData = JSON.parse(res.body) as APIUploadResponse;
 
 			return fetchedData.files;
 		}
 
-		const chunkSize = bytes(ziplineOptions.chunkSize) || 0
-		
+		const chunkSize = bytes(ziplineOptions.chunkSize) || 0;
+
 		const numberOfChunks = Math.ceil(blob.size / chunkSize);
 
-		const cacheDirectory = new Directory(Paths.cache)
+		const cacheDirectory = new Directory(Paths.cache);
 
 		let identifier: string | undefined;
 
-		for (let i = numberOfChunks - 1; i >= 0; i--) {
-			const start = i * chunkSize
-			const end = Math.min(start + chunkSize, blob.size)
+		for (let i = 0; i < numberOfChunks; i++) {
+			const start = i * chunkSize;
+			const end = Math.min(start + chunkSize, blob.size);
 
-			const chunk = blob.slice(start, end)
+			const base64 = await FileSystem.readAsStringAsync(file.uri, {
+				encoding: FileSystem.EncodingType.Base64,
+				position: start,
+				length: end - start,
+			});
 
-			headers["Content-Range"] = `bytes ${start}-${end - 1}/${blob.size}`
+			headers["Content-Range"] = `bytes ${start}-${end - 1}/${blob.size}`;
 			headers["X-Zipline-P-Filename"] = filename;
-			headers["X-Zipline-P-Lastchunk"] = i === 0 ? "true" : "false";
+			headers["X-Zipline-P-Lastchunk"] =
+				i === numberOfChunks - 1 ? "true" : "false";
 			headers["X-Zipline-P-Content-Type"] = file.mimetype || blob.type;
 			headers["X-Zipline-P-Content-Length"] = String(blob.size);
-			
+
 			if (identifier) headers["X-Zipline-P-Identifier"] = identifier;
 
-			const arrayBuffer = await chunk.arrayBuffer()
+			const chunkURI = `${cacheDirectory.uri}/chunk-${i}.${extension}`;
 
-			const base64 = Buffer.from(arrayBuffer).toString("base64")
-
-			const chunkURI = `${cacheDirectory.uri}/chunk-${i}.${extension}`
-
-			await FileSystem.writeAsStringAsync(
-				chunkURI,
-				base64,
-				{
-					encoding: FileSystem.EncodingType.Base64,
-				}
-			)
+			await FileSystem.writeAsStringAsync(chunkURI, base64, {
+				encoding: FileSystem.EncodingType.Base64,
+			});
 
 			const uploadTask = FileSystem.createUploadTask(
 				`${url}/api/upload/partial`,
@@ -381,7 +388,14 @@ export async function uploadFiles(
 					fieldName: "file",
 					mimeType: file.mimetype,
 				},
-				onProgress,
+				(uploadData) => {
+					if (!onProgress) return;
+
+					onProgress(uploadData, {
+						totalChunks: numberOfChunks,
+						currentChunk: i + 1,
+					});
+				},
 			);
 
 			const res = await uploadTask.uploadAsync();
@@ -399,45 +413,16 @@ export async function uploadFiles(
 
 			if (!res) return "Something went wrong...";
 
-			const fetchedData = JSON.parse(res.body) as APIUploadPartialResponse
+			const fetchedData = JSON.parse(res.body) as APIUploadPartialResponse;
 
 			identifier = fetchedData.partialIdentifier;
 
 			if (fetchedData.files.length > 0) {
-				return fetchedData.files
+				return fetchedData.files;
 			}
 		}
 
-		return "Something went wrong..."
-		// const uploadTask = FileSystem.createUploadTask(
-		// 	`${url}/api/upload`,
-		// 	file.uri,
-		// 	{
-		// 		uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-		// 		headers,
-		// 		httpMethod: "POST",
-		// 		fieldName: "file",
-		// 		mimeType: file.mimetype,
-		// 	},
-		// 	onProgress,
-		// );
-
-		// const res = await uploadTask.uploadAsync();
-
-		// if (res?.status && (res.status < 200 || res.status > 299)) {
-		// 	const data = JSON.parse(res?.body) as {
-		// 		error: string;
-		// 		statusCode: number;
-		// 	} | null;
-
-		// 	if (data) return data.error;
-
-		// 	return "Something went wrong...";
-		// }
-
-		// if (!res) return "Something went wrong...";
-
-		// return JSON.parse(res.body)?.files || [];
+		return "Something went wrong...";
 	} catch (e) {
 		const error = e as AxiosError;
 

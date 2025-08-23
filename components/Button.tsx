@@ -17,6 +17,7 @@ interface Props {
 	color: ColorValue;
 	textColor?: ColorValue;
 	text?: string;
+	textJsx?: (disabled: boolean, hasIcon: boolean) => JSX.Element;
 	width?: DimensionValue;
 	height?: DimensionValue;
 	icon?: keyof typeof MaterialIcons.glyphMap;
@@ -46,6 +47,7 @@ export default function Button({
 	color,
 	textColor = "white",
 	text,
+	textJsx,
 	width,
 	height,
 	icon,
@@ -97,7 +99,10 @@ export default function Button({
 			}}
 		>
 			{icon && <MaterialIcons name={icon} size={iconSize} color={iconColor} />}
-			{text && (
+
+			{textJsx?.(disabled, !!icon)}
+
+			{text && !textJsx && (
 				<Text
 					style={{
 						...styles.buttonText,
@@ -109,6 +114,7 @@ export default function Button({
 					{text}
 				</Text>
 			)}
+
 			{typeof open === "boolean" && (
 				<MaterialIcons
 					name={open ? "expand-more" : "expand-less"}

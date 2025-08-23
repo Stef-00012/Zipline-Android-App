@@ -46,14 +46,14 @@ export default function UploadFile({
 	fromShareIntent = false,
 }: Props) {
 	useAuth();
-	
+
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
-	const { webSettings, publicSettings } = useContext(ZiplineContext)
+	const { webSettings, publicSettings } = useContext(ZiplineContext);
 
 	const maxFileSize = webSettings
 		? webSettings.config.files.maxFileSize
-		: "99TB"
+		: "99TB";
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
@@ -76,7 +76,7 @@ export default function UploadFile({
 		}[]
 	>([]);
 
-	const [isCopying, setIsCopying] = useState<boolean>(false)
+	const [isCopying, setIsCopying] = useState<boolean>(false);
 
 	const [overrideDomain, setOverrideDomain] =
 		useState<UploadFileOptions["overrideDomain"]>();
@@ -98,31 +98,22 @@ export default function UploadFile({
 		}[]
 	>([]);
 
-	const chunkSize = webSettings
-		? webSettings.config.chunks.size
-		: "25mb"
+	const chunkSize = webSettings ? webSettings.config.chunks.size : "25mb";
 
-	const maxChunkSize = webSettings
-		? webSettings.config.chunks.max
-		: "95mb"
+	const maxChunkSize = webSettings ? webSettings.config.chunks.max : "95mb";
 
-	const chunksEnabled = webSettings
-		? webSettings.config.chunks.enabled
-		: false
+	const chunksEnabled = webSettings ? webSettings.config.chunks.enabled : false;
 
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
-		: "random"
+		: "random";
 
-	const domainList = publicSettings
-		? publicSettings.domains ?? []
-		: []
+	const domainList = publicSettings ? (publicSettings.domains ?? []) : [];
 
-	const domains = domainList
-		.map((domain) => ({
-			label: domain,
-			value: domain
-		}))
+	const domains = domainList.map((domain) => ({
+		label: domain,
+		value: domain,
+	}));
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -131,6 +122,11 @@ export default function UploadFile({
 	);
 	const [uploading, setUploading] = useState<boolean>(false);
 	const [uploadPercentage, setUploadPercentage] = useState<string>("0");
+
+	const [isChunked, setIsChunked] = useState<boolean>(false);
+	const [numberOfChunks, setNumberOfChunks] = useState<number>(0);
+	const [currentChunk, setCurrentChunk] = useState<number>(0);
+	const [chunkPercentage, setChunkPercentage] = useState<string>("0");
 
 	const [savePreset, setSavePreset] = useState<boolean>(false);
 	const [newPresetName, setNewPresetName] = useState<string>("");
@@ -141,23 +137,25 @@ export default function UploadFile({
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
 
 	useEffect(() => {
-		const bytesMaxFileSize = bytes(maxFileSize) || 0
+		const bytesMaxFileSize = bytes(maxFileSize) || 0;
 
 		const removedFiles: SelectedFile[] = [];
 
 		for (const file of selectedFiles) {
 			if (file.size && file.size > bytesMaxFileSize) {
-				removedFiles.push(file)
+				removedFiles.push(file);
 			}
 		}
 
 		if (removedFiles.length > 0) {
-			const newSelectedFiles = selectedFiles.filter((file) => removedFiles.every((removedFile) => removedFile.uri !== file.uri))
+			const newSelectedFiles = selectedFiles.filter((file) =>
+				removedFiles.every((removedFile) => removedFile.uri !== file.uri),
+			);
 
-			setSelectedFiles(newSelectedFiles)
-			setRemovedFiles(removedFiles)
+			setSelectedFiles(newSelectedFiles);
+			setRemovedFiles(removedFiles);
 		}
-	}, [selectedFiles, maxFileSize])
+	}, [selectedFiles, maxFileSize]);
 
 	useEffect(() => {
 		(async () => {
@@ -415,13 +413,22 @@ export default function UploadFile({
 				</View>
 			</Popup>
 
-			<Popup onClose={() => setRemovedFiles([])} hidden={removedFiles.length <= 0}>
+			<Popup
+				onClose={() => setRemovedFiles([])}
+				hidden={removedFiles.length <= 0}
+			>
 				<View>
 					<Text style={styles.headerText}>Removed Files</Text>
-					<Text style={styles.subHeaderText}>Some files have been removed because they exceed the limit of {convertToBytes(maxFileSize)}.</Text>
+					<Text style={styles.subHeaderText}>
+						Some files have been removed because they exceed the limit of{" "}
+						{convertToBytes(maxFileSize)}.
+					</Text>
 
 					{removedFiles.map((file) => (
-						<Text style={styles.text} key={file.uri}>{file.name} ({file.size ? convertToBytes(file.size) : "Unknown Size"})</Text>
+						<Text style={styles.text} key={file.uri}>
+							{file.name} (
+							{file.size ? convertToBytes(file.size) : "Unknown Size"})
+						</Text>
 					))}
 				</View>
 			</Popup>
@@ -452,7 +459,11 @@ export default function UploadFile({
 					</View>
 				</View>
 
-				{isCopying && <Text style={styles.copyText}>Preparing your files... This may take a few moments</Text>}
+				{isCopying && (
+					<Text style={styles.copyText}>
+						Preparing your files... This may take a few moments
+					</Text>
+				)}
 
 				<ScrollView
 					horizontal
@@ -487,13 +498,16 @@ export default function UploadFile({
 
 			{showFileSelector && (
 				<View>
-					<Text style={{
-						...styles.subHeaderText,
-						...styles.fileLimitText
-					}}>
+					<Text
+						style={{
+							...styles.subHeaderText,
+							...styles.fileLimitText,
+						}}
+					>
 						{convertToBytes(maxFileSize, {
-							unitSeparator: " "
-						})} limit per file
+							unitSeparator: " ",
+						})}{" "}
+						limit per file
 					</Text>
 
 					<Button
@@ -529,27 +543,27 @@ export default function UploadFile({
 										),
 								);
 
-							const cacheDir = new Directory(Paths.cache)
+							const cacheDir = new Directory(Paths.cache);
 
-							setIsCopying(true)
+							setIsCopying(true);
 
 							for (const file of newSelectedFiles) {
 								const fileSAFURI = file.uri;
-								const outputURI = `${cacheDir.uri}/${file.name}`
+								const outputURI = `${cacheDir.uri}/${file.name}`;
 
-								const outputFile = await FileSystem.getInfoAsync(outputURI)
+								const outputFile = await FileSystem.getInfoAsync(outputURI);
 
-								if (outputFile.exists) await FileSystem.deleteAsync(outputURI)
-								
+								if (outputFile.exists) await FileSystem.deleteAsync(outputURI);
+
 								await FileSystem.copyAsync({
 									from: fileSAFURI,
 									to: outputURI,
-								})
+								});
 
-								file.uri = outputURI
+								file.uri = outputURI;
 							}
 
-							setIsCopying(false)
+							setIsCopying(false);
 
 							setSelectedFiles((alreadySelectedFiles) => [
 								...alreadySelectedFiles,
@@ -557,8 +571,8 @@ export default function UploadFile({
 							]);
 						}}
 						text="Select File(s)"
-						color={(uploading || isCopying) ? "#373d79" : "#323ea8"}
-						textColor={(uploading || isCopying) ? "gray" : "white"}
+						color={uploading || isCopying ? "#373d79" : "#323ea8"}
+						textColor={uploading || isCopying ? "gray" : "white"}
 						margin={{
 							left: "auto",
 							right: "auto",
@@ -706,7 +720,9 @@ export default function UploadFile({
 						},
 						...domains,
 					]}
-					defaultValue={domains.find((domain) => domain.value === overrideDomain)}
+					defaultValue={domains.find(
+						(domain) => domain.value === overrideDomain,
+					)}
 					disabled={uploading || isCopying}
 					placeholder="Select Domain..."
 					onSelect={(selectedDomain) => {
@@ -855,7 +871,7 @@ export default function UploadFile({
 							setSavePreset(true);
 						}}
 						disabled={uploading || isCopying}
-						color={(uploading || isCopying) ? "#373d79" : "#323ea8"}
+						color={uploading || isCopying ? "#373d79" : "#323ea8"}
 						margin={{
 							left: "2.5%",
 							right: "2.5%",
@@ -896,7 +912,7 @@ export default function UploadFile({
 									file.uri.split(".").pop() as Mimetypes[keyof Mimetypes],
 								);
 
-							const fileURI = fileInfo.uri || file.uri
+							const fileURI = fileInfo.uri || file.uri;
 
 							const fileData = {
 								uri: fileURI,
@@ -909,7 +925,7 @@ export default function UploadFile({
 								{
 									chunksEnabled,
 									chunkSize,
-									maxChunkSize
+									maxChunkSize,
 								},
 								{
 									compression,
@@ -922,14 +938,28 @@ export default function UploadFile({
 									overrideDomain,
 									password,
 								},
-								(uploadData) => {
-									setUploadPercentage(
-										(
-											(uploadData.totalBytesSent /
-												uploadData.totalBytesExpectedToSend) *
-											100
-										).toFixed(2),
-									);
+								(uploadData, chunkData) => {
+									const chunkPercentage =
+										(uploadData.totalBytesSent /
+											uploadData.totalBytesExpectedToSend) *
+										100;
+									let percentage = chunkPercentage;
+
+									if (chunkData) {
+										setIsChunked(true);
+										setCurrentChunk(chunkData.currentChunk);
+										setNumberOfChunks(chunkData.totalChunks);
+
+										percentage =
+											percentage / chunkData.totalChunks +
+											(100 / chunkData.totalChunks) *
+												(chunkData.currentChunk - 1);
+									} else {
+										setIsChunked(false);
+									}
+
+									setUploadPercentage(percentage.toFixed(2));
+									setChunkPercentage(chunkPercentage.toFixed(2));
 								},
 							);
 
@@ -951,17 +981,54 @@ export default function UploadFile({
 
 						afterUploadCleanup();
 					}}
-					text={
-						uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"
+					color={
+						uploading || isCopying || uploadButtonDisabled
+							? "#373d79"
+							: "#323ea8"
 					}
-					color={(uploading || isCopying) || uploadButtonDisabled ? "#373d79" : "#323ea8"}
-					textColor={(uploading || isCopying) || uploadButtonDisabled ? "gray" : "white"}
+					textColor={
+						uploading || isCopying || uploadButtonDisabled ? "gray" : "white"
+					}
 					margin={{
 						left: "auto",
 						right: "auto",
 						top: 10,
 						bottom: 10,
 					}}
+					textJsx={(disabled, hasIcon) => (
+						<View
+							style={
+								hasIcon && {
+									marginLeft: 5,
+								}
+							}
+						>
+							<Text
+								style={{
+									...styles.uploadButtonText,
+									color: disabled ? "gray" : "white",
+								}}
+							>
+								{uploading ? (
+									<Text>
+										{isChunked ? (
+											<Text>
+												<Text>Uploading... {uploadPercentage}%</Text>
+												<Text style={styles.uploadButtonChunkText}>
+													{" "}
+													{currentChunk}/{numberOfChunks} - {chunkPercentage}%
+												</Text>
+											</Text>
+										) : (
+											<Text>Uploading... {uploadPercentage}%</Text>
+										)}
+									</Text>
+								) : (
+									<Text>Upload File(s)</Text>
+								)}
+							</Text>
+						</View>
+					)}
 				/>
 			</View>
 		</View>

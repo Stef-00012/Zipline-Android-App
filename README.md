@@ -20,7 +20,7 @@ This is an android app made to manage your [Zipline V4](https://github.com/diced
 # Download
 
 The app is available on the following platforms:
-- Google Play tore (Currently in closed testing)
+- Google Play Store
 - GitHub Releases
 
 [![Get on Google Play](/assets/github/google-play.png)](https://play.google.com/store/apps/details?id=com.stefdp.zipline)

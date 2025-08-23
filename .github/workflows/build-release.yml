@@ -1,0 +1,129 @@
+name: Build APK
+
+on:
+  push:
+    paths:
+      - components/**
+      - constants/**
+      - functions/**
+      - hooks/**
+      - styles/**
+      - types/**
+      - assets/**
+      - app/**
+      - metro.config.js
+      - babel.config.js
+      - app.config.ts
+      - package.json
+      - eas.json
+      - .github/workflows/build-release.yml
+      - .github/workflows/build-prerelease.yml
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, '[release]') || startsWith(github.event.head_commit.message, '[build]')))
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Repo
+        uses: actions/checkout@v4
+
+      - name: Get App Version
+        id: version
+        run: |
+          echo "app_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
+
+      - name: Get Commit SHA
+        id: sha
+        run: |
+          echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Android App APK
+        run: eas build --clear-cache --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: app-apk-release
+            path: ${{ format('{0}/app-release.apk', github.workspace) }}
+
+      - name: Build Android App AAB
+        run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-release.aab
+
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-aab-release
+          path: ${{ github.workspace }}/app-release.aab
+
+      - name: Publish Release
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: false
+          artifacts: "app-release.apk,app-release.aab"
+          artifactContentType: application/vnd.android.package-archive
+          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
+          generateReleaseNotes: true
+
+      - name: Announce Release
+        run: |
+          curl https://ntfy.stefdp.com \
+          -H "Authorization: Bearer ${{ secrets.NTFY_TOKEN }}" \
+          -d '{
+            "topic": "ziplineAndroid",
+            "priority": 4,
+            "title": "A new release of Zipline Android has been published",
+            "message": "v${{ steps.version.outputs.app_version }} is out",
+            "actions": [
+              {
+                "action": "view",
+                "label": "View on GitHub",
+                "url": "https://github.com/Stef-00012/Zipline-Android-App/releases/tag/v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
+              }
+            ]
+          }'
+
+      - name: Announce Failure
+        if: failure()
+        run: |
+          curl https://ntfy.stefdp.com \
+          -H "Authorization: Bearer ${{ secrets.NTFY_TOKEN }}" \
+          -d '{
+            "topic": "ziplineAndroid",
+            "priority": 4,
+            "title": "Something went wrong while building a new release of Zipline Android",
+            "message": "v${{ steps.version.outputs.app_version }} failed to build",
+            "actions": [
+              {
+                "action": "view",
+                "label": "View Logs",
+                "url": "https://github.com/Stef-00012/Zipline-Android-App/actions/runs/${{ github.run_id }}/job/${{ github.job }}"
+              }
+            ]
+          }'

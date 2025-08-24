@@ -1,7 +1,7 @@
 import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { type ExternalPathString, Link, useRouter } from "expo-router";
-import { ScrollView, Text, View, ToastAndroid } from "react-native";
+import { ScrollView, Text, View, ToastAndroid, BackHandler } from "react-native";
 import type { Preset, APIUploadResponse } from "@/types/zipline";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import { getFolders } from "@/functions/zipline/folders";
@@ -25,6 +25,9 @@ import Popup from "@/components/Popup";
 import { Directory, File, Paths } from "expo-file-system/next";
 import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import bytes from "bytes";
+import { useCameraPermission, useMicrophonePermission } from "react-native-vision-camera"
+import { HeaderContext } from "@/contexts/HeaderContext";
+import Camera from "@/components/Camera";
 
 export interface SelectedFile {
 	name: string;
@@ -50,6 +53,7 @@ export default function UploadFile({
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
 	const { webSettings, publicSettings } = useContext(ZiplineContext);
+	const { updateHidden } = useContext(HeaderContext)
 
 	const maxFileSize = webSettings
 		? webSettings.config.files.maxFileSize
@@ -136,6 +140,10 @@ export default function UploadFile({
 	const [editPresetError, setEditPresetError] = useState<string | null>(null);
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
 
+	const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } = useCameraPermission()
+	const { hasPermission: hasMicrophonePermission, requestPermission: requestMicrophonePermission } = useMicrophonePermission()
+	const [showCamera, setShowCamera] = useState<boolean>(false);
+
 	useEffect(() => {
 		const bytesMaxFileSize = bytes(maxFileSize) || 0;
 
@@ -188,11 +196,45 @@ export default function UploadFile({
 	}
 
 	useEffect(() => {
+		if (showCamera) {
+			console.log("show camera true")
+			updateHidden(true)
+
+			const { remove } = BackHandler.addEventListener("hardwareBackPress", () => {
+				setShowCamera(false)
+				remove();
+
+				return true;
+			})
+		} else {
+			updateHidden(false)
+		}
+	}, [showCamera, updateHidden])
+
+	useEffect(() => {
 		setUploadButtonDisabled(selectedFiles.length === 0);
 		setFileNameEnabled(selectedFiles.length <= 1);
 	}, [selectedFiles]);
 
 	const iskeyboardOpen = useDetectKeyboardOpen(false);
+
+	if (showCamera) {
+		return (
+			<Camera
+				microphoneEnabled={hasMicrophonePermission}
+				disableCamera={() => {
+					setShowCamera(false)
+				}}
+				onError={(error) => {
+					setShowCamera(false)
+
+					if (__DEV__) console.error(error);
+
+					ToastAndroid.show("Unable to open the camera", ToastAndroid.LONG)
+				}}
+			/>
+		)
+	}
 
 	return (
 		<View style={styles.mainContainer}>
@@ -442,6 +484,35 @@ export default function UploadFile({
 
 					<View style={styles.headerButtons}>
 						<Button
+							onPress={async () => {
+								if (!hasCameraPermission) await requestCameraPermission()
+								if (!hasMicrophonePermission) await requestMicrophonePermission()
+
+								if (!hasCameraPermission) {
+									return ToastAndroid.show("Camera permission is denied", ToastAndroid.SHORT)
+								}
+
+								if (!hasMicrophonePermission) {
+									ToastAndroid.show("Microphone permission denied, videos will not have audio", ToastAndroid.SHORT)
+								}
+
+								setShowCamera(true)
+							}}
+							icon="camera-alt"
+							color="transparent"
+							iconColor="#2d3f70"
+							borderColor="#222c47"
+							borderWidth={2}
+							iconSize={30}
+							padding={4}
+							rippleColor="#283557"
+							margin={{
+								left: 2,
+								right: 2,
+							}}
+						/>
+
+						<Button
 							onPress={() => {
 								resetShareIntent();
 
@@ -455,6 +526,10 @@ export default function UploadFile({
 							iconSize={30}
 							padding={4}
 							rippleColor="#283557"
+							margin={{
+								left: 2,
+								right: 2,
+							}}
 						/>
 					</View>
 				</View>

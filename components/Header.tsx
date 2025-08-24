@@ -11,6 +11,7 @@ import { getRippleColor } from "@/functions/util";
 import { Skeleton } from "moti/skeleton";
 import { colors } from "@/constants/skeleton";
 import { AuthContext } from "@/contexts/AuthProvider";
+import { HeaderContext } from "@/contexts/HeaderContext";
 
 export default function Header({ children }: PropsWithChildren) {
 	const router = useRouter();
@@ -18,13 +19,14 @@ export default function Header({ children }: PropsWithChildren) {
 
 	const resetShareIntent = useShareIntent(true);
 	const { avatar, user } = useContext(AuthContext)
+	const { hidden } = useContext(HeaderContext)
 
 	const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
 	return (
 		<View style={styles.headerContainer}>
 			<View style={{
-				display: pathname === "/login" ? "none" : undefined
+				display: (hidden || pathname === "/login") ? "none" : undefined
 			}}>
 				{user ? (
 					<View

@@ -197,23 +197,23 @@ export default function Metrics() {
 				</View>
 
 				<Button
-						onPress={() => {
-							setDatePickerOpen(true);
-						}}
-						color="transparent"
-						text="Change Date Range"
-						borderWidth={2}
-						borderColor="#222c47"
-						margin={{
-							right: 10,
-							left: 10,
-							// top: 10,
-							bottom: 10,
-						}}
-						rippleColor="#283557"
-						disabled={!filteredStats || !mainStat}
-						textColor={filteredStats && mainStat ? "white" : "gray"}
-					/>
+					onPress={() => {
+						setDatePickerOpen(true);
+					}}
+					color="transparent"
+					text="Change Date Range"
+					borderWidth={2}
+					borderColor="#222c47"
+					margin={{
+						right: 10,
+						left: 10,
+						// top: 10,
+						bottom: 10,
+					}}
+					rippleColor="#283557"
+					disabled={!filteredStats || !mainStat}
+					textColor={filteredStats && mainStat ? "white" : "gray"}
+				/>
 
 				{filteredStats && mainStat ? (
 					<View>

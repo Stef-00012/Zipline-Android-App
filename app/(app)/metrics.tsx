@@ -27,9 +27,16 @@ import {
 } from "@/functions/util";
 
 export default function Metrics() {
+	const { webSettings } = useContext(ZiplineContext);
+
+	// is this rlly needed? api endpoint is public anyway
+	// const adminOnly = webSettings
+	// 		? webSettings.config.features.metrics.adminOnly
+	// 		: false
+
+	// useAuth(adminOnly ? "ADMIN" : "USER");
 	useAuth();
 	useShareIntent();
-	const { webSettings } = useContext(ZiplineContext);
 
 	const [stats, setStats] = useState<APIStats | null>();
 	const [userSpecificMetrics, setUserSpecificMetrics] =

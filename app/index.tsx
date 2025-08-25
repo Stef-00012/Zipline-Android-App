@@ -7,7 +7,6 @@ import SkeletonTable from "@/components/skeleton/Table";
 import { Text, View, ScrollView } from "react-native";
 import { AuthContext } from "@/contexts/AuthProvider";
 import Skeleton from "@/components/skeleton/Skeleton";
-import { useAppUpdates } from "@/hooks/useUpdates";
 import FileDisplay from "@/components/FileDisplay";
 import { convertToBytes } from "@/functions/util";
 import * as db from "@/functions/database";
@@ -33,8 +32,6 @@ import type {
 export default function Home() {
 	useAuth();
 	useShareIntent();
-
-	useAppUpdates();
 
 	const { user } = useContext(AuthContext);
 

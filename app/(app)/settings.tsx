@@ -1,10 +1,13 @@
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import type { APIExports, APIVersion, DashURL } from "@/types/zipline";
+import { getInstallerPackageNameSync } from "react-native-device-info";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { convertToBytes, guessExtension } from "@/functions/util";
+import { knownInstallersName } from "@/constants/knownInstallers";
 import SkeletonTextInput from "@/components/skeleton/TextInput";
 import { getTokenWithToken } from "@/functions/zipline/auth";
+import { UpdateContext } from "@/contexts/UpdateContext";
 import VersionDisplay from "@/components/VersionDisplay";
 import { getVersion } from "@/functions/zipline/version";
 import { useState, useEffect, useContext } from "react";
@@ -13,7 +16,6 @@ import SkeletonTable from "@/components/skeleton/Table";
 import { version as appVersion } from "@/package.json";
 import { AuthContext } from "@/contexts/AuthProvider";
 import Skeleton from "@/components/skeleton/Skeleton";
-import { useAppUpdates } from "@/hooks/useUpdates";
 import ColorPicker from "@/components/ColorPicker";
 import { alignments } from "@/constants/settings";
 import type { Mimetypes } from "@/types/mimetypes";
@@ -47,9 +49,6 @@ import {
 	type EditUserOptions,
 } from "@/functions/zipline/user";
 
-import { getInstallerPackageNameSync } from "react-native-device-info";
-import { knownInstallersName } from "@/constants/knownInstallers";
-
 export default function UserSettings() {
 	const {
 		updateAuth,
@@ -61,22 +60,24 @@ export default function UserSettings() {
 	const {
 		checkForUpdates,
 		downloadUpdate,
-		// downloadProgress,
-		// downloadSize,
-		isChecking,
+		downloadPercentage,
 		isDownloading,
-		isUpdateAvailable,
-	} = useAppUpdates();
+		updateAvailable,
+		isCheckingUpdate,
+	} = useContext(UpdateContext);
 
 	useAuth();
 	useShareIntent();
 
 	const installerPackage = getInstallerPackageNameSync();
-	const installerPackageName = installerPackage in knownInstallersName
-		? knownInstallersName[installerPackage as keyof typeof knownInstallersName]
-		: __DEV__
-			? "Development Instance"
-			: installerPackage;
+	const installerPackageName =
+		installerPackage in knownInstallersName
+			? knownInstallersName[
+					installerPackage as keyof typeof knownInstallersName
+				]
+			: __DEV__
+				? "Development Instance"
+				: installerPackage;
 
 	const [mediaLibraryPermission, requestMediaLibraryPermission] =
 		ImagePicker.useMediaLibraryPermissions();
@@ -1254,7 +1255,7 @@ export default function UserSettings() {
 									}}
 								/>
 
-								{isUpdateAvailable ? (
+								{updateAvailable ? (
 									<Button
 										onPress={async () => {
 											await downloadUpdate();
@@ -1264,7 +1265,7 @@ export default function UserSettings() {
 										color={isDownloading ? "#373d79" : "#323ea8"}
 										text={
 											isDownloading
-												? "Downloading Update..."
+												? `Downloading Update... ${downloadPercentage.toFixed(2)}%`
 												: "Download Update"
 										}
 										// text={
@@ -1289,17 +1290,17 @@ export default function UserSettings() {
 											const update = await checkForUpdates();
 
 											ToastAndroid.show(
-												`${update.available ? "" : "No "}Update Avaible${update.nextVersion ? ` (v${update.currentVersion} -> v${update.nextVersion})` : ""}`,
+												`${update.available ? "" : "No "}Update Avaible${update.newVersion ? ` (v${appVersion} -> v${update.newVersion})` : ""}`,
 												ToastAndroid.SHORT,
 											);
 										}}
-										color={isChecking ? "#373d79" : "#323ea8"}
+										color={isCheckingUpdate ? "#373d79" : "#323ea8"}
 										text={
-											isChecking
+											isCheckingUpdate
 												? "Checking for Updates..."
 												: "Check for Updates"
 										}
-										disabled={isChecking}
+										disabled={isCheckingUpdate}
 										margin={{
 											top: 10,
 										}}

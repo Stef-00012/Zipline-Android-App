@@ -3,6 +3,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ZiplineProvider from "@/contexts/ZiplineProvider";
 import { ShareIntentProvider } from "expo-share-intent";
+import UpdateProvider from "@/contexts/UpdateContext";
 import NetInfo from "@react-native-community/netinfo";
 import AuthProvider from "@/contexts/AuthProvider";
 import { Slot, useRouter } from "expo-router";
@@ -50,21 +51,23 @@ export default function Layout() {
 					<GestureHandlerRootView>
 						<AuthProvider>
 							<ZiplineProvider>
-								{hasInternet ? (
-									<Host>
+								<UpdateProvider>
+									{hasInternet ? (
+										<Host>
+											<Header>
+												<Slot />
+											</Header>
+										</Host>
+									) : (
 										<Header>
-											<Slot />
+											<View style={styles.noInternetContainer}>
+												<Text style={styles.noInternetText}>
+													No internet connection.
+												</Text>
+											</View>
 										</Header>
-									</Host>
-								) : (
-									<Header>
-										<View style={styles.noInternetContainer}>
-											<Text style={styles.noInternetText}>
-												No internet connection.
-											</Text>
-										</View>
-									</Header>
-								)}
+									)}
+								</UpdateProvider>
 							</ZiplineProvider>
 						</AuthProvider>
 					</GestureHandlerRootView>

@@ -49,6 +49,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		scheme: `com.stefdp.zipline${environmentAppIdentifier}`,
 		newArchEnabled: true,
 		edgeToEdgeEnabled: true,
+		permissions: [
+			"REQUEST_INSTALL_PACKAGES"
+		]
 	},
 	plugins: [
 		"expo-router",

@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Prerelease
 
 on:
   push:
@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-prerelease:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, '[pre]') || startsWith(github.event.head_commit.message, '[prerelease]')))
     permissions:
       contents: write

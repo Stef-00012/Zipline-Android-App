@@ -168,8 +168,10 @@ export default function UpdateProvider({ children }: Props) {
 
 			await downloadResumable.downloadAsync();
 
+            const updatePathContent = await FileSystem.getContentUriAsync(updatePath)
+
 			await startActivityAsync("android.intent.action.INSTALL_PACKAGE", {
-				data: updatePath,
+				data: updatePathContent,
 				flags: 1,
 			});
 

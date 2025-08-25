@@ -1,8 +1,8 @@
 import { type ExternalPathString, Link } from "expo-router";
+import { styles } from "@/styles/components/externalUrl";
 import type { ExternalLink } from "@/types/zipline";
 import { Text, View } from "react-native";
 import Button from "./Button";
-import { styles } from "@/styles/components/externalUrl";
 
 type ChangeType = "delete" | "edit";
 type MoveType = "up" | "down";

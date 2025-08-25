@@ -1,20 +1,20 @@
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { getVersion } from "@/functions/zipline/version";
+import { AuthContext } from "@/contexts/AuthProvider";
+import { minimumVersion } from "@/constants/auth";
 import TextInput from "@/components/TextInput";
+import { useContext, useState } from "react";
 import * as db from "@/functions/database";
 import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import { styles } from "@/styles/login";
-import { useContext, /*useEffect,*/ useState } from "react";
 import semver from "semver";
-import { minimumVersion } from "@/constants/auth";
-import { AuthContext } from "@/contexts/AuthProvider";
 
 export default function Login() {
 	const router = useRouter();
-	const { updateAuth, updateUser } = useContext(AuthContext) 
+	const { updateAuth, updateUser } = useContext(AuthContext);
 
 	const [error, setError] = useState<string>();
 	const [tokenLogin, setTokenLogin] = useState<boolean>(false);

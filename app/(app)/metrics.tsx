@@ -1,16 +1,15 @@
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { LineChart, PieChart } from "react-native-gifted-charts";
-import {
-	colorHash,
-	convertToBytes,
-	getMetricsDifference,
-} from "@/functions/util";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import type { DateType } from "react-native-ui-datepicker";
+import { useContext, useEffect, useState } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import SkeletonTable from "@/components/skeleton/Table";
+import Skeleton from "@/components/skeleton/Skeleton";
+import { MaterialIcons } from "@expo/vector-icons";
 import ChartLegend from "@/components/ChartLegend";
 import DatePicker from "@/components/DatePicker";
 import type { APIStats } from "@/types/zipline";
-import { useContext, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/metrics";
 import Button from "@/components/Button";
@@ -21,15 +20,16 @@ import {
 	getStats,
 	type StatsProps,
 } from "@/functions/zipline/stats";
-import { MaterialIcons } from "@expo/vector-icons";
-import Skeleton from "@/components/skeleton/Skeleton";
-import SkeletonTable from "@/components/skeleton/Table";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import {
+	colorHash,
+	convertToBytes,
+	getMetricsDifference,
+} from "@/functions/util";
 
 export default function Metrics() {
 	useAuth();
 	useShareIntent();
-	const { webSettings } = useContext(ZiplineContext)
+	const { webSettings } = useContext(ZiplineContext);
 
 	const [stats, setStats] = useState<APIStats | null>();
 	const [userSpecificMetrics, setUserSpecificMetrics] =
@@ -99,7 +99,7 @@ export default function Metrics() {
 		setUserSpecificMetrics(
 			webSettings
 				? webSettings.config.features.metrics.showUserSpecific
-				: false
+				: false,
 		);
 
 		if (typeof stats === "string") return setStats(null);

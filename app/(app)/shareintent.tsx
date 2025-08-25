@@ -4,9 +4,9 @@ import UploadFile from "@/app/(app)/(files)/upload/file";
 import UploadText from "@/app/(app)/(files)/upload/text";
 import { useFocusEffect, useRouter } from "expo-router";
 import { styles } from "@/styles/shareIntent";
+import { File } from "expo-file-system/next";
 import { useAuth } from "@/hooks/useAuth";
 import { View } from "react-native";
-import { File } from "expo-file-system/next";
 
 export default function ShareIntent() {
 	const router = useRouter();

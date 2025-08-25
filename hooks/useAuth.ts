@@ -1,13 +1,13 @@
-import { useRouter } from "expo-router";
+import { AuthContext } from "@/contexts/AuthProvider";
 import type { APIUser } from "@/types/zipline";
 import { roles } from "@/constants/auth";
+import { useRouter } from "expo-router";
 import { useContext } from "react";
-import { AuthContext } from "@/contexts/AuthProvider";
 
 export const useAuth = (minimumRole: APIUser["role"] = "USER") => {
 	const router = useRouter();
 
-	const { role } = useContext(AuthContext)
+	const { role } = useContext(AuthContext);
 
 	const minimumPosition = roles[minimumRole];
 	const userPosition = role ? roles[role] : 0;

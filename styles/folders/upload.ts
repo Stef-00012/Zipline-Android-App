@@ -89,7 +89,7 @@ export const styles = StyleSheet.create({
 	copyText: {
 		color: "#dac614ff",
 		fontWeight: "bold",
-		textAlign: "center"
+		textAlign: "center",
 	},
 	selectText: {
 		flex: 1,

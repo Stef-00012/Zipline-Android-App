@@ -2,19 +2,22 @@ import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { type ExternalPathString, Link, useRouter } from "expo-router";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
+import { convertToBytes, guessExtension } from "@/functions/util";
 import type { Preset, APIUploadResponse } from "@/types/zipline";
+import { Directory, File, Paths } from "expo-file-system/next";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import { getFolders } from "@/functions/zipline/folders";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import { useContext, useEffect, useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { dates, formats } from "@/constants/upload";
 import type { Mimetypes } from "@/types/mimetypes";
 import FileDisplay from "@/components/FileDisplay";
 import { styles } from "@/styles/files/uploadFile";
-import { convertToBytes, guessExtension } from "@/functions/util";
+import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
-import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,10 +25,7 @@ import Select from "@/components/Select";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
-import { Directory, File, Paths } from "expo-file-system/next";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import bytes from "bytes";
-import * as ImagePicker from 'expo-image-picker';
 
 export interface SelectedFile {
 	name: string;
@@ -137,7 +137,8 @@ export default function UploadFile({
 	const [editPresetError, setEditPresetError] = useState<string | null>(null);
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
 
-	const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
+	const [cameraPermission, requestCameraPermission] =
+		ImagePicker.useCameraPermissions();
 
 	useEffect(() => {
 		const bytesMaxFileSize = bytes(maxFileSize) || 0;
@@ -446,9 +447,19 @@ export default function UploadFile({
 					<View style={styles.headerButtons}>
 						<Button
 							onPress={async () => {
-								if (cameraPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestCameraPermission()
-								if (cameraPermission?.status === ImagePicker.PermissionStatus.DENIED) {
-									return ToastAndroid.show("Camera permission is denied", ToastAndroid.SHORT)
+								if (
+									cameraPermission?.status ===
+									ImagePicker.PermissionStatus.UNDETERMINED
+								)
+									await requestCameraPermission();
+								if (
+									cameraPermission?.status ===
+									ImagePicker.PermissionStatus.DENIED
+								) {
+									return ToastAndroid.show(
+										"Camera permission is denied",
+										ToastAndroid.SHORT,
+									);
 								}
 
 								const res = await ImagePicker.launchCameraAsync({
@@ -457,8 +468,8 @@ export default function UploadFile({
 									exif: false,
 									mediaTypes: ["videos", "images"],
 									videoMaxDuration: 0,
-									quality: 1
-								})
+									quality: 1,
+								});
 
 								if (res.canceled || res.assets.length <= 0) return;
 
@@ -476,8 +487,8 @@ export default function UploadFile({
 										name: image.fileName || fileName,
 										uri: image.uri,
 										mimetype: image.mimeType,
-										size: image.fileSize
-									}
+										size: image.fileSize,
+									},
 								]);
 							}}
 							icon="camera-alt"

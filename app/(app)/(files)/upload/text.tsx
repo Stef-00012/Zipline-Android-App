@@ -5,8 +5,11 @@ import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { APIUploadResponse, Preset } from "@/types/zipline";
 import { guessExtension, guessMimetype } from "@/functions/util";
 import Select, { type SelectProps } from "@/components/Select";
+import { Directory, File, Paths } from "expo-file-system/next";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import { getFolders } from "@/functions/zipline/folders";
+import { useContext, useEffect, useState } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import * as DocumentPicker from "expo-document-picker";
 import type { Mimetypes } from "@/types/mimetypes";
@@ -14,15 +17,12 @@ import { dates, formats } from "@/constants/upload";
 import { styles } from "@/styles/files/uploadText";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
-import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { Directory, File, Paths } from "expo-file-system/next";
 
 interface SelectedFile {
 	name: string;
@@ -43,12 +43,12 @@ export default function UploadText({
 	fromShareIntent = false,
 }: Props) {
 	useAuth();
-	
+
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
-	const { webSettings, publicSettings } = useContext(ZiplineContext)
+	const { webSettings, publicSettings } = useContext(ZiplineContext);
 
-	const [mimetypes, setMimetypes] = useState<SelectProps["data"]>([])
+	const [mimetypes, setMimetypes] = useState<SelectProps["data"]>([]);
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 
@@ -83,31 +83,22 @@ export default function UploadText({
 		}[]
 	>([]);
 
-	const chunkSize = webSettings
-		? webSettings.config.chunks.size
-		: "25mb"
+	const chunkSize = webSettings ? webSettings.config.chunks.size : "25mb";
 
-	const maxChunkSize = webSettings
-		? webSettings.config.chunks.max
-		: "95mb"
+	const maxChunkSize = webSettings ? webSettings.config.chunks.max : "95mb";
 
-	const chunksEnabled = webSettings
-		? webSettings.config.chunks.enabled
-		: false
+	const chunksEnabled = webSettings ? webSettings.config.chunks.enabled : false;
 
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
-		: "random"
+		: "random";
 
-	const domainList = publicSettings
-	? publicSettings.domains ?? []
-	: []
+	const domainList = publicSettings ? (publicSettings.domains ?? []) : [];
 
-const domains = domainList
-	.map((domain) => ({
+	const domains = domainList.map((domain) => ({
 		label: domain,
-		value: domain
-	}))
+		value: domain,
+	}));
 
 	const [isReading, setIsReading] = useState<boolean>(false);
 
@@ -132,16 +123,16 @@ const domains = domainList
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
 
 	useEffect(() => {
-		const mimetypeData = webSettings
-			? webSettings.codeMap
-			: []
+		const mimetypeData = webSettings ? webSettings.codeMap : [];
 
-		setMimetypes(mimetypeData.map((mimetype) => ({
-			label: mimetype.name,
-			value: mimetype.ext,
-			mimetype: mimetype.mime
-		})))
-	}, [webSettings])
+		setMimetypes(
+			mimetypeData.map((mimetype) => ({
+				label: mimetype.name,
+				value: mimetype.ext,
+				mimetype: mimetype.mime,
+			})),
+		);
+	}, [webSettings]);
 
 	useEffect(() => {
 		(async () => {
@@ -161,7 +152,7 @@ const domains = domainList
 	function afterUploadCleanup() {
 		setUploading(false);
 		setUploadButtonDisabled(true);
-		setText("")
+		setText("");
 
 		setFolder(undefined);
 		setMaxViews(undefined);
@@ -412,7 +403,11 @@ const domains = domainList
 					</View>
 				</View>
 
-				{isReading && <Text style={styles.readText}>Reading your file... This may take a few moments</Text>}
+				{isReading && (
+					<Text style={styles.readText}>
+						Reading your file... This may take a few moments
+					</Text>
+				)}
 
 				<View style={styles.mainTextInputContainer}>
 					<TextInput
@@ -459,27 +454,26 @@ const domains = domainList
 							const newSelectedFiles: SelectedFile = output.assets[0];
 
 							let fileURI = newSelectedFiles.uri;
-							const cacheDir = new Directory(Paths.cache)
+							const cacheDir = new Directory(Paths.cache);
 
-							setIsReading(true)
+							setIsReading(true);
 
 							const extension = fileURI.split(".").pop() || "txt";
 							const mimetype =
-								(mimetypes.find(
-									(format) => format.value === extension,
-								)?.mimetype as string) ||
+								(mimetypes.find((format) => format.value === extension)
+									?.mimetype as string) ||
 								guessMimetype(extension as keyof Mimetypes);
 
-							const outputURI = `${cacheDir.uri}/upload.${extension}`
+							const outputURI = `${cacheDir.uri}/upload.${extension}`;
 
-							const outputFile = await FileSystem.getInfoAsync(outputURI)
-							
-							if (outputFile.exists) await FileSystem.deleteAsync(outputURI)
-							
+							const outputFile = await FileSystem.getInfoAsync(outputURI);
+
+							if (outputFile.exists) await FileSystem.deleteAsync(outputURI);
+
 							await FileSystem.copyAsync({
 								from: fileURI,
 								to: outputURI,
-							})
+							});
 
 							fileURI = outputURI;
 
@@ -492,11 +486,11 @@ const domains = domainList
 							setText(decoded);
 							setFileType(mimetype);
 							setFileExtension(extension);
-							setIsReading(false)
+							setIsReading(false);
 						}}
 						text="Select File"
-						color={(uploading || isReading) ? "#373d79" : "#323ea8"}
-						textColor={(uploading || isReading) ? "gray" : "white"}
+						color={uploading || isReading ? "#373d79" : "#323ea8"}
+						textColor={uploading || isReading ? "gray" : "white"}
 						margin={{
 							left: "auto",
 							right: "auto",
@@ -523,9 +517,7 @@ const domains = domainList
 					data={mimetypes}
 					placeholder="Select File Type..."
 					disabled={uploading || isReading}
-					defaultValue={mimetypes.find(
-						(format) => format.value === "txt",
-					)}
+					defaultValue={mimetypes.find((format) => format.value === "txt")}
 					onSelect={(selectedType) => {
 						if (selectedType.length <= 0) return;
 
@@ -667,7 +659,9 @@ const domains = domainList
 						},
 						...domains,
 					]}
-					defaultValue={domains.find((domain) => domain.value === overrideDomain)}
+					defaultValue={domains.find(
+						(domain) => domain.value === overrideDomain,
+					)}
 					disabled={uploading || isReading}
 					placeholder="Select Domain..."
 					onSelect={(selectedDomain) => {
@@ -852,12 +846,13 @@ const domains = domainList
 						};
 
 						const uploadedFiles = await uploadFiles(
-							fileData, 
+							fileData,
 							{
 								chunksEnabled,
 								chunkSize,
-								maxChunkSize
-							}, {
+								maxChunkSize,
+							},
+							{
 								compression,
 								expiresAt: deletesAt,
 								filename: fileName,
@@ -867,7 +862,7 @@ const domains = domainList
 								originalName,
 								overrideDomain,
 								password,
-							}
+							},
 						);
 
 						if (typeof uploadedFiles === "string") {
@@ -885,8 +880,14 @@ const domains = domainList
 						afterUploadCleanup();
 					}}
 					text={uploading ? "Uploading..." : "Upload File"}
-					color={uploading || isReading || uploadButtonDisabled ? "#373d79" : "#323ea8"}
-					textColor={uploading || isReading || uploadButtonDisabled ? "gray" : "white"}
+					color={
+						uploading || isReading || uploadButtonDisabled
+							? "#373d79"
+							: "#323ea8"
+					}
+					textColor={
+						uploading || isReading || uploadButtonDisabled ? "gray" : "white"
+					}
 					margin={{
 						left: "auto",
 						right: "auto",

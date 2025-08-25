@@ -1,17 +1,23 @@
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import type {
-	APIExports,
-	APIVersion,
-	DashURL,
-} from "@/types/zipline";
+import type { APIExports, APIVersion, DashURL } from "@/types/zipline";
+import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
 import { convertToBytes, guessExtension } from "@/functions/util";
+import SkeletonTextInput from "@/components/skeleton/TextInput";
 import { getTokenWithToken } from "@/functions/zipline/auth";
+import VersionDisplay from "@/components/VersionDisplay";
+import { getVersion } from "@/functions/zipline/version";
 import { useState, useEffect, useContext } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import SkeletonTable from "@/components/skeleton/Table";
 import { version as appVersion } from "@/package.json";
+import { AuthContext } from "@/contexts/AuthProvider";
+import Skeleton from "@/components/skeleton/Skeleton";
 import { useAppUpdates } from "@/hooks/useUpdates";
+import ColorPicker from "@/components/ColorPicker";
 import { alignments } from "@/constants/settings";
+import type { Mimetypes } from "@/types/mimetypes";
+import * as ImagePicker from "expo-image-picker";
 import UserAvatar from "@/components/UserAvatar";
 import TextInput from "@/components/TextInput";
 import * as FileSystem from "expo-file-system";
@@ -40,19 +46,14 @@ import {
 	editCurrentUser,
 	type EditUserOptions,
 } from "@/functions/zipline/user";
-import ColorPicker from "@/components/ColorPicker";
-import { getVersion } from "@/functions/zipline/version";
-import Skeleton from "@/components/skeleton/Skeleton";
-import SkeletonTextInput from "@/components/skeleton/TextInput";
-import SkeletonTable from "@/components/skeleton/Table";
-import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
-import VersionDisplay from "@/components/VersionDisplay";
-import { AuthContext } from "@/contexts/AuthProvider";
-import * as ImagePicker from "expo-image-picker"
-import type { Mimetypes } from "@/types/mimetypes";
 
 export default function UserSettings() {
-	const { updateAuth, updateUser, user, avatar: currentAvatar } = useContext(AuthContext)
+	const {
+		updateAuth,
+		updateUser,
+		user,
+		avatar: currentAvatar,
+	} = useContext(AuthContext);
 
 	const {
 		checkForUpdates,
@@ -67,8 +68,10 @@ export default function UserSettings() {
 	useAuth();
 	useShareIntent();
 
-	const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions()
-	const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions()
+	const [mediaLibraryPermission, requestMediaLibraryPermission] =
+		ImagePicker.useMediaLibraryPermissions();
+	const [cameraPermission, requestCameraPermission] =
+		ImagePicker.useCameraPermissions();
 
 	const [updateAlertDisabled, setUpdateAlertDisabled] = useState<boolean>(
 		db.get("disableUpdateAlert") === "true",
@@ -504,10 +507,20 @@ export default function UserSettings() {
 							rippleColor="gray"
 							text="Upload Image"
 							onPress={async () => {
-								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestMediaLibraryPermission();
+								if (
+									mediaLibraryPermission?.status ===
+									ImagePicker.PermissionStatus.UNDETERMINED
+								)
+									await requestMediaLibraryPermission();
 
-								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.DENIED) {
-									return ToastAndroid.show("Media Library permission is required to select an avatar", ToastAndroid.LONG);
+								if (
+									mediaLibraryPermission?.status ===
+									ImagePicker.PermissionStatus.DENIED
+								) {
+									return ToastAndroid.show(
+										"Media Library permission is required to select an avatar",
+										ToastAndroid.LONG,
+									);
 								}
 
 								const output = await ImagePicker.launchImageLibraryAsync({
@@ -519,7 +532,7 @@ export default function UserSettings() {
 									base64: true,
 									defaultTab: "photos",
 									exif: false,
-								})
+								});
 
 								if (output.canceled || output.assets.length <= 0) {
 									setAvatar(undefined);
@@ -528,7 +541,7 @@ export default function UserSettings() {
 									return;
 								}
 
-								const image = output.assets[0]
+								const image = output.assets[0];
 
 								const imageURI = image.uri;
 
@@ -539,16 +552,19 @@ export default function UserSettings() {
 								const base64Data = image.base64 as string;
 
 								const extension = imageURI.split(".").pop();
-								const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+								const mimeType =
+									image.mimeType ||
+									guessExtension(extension as Mimetypes[keyof Mimetypes]);
 
-								const avatarDataURI = `data:${mimeType};base64,${base64Data}`
+								const avatarDataURI = `data:${mimeType};base64,${base64Data}`;
 
 								setAvatar(avatarDataURI || undefined);
 
-								const filename = image.fileName || imageURI.split("/").pop() || "avatar.png";
+								const filename =
+									image.fileName || imageURI.split("/").pop() || "avatar.png";
 
 								setAvatarName(filename);
-								setShowAvatarPopup(false)
+								setShowAvatarPopup(false);
 							}}
 						/>
 
@@ -562,10 +578,20 @@ export default function UserSettings() {
 							rippleColor="gray"
 							text="Take Picture"
 							onPress={async () => {
-								if (cameraPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestCameraPermission();
+								if (
+									cameraPermission?.status ===
+									ImagePicker.PermissionStatus.UNDETERMINED
+								)
+									await requestCameraPermission();
 
-								if (cameraPermission?.status === ImagePicker.PermissionStatus.DENIED) {
-									return ToastAndroid.show("Camera permission is required to take a picture", ToastAndroid.LONG);
+								if (
+									cameraPermission?.status ===
+									ImagePicker.PermissionStatus.DENIED
+								) {
+									return ToastAndroid.show(
+										"Camera permission is required to take a picture",
+										ToastAndroid.LONG,
+									);
 								}
 
 								const output = await ImagePicker.launchCameraAsync({
@@ -576,7 +602,7 @@ export default function UserSettings() {
 									aspect: [1, 1],
 									base64: true,
 									exif: false,
-								})
+								});
 
 								if (output.canceled || output.assets.length <= 0) {
 									setAvatar(undefined);
@@ -585,7 +611,7 @@ export default function UserSettings() {
 									return;
 								}
 
-								const image = output.assets[0]
+								const image = output.assets[0];
 
 								const imageURI = image.uri;
 
@@ -596,16 +622,19 @@ export default function UserSettings() {
 								const base64Data = image.base64 as string;
 
 								const extension = imageURI.split(".").pop();
-								const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+								const mimeType =
+									image.mimeType ||
+									guessExtension(extension as Mimetypes[keyof Mimetypes]);
 
-								const avatarDataURI = `data:${mimeType};base64,${base64Data}`
+								const avatarDataURI = `data:${mimeType};base64,${base64Data}`;
 
 								setAvatar(avatarDataURI || undefined);
 
-								const filename = image.fileName || imageURI.split("/").pop() || "avatar.png";
+								const filename =
+									image.fileName || imageURI.split("/").pop() || "avatar.png";
 
 								setAvatarName(filename);
-								setShowAvatarPopup(false)
+								setShowAvatarPopup(false);
 							}}
 						/>
 					</View>
@@ -694,7 +723,7 @@ export default function UserSettings() {
 									rippleColor="gray"
 									text={avatar ? (avatarName as string) : "Select an Avatar..."}
 									onPress={async () => {
-										setShowAvatarPopup(true)
+										setShowAvatarPopup(true);
 									}}
 								/>
 
@@ -749,7 +778,7 @@ export default function UserSettings() {
 												if (typeof success === "string")
 													return setSaveError(success);
 
-												await updateUser()
+												await updateUser();
 
 												setAvatar(undefined);
 												setAvatarName(null);
@@ -1194,9 +1223,7 @@ export default function UserSettings() {
 								{ziplineVersion && (
 									<View style={styles.versionContainer}>
 										<Text style={styles.subHeaderText}>Zipline Version: </Text>
-										<VersionDisplay
-											versionData={ziplineVersion}
-										/>
+										<VersionDisplay versionData={ziplineVersion} />
 									</View>
 								)}
 
@@ -1345,7 +1372,7 @@ export default function UserSettings() {
 										await db.del("url");
 										await db.del("token");
 
-										await updateAuth()
+										await updateAuth();
 									}}
 									color="#CF4238"
 									text="Logout"

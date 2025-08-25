@@ -1,6 +1,9 @@
 import { type SidebarOption, sidebarOptions } from "@/constants/sidebar";
 import { type RelativePathString, usePathname } from "expo-router";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import { Animated, View, Dimensions } from "react-native";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { AuthContext } from "@/contexts/AuthProvider";
 import { styles } from "@/styles/components/sidebar";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
@@ -12,9 +15,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { AuthContext } from "@/contexts/AuthProvider";
 
 interface Props {
 	open: boolean;
@@ -30,9 +30,9 @@ export default function Sidebar({
 	const router = useRouter();
 
 	const resetShareIntent = useShareIntent(true);
-	const { webSettings } = useContext(ZiplineContext)
+	const { webSettings } = useContext(ZiplineContext);
 
-	const { role } = useContext(AuthContext)
+	const { role } = useContext(AuthContext);
 
 	const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
 	const animatedHeights = useRef<Record<string, Animated.Value>>({}).current;
@@ -44,7 +44,7 @@ export default function Sidebar({
 
 	const invitesEnabled = webSettings
 		? webSettings.config.invites.enabled
-		: false
+		: false;
 
 	const [isAdmin, setIsAdmin] = useState<boolean>(false);
 	const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
@@ -57,7 +57,8 @@ export default function Sidebar({
 				setIsSuperAdmin(false);
 			}
 
-			if (["ADMIN", "SUPERADMIN"].includes(role || "NOT_LOGGED")) setIsAdmin(true);
+			if (["ADMIN", "SUPERADMIN"].includes(role || "NOT_LOGGED"))
+				setIsAdmin(true);
 			if (role === "SUPERADMIN") setIsSuperAdmin(true);
 		})();
 	}, [open]);
@@ -94,9 +95,13 @@ export default function Sidebar({
 				},
 			]}
 		>
-			<View style={{
-				display: displayed ? undefined : "none"
-			}}>{sidebarOptions.map(renderSidebarOptions)}</View>
+			<View
+				style={{
+					display: displayed ? undefined : "none",
+				}}
+			>
+				{sidebarOptions.map(renderSidebarOptions)}
+			</View>
 		</Animated.View>
 	);
 

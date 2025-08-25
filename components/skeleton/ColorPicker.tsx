@@ -1,6 +1,6 @@
 import { styles } from "@/styles/components/colorPicker";
-import { View, Text } from "react-native";
 import Skeleton from "@/components/skeleton/Skeleton";
+import { View, Text } from "react-native";
 
 interface CustomColorPickerProps {
 	description?: string;

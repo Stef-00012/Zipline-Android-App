@@ -1,19 +1,22 @@
-import type { APIURLs, DashURL } from "@/types/zipline";
 import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import { type ExternalPathString, Link } from "expo-router";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { useContext, useEffect, useState } from "react";
+import type { APIURLs, DashURL } from "@/types/zipline";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import SkeletonTable from "@/components/skeleton/Table";
+import Skeleton from "@/components/skeleton/Skeleton";
 import LargeURLView from "@/components/LargeURLView";
 import { timeDifference } from "@/functions/util";
 import { searchKeyNames } from "@/constants/urls";
 import TextInput from "@/components/TextInput";
-import { useContext, useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import Switch from "@/components/Switch";
 import Button from "@/components/Button";
-import Popup from "@/components/Popup";
 import { styles } from "@/styles/urls";
+import Popup from "@/components/Popup";
 import Table from "@/components/Table";
 import {
 	type CreateURLParams,
@@ -23,9 +26,6 @@ import {
 	editURL,
 	getURLs,
 } from "@/functions/zipline/urls";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 export type URLActions =
 	| "copyShortLink"
@@ -38,7 +38,7 @@ const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 export default function Urls() {
 	useAuth();
 	useShareIntent();
-	const { webSettings } = useContext(ZiplineContext)
+	const { webSettings } = useContext(ZiplineContext);
 
 	const urlsCompactView = db.get("urlsCompactView");
 

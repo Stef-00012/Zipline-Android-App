@@ -1,6 +1,6 @@
+import { styles } from "@/styles/components/domain";
 import { Text, View } from "react-native";
 import Button from "@/components/Button";
-import { styles } from "@/styles/components/domain";
 
 interface Props {
 	domain: string;

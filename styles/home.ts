@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
 	},
 	recentFileContainer: {
 		marginHorizontal: 10,
-		marginVertical: 7.5
+		marginVertical: 7.5,
 	},
 	headerText: {
 		marginTop: 5,
@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 10,
 		marginHorizontal: 4,
-		marginVertical: 7.5
+		marginVertical: 7.5,
 	},
 	tableText: {
 		color: "white",

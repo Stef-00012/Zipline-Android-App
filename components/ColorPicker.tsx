@@ -91,7 +91,8 @@ export default function ColorPicker({
 }: CustomColorPickerProps) {
 	const [showPicker, setShowPicker] = useState<boolean>(false);
 	const [color, setColor] = useState<string>(initialColor || "#ffffff");
-	const [selectedColorData, setSelectedColorData] = useState<ColorFormatsObject>();
+	const [selectedColorData, setSelectedColorData] =
+		useState<ColorFormatsObject>();
 	const [panelType, setPanelType] = useState<PanelType>();
 	const [panelComponent, setPanelComponent] =
 		useState<PanelComponent>("panel1");

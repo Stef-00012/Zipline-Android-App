@@ -1,34 +1,34 @@
+import { View, Text, ToastAndroid, ScrollView, Pressable } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
+import { settings as zlSettings } from "@/constants/adminSettings";
+import type { APISettings, ExternalLink } from "@/types/zipline";
+import { convertToBytes, convertToTime } from "@/functions/util";
+import SkeletonTextInput from "@/components/skeleton/TextInput";
+import { parseMarkdownLinks } from "@/functions/componentUtil";
+import { useState, useEffect, type ReactNode } from "react";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import Skeleton from "@/components/skeleton/Skeleton";
+import ExternalUrl from "@/components/ExternalUrl";
+import ColorPicker from "@/components/ColorPicker";
+import { styles } from "@/styles/admin/settings";
+import TextInput from "@/components/TextInput";
+import { useAuth } from "@/hooks/useAuth";
+import Select from "@/components/Select";
+import Switch from "@/components/Switch";
+import Button from "@/components/Button";
+import Domain from "@/components/Domain";
+import Popup from "@/components/Popup";
 import {
 	getSettings,
 	reloadSettings,
 	updateSettings,
 } from "@/functions/zipline/settings";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { settings as zlSettings } from "@/constants/adminSettings";
-import { convertToBytes, convertToTime } from "@/functions/util";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { View, Text, ToastAndroid, ScrollView, Pressable } from "react-native";
-import type { APISettings, ExternalLink } from "@/types/zipline";
-import ExternalUrl from "@/components/ExternalUrl";
-import { styles } from "@/styles/admin/settings";
-import TextInput from "@/components/TextInput";
-import { useState, useEffect, type ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import Select from "@/components/Select";
-import Switch from "@/components/Switch";
-import Button from "@/components/Button";
 import type {
 	SaveCategories,
 	SaveSettings,
 	Setting,
 } from "@/constants/adminSettings";
-import Popup from "@/components/Popup";
-import ColorPicker from "@/components/ColorPicker";
-import SkeletonTextInput from "@/components/skeleton/TextInput";
-import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
-import Skeleton from "@/components/skeleton/Skeleton";
-import { parseMarkdownLinks } from "@/functions/componentUtil";
-import Domain from "@/components/Domain";
 
 const urlRegex = /http(s)?:\/\/(.+)\.(.+)/;
 

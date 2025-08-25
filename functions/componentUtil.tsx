@@ -1,7 +1,7 @@
 import { type ExternalPathString, Link } from "expo-router";
-import { Text } from "react-native";
-import type { ReactNode } from "react";
 import type { StyleProp, TextStyle } from "react-native";
+import type { ReactNode } from "react";
+import { Text } from "react-native";
 
 export function parseMarkdownLinks(
 	input: string,
@@ -19,12 +19,10 @@ export function parseMarkdownLinks(
 			url: string;
 		};
 
-		// Add text before the match
 		if (match.index > lastIndex) {
 			parts.push(input.slice(lastIndex, match.index));
 		}
 
-		// Add the Link component
 		parts.push(
 			<Link
 				key={url + match.index}
@@ -38,7 +36,6 @@ export function parseMarkdownLinks(
 		lastIndex = regex.lastIndex;
 	}
 
-	// Add remaining text after the last match
 	if (lastIndex < input.length) {
 		parts.push(input.slice(lastIndex));
 	}

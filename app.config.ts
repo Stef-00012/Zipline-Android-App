@@ -76,9 +76,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				disableIOS: true,
 			},
 		],
-		[
-			"expo-image-picker"
-		]
+		["expo-image-picker"],
 	],
 	experiments: {
 		typedRoutes: true,

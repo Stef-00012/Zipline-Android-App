@@ -522,7 +522,13 @@ export interface APIPublicSettings {
 	tos?: string | null;
 	files: {
 		maxFileSize: string;
-		defaultFormat: "uuid" | "date" | "random" | "name" | "gfycat" | "random-words";
+		defaultFormat:
+			| "uuid"
+			| "date"
+			| "random"
+			| "name"
+			| "gfycat"
+			| "random-words";
 	};
 	chunks: {
 		max?: string;
@@ -550,7 +556,13 @@ export interface APIWebSettings {
 		files: {
 			route: string;
 			length: number;
-			defaultFormat: "uuid" | "date" | "random" | "name" | "gfycat" | "random-words";
+			defaultFormat:
+				| "uuid"
+				| "date"
+				| "random"
+				| "name"
+				| "gfycat"
+				| "random-words";
 			disabledExtensions: string[];
 			maxFileSize: string;
 			defaultExpiration: string | null;

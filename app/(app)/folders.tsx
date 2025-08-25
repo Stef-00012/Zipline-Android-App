@@ -1,8 +1,16 @@
+import {
+	createFolder,
+	deleteFolder,
+	editFolder,
+	getFolders,
+} from "@/functions/zipline/folders";
 import { type ExternalPathString, Link, useRouter } from "expo-router";
 import { Text, View, ToastAndroid, ScrollView } from "react-native";
 import type { APIFolders, DashURL } from "@/types/zipline";
 import LargeFolderView from "@/components/LargeFolderView";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import SkeletonTable from "@/components/skeleton/Table";
+import Skeleton from "@/components/skeleton/Skeleton";
 import { searchKeyNames } from "@/constants/folders";
 import { timeDifference } from "@/functions/util";
 import TextInput from "@/components/TextInput";
@@ -15,14 +23,6 @@ import Switch from "@/components/Switch";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
 import Table from "@/components/Table";
-import {
-	createFolder,
-	deleteFolder,
-	editFolder,
-	getFolders,
-} from "@/functions/zipline/folders";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
 
 export type FolderActions =
 	| "viewFiles"

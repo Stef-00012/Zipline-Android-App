@@ -1,20 +1,24 @@
 import { colorHash, convertToBytes, timeDifference } from "@/functions/util";
+import { getFolder, getFolders } from "@/functions/zipline/folders";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import { getFolder, getFolders } from "@/functions/zipline/folders";
+import SkeletonTable from "@/components/skeleton/Table";
 import { getUser } from "@/functions/zipline/users";
 import { searchKeyNames } from "@/constants/files";
+import ColorPicker from "@/components/ColorPicker";
 import FileDisplay from "@/components/FileDisplay";
 import { isLightColor } from "@/functions/color";
 import TextInput from "@/components/TextInput";
 import * as FileSystem from "expo-file-system";
+import { colors } from "@/constants/skeleton";
 import { styles } from "@/styles/files/files";
 import CheckBox from "@/components/CheckBox";
 import { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
+import { Skeleton } from "moti/skeleton";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
 import Table from "@/components/Table";
@@ -45,10 +49,6 @@ import {
 	ToastAndroid,
 	View,
 } from "react-native";
-import ColorPicker from "@/components/ColorPicker";
-import SkeletonTable from "@/components/skeleton/Table";
-import { Skeleton } from "moti/skeleton";
-import { colors } from "@/constants/skeleton";
 
 export default function Files() {
 	const router = useRouter();

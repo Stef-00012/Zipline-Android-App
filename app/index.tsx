@@ -1,25 +1,25 @@
-import { getRecentFiles } from "@/functions/zipline/user";
 import LargeFileDisplay from "@/components/LargeFileDisplay";
+import { getRecentFiles } from "@/functions/zipline/user";
 import { getUserStats } from "@/functions/zipline/stats";
+import { useContext, useEffect, useState } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import SkeletonTable from "@/components/skeleton/Table";
 import { Text, View, ScrollView } from "react-native";
+import { AuthContext } from "@/contexts/AuthProvider";
+import Skeleton from "@/components/skeleton/Skeleton";
 import { useAppUpdates } from "@/hooks/useUpdates";
 import FileDisplay from "@/components/FileDisplay";
 import { convertToBytes } from "@/functions/util";
-import { useContext, useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { useAuth } from "@/hooks/useAuth";
 import { styles } from "@/styles/home";
 import Table from "@/components/Table";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
 import type {
 	APIFile,
 	APIRecentFiles,
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
-import { AuthContext } from "@/contexts/AuthProvider";
 
 // ------------------------ DEV -------------------------
 
@@ -33,7 +33,7 @@ export default function Home() {
 
 	useAppUpdates();
 
-	const { user } = useContext(AuthContext)
+	const { user } = useContext(AuthContext);
 
 	const url = db.get("url") as DashURL | null;
 
@@ -157,7 +157,10 @@ export default function Home() {
 									))}
 								</ScrollView>
 							) : (
-								<Text style={styles.subHeader}>You have no recent files. The last three files you uploaded will appear here.</Text>
+								<Text style={styles.subHeader}>
+									You have no recent files. The last three files you uploaded
+									will appear here.
+								</Text>
 							)}
 						</View>
 					)}

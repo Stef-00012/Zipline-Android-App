@@ -1,6 +1,8 @@
+import { Directory, Paths } from "expo-file-system/next";
 import * as FileSystem from "expo-file-system";
 import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
+import bytes from "bytes";
 import type {
 	APIFile,
 	APIFiles,
@@ -11,8 +13,6 @@ import type {
 	APIUploadPartialResponse,
 	APIUploadResponse,
 } from "@/types/zipline";
-import bytes from "bytes";
-import { Directory, Paths } from "expo-file-system/next";
 
 export interface GetFilesOptions {
 	id?: string;

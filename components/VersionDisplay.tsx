@@ -1,13 +1,13 @@
 import { styles } from "@/styles/components/versionDisplay";
+import { type ExternalPathString, Link } from "expo-router";
 import type { /*APIUser,*/ APIVersion } from "@/types/zipline";
 import { /*useContext, useEffect,*/ useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Popup from "./Popup";
-import { type ExternalPathString, Link } from "expo-router";
-// import Table from "./Table";
-import Button from "./Button";
-import { openURL } from "expo-linking";
 // import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { openURL } from "expo-linking";
+import Button from "./Button";
+import Popup from "./Popup";
+// import Table from "./Table";
 
 interface Props {
 	versionData: APIVersion;

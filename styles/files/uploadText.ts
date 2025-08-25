@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
 	readText: {
 		color: "#dac614ff",
 		fontWeight: "bold",
-		textAlign: "center"
+		textAlign: "center",
 	},
 	selectText: {
 		flex: 1,

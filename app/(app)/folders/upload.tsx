@@ -1,37 +1,37 @@
+import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
+import type { APIFolder, APIUploadResponse, DashURL } from "@/types/zipline";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
+import type { SelectedFile } from "@/app/(app)/(files)/upload/file";
+import { Directory, File, Paths } from "expo-file-system/next";
+import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { getFolder } from "@/functions/zipline/folders";
+import { useContext, useEffect, useState } from "react";
+import * as DocumentPicker from "expo-document-picker";
+import { dates, formats } from "@/constants/upload";
+import type { Mimetypes } from "@/types/mimetypes";
+import FileDisplay from "@/components/FileDisplay";
+import { guessExtension } from "@/functions/util";
+import { styles } from "@/styles/folders/upload";
+import * as FileSystem from "expo-file-system";
+import TextInput from "@/components/TextInput";
+import * as Clipboard from "expo-clipboard";
+import * as db from "@/functions/database";
+import Button from "@/components/Button";
+import Select from "@/components/Select";
+import Switch from "@/components/Switch";
+import Popup from "@/components/Popup";
 import {
 	type ExternalPathString,
 	Link,
 	useLocalSearchParams,
 	useRouter,
 } from "expo-router";
-import { getFolder } from "@/functions/zipline/folders";
-import { ScrollView, Text, ToastAndroid, View } from "react-native";
-import { useContext, useEffect, useState } from "react";
-import type { APIFolder, APIUploadResponse, DashURL } from "@/types/zipline";
-import type { SelectedFile } from "@/app/(app)/(files)/upload/file";
-import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
-import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
-import * as DocumentPicker from "expo-document-picker";
-import Popup from "@/components/Popup";
-import * as Clipboard from "expo-clipboard";
-import * as FileSystem from "expo-file-system";
-import Button from "@/components/Button";
-import FileDisplay from "@/components/FileDisplay";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import Select from "@/components/Select";
-import { dates, formats } from "@/constants/upload";
-import TextInput from "@/components/TextInput";
-import Switch from "@/components/Switch";
-import { guessExtension } from "@/functions/util";
-import type { Mimetypes } from "@/types/mimetypes";
-import { styles } from "@/styles/folders/upload";
-import * as db from "@/functions/database";
-import { Directory, File, Paths } from "expo-file-system/next";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
 
 export default function FolderUpload() {
 	const router = useRouter();
-	const { webSettings, publicSettings } = useContext(ZiplineContext)
+	const { webSettings, publicSettings } = useContext(ZiplineContext);
 
 	const searchParams = useLocalSearchParams<{
 		folderId?: string;
@@ -67,31 +67,22 @@ export default function FolderUpload() {
 	const [fileName, setFileName] = useState<UploadFileOptions["filename"]>();
 	const [password, setPassword] = useState<UploadFileOptions["password"]>();
 
-	const chunkSize = webSettings
-		? webSettings.config.chunks.size
-		: "25mb"
+	const chunkSize = webSettings ? webSettings.config.chunks.size : "25mb";
 
-	const maxChunkSize = webSettings
-		? webSettings.config.chunks.max
-		: "95mb"
+	const maxChunkSize = webSettings ? webSettings.config.chunks.max : "95mb";
 
-	const chunksEnabled = webSettings
-		? webSettings.config.chunks.enabled
-		: false
+	const chunksEnabled = webSettings ? webSettings.config.chunks.enabled : false;
 
 	const defaultFormat = webSettings
 		? webSettings.config.files.defaultFormat
 		: "random";
 
-	const domainList = publicSettings
-		? publicSettings.domains ?? []
-		: []
+	const domainList = publicSettings ? (publicSettings.domains ?? []) : [];
 
-	const domains = domainList
-		.map((domain) => ({
-			label: domain,
-			value: domain
-		}))
+	const domains = domainList.map((domain) => ({
+		label: domain,
+		value: domain,
+	}));
 
 	const [uploadButtonDisabled, setUploadButtonDisabled] =
 		useState<boolean>(true);
@@ -245,7 +236,11 @@ export default function FolderUpload() {
 					</View>
 				</View>
 
-				{isCopying && <Text style={styles.copyText}>Preparing your files... This may take a few moments</Text>}
+				{isCopying && (
+					<Text style={styles.copyText}>
+						Preparing your files... This may take a few moments
+					</Text>
+				)}
 
 				<ScrollView
 					horizontal
@@ -312,27 +307,27 @@ export default function FolderUpload() {
 									),
 							);
 
-						const cacheDir = new Directory(Paths.cache)
-						
-						setIsCopying(true)
+						const cacheDir = new Directory(Paths.cache);
+
+						setIsCopying(true);
 
 						for (const file of newSelectedFiles) {
 							const fileSAFURI = file.uri;
-							const outputURI = `${cacheDir.uri}/${file.name}`
+							const outputURI = `${cacheDir.uri}/${file.name}`;
 
-							const outputFile = await FileSystem.getInfoAsync(outputURI)
+							const outputFile = await FileSystem.getInfoAsync(outputURI);
 
-							if (outputFile.exists) await FileSystem.deleteAsync(outputURI)
-							
+							if (outputFile.exists) await FileSystem.deleteAsync(outputURI);
+
 							await FileSystem.copyAsync({
 								from: fileSAFURI,
 								to: outputURI,
-							})
+							});
 
-							file.uri = outputURI
+							file.uri = outputURI;
 						}
 
-						setIsCopying(false)
+						setIsCopying(false);
 
 						setSelectedFiles((alreadySelectedFiles) => [
 							...alreadySelectedFiles,
@@ -340,8 +335,8 @@ export default function FolderUpload() {
 						]);
 					}}
 					text="Select File(s)"
-					color={(uploading || isCopying) ? "#373d79" : "#323ea8"}
-					textColor={(uploading || isCopying) ? "gray" : "white"}
+					color={uploading || isCopying ? "#373d79" : "#323ea8"}
+					textColor={uploading || isCopying ? "gray" : "white"}
 					margin={{
 						left: "auto",
 						right: "auto",
@@ -476,7 +471,9 @@ export default function FolderUpload() {
 						},
 						...domains,
 					]}
-					defaultValue={domains.find((domain) => domain.value === overrideDomain)}
+					defaultValue={domains.find(
+						(domain) => domain.value === overrideDomain,
+					)}
 					disabled={uploading || isCopying}
 					placeholder="Select Domain..."
 					onSelect={(selectedDomain) => {
@@ -560,7 +557,7 @@ export default function FolderUpload() {
 								{
 									chunksEnabled,
 									chunkSize,
-									maxChunkSize
+									maxChunkSize,
 								},
 								{
 									compression,
@@ -605,8 +602,14 @@ export default function FolderUpload() {
 					text={
 						uploading ? `Uploading... ${uploadPercentage}%` : "Upload File(s)"
 					}
-					color={uploading || isCopying || uploadButtonDisabled ? "#373d79" : "#323ea8"}
-					textColor={uploading || isCopying || uploadButtonDisabled ? "gray" : "white"}
+					color={
+						uploading || isCopying || uploadButtonDisabled
+							? "#373d79"
+							: "#323ea8"
+					}
+					textColor={
+						uploading || isCopying || uploadButtonDisabled ? "gray" : "white"
+					}
 					margin={{
 						left: "auto",
 						right: "auto",

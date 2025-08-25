@@ -1,8 +1,8 @@
+import { type ColorValue, View, Text, type DimensionValue } from "react-native";
 import type { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "@/styles/components/textInput";
-import Button from "@/components/Button";
-import { type ColorValue, View, Text, type DimensionValue } from "react-native";
 import Skeleton from "@/components/skeleton/Skeleton";
+import Button from "@/components/Button";
 import type { ReactNode } from "react";
 
 interface Props {

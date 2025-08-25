@@ -3,7 +3,11 @@ import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { guessExtension, timeDifference } from "@/functions/util";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntent } from "@/hooks/useShareIntent";
+import SkeletonTable from "@/components/skeleton/Table";
 import LargeUserView from "@/components/LargeUserView";
+import Skeleton from "@/components/skeleton/Skeleton";
+import type { Mimetypes } from "@/types/mimetypes";
+import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
 import { styles } from "@/styles/admin/users";
@@ -29,10 +33,6 @@ import type {
 	APIUsersNoIncl,
 	DashURL,
 } from "@/types/zipline";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
-import * as ImagePicker from "expo-image-picker"
-import type { Mimetypes } from "@/types/mimetypes";
 
 export type UserActions = "viewFiles" | "edit" | "delete";
 
@@ -42,7 +42,8 @@ export default function Users() {
 
 	const usersCompactView = db.get("usersCompactView");
 
-	const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions()
+	const [mediaLibraryPermission, requestMediaLibraryPermission] =
+		ImagePicker.useMediaLibraryPermissions();
 
 	const [showSearch, setShowSearch] = useState<boolean>(false);
 	const [searchTerm, setSearchTerm] = useState<string>("");
@@ -223,12 +224,22 @@ export default function Users() {
 										: "Select an Avatar..."
 								}
 								onPress={async () => {
-									if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestMediaLibraryPermission();
-									
-									if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.DENIED) {
-										return ToastAndroid.show("Media Library permission is required to select an avatar", ToastAndroid.LONG);
+									if (
+										mediaLibraryPermission?.status ===
+										ImagePicker.PermissionStatus.UNDETERMINED
+									)
+										await requestMediaLibraryPermission();
+
+									if (
+										mediaLibraryPermission?.status ===
+										ImagePicker.PermissionStatus.DENIED
+									) {
+										return ToastAndroid.show(
+											"Media Library permission is required to select an avatar",
+											ToastAndroid.LONG,
+										);
 									}
-	
+
 									const output = await ImagePicker.launchImageLibraryAsync({
 										mediaTypes: ["images"],
 										allowsEditing: true,
@@ -238,7 +249,7 @@ export default function Users() {
 										base64: true,
 										defaultTab: "photos",
 										exif: false,
-									})
+									});
 
 									if (output.canceled || !output.assets) {
 										setEditAvatar(undefined);
@@ -247,7 +258,7 @@ export default function Users() {
 										return;
 									}
 
-									const image = output.assets[0]
+									const image = output.assets[0];
 
 									const imageURI = image.uri;
 
@@ -258,9 +269,11 @@ export default function Users() {
 									const base64Data = image.base64 as string;
 
 									const extension = imageURI.split(".").pop();
-									const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+									const mimeType =
+										image.mimeType ||
+										guessExtension(extension as Mimetypes[keyof Mimetypes]);
 
-									const avatarDataURI = `data:${mimeType};base64,${base64Data}`
+									const avatarDataURI = `data:${mimeType};base64,${base64Data}`;
 
 									setEditAvatar(avatarDataURI || undefined);
 
@@ -476,10 +489,20 @@ export default function Users() {
 									: "Select an Avatar..."
 							}
 							onPress={async () => {
-								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestMediaLibraryPermission();
-								
-								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.DENIED) {
-									return ToastAndroid.show("Media Library permission is required to select an avatar", ToastAndroid.LONG);
+								if (
+									mediaLibraryPermission?.status ===
+									ImagePicker.PermissionStatus.UNDETERMINED
+								)
+									await requestMediaLibraryPermission();
+
+								if (
+									mediaLibraryPermission?.status ===
+									ImagePicker.PermissionStatus.DENIED
+								) {
+									return ToastAndroid.show(
+										"Media Library permission is required to select an avatar",
+										ToastAndroid.LONG,
+									);
 								}
 
 								const output = await ImagePicker.launchImageLibraryAsync({
@@ -491,7 +514,7 @@ export default function Users() {
 									base64: true,
 									defaultTab: "photos",
 									exif: false,
-								})
+								});
 
 								if (output.canceled || !output.assets) {
 									setNewUserAvatar(undefined);
@@ -500,7 +523,7 @@ export default function Users() {
 									return;
 								}
 
-								const image = output.assets[0]
+								const image = output.assets[0];
 
 								const imageURI = image.uri;
 
@@ -509,11 +532,13 @@ export default function Users() {
 								if (!fileInfo.exists) return;
 
 								const base64Data = image.base64 as string;
-								
-								const extension = imageURI.split(".").pop();
-								const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
 
-								const avatarDataURI = `data:${mimeType};base64,${base64Data}`
+								const extension = imageURI.split(".").pop();
+								const mimeType =
+									image.mimeType ||
+									guessExtension(extension as Mimetypes[keyof Mimetypes]);
+
+								const avatarDataURI = `data:${mimeType};base64,${base64Data}`;
 
 								setNewUserAvatar(avatarDataURI || undefined);
 

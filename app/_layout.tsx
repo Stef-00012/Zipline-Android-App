@@ -1,17 +1,17 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ZiplineProvider from "@/contexts/ZiplineProvider";
 import { ShareIntentProvider } from "expo-share-intent";
 import NetInfo from "@react-native-community/netinfo";
+import AuthProvider from "@/contexts/AuthProvider";
 import { Slot, useRouter } from "expo-router";
+import { Host } from "react-native-portalize";
 import { styles } from "@/styles/noInternet";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Header from "@/components/Header";
-import { Host } from "react-native-portalize";
-import AuthProvider from "@/contexts/AuthProvider";
-import ZiplineProvider from "@/contexts/ZiplineProvider";
 
 export default function Layout() {
 	const router = useRouter();

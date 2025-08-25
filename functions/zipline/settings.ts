@@ -1,7 +1,11 @@
 import { settingNames } from "@/constants/adminSettings";
-import type { APIPublicSettings, APISettings, APIWebSettings } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
+import type {
+	APIPublicSettings,
+	APISettings,
+	APIWebSettings,
+} from "@/types/zipline";
 
 // GET /api/server/settings
 export async function getSettings(): Promise<APISettings | string> {

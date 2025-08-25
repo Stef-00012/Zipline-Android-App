@@ -1,6 +1,6 @@
 import type { APISettings, ShortenEmbed, UploadEmbed } from "@/types/zipline";
-import type { SelectProps } from "@/components/Select";
 import type { DimensionValue, KeyboardType } from "react-native";
+import type { SelectProps } from "@/components/Select";
 
 export const defaultUploadEmbed: UploadEmbed = {
 	imageOrVideo: false,

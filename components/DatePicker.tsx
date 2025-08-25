@@ -33,12 +33,15 @@ export default function DatePicker(props: Props) {
 
 	return (
 		<Popup hidden={!open} onClose={onClose}>
-			<DateTimePicker {...defaultProps} styles={{
-				month_selector_label: styles.monthSelectorLabel,
-				year_selector_label: styles.yearSelectorLabel,
-				weekday_label: styles.weekdayLabel,
-				day_label: styles.dayLabel
-			}} />
+			<DateTimePicker
+				{...defaultProps}
+				styles={{
+					month_selector_label: styles.monthSelectorLabel,
+					year_selector_label: styles.yearSelectorLabel,
+					weekday_label: styles.weekdayLabel,
+					day_label: styles.dayLabel,
+				}}
+			/>
 
 			{props.children}
 

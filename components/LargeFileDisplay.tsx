@@ -6,6 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { getTags } from "@/functions/zipline/tags";
 import { convertToBytes } from "@/functions/util";
 import { isLightColor } from "@/functions/color";
+import { Portal } from "react-native-portalize";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
 import { useEffect, useState } from "react";
@@ -39,7 +40,6 @@ import {
 	View,
 	BackHandler,
 } from "react-native";
-import { Portal } from "react-native-portalize";
 
 interface Props {
 	file: APIFile;
@@ -87,14 +87,17 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		if (!hidden) {
-			const { remove } = BackHandler.addEventListener("hardwareBackPress", () => {
-				onClose();
-				remove();
+			const { remove } = BackHandler.addEventListener(
+				"hardwareBackPress",
+				() => {
+					onClose();
+					remove();
 
-				return true;
-			})
+					return true;
+				},
+			);
 		}
-	}, [hidden])
+	}, [hidden]);
 
 	useEffect(() => {
 		(async () => {
@@ -334,7 +337,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 					<View style={styles.popupContainer}>
 						<Text style={styles.fileHeader}>{file.name}</Text>
 
-						<KeyboardAwareScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="always">
+						<KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
 							{fileContent ? (
 								<TextInput
 									multiline

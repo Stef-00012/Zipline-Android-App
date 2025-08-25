@@ -27,17 +27,17 @@ export const styles = StyleSheet.create({
 	},
 	monthSelectorLabel: {
 		color: "white",
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	yearSelectorLabel: {
 		color: "white",
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	weekdayLabel: {
 		color: "gray",
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	dayLabel: {
-		color: "white"
+		color: "white",
 	},
 });

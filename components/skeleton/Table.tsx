@@ -1,8 +1,8 @@
+import { ScrollView, Text, View, type DimensionValue } from "react-native";
 import { Table as NativeTable, Row } from "react-native-reanimated-table";
 import { styles } from "@/styles/components/table";
-import { Skeleton } from "moti/skeleton";
 import { colors } from "@/constants/skeleton";
-import { ScrollView, Text, View, type DimensionValue } from "react-native";
+import { Skeleton } from "moti/skeleton";
 import type { ReactNode } from "react";
 
 interface Props {

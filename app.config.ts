@@ -28,7 +28,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	name: `Zipline${environmentAppName}`,
 	slug: "zipline",
 	version: appVersion,
-	// orientation: "portrait",
+	orientation: "portrait",
 	icon: `./assets/images${environmentAssetsPath}/icon.png`,
 	scheme: "zipline",
 	newArchEnabled: true,
@@ -77,13 +77,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			},
 		],
 		[
-			"react-native-vision-camera",
-			{
-				cameraPermissionText: "$(PRODUCT_NAME) needs access to your Camera.",
-				enableMicrophonePermission: true,
-				microphonePermissionText: "$(PRODUCT_NAME) needs access to your Microphone.",
-			},
-		],
+			"expo-image-picker"
+		]
 	],
 	experiments: {
 		typedRoutes: true,

@@ -40,6 +40,8 @@ export default function Sidebar({
 	const screenWidth = Dimensions.get("window").width;
 	const translateX = useRef(new Animated.Value(-screenWidth)).current;
 
+	const [displayed, setDisplayed] = useState<boolean>(open);
+
 	const invitesEnabled = webSettings
 		? webSettings.config.invites.enabled
 		: false
@@ -68,6 +70,13 @@ export default function Sidebar({
 			duration: 300,
 			useNativeDriver: true,
 		}).start();
+
+		if (open) setDisplayed(true);
+		else {
+			setTimeout(() => {
+				setDisplayed(false);
+			}, 300);
+		}
 	}, [open, screenWidth, translateX]);
 
 	return (
@@ -85,7 +94,9 @@ export default function Sidebar({
 				},
 			]}
 		>
-			<View>{sidebarOptions.map(renderSidebarOptions)}</View>
+			<View style={{
+				display: displayed ? undefined : "none"
+			}}>{sidebarOptions.map(renderSidebarOptions)}</View>
 		</Animated.View>
 	);
 

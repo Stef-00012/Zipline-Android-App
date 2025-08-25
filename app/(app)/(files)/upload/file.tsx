@@ -1,7 +1,7 @@
 import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { type ExternalPathString, Link, useRouter } from "expo-router";
-import { ScrollView, Text, View, ToastAndroid, BackHandler } from "react-native";
+import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import type { Preset, APIUploadResponse } from "@/types/zipline";
 import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
 import { getFolders } from "@/functions/zipline/folders";
@@ -25,9 +25,7 @@ import Popup from "@/components/Popup";
 import { Directory, File, Paths } from "expo-file-system/next";
 import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import bytes from "bytes";
-import { useCameraPermission, useMicrophonePermission } from "react-native-vision-camera"
-import { HeaderContext } from "@/contexts/HeaderContext";
-import Camera from "@/components/Camera";
+import * as ImagePicker from 'expo-image-picker';
 
 export interface SelectedFile {
 	name: string;
@@ -53,7 +51,6 @@ export default function UploadFile({
 	const router = useRouter();
 	const resetShareIntent = useShareIntent(fromShareIntent);
 	const { webSettings, publicSettings } = useContext(ZiplineContext);
-	const { updateHidden } = useContext(HeaderContext)
 
 	const maxFileSize = webSettings
 		? webSettings.config.files.maxFileSize
@@ -140,9 +137,7 @@ export default function UploadFile({
 	const [editPresetError, setEditPresetError] = useState<string | null>(null);
 	const [presetToEdit, setPresetToEdit] = useState<string | null>(null);
 
-	const { hasPermission: hasCameraPermission, requestPermission: requestCameraPermission } = useCameraPermission()
-	const { hasPermission: hasMicrophonePermission, requestPermission: requestMicrophonePermission } = useMicrophonePermission()
-	const [showCamera, setShowCamera] = useState<boolean>(false);
+	const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
 	useEffect(() => {
 		const bytesMaxFileSize = bytes(maxFileSize) || 0;
@@ -196,45 +191,11 @@ export default function UploadFile({
 	}
 
 	useEffect(() => {
-		if (showCamera) {
-			console.log("show camera true")
-			updateHidden(true)
-
-			const { remove } = BackHandler.addEventListener("hardwareBackPress", () => {
-				setShowCamera(false)
-				remove();
-
-				return true;
-			})
-		} else {
-			updateHidden(false)
-		}
-	}, [showCamera, updateHidden])
-
-	useEffect(() => {
 		setUploadButtonDisabled(selectedFiles.length === 0);
 		setFileNameEnabled(selectedFiles.length <= 1);
 	}, [selectedFiles]);
 
 	const iskeyboardOpen = useDetectKeyboardOpen(false);
-
-	if (showCamera) {
-		return (
-			<Camera
-				microphoneEnabled={hasMicrophonePermission}
-				disableCamera={() => {
-					setShowCamera(false)
-				}}
-				onError={(error) => {
-					setShowCamera(false)
-
-					if (__DEV__) console.error(error);
-
-					ToastAndroid.show("Unable to open the camera", ToastAndroid.LONG)
-				}}
-			/>
-		)
-	}
 
 	return (
 		<View style={styles.mainContainer}>
@@ -485,18 +446,39 @@ export default function UploadFile({
 					<View style={styles.headerButtons}>
 						<Button
 							onPress={async () => {
-								if (!hasCameraPermission) await requestCameraPermission()
-								if (!hasMicrophonePermission) await requestMicrophonePermission()
-
-								if (!hasCameraPermission) {
+								if (cameraPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestCameraPermission()
+								if (cameraPermission?.status === ImagePicker.PermissionStatus.DENIED) {
 									return ToastAndroid.show("Camera permission is denied", ToastAndroid.SHORT)
 								}
 
-								if (!hasMicrophonePermission) {
-									ToastAndroid.show("Microphone permission denied, videos will not have audio", ToastAndroid.SHORT)
-								}
+								const res = await ImagePicker.launchCameraAsync({
+									allowsEditing: true,
+									base64: false,
+									exif: false,
+									mediaTypes: ["videos", "images"],
+									videoMaxDuration: 0,
+									quality: 1
+								})
 
-								setShowCamera(true)
+								if (res.canceled || res.assets.length <= 0) return;
+
+								const image = res.assets[0];
+
+								const date = new Date().toISOString().replace(/:/g, "-");
+								const extension = image.uri.split(".").pop() as string;
+
+								const fileName = `Camera_${date}.${extension}`;
+
+								setSelectedFiles((alreadySelectedFiles) => [
+									...alreadySelectedFiles,
+									{
+										instance: new File(image.uri),
+										name: image.fileName || fileName,
+										uri: image.uri,
+										mimetype: image.mimeType,
+										size: image.fileSize
+									}
+								]);
 							}}
 							icon="camera-alt"
 							color="transparent"

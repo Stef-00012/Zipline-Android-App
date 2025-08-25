@@ -334,7 +334,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 					<View style={styles.popupContainer}>
 						<Text style={styles.fileHeader}>{file.name}</Text>
 
-						<KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+						<KeyboardAwareScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="always">
 							{fileContent ? (
 								<TextInput
 									multiline

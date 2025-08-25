@@ -2,7 +2,6 @@ import { isLightColor, rgbaToHex, toRgba } from "@/functions/color";
 import mimetypesJSON from "@/assets/mimetypes.json";
 import type { Mimetypes } from "@/types/mimetypes";
 import { namedColors } from "@/constants/colors";
-import * as FileSystem from "expo-file-system";
 import ms from "enhanced-ms";
 import bytes from "bytes";
 
@@ -30,20 +29,6 @@ export function guessExtension(
 	if (!mime) return "application/octet-stream";
 
 	return mime[0];
-}
-
-export async function getFileDataURI(filePath: string): Promise<string | null> {
-	const base64Data = await FileSystem.readAsStringAsync(filePath, {
-		encoding: FileSystem.EncodingType.Base64,
-	});
-
-	const extension = filePath.split(".").pop();
-
-	const mimetype = guessExtension(extension as Mimetypes[keyof Mimetypes]);
-
-	const dataURI = `data:${mimetype};base64,${base64Data}`;
-
-	return dataURI;
 }
 
 export function timeDifference(currentDate: Date, targetDate: Date) {

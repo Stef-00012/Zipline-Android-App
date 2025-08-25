@@ -73,11 +73,20 @@ jobs:
             name: app-apk-pre-release
             path: ${{ format('{0}/app-pre-release.apk', github.workspace) }}
 
+      - name: Build Android App AAB
+        run: eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-pre-release.aab
+
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-aab-pre-release
+          path: ${{ github.workspace }}/app-pre-release.aab
+
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
           prerelease: true
-          artifacts: app-pre-release.apk
+          artifacts: app-pre-release.apk,app-pre-release.aab
           artifactContentType: application/vnd.android.package-archive
           tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}-pre"
           generateReleaseNotes: true

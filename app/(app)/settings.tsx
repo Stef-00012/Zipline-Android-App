@@ -5,12 +5,11 @@ import type {
 	DashURL,
 } from "@/types/zipline";
 import { View, Text, Pressable, ToastAndroid } from "react-native";
-import { convertToBytes, getFileDataURI } from "@/functions/util";
+import { convertToBytes, guessExtension } from "@/functions/util";
 import { getTokenWithToken } from "@/functions/zipline/auth";
 import { useState, useEffect, useContext } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import { version as appVersion } from "@/package.json";
-import * as DocumentPicker from "expo-document-picker";
 import { useAppUpdates } from "@/hooks/useUpdates";
 import { alignments } from "@/constants/settings";
 import UserAvatar from "@/components/UserAvatar";
@@ -49,6 +48,8 @@ import SkeletonTable from "@/components/skeleton/Table";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import VersionDisplay from "@/components/VersionDisplay";
 import { AuthContext } from "@/contexts/AuthProvider";
+import * as ImagePicker from "expo-image-picker"
+import type { Mimetypes } from "@/types/mimetypes";
 
 export default function UserSettings() {
 	const { updateAuth, updateUser, user, avatar: currentAvatar } = useContext(AuthContext)
@@ -65,6 +66,9 @@ export default function UserSettings() {
 
 	useAuth();
 	useShareIntent();
+
+	const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions()
+	const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions()
 
 	const [updateAlertDisabled, setUpdateAlertDisabled] = useState<boolean>(
 		db.get("disableUpdateAlert") === "true",
@@ -124,6 +128,8 @@ export default function UserSettings() {
 
 	const [generateThumbnailsRerun, setGenerateThumbnailsRerun] =
 		useState<boolean>(false);
+
+	const [showAvatarPopup, setShowAvatarPopup] = useState<boolean>(false);
 
 	const [ziplineVersion, setZiplineVersion] = useState<APIVersion | null>(null);
 
@@ -479,6 +485,136 @@ export default function UserSettings() {
 					</Text>
 				</Popup>
 
+				<Popup
+					hidden={!showAvatarPopup}
+					onClose={() => {
+						setShowAvatarPopup(false);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Select Avatar</Text>
+
+						<Button
+							color="transparent"
+							borderWidth={2}
+							borderColor="#222c47"
+							margin={{
+								top: 5,
+							}}
+							rippleColor="gray"
+							text="Upload Image"
+							onPress={async () => {
+								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestMediaLibraryPermission();
+
+								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.DENIED) {
+									return ToastAndroid.show("Media Library permission is required to select an avatar", ToastAndroid.LONG);
+								}
+
+								const output = await ImagePicker.launchImageLibraryAsync({
+									mediaTypes: ["images"],
+									allowsEditing: true,
+									allowsMultipleSelection: false,
+									quality: 1,
+									aspect: [1, 1],
+									base64: true,
+									defaultTab: "photos",
+									exif: false,
+								})
+
+								if (output.canceled || output.assets.length <= 0) {
+									setAvatar(undefined);
+									setAvatarName(null);
+
+									return;
+								}
+
+								const image = output.assets[0]
+
+								const imageURI = image.uri;
+
+								const fileInfo = await FileSystem.getInfoAsync(imageURI);
+
+								if (!fileInfo.exists) return;
+
+								const base64Data = image.base64 as string;
+
+								const extension = imageURI.split(".").pop();
+								const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+
+								const avatarDataURI = `data:${mimeType};base64,${base64Data}`
+
+								setAvatar(avatarDataURI || undefined);
+
+								const filename = image.fileName || imageURI.split("/").pop() || "avatar.png";
+
+								setAvatarName(filename);
+								setShowAvatarPopup(false)
+							}}
+						/>
+
+						<Button
+							color="transparent"
+							borderWidth={2}
+							borderColor="#222c47"
+							margin={{
+								top: 5,
+							}}
+							rippleColor="gray"
+							text="Take Picture"
+							onPress={async () => {
+								if (cameraPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestCameraPermission();
+
+								if (cameraPermission?.status === ImagePicker.PermissionStatus.DENIED) {
+									return ToastAndroid.show("Camera permission is required to take a picture", ToastAndroid.LONG);
+								}
+
+								const output = await ImagePicker.launchCameraAsync({
+									mediaTypes: ["images"],
+									allowsEditing: true,
+									allowsMultipleSelection: false,
+									quality: 1,
+									aspect: [1, 1],
+									base64: true,
+									exif: false,
+								})
+
+								if (output.canceled || output.assets.length <= 0) {
+									setAvatar(undefined);
+									setAvatarName(null);
+
+									return;
+								}
+
+								const image = output.assets[0]
+
+								const imageURI = image.uri;
+
+								const fileInfo = await FileSystem.getInfoAsync(imageURI);
+
+								if (!fileInfo.exists) return;
+
+								const base64Data = image.base64 as string;
+
+								const extension = imageURI.split(".").pop();
+								const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+
+								const avatarDataURI = `data:${mimeType};base64,${base64Data}`
+
+								setAvatar(avatarDataURI || undefined);
+
+								const filename = image.fileName || imageURI.split("/").pop() || "avatar.png";
+
+								setAvatarName(filename);
+								setShowAvatarPopup(false)
+							}}
+						/>
+					</View>
+
+					<Text style={styles.popupSubHeaderText}>
+						Press outside to close this popup
+					</Text>
+				</Popup>
+
 				<View style={styles.header}>
 					<Text style={styles.headerText}>User Settings</Text>
 
@@ -558,31 +694,7 @@ export default function UserSettings() {
 									rippleColor="gray"
 									text={avatar ? (avatarName as string) : "Select an Avatar..."}
 									onPress={async () => {
-										const output = await DocumentPicker.getDocumentAsync({
-											type: ["image/png", "image/jpeg", "image/jpg"],
-											copyToCacheDirectory: true,
-										});
-
-										if (output.canceled || !output.assets) {
-											setAvatar(undefined);
-											setAvatarName(null);
-
-											return;
-										}
-
-										const fileURI = output.assets[0].uri;
-
-										const fileInfo = await FileSystem.getInfoAsync(fileURI);
-
-										if (!fileInfo.exists) return;
-
-										const avatarDataURI = await getFileDataURI(fileURI);
-
-										setAvatar(avatarDataURI || undefined);
-
-										const filename = fileURI.split("/").pop() || "avatar.png";
-
-										setAvatarName(filename);
+										setShowAvatarPopup(true)
 									}}
 								/>
 

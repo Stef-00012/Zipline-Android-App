@@ -12,7 +12,6 @@ import Header from "@/components/Header";
 import { Host } from "react-native-portalize";
 import AuthProvider from "@/contexts/AuthProvider";
 import ZiplineProvider from "@/contexts/ZiplineProvider";
-import HeaderProvider from "@/contexts/HeaderContext";
 
 export default function Layout() {
 	const router = useRouter();
@@ -51,23 +50,21 @@ export default function Layout() {
 					<GestureHandlerRootView>
 						<AuthProvider>
 							<ZiplineProvider>
-								<HeaderProvider>
-									{hasInternet ? (
-										<Host>
-											<Header>
-												<Slot />
-											</Header>
-										</Host>
-									) : (
+								{hasInternet ? (
+									<Host>
 										<Header>
-											<View style={styles.noInternetContainer}>
-												<Text style={styles.noInternetText}>
-													No internet connection.
-												</Text>
-											</View>
+											<Slot />
 										</Header>
-									)}
-								</HeaderProvider>
+									</Host>
+								) : (
+									<Header>
+										<View style={styles.noInternetContainer}>
+											<Text style={styles.noInternetText}>
+												No internet connection.
+											</Text>
+										</View>
+									</Header>
+								)}
 							</ZiplineProvider>
 						</AuthProvider>
 					</GestureHandlerRootView>

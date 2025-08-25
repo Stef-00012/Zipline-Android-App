@@ -1,9 +1,8 @@
 import { fileQuotaTypes, searchKeyNames, userRoles } from "@/constants/users";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import { getFileDataURI, timeDifference } from "@/functions/util";
+import { guessExtension, timeDifference } from "@/functions/util";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntent } from "@/hooks/useShareIntent";
-import * as DocumentPicker from "expo-document-picker";
 import LargeUserView from "@/components/LargeUserView";
 import * as FileSystem from "expo-file-system";
 import TextInput from "@/components/TextInput";
@@ -32,6 +31,8 @@ import type {
 } from "@/types/zipline";
 import SkeletonTable from "@/components/skeleton/Table";
 import Skeleton from "@/components/skeleton/Skeleton";
+import * as ImagePicker from "expo-image-picker"
+import type { Mimetypes } from "@/types/mimetypes";
 
 export type UserActions = "viewFiles" | "edit" | "delete";
 
@@ -40,6 +41,8 @@ export default function Users() {
 	useShareIntent();
 
 	const usersCompactView = db.get("usersCompactView");
+
+	const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions()
 
 	const [showSearch, setShowSearch] = useState<boolean>(false);
 	const [searchTerm, setSearchTerm] = useState<string>("");
@@ -220,10 +223,22 @@ export default function Users() {
 										: "Select an Avatar..."
 								}
 								onPress={async () => {
-									const output = await DocumentPicker.getDocumentAsync({
-										type: ["image/png", "image/jpeg", "image/jpg"],
-										copyToCacheDirectory: true,
-									});
+									if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestMediaLibraryPermission();
+									
+									if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.DENIED) {
+										return ToastAndroid.show("Media Library permission is required to select an avatar", ToastAndroid.LONG);
+									}
+	
+									const output = await ImagePicker.launchImageLibraryAsync({
+										mediaTypes: ["images"],
+										allowsEditing: true,
+										allowsMultipleSelection: false,
+										quality: 1,
+										aspect: [1, 1],
+										base64: true,
+										defaultTab: "photos",
+										exif: false,
+									})
 
 									if (output.canceled || !output.assets) {
 										setEditAvatar(undefined);
@@ -232,17 +247,24 @@ export default function Users() {
 										return;
 									}
 
-									const fileURI = output.assets[0].uri;
+									const image = output.assets[0]
 
-									const fileInfo = await FileSystem.getInfoAsync(fileURI);
+									const imageURI = image.uri;
+
+									const fileInfo = await FileSystem.getInfoAsync(imageURI);
 
 									if (!fileInfo.exists) return;
 
-									const avatarDataURI = await getFileDataURI(fileURI);
+									const base64Data = image.base64 as string;
+
+									const extension = imageURI.split(".").pop();
+									const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+
+									const avatarDataURI = `data:${mimeType};base64,${base64Data}`
 
 									setEditAvatar(avatarDataURI || undefined);
 
-									const filename = fileURI.split("/").pop() || "avatar.png";
+									const filename = imageURI.split("/").pop() || "avatar.png";
 
 									setEditAvatarName(filename);
 								}}
@@ -454,10 +476,22 @@ export default function Users() {
 									: "Select an Avatar..."
 							}
 							onPress={async () => {
-								const output = await DocumentPicker.getDocumentAsync({
-									type: ["image/png", "image/jpeg", "image/jpg"],
-									copyToCacheDirectory: true,
-								});
+								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED) await requestMediaLibraryPermission();
+								
+								if (mediaLibraryPermission?.status === ImagePicker.PermissionStatus.DENIED) {
+									return ToastAndroid.show("Media Library permission is required to select an avatar", ToastAndroid.LONG);
+								}
+
+								const output = await ImagePicker.launchImageLibraryAsync({
+									mediaTypes: ["images"],
+									allowsEditing: true,
+									allowsMultipleSelection: false,
+									quality: 1,
+									aspect: [1, 1],
+									base64: true,
+									defaultTab: "photos",
+									exif: false,
+								})
 
 								if (output.canceled || !output.assets) {
 									setNewUserAvatar(undefined);
@@ -466,17 +500,24 @@ export default function Users() {
 									return;
 								}
 
-								const fileURI = output.assets[0].uri;
+								const image = output.assets[0]
 
-								const fileInfo = await FileSystem.getInfoAsync(fileURI);
+								const imageURI = image.uri;
+
+								const fileInfo = await FileSystem.getInfoAsync(imageURI);
 
 								if (!fileInfo.exists) return;
 
-								const avatarDataURI = await getFileDataURI(fileURI);
+								const base64Data = image.base64 as string;
+								
+								const extension = imageURI.split(".").pop();
+								const mimeType = image.mimeType || guessExtension(extension as Mimetypes[keyof Mimetypes])
+
+								const avatarDataURI = `data:${mimeType};base64,${base64Data}`
 
 								setNewUserAvatar(avatarDataURI || undefined);
 
-								const filename = fileURI.split("/").pop() || "avatar.png";
+								const filename = imageURI.split("/").pop() || "avatar.png";
 
 								setNewUserAvatarName(filename);
 							}}

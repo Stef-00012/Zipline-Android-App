@@ -21,9 +21,12 @@ import type {
 	DashURL,
 } from "@/types/zipline";
 
+// import DeviceInfo from "react-native-device-info"
+
 // ------------------------ DEV -------------------------
 
 // import { useFocusEffect, useRouter } from "expo-router";
+// import Constants from "expo-constants"
 
 // ---------------------- END DEV -----------------------
 
@@ -53,6 +56,19 @@ export default function Home() {
 
 	// useFocusEffect(() => {
 	// 	if (__DEV__) {
+	// 		// DeviceInfo.getInstallerPackageName().then((v) => {
+	// 		// 	console.log("Installer:", v);
+	// 		// })
+
+	// 		// console.log("bundle:", {
+	// 		// 	deviceInfo: DeviceInfo.getBundleId(),
+	// 		// 	expo: Constants.expoConfig?.ios?.bundleIdentifier
+	// 		// });
+
+	// 		// console.log("ver:", {
+	// 		// 	deviceInfo: DeviceInfo.getVersion(),
+	// 		// 	expo: Constants.expoConfig?.version
+	// 		// });
 	// 		// db.del("url")
 	// 		// db.del("token")
 

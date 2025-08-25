@@ -47,6 +47,9 @@ import {
 	type EditUserOptions,
 } from "@/functions/zipline/user";
 
+import { getInstallerPackageNameSync } from "react-native-device-info";
+import { knownInstallersName } from "@/constants/knownInstallers";
+
 export default function UserSettings() {
 	const {
 		updateAuth,
@@ -67,6 +70,13 @@ export default function UserSettings() {
 
 	useAuth();
 	useShareIntent();
+
+	const installerPackage = getInstallerPackageNameSync();
+	const installerPackageName = installerPackage in knownInstallersName
+		? knownInstallersName[installerPackage as keyof typeof knownInstallersName]
+		: __DEV__
+			? "Development Instance"
+			: installerPackage;
 
 	const [mediaLibraryPermission, requestMediaLibraryPermission] =
 		ImagePicker.useMediaLibraryPermissions();
@@ -1218,6 +1228,10 @@ export default function UserSettings() {
 
 								<Text style={styles.subHeaderText}>
 									App Version: {appVersion}
+								</Text>
+
+								<Text style={styles.subHeaderText}>
+									App Source: {installerPackageName}
 								</Text>
 
 								{ziplineVersion && (

@@ -1,7 +1,6 @@
 import { fileQuotaTypes, searchKeyNames, userRoles } from "@/constants/users";
 import { ScrollView, Text, View, ToastAndroid } from "react-native";
 import { guessExtension, timeDifference } from "@/functions/util";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import SkeletonTable from "@/components/skeleton/Table";
 import LargeUserView from "@/components/LargeUserView";
@@ -33,6 +32,7 @@ import type {
 	APIUsersNoIncl,
 	DashURL,
 } from "@/types/zipline";
+import MaterialSymbols from "@/components/MaterialSymbols";
 
 export type UserActions = "viewFiles" | "edit" | "delete";
 
@@ -782,7 +782,7 @@ export default function Users() {
 							onPress={() => {
 								setCreateNewUser(true);
 							}}
-							icon="person-add"
+							icon="person_add"
 							color="transparent"
 							iconColor={users && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -806,7 +806,7 @@ export default function Users() {
 
 								setCompactModeEnabled((prev) => !prev);
 							}}
-							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={users && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -957,10 +957,13 @@ export default function Users() {
 													/>
 												) : (
 													<View key={user.id} style={styles.userAvatar}>
-														<MaterialIcons
-															name="person"
+														<MaterialSymbols
+															name="person_filled"
 															size={30}
 															color={"white"}
+															style={{
+																color: "white"
+															}}
 														/>
 													</View>
 												);
@@ -1005,7 +1008,7 @@ export default function Users() {
 												const actions = (
 													<View key={user.id} style={styles.actionsContainer}>
 														<Button
-															icon="folder-open"
+															icon="folder_open"
 															color="#323ea8"
 															onPress={async () => {
 																onAction("viewFiles", user);

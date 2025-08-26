@@ -125,7 +125,7 @@ export default function Folders() {
 				const folderId = folder.id;
 
 				const success = await editFolder(folderId, {
-					public: !folder.public,
+					isPublic: !folder.public,
 				});
 
 				if (typeof success === "string")
@@ -330,7 +330,7 @@ export default function Folders() {
 							onPress={() => {
 								setCreateNewFolder(true);
 							}}
-							icon="create-new-folder"
+							icon="create_new_folder"
 							color="transparent"
 							iconColor={folders && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -354,7 +354,7 @@ export default function Folders() {
 
 								setCompactModeEnabled((prev) => !prev);
 							}}
-							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={folders && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -575,7 +575,7 @@ export default function Folders() {
 												const actions = (
 													<View key={folder.id} style={styles.actionsContainer}>
 														<Button
-															icon="folder-open"
+															icon="folder_open"
 															color="#323ea8"
 															onPress={() => {
 																onAction("viewFiles", folder);
@@ -587,7 +587,7 @@ export default function Folders() {
 														/>
 
 														<Button
-															icon="content-copy"
+															icon="content_copy"
 															color={folder.public ? "#323ea8" : "#181c28"}
 															iconColor={folder.public ? "white" : "#2a3952"}
 															onPress={async () => {
@@ -601,7 +601,7 @@ export default function Folders() {
 														/>
 
 														<Button
-															icon={folder.public ? "lock-open" : "lock"}
+															icon={folder.public ? "lock_open" : "lock"}
 															color={folder.public ? "#323ea8" : "#343a40"}
 															iconSize={20}
 															width={32}

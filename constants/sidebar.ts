@@ -1,7 +1,7 @@
-import type MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import type MaterialSymbols from "@/components/MaterialSymbols";
 
 interface SidebarOptionButton {
-	icon: keyof typeof MaterialIcons.glyphMap;
+	icon: keyof typeof MaterialSymbols.glyphMap;
 	invitesRoute: boolean;
 	adminOnly: boolean;
 	superAdminOnly: boolean;
@@ -12,7 +12,7 @@ interface SidebarOptionButton {
 }
 
 interface SidebarOptionSelect {
-	icon: keyof typeof MaterialIcons.glyphMap;
+	icon: keyof typeof MaterialSymbols.glyphMap;
 	subMenus: SidebarOption[];
 	invitesRoute: boolean;
 	adminOnly: boolean;
@@ -38,7 +38,7 @@ export const sidebarOptions: SidebarOption[] = [
 	{
 		route: "/metrics",
 		name: "Metrics",
-		icon: "bar-chart",
+		icon: "bar_chart",
 		adminOnly: false,
 		superAdminOnly: false,
 		invitesRoute: false,
@@ -48,7 +48,7 @@ export const sidebarOptions: SidebarOption[] = [
 	{
 		route: "/files",
 		name: "Files",
-		icon: "insert-drive-file",
+		icon: "insert_drive_file",
 		adminOnly: false,
 		superAdminOnly: false,
 		invitesRoute: false,
@@ -68,7 +68,7 @@ export const sidebarOptions: SidebarOption[] = [
 	{
 		route: null,
 		name: "Upload",
-		icon: "cloud-upload",
+		icon: "cloud_upload",
 		adminOnly: false,
 		superAdminOnly: false,
 		invitesRoute: false,
@@ -77,7 +77,7 @@ export const sidebarOptions: SidebarOption[] = [
 			{
 				route: "/upload/file",
 				name: "File",
-				icon: "upload-file",
+				icon: "upload_file",
 				adminOnly: false,
 				superAdminOnly: false,
 				invitesRoute: false,
@@ -87,7 +87,7 @@ export const sidebarOptions: SidebarOption[] = [
 			{
 				route: "/upload/text",
 				name: "Text",
-				icon: "text-fields",
+				icon: "text_fields",
 				adminOnly: false,
 				superAdminOnly: false,
 				invitesRoute: false,
@@ -109,7 +109,7 @@ export const sidebarOptions: SidebarOption[] = [
 	{
 		route: null,
 		name: "Administrator",
-		icon: "admin-panel-settings",
+		icon: "admin_panel_settings",
 		adminOnly: true,
 		superAdminOnly: false,
 		invitesRoute: false,
@@ -138,7 +138,7 @@ export const sidebarOptions: SidebarOption[] = [
 			{
 				route: "/admin/invites",
 				name: "Invites",
-				icon: "mail-outline",
+				icon: "mail_outline",
 				adminOnly: true,
 				superAdminOnly: false,
 				invitesRoute: true,

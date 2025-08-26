@@ -44,4 +44,4 @@ package-lock.json
 *.apk
 /error.log
 
-shell.nix
+devlog.md

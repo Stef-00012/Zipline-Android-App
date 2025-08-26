@@ -55,6 +55,11 @@ export default function UserSettings() {
 		updateUser,
 		user,
 		avatar: currentAvatar,
+		updateBiometricsSetting,
+		unlockWithBiometrics,
+		supportsBiometrics,
+		hasEnrolledBiometrics,
+		supportsAuthenticationTypes,
 	} = useContext(AuthContext);
 
 	const {
@@ -688,7 +693,7 @@ export default function UserSettings() {
 											onSideButtonPress={() => {
 												Clipboard.setStringAsync(token);
 											}}
-											sideButtonIcon="content-copy"
+											sideButtonIcon="content_copy"
 										/>
 									</Pressable>
 
@@ -1243,6 +1248,32 @@ export default function UserSettings() {
 								)}
 
 								<Switch
+									title="Unlock with Biometrics"
+									description={`Require biometric authentication to unlock the app${
+										supportsBiometrics
+											? ""
+											: ".\nYour device does not have the required biometrics hardware"
+									}${
+										hasEnrolledBiometrics
+											? ""
+											: ".\nYou do not have any biometrics enrolled"
+									}${
+										supportsAuthenticationTypes.length <= 0
+											? ".\nYour device does not support any of the required authentication types"
+											: ""
+									}`}
+									value={unlockWithBiometrics}
+									onValueChange={() => {
+										updateBiometricsSetting(!unlockWithBiometrics);
+									}}
+									disabled={
+										!supportsBiometrics ||
+										!hasEnrolledBiometrics ||
+										supportsAuthenticationTypes.length <= 0
+									}
+								/>
+
+								<Switch
 									title="Disable Update Alert"
 									value={updateAlertDisabled}
 									onValueChange={() => {
@@ -1395,7 +1426,7 @@ export default function UserSettings() {
 
 								<SkeletonTextInput
 									title="Token:"
-									sideButtonIcon="content-copy"
+									sideButtonIcon="content_copy"
 									skeletonWidth="80%"
 								/>
 

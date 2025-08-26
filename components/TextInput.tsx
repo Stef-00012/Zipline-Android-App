@@ -1,4 +1,3 @@
-import type { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "@/styles/components/textInput";
 import { type ReactNode, useState } from "react";
 import Button from "@/components/Button";
@@ -14,6 +13,7 @@ import {
 	View,
 	Text,
 } from "react-native";
+import type MaterialSymbols from "./MaterialSymbols";
 
 interface Props {
 	value?: string;
@@ -36,7 +36,7 @@ interface Props {
 	sideButtonColor?: ColorValue;
 	sideButtonIconColor?: ColorValue;
 	onSideButtonPress?: (id?: Props["id"]) => void | Promise<void>;
-	sideButtonIcon?: keyof typeof MaterialIcons.glyphMap;
+	sideButtonIcon?: keyof typeof MaterialSymbols.glyphMap;
 	maxLength?: number;
 	inputStyle?: TextStyle;
 	showSoftInputOnFocus?: boolean;
@@ -136,7 +136,7 @@ export default function TextInput({
 							onSideButtonPress(id);
 							setDisplayPassword((prev) => !prev);
 						}}
-						icon={displayPassword ? "visibility-off" : "visibility"}
+						icon={displayPassword ? "visibility_off" : "visibility"}
 						color={sideButtonColor}
 						margin={{
 							left: 10,

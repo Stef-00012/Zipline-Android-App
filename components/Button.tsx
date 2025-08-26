@@ -1,5 +1,4 @@
 import { styles } from "@/styles/components/button";
-import { MaterialIcons } from "@expo/vector-icons";
 import { getRippleColor } from "@/functions/util";
 import type { RefObject } from "react";
 import {
@@ -10,6 +9,7 @@ import {
 	Pressable,
 	Text,
 } from "react-native";
+import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {
 	onPress: () => unknown | Promise<unknown>;
@@ -20,7 +20,7 @@ interface Props {
 	textJsx?: (disabled: boolean, hasIcon: boolean) => JSX.Element;
 	width?: DimensionValue;
 	height?: DimensionValue;
-	icon?: keyof typeof MaterialIcons.glyphMap;
+	icon?: keyof typeof MaterialSymbols.glyphMap;
 	iconColor?: ColorValue;
 	borderWidth?: number;
 	borderColor?: ColorValue;
@@ -98,7 +98,7 @@ export default function Button({
 				...(!Number.isNaN(Number(borderRadius)) && { borderRadius }),
 			}}
 		>
-			{icon && <MaterialIcons name={icon} size={iconSize} color={iconColor} />}
+			{icon && <MaterialSymbols name={icon} size={iconSize} color={iconColor} />}
 
 			{textJsx?.(disabled, !!icon)}
 
@@ -116,8 +116,8 @@ export default function Button({
 			)}
 
 			{typeof open === "boolean" && (
-				<MaterialIcons
-					name={open ? "expand-more" : "expand-less"}
+				<MaterialSymbols
+					name={open ? "expand_more" : "expand_less"}
 					size={20}
 					color="white"
 				/>

@@ -31,12 +31,12 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 				)}
 
 				<Dropdown
-					icon="more-horiz"
+					icon="more_horiz"
 					data={[
 						{
 							name: "View Files",
 							id: `${folder.id}-viewFiles`,
-							icon: "folder-open",
+							icon: "folder_open",
 							onPress: () => {
 								onAction("viewFiles", folder);
 							},
@@ -44,7 +44,7 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 						{
 							name: folder.public ? "Make Private" : "Make Public",
 							id: `${folder.id}-changeVisibility`,
-							icon: folder.public ? "lock-open" : "lock",
+							icon: folder.public ? "lock_open" : "lock",
 							onPress: async () => {
 								onAction("visibility", folder);
 							},
@@ -70,7 +70,7 @@ export default function LargeFolderView({ folder, dashUrl, onAction }: Props) {
 						{
 							name: "Copy URL",
 							id: `${folder.id}-copyUrl`,
-							icon: "content-copy",
+							icon: "content_copy",
 							onPress: () => {
 								onAction("copyUrl", folder);
 							},

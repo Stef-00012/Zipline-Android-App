@@ -173,7 +173,13 @@ export default function UpdateProvider({ children }: Props) {
 				},
 			);
 
-			await downloadResumable.downloadAsync();
+			const downloadResult = await downloadResumable.downloadAsync();
+
+			if (!downloadResult?.uri)
+				return ToastAndroid.show(
+					"Something went wrong while downloading the update...",
+					ToastAndroid.SHORT,
+				);
 
             const updatePathContent = await FileSystem.getContentUriAsync(updatePath)
 
@@ -264,7 +270,7 @@ export default function UpdateProvider({ children }: Props) {
 			});
 
 			await inAppUpdates.startUpdate({
-				updateType: IAUUpdateKind.IMMEDIATE,
+				updateType: IAUUpdateKind.FLEXIBLE,
 			});
 
 			return "Successfully downloaded the update";

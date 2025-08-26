@@ -37,12 +37,12 @@ export default function LargeURLView({
 				)}
 
 				<Dropdown
-					icon="more-horiz"
+					icon="more_horiz"
 					data={[
 						{
 							name: "Copy Short Link",
 							id: `${url.id}-copyShortLink`,
-							icon: "content-copy",
+							icon: "content_copy",
 							onPress: () => {
 								onAction("copyShortLink", url);
 							},
@@ -50,7 +50,7 @@ export default function LargeURLView({
 						{
 							name: "Copy Destination",
 							id: `${url.id}-copyDestinatin`,
-							icon: "content-copy",
+							icon: "content_copy",
 							onPress: async () => {
 								onAction("copyDestination", url);
 							},

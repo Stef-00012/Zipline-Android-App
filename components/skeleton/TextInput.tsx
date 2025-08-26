@@ -1,16 +1,16 @@
 import { type ColorValue, View, Text, type DimensionValue } from "react-native";
-import type { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "@/styles/components/textInput";
 import Skeleton from "@/components/skeleton/Skeleton";
 import Button from "@/components/Button";
 import type { ReactNode } from "react";
+import type MaterialSymbols from "../MaterialSymbols";
 
 interface Props {
 	title?: string;
 	description?: string | ReactNode;
 	sideButtonColor?: ColorValue;
 	sideButtonIconColor?: ColorValue;
-	sideButtonIcon?: keyof typeof MaterialIcons.glyphMap;
+	sideButtonIcon?: keyof typeof MaterialSymbols.glyphMap;
 	skeletonWidth?: DimensionValue;
 	skeletonHeight?: DimensionValue;
 	disableAnimation?: boolean;

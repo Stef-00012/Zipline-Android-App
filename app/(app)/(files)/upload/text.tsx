@@ -187,7 +187,7 @@ export default function UploadText({
 								</Link>
 
 								<Button
-									icon="content-copy"
+									icon="content_copy"
 									color="#323ea8"
 									onPress={async () => {
 										const saved = await Clipboard.setStringAsync(
@@ -216,7 +216,7 @@ export default function UploadText({
 								/>
 
 								<Button
-									icon="open-in-new"
+									icon="open_in_new"
 									color="#323ea8"
 									onPress={() => {
 										router.push(uploadedFile.url as ExternalPathString);
@@ -391,7 +391,7 @@ export default function UploadText({
 
 								router.push("/files");
 							}}
-							icon="folder-open"
+							icon="folder_open"
 							color="transparent"
 							iconColor="#2d3f70"
 							borderColor="#222c47"

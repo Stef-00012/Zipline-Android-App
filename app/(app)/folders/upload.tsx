@@ -149,7 +149,7 @@ export default function FolderUpload() {
 									</Link>
 
 									<Button
-										icon="content-copy"
+										icon="content_copy"
 										color="#323ea8"
 										onPress={async () => {
 											const saved = await Clipboard.setStringAsync(file.url);
@@ -176,7 +176,7 @@ export default function FolderUpload() {
 									/>
 
 									<Button
-										icon="open-in-new"
+										icon="open_in_new"
 										color="#323ea8"
 										onPress={() => {
 											router.push(file.url as ExternalPathString);

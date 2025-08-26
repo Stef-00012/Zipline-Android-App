@@ -20,11 +20,11 @@ import type {
 	DashURL,
 } from "@/types/zipline";
 
-// import DeviceInfo from "react-native-device-info"
 
 // ------------------------ DEV -------------------------
 
 // import { useFocusEffect, useRouter } from "expo-router";
+// import DeviceInfo from "react-native-device-info"
 // import Constants from "expo-constants"
 
 // ---------------------- END DEV -----------------------
@@ -33,7 +33,7 @@ export default function Home() {
 	useAuth();
 	useShareIntent();
 
-	const { user } = useContext(AuthContext);
+	const { user, isAuthenticating } = useContext(AuthContext);
 
 	const url = db.get("url") as DashURL | null;
 
@@ -53,6 +53,7 @@ export default function Home() {
 
 	// useFocusEffect(() => {
 	// 	if (__DEV__) {
+	// 		// DeviceInfo.isPinOrFingerprintSet().then(console.log)
 	// 		// DeviceInfo.getInstallerPackageName().then((v) => {
 	// 		// 	console.log("Installer:", v);
 	// 		// })
@@ -102,7 +103,7 @@ export default function Home() {
 				/>
 			)}
 
-			{user ? (
+			{(user && !isAuthenticating) ? (
 				<ScrollView>
 					<Text style={styles.mainHeader}>Welcome Back, {user.username}</Text>
 					<Text style={styles.subHeader}>

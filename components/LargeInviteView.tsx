@@ -27,12 +27,12 @@ export default function LargeInviteView({ invite, dashUrl, onAction }: Props) {
 				</Link>
 
 				<Dropdown
-					icon="more-horiz"
+					icon="more_horiz"
 					data={[
 						{
 							name: "Copy URL",
 							id: `${invite.id}-copyUrl`,
-							icon: "folder-open",
+							icon: "folder_open",
 							onPress: () => {
 								onAction("copy", invite);
 							},

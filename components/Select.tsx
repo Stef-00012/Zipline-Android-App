@@ -1,4 +1,3 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState, useEffect, type ReactNode } from "react";
 import { styles } from "@/styles/components/select";
 import CheckBox from "@/components/CheckBox";
@@ -10,6 +9,7 @@ import {
 	Modal,
 	type DimensionValue,
 } from "react-native";
+import MaterialSymbols from "./MaterialSymbols";
 
 export interface SelectProps {
 	data: {
@@ -169,8 +169,8 @@ export default function Select({
 						<Text style={styles.selectText}>{placeholder}</Text>
 					)}
 				</View>
-				<MaterialIcons
-					name={isOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+				<MaterialSymbols
+					name={isOpen ? "keyboard_arrow_up" : "keyboard_arrow_down"}
 					size={32}
 					color={styles.selectText.color}
 				/>

@@ -5,6 +5,7 @@ import ZiplineProvider from "@/contexts/ZiplineProvider";
 import { ShareIntentProvider } from "expo-share-intent";
 import UpdateProvider from "@/contexts/UpdateContext";
 import NetInfo from "@react-native-community/netinfo";
+import * as SplashScreen from 'expo-splash-screen';
 import AuthProvider from "@/contexts/AuthProvider";
 import { Slot, useRouter } from "expo-router";
 import { Host } from "react-native-portalize";
@@ -13,10 +14,25 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Header from "@/components/Header";
+import { useFonts } from 'expo-font';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function Layout() {
 	const router = useRouter();
 	const [hasInternet, setHasInternet] = useState<boolean>(false);
+	
+	const [loaded, error] = useFonts({
+		MaterialSymbols: require('../assets/material-symbols.ttf'),
+	})
+
+	useEffect(() => {
+		if (loaded || error) {
+			SplashScreen.hideAsync();
+		}
+
+		if (error) console.error(error)
+	}, [loaded, error])
 
 	useEffect(() => {
 		NetInfo.fetch().then((state) => {
@@ -31,6 +47,8 @@ export default function Layout() {
 			unsubscribe();
 		};
 	}, []);
+
+	if (!loaded && !error) return null;
 
 	return (
 		<ShareIntentProvider

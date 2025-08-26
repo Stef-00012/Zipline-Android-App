@@ -1,4 +1,3 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { useState, useRef } from "react";
 import Button from "@/components/Button";
 import {
@@ -13,6 +12,7 @@ import {
 	ScrollView,
 	type ColorValue,
 } from "react-native";
+import MaterialSymbols from "./MaterialSymbols";
 
 interface Item {
 	name: string;
@@ -20,7 +20,7 @@ interface Item {
 	color?: ColorValue;
 	iconColor?: ColorValue;
 	disabled?: boolean;
-	icon?: keyof typeof MaterialIcons.glyphMap;
+	icon?: keyof typeof MaterialSymbols.glyphMap;
 	onPress: () => Promise<void> | void;
 }
 
@@ -38,7 +38,7 @@ interface Props {
 	height?: DimensionValue;
 	iconColor?: ColorValue;
 	iconSize?: number;
-	icon: keyof typeof MaterialIcons.glyphMap;
+	icon: keyof typeof MaterialSymbols.glyphMap;
 	margin?: {
 		top?: DimensionValue;
 		bottom?: DimensionValue;
@@ -148,7 +148,7 @@ export default function Dropdown({
 					}
 				}}
 			>
-				<MaterialIcons name={icon} size={iconSize} color={iconColor} />
+				<MaterialSymbols name={icon} size={iconSize} color={iconColor} />
 			</Pressable>
 
 			<Modal visible={visible} transparent animationType="none">

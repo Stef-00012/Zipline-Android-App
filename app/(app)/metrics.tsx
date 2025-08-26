@@ -6,7 +6,6 @@ import { useContext, useEffect, useState } from "react";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import SkeletonTable from "@/components/skeleton/Table";
 import Skeleton from "@/components/skeleton/Skeleton";
-import { MaterialIcons } from "@expo/vector-icons";
 import ChartLegend from "@/components/ChartLegend";
 import DatePicker from "@/components/DatePicker";
 import type { APIStats } from "@/types/zipline";
@@ -25,6 +24,7 @@ import {
 	convertToBytes,
 	getMetricsDifference,
 } from "@/functions/util";
+import MaterialSymbols from "@/components/MaterialSymbols";
 
 export default function Metrics() {
 	const { webSettings } = useContext(ZiplineContext);
@@ -276,19 +276,19 @@ export default function Metrics() {
 												}}
 											>
 												{stat.difference > 0 ? (
-													<MaterialIcons
+													<MaterialSymbols
 														name="north"
 														size={18}
 														color="#69db7c"
 													/>
 												) : stat.difference < 0 ? (
-													<MaterialIcons
+													<MaterialSymbols
 														name="south"
 														size={18}
 														color="#ff8787"
 													/>
 												) : (
-													<MaterialIcons
+													<MaterialSymbols
 														name="remove"
 														size={18}
 														color="#ced4da"

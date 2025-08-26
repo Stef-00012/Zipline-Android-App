@@ -1,6 +1,5 @@
 import { Image as NativeImage, Pressable, Text, View } from "react-native";
 import { type ExternalPathString, useRouter } from "expo-router";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { styles } from "@/styles/components/fileDisplay";
 import type { APIFile, DashURL } from "@/types/zipline";
 import type { Mimetypes } from "@/types/mimetypes";
@@ -8,6 +7,7 @@ import { guessExtension } from "@/functions/util";
 import { useEffect, useState } from "react";
 import * as db from "@/functions/database";
 import { Image } from "expo-image";
+import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {
 	uri: string;
@@ -80,7 +80,7 @@ export default function FileDisplay({
 						width,
 					}}
 				>
-					<MaterialIcons name="lock" size={60} color={"white"} />
+					<MaterialSymbols name="lock" size={60} color={"white"} />
 					<Text style={styles.nonDisplayableFileText}>
 						{openable ? "Click to view password " : ""}
 						{originalName || name}
@@ -161,7 +161,7 @@ export default function FileDisplay({
 					width,
 				}}
 			>
-				<MaterialIcons name="description" size={60} color={"white"} />
+				<MaterialSymbols name="description" size={60} color={"white"} />
 				<Text style={styles.nonDisplayableFileText}>
 					{openable ? "Click to view " : ""}
 					{originalName || name}

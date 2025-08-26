@@ -113,7 +113,7 @@ export async function createFolder(
 
 interface FolderEditOptions {
 	allowUploads?: boolean;
-	public?: boolean;
+	isPublic?: boolean;
 	name?: string;
 }
 

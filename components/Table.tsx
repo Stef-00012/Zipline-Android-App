@@ -1,8 +1,8 @@
 import { Table as NativeTable, Row } from "react-native-reanimated-table";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "@/styles/components/table";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useState, type ReactNode } from "react";
+import MaterialSymbols from "./MaterialSymbols";
 
 type HeaderRow = {
 	row: ReactNode;
@@ -98,7 +98,7 @@ export default function Table({
 
 				<View style={styles.actionsContainer}>
 					{row.sortable && (
-						<MaterialIcons
+						<MaterialSymbols
 							name={sortIcon}
 							color={sortIcon === "sort" ? "#303e58" : "white"}
 							size={16}
@@ -113,7 +113,7 @@ export default function Table({
 								if (row.id) return onSearch(row.id);
 							}}
 						>
-							<MaterialIcons name="filter-alt" color="#303e58" size={16} />
+							<MaterialSymbols name="filter_alt" color="#303e58" size={16} />
 						</Pressable>
 					)}
 				</View>
@@ -123,7 +123,7 @@ export default function Table({
 
 	function getSortIcon(
 		order: "asc" | "desc" | null,
-	): keyof typeof MaterialIcons.glyphMap {
+	): keyof typeof MaterialSymbols.glyphMap {
 		switch (order) {
 			case "asc":
 				return "north";

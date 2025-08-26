@@ -1,6 +1,6 @@
 import { styles } from "@/styles/components/userAvatar";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Text, View, Image } from "react-native";
+import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {
 	username: string;
@@ -23,7 +23,7 @@ export default function UserAvatar({ username, avatar }: Props) {
 						...styles.settingsIcon,
 					}}
 				>
-					<MaterialIcons size={22} name="settings" color="#fff" />
+					<MaterialSymbols size={22} name="settings" color="#fff" />
 				</View>
 			)}
 			<Text

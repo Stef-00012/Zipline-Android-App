@@ -49,6 +49,8 @@ import {
 	ToastAndroid,
 	View,
 } from "react-native";
+import { Directory, Paths } from "expo-file-system/next";
+import { startActivityAsync } from "expo-intent-launcher";
 
 export default function Files() {
 	const router = useRouter();
@@ -78,7 +80,7 @@ export default function Files() {
 		sortOrder: Exclude<GetFilesOptions["order"], undefined>;
 	}>({
 		id: "createdAt",
-		sortOrder: "asc",
+		sortOrder: "desc",
 	});
 
 	const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -549,7 +551,7 @@ export default function Files() {
 									onPress={() => {
 										setFavorites((prev) => !prev);
 									}}
-									icon={favorites ? "star" : "star-border"}
+									icon={favorites ? "star_half" : "star"}
 									color="transparent"
 									iconColor={
 										favorites
@@ -603,7 +605,7 @@ export default function Files() {
 
 								router.push(url);
 							}}
-							icon="upload-file"
+							icon="upload_file"
 							color="transparent"
 							iconColor={
 								(files && !isFolder) || (isFolder && allowUploads)
@@ -633,7 +635,7 @@ export default function Files() {
 
 								setSelectedFiles([]);
 							}}
-							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={files ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -792,7 +794,7 @@ export default function Files() {
 									/>
 
 									<Button
-										icon="star-border"
+										icon="star"
 										color="transparent"
 										rippleColor="gray"
 										borderWidth={2}
@@ -990,7 +992,7 @@ export default function Files() {
 										id: sortKey.id as string,
 										sortOrder: sortKey.sortOrder || "desc",
 									}}
-									rowWidth={[30, 150, 150, 150, 80, 130, 100, 220, 213]}
+									rowWidth={[30, 150, 150, 150, 80, 130, 100, 220, 256]}
 									rows={files.page.map((file) => {
 										const checkbox = (
 											<CheckBox
@@ -1078,7 +1080,7 @@ export default function Files() {
 										const actions = (
 											<View key={file.id} style={styles.actionsContainer}>
 												<Button
-													icon="insert-drive-file"
+													icon="insert_drive_file"
 													color="#323ea8"
 													onPress={async () => {
 														setFocusedFile(file);
@@ -1090,7 +1092,7 @@ export default function Files() {
 												/>
 
 												<Button
-													icon="open-in-new"
+													icon="open_in_new"
 													color="#323ea8"
 													onPress={() => {
 														router.push(`${dashUrl}${file.url}`);
@@ -1102,7 +1104,7 @@ export default function Files() {
 												/>
 
 												<Button
-													icon="content-copy"
+													icon="content_copy"
 													color="#323ea8"
 													onPress={async () => {
 														const url = `${dashUrl}${file.url}`;
@@ -1127,7 +1129,7 @@ export default function Files() {
 												/>
 
 												<Button
-													icon="file-download"
+													icon="file_download"
 													color="#343a40"
 													onPress={async () => {
 														const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
@@ -1197,6 +1199,69 @@ export default function Files() {
 															ToastAndroid.SHORT,
 														);
 													}}
+													iconSize={20}
+													width={32}
+													height={32}
+													padding={6}
+												/>
+
+												<Button
+													icon="apk_install"
+													color="#343a40"
+													onPress={async () => {
+														if (!file.name.endsWith(".apk"))
+															return ToastAndroid.show(
+																"The selected file is not an APK",
+																ToastAndroid.SHORT,
+															);
+
+														if (!file.password)
+															return ToastAndroid.show(
+																"Unable to install password protected APKs",
+																ToastAndroid.SHORT,
+															);
+
+														ToastAndroid.show(
+															"Downloading...",
+															ToastAndroid.SHORT,
+														);
+
+														const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
+
+														const cacheDir = new Directory(Paths.cache);
+														const saveURI = `${cacheDir.uri}/${file.name}`;
+
+														const downloadResult =
+															await FileSystem.downloadAsync(
+																downloadUrl,
+																saveURI,
+															);
+
+														if (!downloadResult.uri)
+															return ToastAndroid.show(
+																"Something went wrong while downloading the file",
+																ToastAndroid.SHORT,
+															);
+
+														const apkPathContent =
+															await FileSystem.getContentUriAsync(saveURI);
+
+														await startActivityAsync(
+															"android.intent.action.INSTALL_PACKAGE",
+															{
+																data: apkPathContent,
+																flags: 1,
+															},
+														);
+													}}
+													iconColor={
+														file.name.endsWith(".apk") && !file.password
+															? "white"
+															: "gray"
+													}
+													disabled={
+														!file.name.endsWith(".apk") || file.password
+													}
 													iconSize={20}
 													width={32}
 													height={32}
@@ -1277,9 +1342,9 @@ export default function Files() {
 										"ID",
 										"Actions",
 									]}
-									rowWidth={[150, 150, 150, 80, 130, 100, 220, 213]}
+									rowWidth={[150, 150, 150, 80, 130, 100, 220, 256]}
 									rows={[...Array(10).keys()].map(() => {
-										return [80, 40, 60, 60, 90, 20, 120, 150];
+										return [80, 40, 60, 60, 90, 20, 120, 200];
 									})}
 									rowHeight={55}
 									disableAnimations

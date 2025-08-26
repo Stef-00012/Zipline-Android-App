@@ -1,12 +1,12 @@
 import type { APIUserNoIncl, DashURL } from "@/types/zipline";
 import type { UserActions } from "@/app/(app)/admin/users";
 import { styles } from "@/styles/components/largeUserView";
-import { MaterialIcons } from "@expo/vector-icons";
 import { timeDifference } from "@/functions/util";
 import Dropdown from "@/components/Dropdown";
 import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { Image } from "expo-image";
+import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {
 	user: APIUserNoIncl;
@@ -32,7 +32,7 @@ export default function LargeUserView({
 						/>
 					) : (
 						<View key={user.id} style={styles.userAvatar}>
-							<MaterialIcons name="person" size={30} color={"white"} />
+							<MaterialSymbols name="person" size={30} color={"white"} />
 						</View>
 					)}
 
@@ -46,7 +46,7 @@ export default function LargeUserView({
 					<Button
 						onPress={() => onAction("viewFiles", user)}
 						color="transparent"
-						icon="folder-open"
+						icon="folder_open"
 						rippleColor="#464953"
 						borderWidth={2}
 						borderColor="#222c47"
@@ -62,7 +62,7 @@ export default function LargeUserView({
 					/>
 
 					<Dropdown
-						icon="more-horiz"
+						icon="more_horiz"
 						data={[
 							{
 								name: "Edit",

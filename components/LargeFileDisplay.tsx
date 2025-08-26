@@ -2,7 +2,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { type ExternalPathString, useRouter } from "expo-router";
 import { styles } from "@/styles/components/largeFileDisplay";
 import FileDisplay from "@/components/FileDisplay";
-import { MaterialIcons } from "@expo/vector-icons";
 import { getTags } from "@/functions/zipline/tags";
 import { convertToBytes } from "@/functions/util";
 import { isLightColor } from "@/functions/color";
@@ -40,6 +39,9 @@ import {
 	View,
 	BackHandler,
 } from "react-native";
+import MaterialSymbols from "./MaterialSymbols";
+import { Directory, Paths } from "expo-file-system/next";
+import { startActivityAsync } from "expo-intent-launcher";
 
 interface Props {
 	file: APIFile;
@@ -361,7 +363,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							)}
 
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="description" size={28} color="white" />
+								<MaterialSymbols name="description" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
 									<Text style={styles.fileInfoHeader}>Type</Text>
 									<Text style={styles.fileInfoText}>{file.type}</Text>
@@ -369,7 +371,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							</View>
 
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="sd-storage" size={28} color="white" />
+								<MaterialSymbols name="sd_storage" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
 									<Text style={styles.fileInfoHeader}>Size</Text>
 									<Text style={styles.fileInfoText}>
@@ -381,7 +383,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							</View>
 
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="visibility" size={28} color="white" />
+								<MaterialSymbols name="visibility" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
 									<Text style={styles.fileInfoHeader}>View</Text>
 									<Text style={styles.fileInfoText}>
@@ -394,7 +396,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							</View>
 
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="file-upload" size={28} color="white" />
+								<MaterialSymbols name="file_upload" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
 									<Text style={styles.fileInfoHeader}>Created At</Text>
 									<Text style={styles.fileInfoText}>
@@ -404,7 +406,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 							</View>
 
 							<View style={styles.fileInfoContainer}>
-								<MaterialIcons name="autorenew" size={28} color="white" />
+								<MaterialSymbols name="autorenew" size={28} color="white" />
 								<View style={styles.fileInfoTextContainer}>
 									<Text style={styles.fileInfoHeader}>Updated At</Text>
 									<Text style={styles.fileInfoText}>
@@ -415,7 +417,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 
 							{file.deletesAt && (
 								<View style={styles.fileInfoContainer}>
-									<MaterialIcons name="auto-delete" size={28} color="white" />
+									<MaterialSymbols name="auto_delete" size={28} color="white" />
 									<View style={styles.fileInfoTextContainer}>
 										<Text style={styles.fileInfoHeader}>Deletes At</Text>
 										<Text style={styles.fileInfoText}>
@@ -427,7 +429,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 
 							{fileOriginalName && (
 								<View style={styles.fileInfoContainer}>
-									<MaterialIcons name="title" size={28} color="white" />
+									<MaterialSymbols name="title" size={28} color="white" />
 									<View style={styles.fileInfoTextContainer}>
 										<Text style={styles.fileInfoHeader}>Original Name</Text>
 										<Text style={styles.fileInfoText}>{fileOriginalName}</Text>
@@ -620,7 +622,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								/>
 
 								<Button
-									icon={fileFavorite ? "star" : "star-outline"}
+									icon={fileFavorite ? "star_half" : "star_outline"}
 									color={fileFavorite ? "#f08c00" : "#343a40"}
 									onPress={async () => {
 										const success = editFile(file.id, {
@@ -652,7 +654,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								/>
 
 								<Button
-									icon="open-in-new"
+									icon="open_in_new"
 									color="#323ea8"
 									onPress={() => {
 										router.push(`${dashUrl}${file.url}` as ExternalPathString);
@@ -668,7 +670,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								/>
 
 								<Button
-									icon="content-copy"
+									icon="content_copy"
 									color="#343a40"
 									onPress={async () => {
 										const url = `${dashUrl}${file.url}`;
@@ -697,7 +699,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								/>
 
 								<Button
-									icon="file-download"
+									icon="file_download"
 									color="#343a40"
 									onPress={async () => {
 										const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
@@ -762,6 +764,67 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										left: 5,
 										right: 5,
 									}}
+								/>
+
+								<Button
+									icon="apk_install"
+									color="#343a40"
+									iconColor={
+										file.name.endsWith(".apk") && !file.password
+											? "white"
+											: "gray"
+									}
+									onPress={async () => {
+										if (!file.name.endsWith(".apk"))
+											return ToastAndroid.show(
+												"The selected file is not an APK",
+												ToastAndroid.SHORT,
+											);
+
+										if (!file.password)
+											return ToastAndroid.show(
+												"Unable to install password protected APKs",
+												ToastAndroid.SHORT,
+											);
+
+										ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
+
+										const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
+
+										const cacheDir = new Directory(Paths.cache);
+										const saveURI = `${cacheDir.uri}/${file.name}`;
+
+										const downloadResult = await FileSystem.downloadAsync(
+											downloadUrl,
+											saveURI,
+										);
+
+										if (!downloadResult.uri)
+											return ToastAndroid.show(
+												"Something went wrong while downloading the file",
+												ToastAndroid.SHORT,
+											);
+
+										const apkPathContent =
+											await FileSystem.getContentUriAsync(saveURI);
+
+										await startActivityAsync(
+											"android.intent.action.INSTALL_PACKAGE",
+											{
+												data: apkPathContent,
+												flags: 1,
+											},
+										);
+									}}
+									iconSize={20}
+									width={30}
+									height={30}
+									padding={5}
+									margin={{
+										left: 5,
+										right: 5,
+									}}
+									disabled={!file.name.endsWith(".apk") || file.password}
 								/>
 							</View>
 						</KeyboardAwareScrollView>

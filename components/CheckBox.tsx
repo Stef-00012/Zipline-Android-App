@@ -1,6 +1,6 @@
 import { TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/components/checkbox";
-import { MaterialIcons } from "@expo/vector-icons";
+import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {
 	value: boolean;
@@ -32,7 +32,7 @@ export default function CheckBox({
 					backgroundColor: value ? "#323ea8" : "transparent",
 				}}
 			>
-				{value && <MaterialIcons name="check" size={16} color="white" />}
+				{value && <MaterialSymbols name="check" size={16} color="white" />}
 			</View>
 		</TouchableOpacity>
 	);

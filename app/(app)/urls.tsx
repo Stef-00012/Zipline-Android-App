@@ -466,7 +466,7 @@ export default function Urls() {
 							onPress={() => {
 								setCreateNewUrl(true);
 							}}
-							icon="add-link"
+							icon="add_link"
 							color="transparent"
 							iconColor={urls && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -490,7 +490,7 @@ export default function Urls() {
 
 								setCompactModeEnabled((prev) => !prev);
 							}}
-							icon={compactModeEnabled ? "view-module" : "view-agenda"}
+							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={urls && dashUrl ? "#2d3f70" : "#2d3f7055"}
 							borderColor="#222c47"
@@ -742,7 +742,7 @@ export default function Urls() {
 												const actions = (
 													<View key={url.id} style={styles.actionsContainer}>
 														<Button
-															icon="content-copy"
+															icon="content_copy"
 															color="#323ea8"
 															onPress={async () => {
 																onAction("copyShortLink", url);

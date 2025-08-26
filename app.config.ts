@@ -6,7 +6,7 @@ import {
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 const IS_PRERELEASE = process.env.APP_VARIANT === "prerelease";
-const IS_PRODUCTION = process.env.APP_VARIANT === "production";
+// const IS_PRODUCTION = process.env.APP_VARIANT === "production";
 
 let environmentAppName = "";
 let environmentAppIdentifier = "";
@@ -50,21 +50,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		scheme: `com.stefdp.zipline${environmentAppIdentifier}`,
 		newArchEnabled: true,
 		edgeToEdgeEnabled: true,
-		permissions: IS_PRODUCTION
-    	    ? []
-    	    : [
-    			"REQUEST_INSTALL_PACKAGES"
-    		]
+		permissions: ["REQUEST_INSTALL_PACKAGES"],
 	},
 	plugins: [
 		"expo-router",
-		[
-			"expo-secure-store",
-			{
-				faceIDPermission:
-					"Allow $(PRODUCT_NAME) to access your Face ID biometric data.",
-			},
-		],
+		"expo-font",
 		[
 			"expo-splash-screen",
 			{
@@ -82,7 +72,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				disableIOS: true,
 			},
 		],
+		["expo-secure-store"],
 		["expo-image-picker"],
+		["expo-local-authentication"],
 	],
 	experiments: {
 		typedRoutes: true,

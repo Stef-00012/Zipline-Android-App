@@ -74,7 +74,7 @@ jobs:
             path: ${{ format('{0}/app-pre-release.apk', github.workspace) }}
 
       - name: Build Android App AAB
-        run:  eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-pre-release.aab
+        run:  APP_VARIANT=production eas build --clear-cache --platform android --profile production --local --output ${{ github.workspace }}/app-pre-release.aab
 
       - name: Upload AAB Artifact
         uses: actions/upload-artifact@v4

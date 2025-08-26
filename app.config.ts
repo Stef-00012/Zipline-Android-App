@@ -6,6 +6,7 @@ import {
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 const IS_PRERELEASE = process.env.APP_VARIANT === "prerelease";
+const IS_PRODUCTION = process.env.APP_VARIANT === "production";
 
 let environmentAppName = "";
 let environmentAppIdentifier = "";
@@ -49,9 +50,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		scheme: `com.stefdp.zipline${environmentAppIdentifier}`,
 		newArchEnabled: true,
 		edgeToEdgeEnabled: true,
-		permissions: [
-			"REQUEST_INSTALL_PACKAGES"
-		]
+		permissions: IS_PRODUCTION
+    	    ? []
+    	    : [
+    			"REQUEST_INSTALL_PACKAGES"
+    		]
 	},
 	plugins: [
 		"expo-router",

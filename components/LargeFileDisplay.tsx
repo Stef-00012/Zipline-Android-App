@@ -781,7 +781,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 												ToastAndroid.SHORT,
 											);
 
-										if (!file.password)
+										if (file.password)
 											return ToastAndroid.show(
 												"Unable to install password protected APKs",
 												ToastAndroid.SHORT,

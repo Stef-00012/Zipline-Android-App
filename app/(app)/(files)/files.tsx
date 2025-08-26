@@ -1215,7 +1215,7 @@ export default function Files() {
 																ToastAndroid.SHORT,
 															);
 
-														if (!file.password)
+														if (file.password)
 															return ToastAndroid.show(
 																"Unable to install password protected APKs",
 																ToastAndroid.SHORT,

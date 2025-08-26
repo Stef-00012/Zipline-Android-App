@@ -1,12 +1,13 @@
 import { View, Text, ToastAndroid, ScrollView, Pressable } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useState, useEffect, type ReactNode, useContext } from "react";
 import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
 import { settings as zlSettings } from "@/constants/adminSettings";
 import type { APISettings, ExternalLink } from "@/types/zipline";
 import { convertToBytes, convertToTime } from "@/functions/util";
 import SkeletonTextInput from "@/components/skeleton/TextInput";
 import { parseMarkdownLinks } from "@/functions/componentUtil";
-import { useState, useEffect, type ReactNode } from "react";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import { useShareIntent } from "@/hooks/useShareIntent";
 import Skeleton from "@/components/skeleton/Skeleton";
 import ExternalUrl from "@/components/ExternalUrl";
@@ -21,7 +22,6 @@ import Domain from "@/components/Domain";
 import Popup from "@/components/Popup";
 import {
 	getSettings,
-	reloadSettings,
 	updateSettings,
 } from "@/functions/zipline/settings";
 import type {
@@ -37,6 +37,7 @@ export default function ServerSettings() {
 	useShareIntent();
 
 	const [settings, setSettings] = useState<APISettings | null>(null);
+	const { updateSettings: updateContextSettings } = useContext(ZiplineContext)
 
 	useEffect(() => {
 		(async () => {
@@ -507,17 +508,12 @@ export default function ServerSettings() {
 			setSaving(false);
 		}
 
-		const reloadSuccess = await reloadSettings();
-
-		if (typeof reloadSuccess === "string") {
-			setSaveError([`Error while reloading: ${reloadSuccess}`]);
-			setSaving(false);
-		}
-
 		const newSettings = await getSettings();
 
 		setSettings(typeof newSettings === "string" ? null : newSettings);
 		setSaving(false);
+
+		await updateContextSettings();
 
 		return ToastAndroid.show(
 			"Successfully saved the settings",

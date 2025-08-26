@@ -32,6 +32,10 @@ export default function Sidebar({
 	const resetShareIntent = useShareIntent(true);
 	const { webSettings } = useContext(ZiplineContext);
 
+	const adminOnlyMetrics = webSettings
+		? webSettings.config.features.metrics.adminOnly
+		: true;
+
 	const { role } = useContext(AuthContext);
 
 	const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
@@ -109,7 +113,8 @@ export default function Sidebar({
 		if (
 			(option.adminOnly && !isAdmin) ||
 			(option.invitesRoute && !invitesEnabled) ||
-			(option.superAdminOnly && !isSuperAdmin)
+			(option.superAdminOnly && !isSuperAdmin) ||
+			(option.route === "/metrics" && adminOnlyMetrics && !isAdmin)
 		)
 			return <View key={option.route || option.name} />;
 

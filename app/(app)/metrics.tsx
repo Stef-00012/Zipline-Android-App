@@ -29,13 +29,11 @@ import {
 export default function Metrics() {
 	const { webSettings } = useContext(ZiplineContext);
 
-	// is this rlly needed? api endpoint is public anyway
-	// const adminOnly = webSettings
-	// 		? webSettings.config.features.metrics.adminOnly
-	// 		: false
+	const adminOnly = webSettings
+		? webSettings.config.features.metrics.adminOnly
+		: true;
 
-	// useAuth(adminOnly ? "ADMIN" : "USER");
-	useAuth();
+	useAuth(adminOnly ? "ADMIN" : "USER");
 	useShareIntent();
 
 	const [stats, setStats] = useState<APIStats | null>();

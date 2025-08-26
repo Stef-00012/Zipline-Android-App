@@ -1259,8 +1259,6 @@ export default function UserSettings() {
 									<Button
 										onPress={async () => {
 											await downloadUpdate();
-
-											// ToastAndroid.show(message, ToastAndroid.SHORT);
 										}}
 										color={isDownloading ? "#373d79" : "#323ea8"}
 										text={
@@ -1268,17 +1266,6 @@ export default function UserSettings() {
 												? `Downloading Update... ${downloadPercentage.toFixed(2)}%`
 												: "Download Update"
 										}
-										// text={
-										// 	isDownloading
-										// 		? `Downloading Update... ${downloadProgress}%${
-										// 				downloadSize
-										// 					? ` (${convertToBytes(downloadSize, {
-										// 							unitSeparator: " ",
-										// 						})})`
-										// 					: ""
-										// 			}`
-										// 		: "Download Update"
-										// }
 										disabled={isDownloading}
 										margin={{
 											top: 10,

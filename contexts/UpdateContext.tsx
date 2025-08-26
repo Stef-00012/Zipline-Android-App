@@ -1,17 +1,14 @@
-import { getInstallerPackageNameSync } from "react-native-device-info";
+import { getBundleId, getInstallerPackageNameSync } from "react-native-device-info";
 import { knownInstallersPackage } from "@/constants/knownInstallers";
+import { getLatestRelease } from "@/functions/github/getRelease";
 import { startActivityAsync } from "expo-intent-launcher";
-import { repoName, username } from "@/constants/updates";
 import { Directory, Paths } from "expo-file-system/next";
 import { version as appVersion } from "@/package.json";
-import type { GitHubRelease } from "@/types/githubApi";
 import { UpdateCheckResult } from "@/types/updates";
 import * as FileSystem from "expo-file-system";
 import { ToastAndroid } from "react-native";
 import * as db from "@/functions/database";
-import { useRouter } from "expo-router";
 import semver from "semver";
-import axios from "axios";
 import SpInAppUpdates, {
     IAUUpdateKind,
 	IAUInstallStatus,
@@ -53,7 +50,6 @@ export const UpdateContext = createContext<UpdateData>({
 });
 
 export default function UpdateProvider({ children }: Props) {
-	const router = useRouter();
 	const installerPackageName = getInstallerPackageNameSync();
 
 	const [updateAvailable, setUpdateAvailable] = useState<boolean>(false);
@@ -66,13 +62,12 @@ export default function UpdateProvider({ children }: Props) {
 		useCallback(async () => {
 			setIsCheckingUpdate(true);
 
-			const res = await axios.get(
-				`https://api.github.com/repos/${username}/${repoName}/releases/latest`,
-			);
+			const bundleId = getBundleId();
 
-			const releaseData = res.data as GitHubRelease;
+			const isPrerelease = bundleId.endsWith(".pre");
+			const isDev = bundleId.endsWith(".dev");
 
-			if (!releaseData.assets?.length) {
+			if (isDev) {
 				setIsCheckingUpdate(false);
 
 				return {
@@ -82,7 +77,19 @@ export default function UpdateProvider({ children }: Props) {
 				};
 			}
 
-			const latestVersion = releaseData.tag_name;
+			const latestReleaseData = await getLatestRelease(isPrerelease);
+
+			if (!latestReleaseData?.assets?.length) {
+				setIsCheckingUpdate(false);
+
+				return {
+					available: false,
+					downloadUrl: null,
+					newVersion: null,
+				};
+			}
+
+			const latestVersion = latestReleaseData.tag_name;
 			const coercedVersion = semver.coerce(latestVersion);
 
 			if (!coercedVersion) {
@@ -99,6 +106,9 @@ export default function UpdateProvider({ children }: Props) {
 				const lastUpdateAlert = db.get("lastUpdateAlert");
 				const latestUpdateAlertVersion = db.get("lastUpdateAlertVersion");
 
+				setUpdateAvailable(true);
+				setNewVersion(coercedVersion.raw);
+
 				// 1000 * 60 * 30 = 30 minutes
 				if (
 					!lastUpdateAlert ||
@@ -111,14 +121,11 @@ export default function UpdateProvider({ children }: Props) {
 						ToastAndroid.LONG,
 					);
 
-					setUpdateAvailable(true);
-					setNewVersion(coercedVersion.raw);
-
 					db.set("lastUpdateAlert", new Date().toISOString());
 					db.set("lastUpdateAlertVersion", coercedVersion.raw);
 				}
 
-				const apkAsset = releaseData.assets.find((asset) =>
+				const apkAsset = latestReleaseData.assets.find((asset) =>
 					asset.name.endsWith(".apk"),
 				);
 
@@ -196,6 +203,25 @@ export default function UpdateProvider({ children }: Props) {
 				setIsCheckingUpdate(false);
 				setUpdateAvailable(true);
 				setNewVersion(needsUpdateRes.storeVersion);
+
+				const lastUpdateAlert = db.get("lastUpdateAlert");
+				const latestUpdateAlertVersion = db.get("lastUpdateAlertVersion");
+
+				// 1000 * 60 * 30 = 30 minutes
+				if (
+					!lastUpdateAlert ||
+					Date.now() - new Date(lastUpdateAlert).getTime() > 1000 * 60 * 30 ||
+					!latestUpdateAlertVersion ||
+					semver.gt(needsUpdateRes.storeVersion, latestUpdateAlertVersion)
+				) {
+					ToastAndroid.show(
+						"There's an Update Available, head to the user settings to download it",
+						ToastAndroid.LONG,
+					);
+
+					db.set("lastUpdateAlert", new Date().toISOString());
+					db.set("lastUpdateAlertVersion", needsUpdateRes.storeVersion);
+				}
 
 				return {
 					available: true,

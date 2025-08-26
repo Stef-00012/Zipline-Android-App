@@ -80,44 +80,6 @@ export async function updateSettings(
 	}
 }
 
-// GET /reload & /api/reload
-
-export async function reloadSettings(): Promise<true | string> {
-	const token = db.get("token");
-	const url = db.get("url");
-
-	if (!url || !token) return "Invalid token or URL";
-
-	try {
-		await axios.get(`${url}/reload`, {
-			headers: {
-				Authorization: token,
-			},
-		});
-
-		await axios.get(`${url}/api/reload`, {
-			headers: {
-				Authorization: token,
-			},
-		});
-
-		return true;
-	} catch (e) {
-		const error = e as AxiosError;
-
-		const data = error.response?.data as
-			| {
-					error: string;
-					statusCode: number;
-			  }
-			| undefined;
-
-		if (data) return data.error;
-
-		return "Something went wrong...";
-	}
-}
-
 export async function getPublicSettings(): Promise<APIPublicSettings | string> {
 	const token = db.get("token");
 	const url = db.get("url");

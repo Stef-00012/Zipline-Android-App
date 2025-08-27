@@ -8,46 +8,46 @@ const IS_DEV = process.env.APP_VARIANT === "development";
 const IS_PRERELEASE = process.env.APP_VARIANT === "prerelease";
 // const IS_PRODUCTION = process.env.APP_VARIANT === "production";
 
-let environmentAppName = "";
-let environmentAppIdentifier = "";
-let environmentAssetsPath = "";
+let appName = "Zipline";
+let appId = "com.stefdp.zipline";
+let assetsPath = "./assets/images";
 
 if (IS_DEV) {
-	environmentAppName = " (Dev)";
-	environmentAppIdentifier = ".dev";
-	environmentAssetsPath = "/dev";
+	appName = "Zipline (Dev)";
+	appId += ".dev";
+	assetsPath += "/dev";
 }
 
 if (IS_PRERELEASE) {
-	environmentAppName = " (Pre)";
-	environmentAppIdentifier = ".pre";
-	environmentAssetsPath = "/pre";
+	appName = "Zipline (Pre)";
+	appId += ".pre";
+	assetsPath += "/pre";
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
-	name: `Zipline${environmentAppName}`,
+	name: appName,
 	slug: "zipline",
 	version: appVersion,
 	orientation: "portrait",
-	icon: `./assets/images${environmentAssetsPath}/icon.png`,
+	icon: `${assetsPath}/icon.png`,
 	scheme: "zipline",
 	newArchEnabled: true,
 	userInterfaceStyle: "automatic",
 	platforms: ["android"],
 	ios: {
-		bundleIdentifier: `com.stefdp.zipline${environmentAppIdentifier}`,
+		bundleIdentifier: appId,
 	},
 	android: {
 		adaptiveIcon: {
-			foregroundImage: `./assets/images${environmentAssetsPath}/adaptive-icon.png`,
-			monochromeImage: `./assets/images${environmentAssetsPath}/monochromatic-adaptive-icon.png`,
+			foregroundImage: `${assetsPath}/adaptive-icon.png`,
+			monochromeImage: `${assetsPath}/monochromatic-adaptive-icon.png`,
 			backgroundColor: "#121317",
 		},
 		versionCode: appVersionCode,
 		version: appVersion,
-		package: `com.stefdp.zipline${environmentAppIdentifier}`,
-		scheme: `com.stefdp.zipline${environmentAppIdentifier}`,
+		package: appId,
+		scheme: appId,
 		newArchEnabled: true,
 		edgeToEdgeEnabled: true,
 		permissions: ["REQUEST_INSTALL_PACKAGES"],
@@ -58,7 +58,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		[
 			"expo-splash-screen",
 			{
-				image: `./assets/images${environmentAssetsPath}/splash-icon.png`,
+				image: `${assetsPath}/splash-icon.png`,
 				imageWidth: 300,
 				resizeMode: "contain",
 				backgroundColor: "#121317",

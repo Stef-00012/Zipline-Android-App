@@ -119,6 +119,11 @@ export default function Files() {
 
 	const [folders, setFolders] = useState<APIFoldersNoIncl>([]);
 
+	const [showApkPopup, setShowApkPopup] = useState<boolean>(false);
+	const [apkFileName, setApkFileName] = useState<string>("");
+	const [apkDownloadPercentage, setApkDownloadPercentage] =
+		useState<string>("0");
+
 	const dashUrl = db.get("url") as DashURL | null;
 
 	useEffect(() => {
@@ -533,6 +538,33 @@ export default function Files() {
 							</View>
 						)}
 					</View>
+				</Popup>
+
+				<Popup
+					hidden={!showApkPopup}
+					onClose={() => {
+						setShowApkPopup(false);
+					}}
+				>
+					<View style={styles.popupContent}>
+						<Text style={styles.mainHeaderText}>Downloading APK...</Text>
+	
+						<Text style={styles.popupText}>
+							Downloading{" "}
+							<Text
+								style={{
+									fontWeight: "bold",
+								}}
+							>
+								{apkFileName}
+							</Text>
+							... {apkDownloadPercentage}%
+						</Text>
+					</View>
+	
+					<Text style={styles.popupSubHeaderText}>
+						Press outside to close this popup
+					</Text>
 				</Popup>
 
 				<View style={styles.header}>
@@ -1221,6 +1253,9 @@ export default function Files() {
 																ToastAndroid.SHORT,
 															);
 
+														setShowApkPopup(true);
+														setApkFileName(file.name);
+
 														ToastAndroid.show(
 															"Downloading...",
 															ToastAndroid.SHORT,
@@ -1231,13 +1266,25 @@ export default function Files() {
 														const cacheDir = new Directory(Paths.cache);
 														const saveURI = `${cacheDir.uri}/${file.name}`;
 
-														const downloadResult =
-															await FileSystem.downloadAsync(
+														const downloadResumable =
+															FileSystem.createDownloadResumable(
 																downloadUrl,
 																saveURI,
+																{},
+																(downloadProgress) => {
+																	const percentage =
+																		(downloadProgress.totalBytesWritten /
+																			downloadProgress.totalBytesExpectedToWrite) *
+																		100;
+				
+																	setApkDownloadPercentage(percentage.toFixed(2));
+																},
 															);
+				
+														const downloadResult =
+															await downloadResumable.downloadAsync();
 
-														if (!downloadResult.uri)
+														if (!downloadResult?.uri)
 															return ToastAndroid.show(
 																"Something went wrong while downloading the file",
 																ToastAndroid.SHORT,
@@ -1253,6 +1300,9 @@ export default function Files() {
 																flags: 1,
 															},
 														);
+
+														setShowApkPopup(false);
+														setApkFileName("");
 													}}
 													iconColor={
 														file.name.endsWith(".apk") && !file.password

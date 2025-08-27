@@ -86,6 +86,10 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 	const [editFileType, setEditFileType] = useState<string>(file.type);
 	const [editFilePassword, setEditFilePassword] = useState<string | null>(null);
 
+	const [showApkPopup, setShowApkPopup] = useState<boolean>(false);
+	const [apkDownloadPercentage, setApkDownloadPercentage] =
+		useState<string>("0");
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Functions should not be parameters of the effect
 	useEffect(() => {
 		if (!hidden) {
@@ -324,6 +328,34 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 						}}
 					/>
 				</View>
+			</Popup>
+
+			<Popup
+				hidden={!showApkPopup}
+				onClose={() => {
+					setShowApkPopup(false);
+					setTempHidden(false);
+				}}
+			>
+				<View style={styles.popupContent}>
+					<Text style={styles.mainHeaderText}>Downloading APK...</Text>
+
+					<Text style={styles.popupText}>
+						Downloading{" "}
+						<Text
+							style={{
+								fontWeight: "bold",
+							}}
+						>
+							{file.name}
+						</Text>
+						... {apkDownloadPercentage}%
+					</Text>
+				</View>
+
+				<Text style={styles.popupSubHeaderText}>
+					Press outside to close this popup
+				</Text>
 			</Popup>
 
 			<Portal>
@@ -787,6 +819,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 												ToastAndroid.SHORT,
 											);
 
+										setShowApkPopup(true);
+										setTempHidden(true);
+
 										ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
 
 										const downloadUrl = `${dashUrl}/raw/${file.name}?download=true`;
@@ -794,12 +829,25 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										const cacheDir = new Directory(Paths.cache);
 										const saveURI = `${cacheDir.uri}/${file.name}`;
 
-										const downloadResult = await FileSystem.downloadAsync(
-											downloadUrl,
-											saveURI,
-										);
+										const downloadResumable =
+											FileSystem.createDownloadResumable(
+												downloadUrl,
+												saveURI,
+												{},
+												(downloadProgress) => {
+													const percentage =
+														(downloadProgress.totalBytesWritten /
+															downloadProgress.totalBytesExpectedToWrite) *
+														100;
 
-										if (!downloadResult.uri)
+													setApkDownloadPercentage(percentage.toFixed(2));
+												},
+											);
+
+										const downloadResult =
+											await downloadResumable.downloadAsync();
+
+										if (!downloadResult?.uri)
 											return ToastAndroid.show(
 												"Something went wrong while downloading the file",
 												ToastAndroid.SHORT,
@@ -815,6 +863,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 												flags: 1,
 											},
 										);
+
+										setShowApkPopup(false);
+										setTempHidden(false);
 									}}
 									iconSize={20}
 									width={30}

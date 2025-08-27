@@ -97,6 +97,10 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "white",
 	},
+	popupText: {
+		marginTop: 10,
+		color: "white",
+	},
 	popupContent: {
 		height: "auto",
 		width: "100%",

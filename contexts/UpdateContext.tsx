@@ -1,4 +1,7 @@
-import { getBundleId, getInstallerPackageNameSync } from "react-native-device-info";
+import {
+	getBundleId,
+	getInstallerPackageNameSync,
+} from "react-native-device-info";
 import { knownInstallersPackage } from "@/constants/knownInstallers";
 import { getLatestRelease } from "@/functions/github/getRelease";
 import { startActivityAsync } from "expo-intent-launcher";
@@ -10,15 +13,15 @@ import { ToastAndroid } from "react-native";
 import * as db from "@/functions/database";
 import semver from "semver";
 import SpInAppUpdates, {
-    IAUUpdateKind,
+	IAUUpdateKind,
 	IAUInstallStatus,
 } from "sp-react-native-in-app-updates";
 import React, {
-    createContext,
-    useState,
-    useCallback,
-    useMemo,
-    useEffect,
+	createContext,
+	useState,
+	useCallback,
+	useMemo,
+	useEffect,
 } from "react";
 
 interface Props {
@@ -181,7 +184,7 @@ export default function UpdateProvider({ children }: Props) {
 					ToastAndroid.SHORT,
 				);
 
-            const updatePathContent = await FileSystem.getContentUriAsync(updatePath)
+			const updatePathContent = await FileSystem.getContentUriAsync(updatePath);
 
 			await startActivityAsync("android.intent.action.INSTALL_PACKAGE", {
 				data: updatePathContent,
@@ -270,7 +273,7 @@ export default function UpdateProvider({ children }: Props) {
 			});
 
 			await inAppUpdates.startUpdate({
-				updateType: IAUUpdateKind.FLEXIBLE,
+				updateType: IAUUpdateKind.IMMEDIATE,
 			});
 
 			return "Successfully downloaded the update";

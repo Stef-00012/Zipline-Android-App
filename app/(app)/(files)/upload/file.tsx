@@ -1,31 +1,31 @@
-import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { type ExternalPathString, Link, useRouter } from "expo-router";
-import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import { convertToBytes, guessExtension } from "@/functions/util";
-import type { Preset, APIUploadResponse } from "@/types/zipline";
-import { Directory, File, Paths } from "expo-file-system/next";
-import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { getFolders } from "@/functions/zipline/folders";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { useContext, useEffect, useState } from "react";
-import * as DocumentPicker from "expo-document-picker";
-import { dates, formats } from "@/constants/upload";
-import type { Mimetypes } from "@/types/mimetypes";
+import Button from "@/components/Button";
 import FileDisplay from "@/components/FileDisplay";
-import { styles } from "@/styles/files/uploadFile";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import TextInput from "@/components/TextInput";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
+import Popup from "@/components/Popup";
 import Select from "@/components/Select";
 import Switch from "@/components/Switch";
-import Button from "@/components/Button";
-import Popup from "@/components/Popup";
+import TextInput from "@/components/TextInput";
+import { dates, formats } from "@/constants/upload";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import * as db from "@/functions/database";
+import { convertToBytes, guessExtension } from "@/functions/util";
+import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
+import { getFolders } from "@/functions/zipline/folders";
+import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/files/uploadFile";
+import type { Mimetypes } from "@/types/mimetypes";
+import type { APIUploadResponse, Preset } from "@/types/zipline";
 import bytes from "bytes";
+import * as Clipboard from "expo-clipboard";
+import * as DocumentPicker from "expo-document-picker";
+import { Directory, File, Paths } from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
+import * as ImagePicker from "expo-image-picker";
+import { Link, useRouter, type ExternalPathString } from "expo-router";
+import { useContext, useEffect, useState } from "react";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 export interface SelectedFile {
 	name: string;
@@ -663,6 +663,9 @@ export default function UploadFile({
 				>
 					Deletes At:
 				</Text>
+				<Text style={styles.selectDescription}>
+					The file will automatically delete itself after this time. You can set a default expiration time in the <Link style={styles.linkText} href="/admin/settings">settings</Link>.
+				</Text>
 				<Select
 					data={dates}
 					placeholder="Select Date..."
@@ -687,7 +690,10 @@ export default function UploadFile({
 						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
-					Format:
+					Name Format:
+				</Text>
+				<Text style={styles.selectDescription}>
+					The file name format to use when upload this file, the "File name" field will override this value.
 				</Text>
 				<Select
 					data={[
@@ -710,8 +716,9 @@ export default function UploadFile({
 
 				<TextInput
 					title="Compression:"
+					description="The compression level to use on images (only). The above format will be used to compress images. Leave blank to disable compression."
 					onValueChange={(content) => {
-						let compressionPercentage = Number.parseInt(content);
+						let compressionPercentage = Number.parseInt(content, 10);
 
 						if (compressionPercentage > 100) compressionPercentage = 100;
 						if (compressionPercentage < 0) compressionPercentage = 0;
@@ -727,8 +734,9 @@ export default function UploadFile({
 
 				<TextInput
 					title="Max Views:"
+					description="The maximum number of views the files can have before they are deleted. Leave blank to allow as many views as you want."
 					onValueChange={(content) => {
-						let maxViewsAmount = Number.parseInt(content);
+						let maxViewsAmount = Number.parseInt(content, 10);
 
 						if (maxViewsAmount < 0) maxViewsAmount = 0;
 
@@ -747,7 +755,10 @@ export default function UploadFile({
 						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
-					Folder:
+					Add to a Folder:
+				</Text>
+				<Text style={styles.selectDescription}>
+					Add this file to a folder. Use the "no folder" option not add the file to a folder. This value is not saved to your browser, and is cleared after uploading.
 				</Text>
 				<Select
 					data={[
@@ -780,6 +791,9 @@ export default function UploadFile({
 				>
 					Override Domain:
 				</Text>
+				<Text style={styles.selectDescription}>
+					Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.
+				</Text>
 				<Select
 					data={[
 						{
@@ -807,6 +821,7 @@ export default function UploadFile({
 
 				<TextInput
 					title="Override File Name:"
+					description={'Override the file name with this value. Leave blank to use the "Name Format" option. This value is ignored if you are uploading more than one file. This value is not saved to your browser, and is cleared after uploading.'}
 					disableContext={fileNameEnabled || !uploading || isCopying}
 					disabled={!fileNameEnabled || uploading || isCopying}
 					onValueChange={(content) => setFileName(content)}
@@ -816,6 +831,7 @@ export default function UploadFile({
 
 				<TextInput
 					title="Password:"
+					description="Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading."
 					onValueChange={(content) => setPassword(content)}
 					disableContext={uploading || isCopying}
 					disabled={uploading || isCopying}
@@ -826,6 +842,7 @@ export default function UploadFile({
 
 				<Switch
 					title="Add Original Name"
+					description={'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for its file name.'}
 					value={originalName || false}
 					disabled={uploading || isCopying}
 					onValueChange={() => setOriginalName((prev) => !prev)}
@@ -960,9 +977,7 @@ export default function UploadFile({
 						const fails: typeof failedUploads = [];
 
 						for (const file of selectedFiles) {
-							const fileInfo = await FileSystem.getInfoAsync(file.uri, {
-								size: true,
-							});
+							const fileInfo = await FileSystem.getInfoAsync(file.uri);
 
 							if (!fileInfo.exists || fileInfo.isDirectory) {
 								fails.push({
@@ -984,7 +999,7 @@ export default function UploadFile({
 
 							const fileData = {
 								uri: fileURI,
-								blob: new File(fileURI).blob(),
+								blob: new File(fileURI),
 								mimetype,
 							};
 

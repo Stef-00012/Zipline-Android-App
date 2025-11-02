@@ -1,7 +1,6 @@
-import { Switch as NativeSwitch } from "@react-native-material/core";
 import { styles } from "@/styles/components/switch";
-import { Text } from "react-native";
-import { View } from "react-native";
+import { Switch as NativeSwitch } from "@react-native-material/core";
+import { Text, View } from "react-native";
 
 interface Props {
 	value: boolean;

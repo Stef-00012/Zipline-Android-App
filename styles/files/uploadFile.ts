@@ -122,4 +122,14 @@ export const styles = StyleSheet.create({
 		fontSize: 10,
 		color: "dimgray",
 	},
+	selectDescription: {
+		color: "#6c7a8d",
+		marginBottom: 5,
+	},
+	linkText: {
+		color: "#CAA8E9",
+		textDecorationStyle: "solid",
+		textDecorationLine: "underline",
+		textDecorationColor: "#CAA8E9",
+	}
 });

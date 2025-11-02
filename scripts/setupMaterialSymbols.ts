@@ -1,6 +1,6 @@
 import axios from "axios";
-import path from "path";
 import fs from "fs";
+import path from "path";
 
 const assetsFolder = path.join(__dirname, "..", "assets");
 

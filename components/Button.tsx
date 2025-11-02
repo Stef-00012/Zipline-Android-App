@@ -1,5 +1,5 @@
-import { styles } from "@/styles/components/button";
 import { getRippleColor } from "@/functions/util";
+import { styles } from "@/styles/components/button";
 import type { RefObject } from "react";
 import {
 	type AnimatableNumericValue,
@@ -98,7 +98,16 @@ export default function Button({
 				...(!Number.isNaN(Number(borderRadius)) && { borderRadius }),
 			}}
 		>
-			{icon && <MaterialSymbols name={icon} size={iconSize} color={iconColor} />}
+			{icon && (
+				<MaterialSymbols
+					name={icon}
+					size={iconSize}
+					color={iconColor}
+					style={{
+						marginTop: -2,
+					}}
+				/>
+			)}
 
 			{textJsx?.(disabled, !!icon)}
 

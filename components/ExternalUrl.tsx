@@ -1,6 +1,6 @@
-import { type ExternalPathString, Link } from "expo-router";
 import { styles } from "@/styles/components/externalUrl";
 import type { ExternalLink } from "@/types/zipline";
+import { type ExternalPathString, Link } from "expo-router";
 import { Text, View } from "react-native";
 import Button from "./Button";
 

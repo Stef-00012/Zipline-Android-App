@@ -1,34 +1,34 @@
-import { View, Text, ToastAndroid, ScrollView, Pressable } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { useState, useEffect, type ReactNode, useContext } from "react";
-import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
-import { settings as zlSettings } from "@/constants/adminSettings";
-import type { APISettings, ExternalLink } from "@/types/zipline";
-import { convertToBytes, convertToTime } from "@/functions/util";
-import SkeletonTextInput from "@/components/skeleton/TextInput";
-import { parseMarkdownLinks } from "@/functions/componentUtil";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import Skeleton from "@/components/skeleton/Skeleton";
-import ExternalUrl from "@/components/ExternalUrl";
-import ColorPicker from "@/components/ColorPicker";
-import { styles } from "@/styles/admin/settings";
-import TextInput from "@/components/TextInput";
-import { useAuth } from "@/hooks/useAuth";
-import Select from "@/components/Select";
-import Switch from "@/components/Switch";
 import Button from "@/components/Button";
+import ColorPicker from "@/components/ColorPicker";
 import Domain from "@/components/Domain";
+import ExternalUrl from "@/components/ExternalUrl";
 import Popup from "@/components/Popup";
-import {
-	getSettings,
-	updateSettings,
-} from "@/functions/zipline/settings";
+import Select from "@/components/Select";
+import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTextInput from "@/components/skeleton/TextInput";
+import Switch from "@/components/Switch";
+import TextInput from "@/components/TextInput";
 import type {
 	SaveCategories,
 	SaveSettings,
 	Setting,
 } from "@/constants/adminSettings";
+import { settings as zlSettings } from "@/constants/adminSettings";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { parseMarkdownLinks } from "@/functions/componentUtil";
+import { convertToBytes, convertToTime } from "@/functions/util";
+import {
+	getSettings,
+	updateSettings,
+} from "@/functions/zipline/settings";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/admin/settings";
+import type { APISettings, ExternalLink } from "@/types/zipline";
+import { useContext, useEffect, useState, type ReactNode } from "react";
+import { Pressable, ScrollView, Text, ToastAndroid, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 const urlRegex = /http(s)?:\/\/(.+)\.(.+)/;
 
@@ -56,6 +56,7 @@ export default function ServerSettings() {
 				coreReturnHttpsUrls: settings.settings.coreReturnHttpsUrls,
 				coreDefaultDomain: settings.settings.coreDefaultDomain,
 				coreTempDirectory: settings.settings.coreTempDirectory,
+				coreTrustProxy: settings.settings.coreTrustProxy,
 
 				chunksEnabled: settings.settings.chunksEnabled,
 				chunksMax:
@@ -105,12 +106,14 @@ export default function ServerSettings() {
 				featuresThumbnailsEnabled: settings.settings.featuresThumbnailsEnabled,
 				featuresThumbnailsNumberThreads:
 					settings.settings.featuresThumbnailsNumberThreads,
+				featuresThumbnailsFormat: settings.settings.featuresThumbnailsFormat,
 				featuresVersionChecking: settings.settings.featuresVersionChecking,
 				featuresVersionAPI: settings.settings.featuresVersionAPI,
 
 				filesRoute: settings.settings.filesRoute,
 				filesLength: settings.settings.filesLength,
 				filesAssumeMimetypes: settings.settings.filesAssumeMimetypes,
+				filesDefaultCompressionFormat: settings.settings.filesDefaultCompressionFormat,
 				filesRemoveGpsMetadata: settings.settings.filesRemoveGpsMetadata,
 				filesDefaultFormat: settings.settings.filesDefaultFormat,
 				filesDisabledExtensions:
@@ -662,6 +665,8 @@ export default function ServerSettings() {
 							)
 						}
 						onSelect={(selectedItem) => {
+							if (!selectedItem || selectedItem.length <= 0) return;
+
 							setSaveSettings((prev) => {
 								return {
 									...prev,

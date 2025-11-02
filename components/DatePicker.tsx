@@ -1,8 +1,8 @@
-import DateTimePicker from "react-native-ui-datepicker";
-import { styles } from "@/styles/components/datePicker";
 import Button from "@/components/Button";
-import type { ReactNode } from "react";
 import Popup from "@/components/Popup";
+import { styles } from "@/styles/components/datePicker";
+import type { ReactNode } from "react";
+import DateTimePicker from "react-native-ui-datepicker";
 
 type DateTimePickerProps = Parameters<typeof DateTimePicker>[0];
 

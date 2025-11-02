@@ -1,7 +1,7 @@
+import { minimumVersion } from "@/constants/auth";
+import * as db from "@/functions/database";
 import type { APIVersion } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
-import * as db from "@/functions/database";
-import { minimumVersion } from "@/constants/auth";
 
 // GET /api/version
 export async function getVersion(): Promise<APIVersion | string> {

@@ -1,5 +1,5 @@
-import { TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/components/checkbox";
+import { TouchableOpacity, View } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {

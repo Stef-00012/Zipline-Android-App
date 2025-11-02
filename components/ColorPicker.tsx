@@ -1,26 +1,26 @@
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { styles } from "@/styles/components/colorPicker";
-import { View, Pressable, Text } from "react-native";
-import { isLightColor } from "@/functions/color";
-import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Popup from "@/components/Popup";
+import TextInput from "@/components/TextInput";
+import { isLightColor } from "@/functions/color";
+import { styles } from "@/styles/components/colorPicker";
+import { useEffect, useState } from "react";
+import { Pressable, Text, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import NativeColorPicker, {
+	BrightnessSlider,
 	type ColorFormatsObject,
 	HSLSaturationSlider,
-	BrightnessSlider,
+	HueSlider,
+	InputWidget,
 	LuminanceSlider,
 	OpacitySlider,
-	InputWidget,
-	HueSlider,
-	Swatches,
-	Preview,
 	Panel1,
 	Panel2,
 	Panel3,
 	Panel4,
 	Panel5,
+	Preview,
+	Swatches,
 } from "reanimated-color-picker";
 
 type PanelType = "saturation" | "brightness" | "hsl-saturation";

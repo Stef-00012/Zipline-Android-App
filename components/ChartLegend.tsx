@@ -1,5 +1,5 @@
-import { Text, View, type ColorValue } from "react-native";
 import { styles } from "@/styles/components/chartLegend";
+import { Text, View, type ColorValue } from "react-native";
 
 interface Props {
 	data: {

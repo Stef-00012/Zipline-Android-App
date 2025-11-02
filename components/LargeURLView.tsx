@@ -1,9 +1,9 @@
-import { type ExternalPathString, Link } from "expo-router";
+import type { URLActions } from "@/app/(app)/urls";
+import Dropdown from "@/components/Dropdown";
+import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/components/largeURLView";
 import type { APIURL, DashURL } from "@/types/zipline";
-import type { URLActions } from "@/app/(app)/urls";
-import { timeDifference } from "@/functions/util";
-import Dropdown from "@/components/Dropdown";
+import { type ExternalPathString, Link } from "expo-router";
 import { Text, View } from "react-native";
 
 interface Props {

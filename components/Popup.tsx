@@ -1,6 +1,4 @@
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { styles } from "@/styles/components/popup";
-import { Portal } from "react-native-portalize";
 import { useEffect } from "react";
 import {
 	BackHandler,
@@ -9,6 +7,8 @@ import {
 	View,
 	type ViewStyle,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { Portal } from "react-native-portalize";
 
 interface Props {
 	onClose: () => void;

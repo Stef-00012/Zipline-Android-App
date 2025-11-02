@@ -1,9 +1,9 @@
-import { isLightColor, rgbaToHex, toRgba } from "@/functions/color";
 import mimetypesJSON from "@/assets/mimetypes.json";
-import type { Mimetypes } from "@/types/mimetypes";
 import { namedColors } from "@/constants/colors";
-import ms from "enhanced-ms";
+import { isLightColor, rgbaToHex, toRgba } from "@/functions/color";
+import type { Mimetypes } from "@/types/mimetypes";
 import bytes from "bytes";
+import ms from "enhanced-ms";
 
 const mimetypes = mimetypesJSON as Mimetypes;
 

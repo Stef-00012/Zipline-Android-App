@@ -1,6 +1,6 @@
+import * as db from "@/functions/database";
 import type { APITag, APITags } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
-import * as db from "@/functions/database";
 
 // GET /api/user/tags
 export async function getTags(): Promise<APITags | string> {

@@ -1,33 +1,33 @@
-import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
-import type { APIFolder, APIUploadResponse, DashURL } from "@/types/zipline";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { ScrollView, Text, ToastAndroid, View } from "react-native";
 import type { SelectedFile } from "@/app/(app)/(files)/upload/file";
-import { Directory, File, Paths } from "expo-file-system/next";
-import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { getFolder } from "@/functions/zipline/folders";
-import { useContext, useEffect, useState } from "react";
-import * as DocumentPicker from "expo-document-picker";
-import { dates, formats } from "@/constants/upload";
-import type { Mimetypes } from "@/types/mimetypes";
-import FileDisplay from "@/components/FileDisplay";
-import { guessExtension } from "@/functions/util";
-import { styles } from "@/styles/folders/upload";
-import * as FileSystem from "expo-file-system";
-import TextInput from "@/components/TextInput";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
 import Button from "@/components/Button";
+import FileDisplay from "@/components/FileDisplay";
+import Popup from "@/components/Popup";
 import Select from "@/components/Select";
 import Switch from "@/components/Switch";
-import Popup from "@/components/Popup";
+import TextInput from "@/components/TextInput";
+import { dates, formats } from "@/constants/upload";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import * as db from "@/functions/database";
+import { guessExtension } from "@/functions/util";
+import { uploadFiles, type UploadFileOptions } from "@/functions/zipline/files";
+import { getFolder } from "@/functions/zipline/folders";
+import { useDetectKeyboardOpen } from "@/hooks/isKeyboardOpen";
+import { styles } from "@/styles/folders/upload";
+import type { Mimetypes } from "@/types/mimetypes";
+import type { APIFolder, APIUploadResponse, DashURL } from "@/types/zipline";
+import * as Clipboard from "expo-clipboard";
+import * as DocumentPicker from "expo-document-picker";
+import { Directory, File, Paths } from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import {
-	type ExternalPathString,
 	Link,
 	useLocalSearchParams,
 	useRouter,
+	type ExternalPathString,
 } from "expo-router";
+import { useContext, useEffect, useState } from "react";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 export default function FolderUpload() {
 	const router = useRouter();
@@ -526,9 +526,7 @@ export default function FolderUpload() {
 						const fails: typeof failedUploads = [];
 
 						for (const file of selectedFiles) {
-							const fileInfo = await FileSystem.getInfoAsync(file.uri, {
-								size: true,
-							});
+							const fileInfo = await FileSystem.getInfoAsync(file.uri);
 
 							if (!fileInfo.exists || fileInfo.isDirectory) {
 								fails.push({
@@ -548,7 +546,7 @@ export default function FolderUpload() {
 
 							const fileData = {
 								uri: fileInfo.uri || file.uri,
-								blob: file.instance.blob(),
+								blob: file.instance,
 								mimetype,
 							};
 

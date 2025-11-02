@@ -1,28 +1,28 @@
+import Button from "@/components/Button";
+import LargeFolderView from "@/components/LargeFolderView";
+import Popup from "@/components/Popup";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
+import Switch from "@/components/Switch";
+import Table from "@/components/Table";
+import TextInput from "@/components/TextInput";
+import { searchKeyNames } from "@/constants/folders";
+import * as db from "@/functions/database";
+import { timeDifference } from "@/functions/util";
 import {
 	createFolder,
 	deleteFolder,
 	editFolder,
 	getFolders,
 } from "@/functions/zipline/folders";
-import { type ExternalPathString, Link, useRouter } from "expo-router";
-import { Text, View, ToastAndroid, ScrollView } from "react-native";
-import type { APIFolders, DashURL } from "@/types/zipline";
-import LargeFolderView from "@/components/LargeFolderView";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
-import { searchKeyNames } from "@/constants/folders";
-import { timeDifference } from "@/functions/util";
-import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
-import { styles } from "@/styles/folders";
 import { useAuth } from "@/hooks/useAuth";
-import Switch from "@/components/Switch";
-import Button from "@/components/Button";
-import Popup from "@/components/Popup";
-import Table from "@/components/Table";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/folders";
+import type { APIFolders, DashURL } from "@/types/zipline";
+import * as Clipboard from "expo-clipboard";
+import { type ExternalPathString, Link, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
 
 export type FolderActions =
 	| "viewFiles"
@@ -225,6 +225,7 @@ export default function Folders() {
 
 						<Switch
 							onValueChange={() => setNewFolderPublic((prev) => !prev)}
+							description="Public folders are visible to everyone"
 							value={newFolderPublic}
 							title="Public"
 						/>

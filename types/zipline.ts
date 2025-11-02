@@ -51,6 +51,8 @@ export interface APIUserView {
 	enabled?: boolean;
 	align?: "left" | "center" | "right";
 	showMimetype?: boolean;
+	showTags?: boolean;
+	showFolder?: boolean;
 	content?: string;
 	embed?: boolean;
 	embedTitle?: string;
@@ -139,7 +141,14 @@ export interface APIUploadFile {
 	id: APIFile["id"];
 	type: keyof Mimetypes;
 	url: string;
-	pending: boolean;
+	pending?: boolean;
+	name: string;
+	compression?: APIUploadFileCompression;
+}
+
+export interface APIUploadFileCompression {
+	mimetype: string;
+	ext: string;
 }
 
 export interface APIUploadResponse {
@@ -178,6 +187,7 @@ export interface APISettings {
 		coreReturnHttpsUrls: boolean;
 		coreDefaultDomain: string | null;
 		coreTempDirectory: string;
+		coreTrustProxy: boolean;
 		chunksEnabled: boolean;
 		chunksMax: number | string;
 		chunksSize: number | string;
@@ -193,6 +203,7 @@ export interface APISettings {
 		filesMaxFileSize: number | string;
 		filesDefaultExpiration: string | null;
 		filesAssumeMimetypes: boolean;
+		filesDefaultCompressionFormat: "png" | "jpg" | "webp" | "jxl";
 		filesDefaultDateFormat: string;
 		filesRemoveGpsMetadata: boolean;
 		filesRandomWordsNumAdjectives: number;
@@ -207,6 +218,7 @@ export interface APISettings {
 		featuresDeleteOnMaxViews: boolean;
 		featuresThumbnailsEnabled: boolean;
 		featuresThumbnailsNumberThreads: number;
+		featuresThumbnailsFormat: "png" | "jpg" | "webp";
 		featuresMetricsEnabled: boolean;
 		featuresMetricsAdminOnly: boolean;
 		featuresMetricsShowUserSpecific: boolean;
@@ -571,6 +583,7 @@ export interface APIWebSettings {
 			removeGpsMetadata: boolean;
 			randomWordsNumAdjectives: number;
 			randomWordsSeparator: string;
+			defaultCompressionFormat: "png" | "jpg" | "webp" | "jxl";
 		};
 		urls: {
 			route: string;
@@ -586,6 +599,7 @@ export interface APIWebSettings {
 			thumbnails: {
 				enabled: boolean;
 				num_threads: number;
+				format: "jpg" | "png" | "webp";
 			};
 			metrics: {
 				enabled: boolean;
@@ -595,6 +609,7 @@ export interface APIWebSettings {
 			versionChecking: boolean;
 			versionAPI: string;
 		};
+		domains: string[];
 		invites: {
 			enabled: boolean;
 			length: number;
@@ -641,7 +656,7 @@ export interface APIWebSettings {
 			bypassLocalLogin: boolean;
 			loginOnly: boolean;
 		};
-		version: string;
+		// version: string;
 	};
 	codeMap: {
 		ext: string;

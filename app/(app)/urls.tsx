@@ -1,23 +1,15 @@
-import { Text, View, ToastAndroid, ScrollView } from "react-native";
-import { type ExternalPathString, Link } from "expo-router";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { useContext, useEffect, useState } from "react";
-import type { APIURLs, DashURL } from "@/types/zipline";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
-import LargeURLView from "@/components/LargeURLView";
-import { timeDifference } from "@/functions/util";
-import { searchKeyNames } from "@/constants/urls";
-import TextInput from "@/components/TextInput";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
-import Switch from "@/components/Switch";
 import Button from "@/components/Button";
-import { styles } from "@/styles/urls";
+import LargeURLView from "@/components/LargeURLView";
 import Popup from "@/components/Popup";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
+import Switch from "@/components/Switch";
 import Table from "@/components/Table";
+import TextInput from "@/components/TextInput";
+import { searchKeyNames } from "@/constants/urls";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import * as db from "@/functions/database";
+import { timeDifference } from "@/functions/util";
 import {
 	type CreateURLParams,
 	type EditURLOptions,
@@ -26,6 +18,14 @@ import {
 	editURL,
 	getURLs,
 } from "@/functions/zipline/urls";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/urls";
+import type { APIURLs, DashURL } from "@/types/zipline";
+import * as Clipboard from "expo-clipboard";
+import { type ExternalPathString, Link } from "expo-router";
+import { useContext, useEffect, useState } from "react";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
 
 export type URLActions =
 	| "copyShortLink"
@@ -38,6 +38,7 @@ const urlRegex = /^http:\/\/(.*)?|https:\/\/(.*)?$/;
 export default function Urls() {
 	useAuth();
 	useShareIntent();
+
 	const { webSettings } = useContext(ZiplineContext);
 
 	const urlsCompactView = db.get("urlsCompactView");
@@ -243,6 +244,7 @@ export default function Urls() {
 
 						<TextInput
 							title="Vanity:"
+							description="Optional field, leave blank to generate a random code"
 							onValueChange={(content) => {
 								setNewUrlVanity(content || null);
 							}}
@@ -252,6 +254,7 @@ export default function Urls() {
 
 						<TextInput
 							title="Max Views:"
+							description="Optional field, leave blank to disable a view limit."
 							keyboardType="numeric"
 							onValueChange={(content) => {
 								setNewUrlMaxViews(content || null);
@@ -262,6 +265,7 @@ export default function Urls() {
 
 						<TextInput
 							title="Password:"
+							description="Protect your link with a password"
 							onValueChange={(content) => {
 								setNewUrlPassword(content || null);
 							}}
@@ -272,6 +276,7 @@ export default function Urls() {
 
 						<Switch
 							title="Enabled"
+							description="Allow or prevent this URL from being visited"
 							value={newUrlEnabled}
 							onValueChange={() => setNewUrlEnabled((prev) => !prev)}
 						/>
@@ -360,7 +365,7 @@ export default function Urls() {
 								)}
 
 								<TextInput
-									title="URL:"
+									title="Destination:"
 									onValueChange={(content) => {
 										setEditUrlDestination((content as DashURL) || null);
 									}}
@@ -371,6 +376,7 @@ export default function Urls() {
 
 								<TextInput
 									title="Vanity:"
+									description="A custom alias for your URL. Leave blank to use the randomly generated code."
 									onValueChange={(content) => {
 										setEditUrlVanity(content || null);
 									}}
@@ -380,6 +386,7 @@ export default function Urls() {
 
 								<TextInput
 									title="Max Views:"
+									description="The maximum number of clicks this URL can have before it is automatically deleted. Leave blank to allow as many views as you want."
 									keyboardType="numeric"
 									onValueChange={(content) => {
 										setEditUrlMaxViews(content || null);
@@ -390,6 +397,7 @@ export default function Urls() {
 
 								<TextInput
 									title="Password:"
+									description="Set a password for this URL. Leave blank to disable password protection."
 									onValueChange={(content) => {
 										setEditUrlPassword(content || null);
 									}}
@@ -400,6 +408,7 @@ export default function Urls() {
 
 								<Switch
 									title="Enabled"
+									description="Prevent or allow this URL from being visited."
 									value={editUrlEnabled}
 									onValueChange={() => setEditUrlEnabled((prev) => !prev)}
 								/>

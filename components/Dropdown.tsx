@@ -1,16 +1,16 @@
-import { useState, useRef } from "react";
 import Button from "@/components/Button";
+import { useRef, useState } from "react";
 import {
-	View,
-	TouchableOpacity,
-	Dimensions,
-	Modal,
-	type StyleProp,
-	type ViewStyle,
-	Pressable,
-	type DimensionValue,
-	ScrollView,
-	type ColorValue,
+    Dimensions,
+    Modal,
+    Pressable,
+    ScrollView,
+    TouchableOpacity,
+    View,
+    type ColorValue,
+    type DimensionValue,
+    type StyleProp,
+    type ViewStyle,
 } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";
 

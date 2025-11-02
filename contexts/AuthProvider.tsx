@@ -1,20 +1,20 @@
-import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
-import * as LocalAuthentication from "expo-local-authentication";
+import { minimumVersion } from "@/constants/auth";
+import * as db from "@/functions/database";
 import { isAuthenticated } from "@/functions/zipline/auth";
+import { getCurrentUser, getCurrentUserAvatar } from "@/functions/zipline/user";
 import { getVersion } from "@/functions/zipline/version";
 import { APISelfUser, APIUser } from "@/types/zipline";
+import * as LocalAuthentication from "expo-local-authentication";
 import { usePathname, useRouter } from "expo-router";
-import { minimumVersion } from "@/constants/auth";
-import { BackHandler } from "react-native";
-import * as db from "@/functions/database";
-import semver from "semver";
 import React, {
 	createContext,
-	useState,
 	useCallback,
-	useMemo,
 	useEffect,
+	useMemo,
+	useState,
 } from "react";
+import { BackHandler } from "react-native";
+import semver from "semver";
 
 interface Props {
 	children: React.ReactNode;

@@ -1,17 +1,17 @@
+import Button from "@/components/Button";
 import { styles } from "@/styles/components/textInput";
 import { type ReactNode, useState } from "react";
-import Button from "@/components/Button";
 import {
-	type TextInputSubmitEditingEventData,
-	type TextInputChangeEventData,
-	TextInput as NativeTextInput,
+	type ColorValue,
+	type KeyboardType,
 	type NativeSyntheticEvent,
 	type ReturnKeyTypeOptions,
-	type KeyboardType,
-	type ColorValue,
+	type TextInputChangeEventData,
+	type TextInputSubmitEditingEventData,
 	type TextStyle,
-	View,
+	TextInput as NativeTextInput,
 	Text,
+	View,
 } from "react-native";
 import type MaterialSymbols from "./MaterialSymbols";
 

@@ -1,11 +1,11 @@
-import ShareIntentShorten from "@/components/ShareIntentShorten";
-import { useShareIntentContext } from "expo-share-intent";
 import UploadFile from "@/app/(app)/(files)/upload/file";
 import UploadText from "@/app/(app)/(files)/upload/text";
-import { useFocusEffect, useRouter } from "expo-router";
-import { styles } from "@/styles/shareIntent";
-import { File } from "expo-file-system/next";
+import ShareIntentShorten from "@/components/ShareIntentShorten";
 import { useAuth } from "@/hooks/useAuth";
+import { styles } from "@/styles/shareIntent";
+import { File } from "expo-file-system";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useShareIntentContext } from "expo-share-intent";
 import { View } from "react-native";
 
 export default function ShareIntent() {

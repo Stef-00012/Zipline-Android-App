@@ -1,15 +1,15 @@
-import { type PropsWithChildren, useContext, useState } from "react";
-import { Stack, IconButton } from "@react-native-material/core";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { AuthContext } from "@/contexts/AuthProvider";
-import { usePathname, useRouter } from "expo-router";
-import { styles } from "@/styles/components/header";
-import { getRippleColor } from "@/functions/util";
-import UserAvatar from "@/components/UserAvatar";
-import { View, Pressable } from "react-native";
-import { colors } from "@/constants/skeleton";
 import Sidebar from "@/components/Sidebar";
+import UserAvatar from "@/components/UserAvatar";
+import { colors } from "@/constants/skeleton";
+import { AuthContext } from "@/contexts/AuthProvider";
+import { getRippleColor } from "@/functions/util";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/components/header";
+import { IconButton, Stack } from "@react-native-material/core";
+import { usePathname, useRouter } from "expo-router";
 import { Skeleton } from "moti/skeleton";
+import { type PropsWithChildren, useContext, useState } from "react";
+import { Pressable, View } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";
 
 export default function Header({ children }: PropsWithChildren) {

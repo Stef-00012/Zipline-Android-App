@@ -1,6 +1,6 @@
+import * as db from "@/functions/database";
 import type { ServerActionResponse } from "@/types/zipline";
 import axios, { type AxiosError } from "axios";
-import * as db from "@/functions/database";
 
 export async function clearZeroByteFiles(): Promise<
 	ServerActionResponse | string

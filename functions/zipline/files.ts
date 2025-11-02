@@ -1,8 +1,4 @@
-import { Directory, Paths } from "expo-file-system/next";
-import * as FileSystem from "expo-file-system";
-import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
-import bytes from "bytes";
 import type {
 	APIFile,
 	APIFiles,
@@ -13,6 +9,10 @@ import type {
 	APIUploadPartialResponse,
 	APIUploadResponse,
 } from "@/types/zipline";
+import axios, { type AxiosError } from "axios";
+import bytes from "bytes";
+import { Directory, Paths } from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 
 export interface GetFilesOptions {
 	id?: string;
@@ -193,6 +193,7 @@ export interface EditFileOptions {
 	type?: string;
 	favorite?: boolean;
 	tags?: APITag["id"][];
+	name?: string;
 }
 // PATCH /api/user/files/[id]
 export async function editFile(

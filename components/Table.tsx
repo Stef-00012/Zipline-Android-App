@@ -1,7 +1,7 @@
-import { Table as NativeTable, Row } from "react-native-reanimated-table";
-import { Pressable, ScrollView, Text, View } from "react-native";
 import { styles } from "@/styles/components/table";
 import { useState, type ReactNode } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { Table as NativeTable, Row } from "react-native-reanimated-table";
 import MaterialSymbols from "./MaterialSymbols";
 
 type HeaderRow = {

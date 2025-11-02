@@ -1,6 +1,6 @@
-import { styles } from "@/styles/components/domain";
-import Skeleton from "@/components/skeleton/Skeleton";
 import Button from "@/components/Button";
+import Skeleton from "@/components/skeleton/Skeleton";
+import { styles } from "@/styles/components/domain";
 import { View } from "react-native";
 
 export default function SkeletonDomain() {

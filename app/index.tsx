@@ -1,24 +1,24 @@
-import LargeFileDisplay from "@/components/LargeFileDisplay";
-import { getRecentFiles } from "@/functions/zipline/user";
-import { getUserStats } from "@/functions/zipline/stats";
-import { useContext, useEffect, useState } from "react";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import { Text, View, ScrollView } from "react-native";
-import { AuthContext } from "@/contexts/AuthProvider";
-import Skeleton from "@/components/skeleton/Skeleton";
 import FileDisplay from "@/components/FileDisplay";
-import { convertToBytes } from "@/functions/util";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
-import { styles } from "@/styles/home";
+import LargeFileDisplay from "@/components/LargeFileDisplay";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
 import Table from "@/components/Table";
+import { AuthContext } from "@/contexts/AuthProvider";
+import * as db from "@/functions/database";
+import { convertToBytes } from "@/functions/util";
+import { getUserStats } from "@/functions/zipline/stats";
+import { getRecentFiles } from "@/functions/zipline/user";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/home";
 import type {
 	APIFile,
 	APIRecentFiles,
 	APIUserStats,
 	DashURL,
 } from "@/types/zipline";
+import { useContext, useEffect, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 
 
 // ------------------------ DEV -------------------------

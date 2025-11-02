@@ -1,11 +1,11 @@
-import type { APIUserNoIncl, DashURL } from "@/types/zipline";
 import type { UserActions } from "@/app/(app)/admin/users";
-import { styles } from "@/styles/components/largeUserView";
-import { timeDifference } from "@/functions/util";
-import Dropdown from "@/components/Dropdown";
-import { Text, View } from "react-native";
 import Button from "@/components/Button";
+import Dropdown from "@/components/Dropdown";
+import { timeDifference } from "@/functions/util";
+import { styles } from "@/styles/components/largeUserView";
+import type { APIUserNoIncl, DashURL } from "@/types/zipline";
 import { Image } from "expo-image";
+import { Text, View } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {

@@ -1,47 +1,49 @@
-import { colorHash, convertToBytes, timeDifference } from "@/functions/util";
-import { getFolder, getFolders } from "@/functions/zipline/folders";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import LargeFileDisplay from "@/components/LargeFileDisplay";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import { getUser } from "@/functions/zipline/users";
-import { searchKeyNames } from "@/constants/files";
+import Button from "@/components/Button";
+import CheckBox from "@/components/CheckBox";
 import ColorPicker from "@/components/ColorPicker";
 import FileDisplay from "@/components/FileDisplay";
-import { isLightColor } from "@/functions/color";
-import TextInput from "@/components/TextInput";
-import * as FileSystem from "expo-file-system";
-import { colors } from "@/constants/skeleton";
-import { styles } from "@/styles/files/files";
-import CheckBox from "@/components/CheckBox";
-import { useEffect, useState } from "react";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
-import { Skeleton } from "moti/skeleton";
-import Select from "@/components/Select";
-import Button from "@/components/Button";
-import Table from "@/components/Table";
+import LargeFileDisplay from "@/components/LargeFileDisplay";
 import Popup from "@/components/Popup";
+import Select from "@/components/Select";
+import SkeletonTable from "@/components/skeleton/Table";
+import Table from "@/components/Table";
+import TextInput from "@/components/TextInput";
+import { searchKeyNames } from "@/constants/files";
+import { colors } from "@/constants/skeleton";
+import { isLightColor } from "@/functions/color";
+import * as db from "@/functions/database";
+import { colorHash, convertToBytes, timeDifference } from "@/functions/util";
 import {
 	bulkEditFiles,
 	deleteFile,
 	getFiles,
 	type GetFilesOptions,
 } from "@/functions/zipline/files";
+import { getFolder, getFolders } from "@/functions/zipline/folders";
 import {
 	createTag,
 	deleteTag,
 	editTag,
 	getTags,
 } from "@/functions/zipline/tags";
+import { getUser } from "@/functions/zipline/users";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/files/files";
 import type {
-	APITags,
-	APIFiles,
-	DashURL,
 	APIFile,
+	APIFiles,
 	APIFoldersNoIncl,
+	APITags,
+	DashURL,
 } from "@/types/zipline";
+import * as Clipboard from "expo-clipboard";
+import { Directory, Paths } from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
+import { startActivityAsync } from "expo-intent-launcher";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Skeleton } from "moti/skeleton";
+import { useEffect, useState } from "react";
 import {
 	type ColorValue,
 	ScrollView,
@@ -49,8 +51,6 @@ import {
 	ToastAndroid,
 	View,
 } from "react-native";
-import { Directory, Paths } from "expo-file-system/next";
-import { startActivityAsync } from "expo-intent-launcher";
 
 export default function Files() {
 	const router = useRouter();

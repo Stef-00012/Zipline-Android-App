@@ -1,28 +1,28 @@
+import { knownInstallersPackage } from "@/constants/knownInstallers";
+import * as db from "@/functions/database";
+import { getLatestRelease } from "@/functions/github/getRelease";
+import { version as appVersion } from "@/package.json";
+import { UpdateCheckResult } from "@/types/updates";
+import * as FileSystem from "expo-file-system";
+import { Directory, Paths } from "expo-file-system";
+import { startActivityAsync } from "expo-intent-launcher";
+import React, {
+	createContext,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
+import { ToastAndroid } from "react-native";
 import {
 	getBundleId,
 	getInstallerPackageNameSync,
 } from "react-native-device-info";
-import { knownInstallersPackage } from "@/constants/knownInstallers";
-import { getLatestRelease } from "@/functions/github/getRelease";
-import { startActivityAsync } from "expo-intent-launcher";
-import { Directory, Paths } from "expo-file-system/next";
-import { version as appVersion } from "@/package.json";
-import { UpdateCheckResult } from "@/types/updates";
-import * as FileSystem from "expo-file-system";
-import { ToastAndroid } from "react-native";
-import * as db from "@/functions/database";
 import semver from "semver";
 import SpInAppUpdates, {
-	IAUUpdateKind,
 	IAUInstallStatus,
+	IAUUpdateKind,
 } from "sp-react-native-in-app-updates";
-import React, {
-	createContext,
-	useState,
-	useCallback,
-	useMemo,
-	useEffect,
-} from "react";
 
 interface Props {
 	children: React.ReactNode;

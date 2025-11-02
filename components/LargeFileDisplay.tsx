@@ -1,47 +1,47 @@
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { type ExternalPathString, useRouter } from "expo-router";
-import { styles } from "@/styles/components/largeFileDisplay";
-import FileDisplay from "@/components/FileDisplay";
-import { getTags } from "@/functions/zipline/tags";
-import { convertToBytes } from "@/functions/util";
-import { isLightColor } from "@/functions/color";
-import { Portal } from "react-native-portalize";
-import * as FileSystem from "expo-file-system";
-import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
-import Select from "@/components/Select";
 import Button from "@/components/Button";
+import FileDisplay from "@/components/FileDisplay";
 import Popup from "@/components/Popup";
-import axios from "axios";
-import {
-	removeFileFromFolder,
-	addFileToFolder,
-	getFolders,
-} from "@/functions/zipline/folders";
+import Select from "@/components/Select";
+import TextInput from "@/components/TextInput";
+import { isLightColor } from "@/functions/color";
+import * as db from "@/functions/database";
+import { convertToBytes } from "@/functions/util";
 import {
 	type EditFileOptions,
 	deleteFile,
 	editFile,
 } from "@/functions/zipline/files";
+import {
+	addFileToFolder,
+	getFolders,
+	removeFileFromFolder,
+} from "@/functions/zipline/folders";
+import { getTags } from "@/functions/zipline/tags";
+import { styles } from "@/styles/components/largeFileDisplay";
 import type {
-	APIFoldersNoIncl,
 	APIFile,
+	APIFoldersNoIncl,
 	APITags,
 	DashURL,
 } from "@/types/zipline";
+import axios from "axios";
+import * as Clipboard from "expo-clipboard";
+import { Directory, Paths } from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
+import { startActivityAsync } from "expo-intent-launcher";
+import { type ExternalPathString, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
+	BackHandler,
 	type ColorValue,
-	ToastAndroid,
 	Pressable,
 	Text,
+	ToastAndroid,
 	View,
-	BackHandler,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { Portal } from "react-native-portalize";
 import MaterialSymbols from "./MaterialSymbols";
-import { Directory, Paths } from "expo-file-system/next";
-import { startActivityAsync } from "expo-intent-launcher";
 
 interface Props {
 	file: APIFile;
@@ -79,6 +79,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 
 	const [editFileMaxViews, setEditFileMaxViews] = useState<number | null>(
 		file.maxViews,
+	);
+	const [editFileName, setEditFileName] = useState<string>(
+		file.name,
 	);
 	const [editFileOriginalName, setEditFileOriginalName] = useState<
 		string | null
@@ -211,9 +214,20 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 					<Text style={styles.mainHeaderText}>Editing "{file.name}"</Text>
 
 					<TextInput
-						title="Max Views:"
+						title="Name:"
+						description="Rename the file."
 						onValueChange={(content) => {
-							setEditFileMaxViews(Math.abs(Number.parseInt(content)));
+							setEditFileName(content);
+						}}
+						value={editFileName ? String(editFileName) : ""}
+						placeholder={file.name}
+					/>
+
+					<TextInput
+						title="Max Views:"
+						description="The maximum number of views this file can have before it is deleted. Leave blank to allow as many views as you want."
+						onValueChange={(content) => {
+							setEditFileMaxViews(Math.abs(Number.parseInt(content, 10)));
 						}}
 						value={editFileMaxViews ? String(editFileMaxViews) : ""}
 						keyboardType="numeric"
@@ -222,6 +236,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 
 					<TextInput
 						title="Original Name:"
+						description={'Add an original name. When downloading this file, instead of using the generated file name (if chosen), it will download with this "original name" instead.'}
 						onValueChange={(content) => {
 							setEditFileOriginalName(content);
 						}}
@@ -230,6 +245,11 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 
 					<TextInput
 						title="Type:"
+						description={
+							<Text>
+								Change a file's mimetype. <Text style={{ fontWeight: "bold" }}>DO NOT CHANGE THIS VALUE</Text> unless you know what you are doing, this can mess with how Zipline renders specific file types.
+							</Text>
+						}
 						onValueChange={(content) => {
 							setEditFileType(content);
 						}}
@@ -270,6 +290,7 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 					) : (
 						<TextInput
 							title="Password:"
+							description="Set a password for this file. Leave blank to disable password protection."
 							password
 							onValueChange={(content) => {
 								setEditFilePassword(content);
@@ -305,6 +326,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								setFilePassword(true);
 								file.password = true;
 							}
+
+							file.name = editFileName;
+							setEditFileName(editFileName);
 
 							file.originalName = editFileOriginalName || null;
 							setFileOriginalName(editFileOriginalName || null);

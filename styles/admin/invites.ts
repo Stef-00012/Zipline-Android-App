@@ -120,4 +120,8 @@ export const styles = StyleSheet.create({
 		fontSize: 20,
 		textAlignVertical: "center",
 	},
+	selectDescription: {
+		color: "#6c7a8d",
+		marginBottom: 5,
+	},
 });

@@ -1,13 +1,13 @@
-import { createURL, type CreateURLParams } from "@/functions/zipline/urls";
-import { styles } from "@/styles/components/shareIntentShorten";
-import { Text, View, ToastAndroid } from "react-native";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import TextInput from "@/components/TextInput";
-import * as Clipboard from "expo-clipboard";
-import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/Button";
+import TextInput from "@/components/TextInput";
+import { createURL, type CreateURLParams } from "@/functions/zipline/urls";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/components/shareIntentShorten";
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Text, ToastAndroid, View } from "react-native";
 
 interface Props {
 	defaultUrl: string;

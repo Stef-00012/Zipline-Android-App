@@ -1,30 +1,30 @@
-import { Dimensions, ScrollView, Text, View } from "react-native";
-import { LineChart, PieChart } from "react-native-gifted-charts";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import type { DateType } from "react-native-ui-datepicker";
-import { useContext, useEffect, useState } from "react";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
+import Button from "@/components/Button";
 import ChartLegend from "@/components/ChartLegend";
 import DatePicker from "@/components/DatePicker";
-import type { APIStats } from "@/types/zipline";
-import { useAuth } from "@/hooks/useAuth";
-import { styles } from "@/styles/metrics";
-import Button from "@/components/Button";
+import MaterialSymbols from "@/components/MaterialSymbols";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
 import Table from "@/components/Table";
-import { add } from "date-fns";
-import {
-	filterStats,
-	getStats,
-	type StatsProps,
-} from "@/functions/zipline/stats";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import {
 	colorHash,
 	convertToBytes,
 	getMetricsDifference,
 } from "@/functions/util";
-import MaterialSymbols from "@/components/MaterialSymbols";
+import {
+	filterStats,
+	getStats,
+	type StatsProps,
+} from "@/functions/zipline/stats";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/metrics";
+import type { APIStats } from "@/types/zipline";
+import { add } from "date-fns";
+import { useContext, useEffect, useState } from "react";
+import { Dimensions, ScrollView, Text, View } from "react-native";
+import { LineChart, PieChart } from "react-native-gifted-charts";
+import type { DateType } from "react-native-ui-datepicker";
 
 export default function Metrics() {
 	const { webSettings } = useContext(ZiplineContext);

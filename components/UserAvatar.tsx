@@ -1,5 +1,5 @@
 import { styles } from "@/styles/components/userAvatar";
-import { Text, View, Image } from "react-native";
+import { Image, Text, View } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";
 
 interface Props {

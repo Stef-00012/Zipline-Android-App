@@ -1,6 +1,6 @@
+import type { SelectProps } from "@/components/Select";
 import type { APISettings, ShortenEmbed, UploadEmbed } from "@/types/zipline";
 import type { DimensionValue, KeyboardType } from "react-native";
-import type { SelectProps } from "@/components/Select";
 
 export const defaultUploadEmbed: UploadEmbed = {
 	imageOrVideo: false,
@@ -52,6 +52,7 @@ export const settingNames: Partial<Record<SettingPath, string>> = {
 	featuresMetricsShowUserSpecific: "Show User Specific Metrics",
 	featuresThumbnailsEnabled: "Enable Thumbnails",
 	featuresThumbnailsNumberThreads: "Thumbnails Number Threads",
+	featuresThumbnailsFormat: "Thumbnails Format",
 	featuresVersionChecking: "Version Checking",
 	featuresVersionAPI: "Version API URL",
 
@@ -157,6 +158,7 @@ export interface SaveSettings {
 	coreDefaultDomain: string | null;
 	coreReturnHttpsUrls: boolean;
 	coreTempDirectory: string;
+	coreTrustProxy: boolean;
 
 	chunksEnabled: boolean;
 	chunksMax: number | string;
@@ -183,12 +185,14 @@ export interface SaveSettings {
 	featuresMetricsShowUserSpecific: boolean;
 	featuresThumbnailsEnabled: boolean;
 	featuresThumbnailsNumberThreads: number;
+	featuresThumbnailsFormat: "png" | "jpg" | "webp";
 	featuresVersionChecking: boolean;
 	featuresVersionAPI: string;
 
 	filesRoute: string;
 	filesLength: number;
 	filesAssumeMimetypes: boolean;
+	filesDefaultCompressionFormat: "png" | "jpg" | "webp" | "jxl";
 	filesRemoveGpsMetadata: boolean;
 	filesDefaultFormat: "random" | "uuid" | "date" | "name" | "gfycat";
 	filesDisabledExtensions: string;
@@ -313,6 +317,40 @@ export const formats: SelectProps["data"] = [
 	},
 ];
 
+export const thumbnailFileFormats: SelectProps["data"] = [
+	{
+		label: ".jpg",
+		value: "jpg",
+	},
+	{
+		label: ".png",
+		value: "png",
+	},
+	{
+		label: ".webp",
+		value: "webp",
+	},
+]
+
+export const filesFormats: SelectProps["data"] = [
+	{
+		label: ".jpg",
+		value: "jpg",
+	},
+	{
+		label: ".png",
+		value: "png",
+	},
+	{
+		label: ".webp",
+		value: "webp",
+	},
+	{
+		label: ".jxl",
+		value: "jxl",
+	}
+]
+
 export type SettingPath<
 	T extends keyof APISettings["settings"] = keyof APISettings["settings"],
 > = T extends "discordOnUploadEmbed"
@@ -430,6 +468,12 @@ export const settings: Setting[] = [
 				name: "Return HTTPS URls",
 				setting: "coreReturnHttpsUrls",
 				description: "Return URLs with HTTPS protocol.",
+			},
+			{
+				type: "switch",
+				name: "Trust Proxies",
+				setting: "coreTrustProxy",
+				description: "Trust the X-Forwarded-* headers set by proxies. Only enable this if you are behind a trusted proxy (nginx, caddy, etc.). Requires a server restart.",
 			},
 			{
 				type: "input",
@@ -673,6 +717,15 @@ export const settings: Setting[] = [
 				skeletonWidth: 30,
 			},
 			{
+				type: "select",
+				name: "Thumbnails Format",
+				setting: "featuresThumbnailsFormat",
+				options: thumbnailFileFormats,
+				defaultValue: "png",
+				placeholder: "Select format...",
+				description: "The output format for thumbnails. Requires a server restart.",
+			},
+			{
 				type: "switch",
 				name: "Version Checking",
 				setting: "featuresVersionChecking",
@@ -789,6 +842,14 @@ export const settings: Setting[] = [
 				placeholder: "-",
 				description: "The separator to use for the random-words/gfycat format.",
 				skeletonWidth: "20%",
+			},
+			{
+				type: "select",
+				name: "Default Compression Format",
+				description: "The default image compression format to use when only a compression percent is specified.",
+				options: filesFormats,
+				placeholder: "Select format...",
+				setting: "filesDefaultCompressionFormat",
 			},
 			{
 				type: "save",

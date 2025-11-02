@@ -1,12 +1,10 @@
-import { type SidebarOption, sidebarOptions } from "@/constants/sidebar";
-import { type RelativePathString, usePathname } from "expo-router";
-import { ZiplineContext } from "@/contexts/ZiplineProvider";
-import { Animated, View, Dimensions } from "react-native";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import { AuthContext } from "@/contexts/AuthProvider";
-import { styles } from "@/styles/components/sidebar";
 import Button from "@/components/Button";
-import { useRouter } from "expo-router";
+import { type SidebarOption, sidebarOptions } from "@/constants/sidebar";
+import { AuthContext } from "@/contexts/AuthProvider";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/components/sidebar";
+import { type RelativePathString, usePathname, useRouter } from "expo-router";
 import {
 	type Dispatch,
 	type SetStateAction,
@@ -15,6 +13,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { Animated, Dimensions, View } from "react-native";
 
 interface Props {
 	open: boolean;

@@ -1,24 +1,15 @@
-import { fileQuotaTypes, searchKeyNames, userRoles } from "@/constants/users";
-import { ScrollView, Text, View, ToastAndroid } from "react-native";
-import { guessExtension, timeDifference } from "@/functions/util";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import LargeUserView from "@/components/LargeUserView";
-import Skeleton from "@/components/skeleton/Skeleton";
-import type { Mimetypes } from "@/types/mimetypes";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import TextInput from "@/components/TextInput";
-import { styles } from "@/styles/admin/users";
-import { useEffect, useState } from "react";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/Button";
-import Select from "@/components/Select";
+import LargeUserView from "@/components/LargeUserView";
+import MaterialSymbols from "@/components/MaterialSymbols";
 import Popup from "@/components/Popup";
+import Select from "@/components/Select";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
 import Table from "@/components/Table";
-import { router } from "expo-router";
-import { Image } from "expo-image";
+import TextInput from "@/components/TextInput";
+import { fileQuotaTypes, searchKeyNames, userRoles } from "@/constants/users";
+import * as db from "@/functions/database";
+import { guessExtension, timeDifference } from "@/functions/util";
 import {
 	createUser,
 	deleteUser,
@@ -26,13 +17,22 @@ import {
 	type EditUserOptions,
 	getUsers,
 } from "@/functions/zipline/users";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/admin/users";
+import type { Mimetypes } from "@/types/mimetypes";
 import type {
 	APIUser,
 	APIUserQuota,
 	APIUsersNoIncl,
 	DashURL,
 } from "@/types/zipline";
-import MaterialSymbols from "@/components/MaterialSymbols";
+import * as FileSystem from "expo-file-system";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
 
 export type UserActions = "viewFiles" | "edit" | "delete";
 
@@ -305,6 +305,9 @@ export default function Users() {
 							<Text style={styles.mainHeaderText}>Quota</Text>
 
 							<Text style={styles.popupHeaderText}>File Quota Type:</Text>
+							<Text style={styles.selectDescription}>
+								Whether to set a quota on files by total bytes or the total number of files
+							</Text>
 							<Select
 								data={fileQuotaTypes}
 								onSelect={(selectedQuota) => {
@@ -334,6 +337,7 @@ export default function Users() {
 										<View>
 											<TextInput
 												title="Max Bytes:"
+												description="The maximum number of bytes the user can upload."
 												onValueChange={(content) => {
 													setEditMaxBytes(content || null);
 												}}
@@ -347,9 +351,10 @@ export default function Users() {
 										<View>
 											<TextInput
 												title="Max Files:"
+												description="The maximum number of files the user can upload."
 												onValueChange={(content) => {
 													setEditMaxFileCount(
-														Math.abs(Number.parseInt(content)) || null,
+														Math.abs(Number.parseInt(content, 10)) || null,
 													);
 												}}
 												value={editMaxFileCount ? String(editMaxFileCount) : ""}
@@ -364,7 +369,7 @@ export default function Users() {
 							<TextInput
 								title="Max URLs:"
 								onValueChange={(content) => {
-									setEditMaxUrls(Math.abs(Number.parseInt(content)) || null);
+									setEditMaxUrls(Math.abs(Number.parseInt(content, 10)) || null);
 								}}
 								value={editMaxUrls ? String(editMaxUrls) : ""}
 								placeholder="0"

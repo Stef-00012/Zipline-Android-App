@@ -1,27 +1,26 @@
-import { Text, View, ToastAndroid, ScrollView } from "react-native";
-import type { APIInvites, DashURL } from "@/types/zipline";
-import LargeInviteView from "@/components/LargeInviteView";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import Skeleton from "@/components/skeleton/Skeleton";
-import { searchKeyNames } from "@/constants/invites";
-import { timeDifference } from "@/functions/util";
-import { styles } from "@/styles/admin/invites";
-import TextInput from "@/components/TextInput";
-import { useEffect, useState } from "react";
-import { dates } from "@/constants/invites";
-import * as Clipboard from "expo-clipboard";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
-import Select from "@/components/Select";
 import Button from "@/components/Button";
+import LargeInviteView from "@/components/LargeInviteView";
 import Popup from "@/components/Popup";
+import Select from "@/components/Select";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
 import Table from "@/components/Table";
+import TextInput from "@/components/TextInput";
+import { dates, searchKeyNames } from "@/constants/invites";
+import * as db from "@/functions/database";
+import { timeDifference } from "@/functions/util";
 import {
 	createInvite,
 	deleteInvite,
 	getInvites,
 } from "@/functions/zipline/invites";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { styles } from "@/styles/admin/invites";
+import type { APIInvites, DashURL } from "@/types/zipline";
+import * as Clipboard from "expo-clipboard";
+import { useEffect, useState } from "react";
+import { ScrollView, Text, ToastAndroid, View } from "react-native";
 
 export type InviteActions = "copy" | "delete";
 
@@ -142,6 +141,9 @@ export default function Invites() {
 						)}
 
 						<Text style={styles.popupHeaderText}>Expires At:</Text>
+						<Text style={styles.selectDescription}>
+							Select an expiration for this invite, or choose "never" if you want the invite to never expire.
+						</Text>
 						<Select
 							placeholder="Select Date..."
 							data={dates}
@@ -155,9 +157,10 @@ export default function Invites() {
 
 						<TextInput
 							title="Max Uses:"
+							description="Set a maximum number of uses for this invite, or leave blank for unlimited uses."
 							onValueChange={(content) => {
 								setNewInviteMaxUses(
-									Math.abs(Number.parseInt(content)) || undefined,
+									Math.abs(Number.parseInt(content, 10)) || undefined,
 								);
 							}}
 							value={newInviteMaxUses ? String(newInviteMaxUses) : ""}

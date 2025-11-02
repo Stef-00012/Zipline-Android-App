@@ -1,6 +1,6 @@
-import type { APIURLs, APIURL, APIShortenResponse } from "@/types/zipline";
-import axios, { type AxiosError } from "axios";
 import * as db from "@/functions/database";
+import type { APIShortenResponse, APIURL, APIURLs } from "@/types/zipline";
+import axios, { type AxiosError } from "axios";
 
 interface GetURLsOptions {
 	searchField?: "code" | "vanity" | "destination";

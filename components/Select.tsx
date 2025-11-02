@@ -1,12 +1,12 @@
-import { useState, useEffect, type ReactNode } from "react";
-import { styles } from "@/styles/components/select";
 import CheckBox from "@/components/CheckBox";
+import { styles } from "@/styles/components/select";
+import { useEffect, useState, type ReactNode } from "react";
 import {
-	Text,
-	View,
-	TouchableOpacity,
 	FlatList,
 	Modal,
+	Text,
+	TouchableOpacity,
+	View,
 	type DimensionValue,
 } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";

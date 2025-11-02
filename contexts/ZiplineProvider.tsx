@@ -1,14 +1,14 @@
-import { APIPublicSettings, APIWebSettings } from "@/types/zipline";
 import {
-    getPublicSettings,
+	getPublicSettings,
 	getWebSettings,
 } from "@/functions/zipline/settings";
+import { APIPublicSettings, APIWebSettings } from "@/types/zipline";
 import React, {
-    createContext,
-    useState,
-    useCallback,
-    useMemo,
-    useEffect,
+	createContext,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
 } from "react";
 
 interface Props {

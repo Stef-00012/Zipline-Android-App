@@ -1,37 +1,28 @@
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import type { APIExports, APIVersion, DashURL } from "@/types/zipline";
-import { getInstallerPackageNameSync } from "react-native-device-info";
-import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
-import { View, Text, Pressable, ToastAndroid } from "react-native";
-import { convertToBytes, guessExtension } from "@/functions/util";
-import { knownInstallersName } from "@/constants/knownInstallers";
-import SkeletonTextInput from "@/components/skeleton/TextInput";
-import { getTokenWithToken } from "@/functions/zipline/auth";
-import { UpdateContext } from "@/contexts/UpdateContext";
-import VersionDisplay from "@/components/VersionDisplay";
-import { getVersion } from "@/functions/zipline/version";
-import { useState, useEffect, useContext } from "react";
-import { useShareIntent } from "@/hooks/useShareIntent";
-import SkeletonTable from "@/components/skeleton/Table";
-import { version as appVersion } from "@/package.json";
-import { AuthContext } from "@/contexts/AuthProvider";
-import Skeleton from "@/components/skeleton/Skeleton";
-import ColorPicker from "@/components/ColorPicker";
-import { alignments } from "@/constants/settings";
-import type { Mimetypes } from "@/types/mimetypes";
-import * as ImagePicker from "expo-image-picker";
-import UserAvatar from "@/components/UserAvatar";
-import TextInput from "@/components/TextInput";
-import * as FileSystem from "expo-file-system";
-import * as Clipboard from "expo-clipboard";
-import { styles } from "@/styles/settings";
-import * as db from "@/functions/database";
-import { useAuth } from "@/hooks/useAuth";
-import Switch from "@/components/Switch";
 import Button from "@/components/Button";
-import Select from "@/components/Select";
+import ColorPicker from "@/components/ColorPicker";
 import Popup from "@/components/Popup";
+import Select from "@/components/Select";
+import SkeletonColorPicker from "@/components/skeleton/ColorPicker";
+import Skeleton from "@/components/skeleton/Skeleton";
+import SkeletonTable from "@/components/skeleton/Table";
+import SkeletonTextInput from "@/components/skeleton/TextInput";
+import Switch from "@/components/Switch";
 import Table from "@/components/Table";
+import TextInput from "@/components/TextInput";
+import UserAvatar from "@/components/UserAvatar";
+import VersionDisplay from "@/components/VersionDisplay";
+import { knownInstallersName } from "@/constants/knownInstallers";
+import { alignments } from "@/constants/settings";
+import { AuthContext } from "@/contexts/AuthProvider";
+import { UpdateContext } from "@/contexts/UpdateContext";
+import * as db from "@/functions/database";
+import { convertToBytes, guessExtension } from "@/functions/util";
+import { getTokenWithToken } from "@/functions/zipline/auth";
+import {
+	createUserExport,
+	deleteUserExport,
+	getUserExports,
+} from "@/functions/zipline/exports";
 import {
 	clearTempFiles,
 	clearZeroByteFiles,
@@ -40,14 +31,24 @@ import {
 	requeryFileSize,
 } from "@/functions/zipline/serverActions";
 import {
-	createUserExport,
-	deleteUserExport,
-	getUserExports,
-} from "@/functions/zipline/exports";
-import {
 	editCurrentUser,
 	type EditUserOptions,
 } from "@/functions/zipline/user";
+import { getVersion } from "@/functions/zipline/version";
+import { useAuth } from "@/hooks/useAuth";
+import { useShareIntent } from "@/hooks/useShareIntent";
+import { version as appVersion } from "@/package.json";
+import { styles } from "@/styles/settings";
+import type { Mimetypes } from "@/types/mimetypes";
+import type { APIExports, APIVersion, DashURL } from "@/types/zipline";
+import * as Clipboard from "expo-clipboard";
+import * as FileSystem from "expo-file-system/legacy";
+import * as ImagePicker from "expo-image-picker";
+import { Link } from "expo-router";
+import { useContext, useEffect, useState } from "react";
+import { Pressable, Text, ToastAndroid, View } from "react-native";
+import { getInstallerPackageNameSync } from "react-native-device-info";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 export default function UserSettings() {
 	const {
@@ -116,6 +117,9 @@ export default function UserSettings() {
 		"left",
 	);
 	const [viewShowMimetype, setViewShowMimetype] = useState<boolean>(false);
+	const [viewShowTags, setViewShowTags] = useState<boolean>(false);
+	const [viewShowFolder, setViewShowFolder] = useState<boolean>(false);
+
 	const [viewContent, setViewContent] = useState<string | undefined>(undefined);
 	const [viewEmbed, setViewEmbed] = useState<boolean>(false);
 	const [viewEmbedTitle, setViewEmbedTitle] = useState<string | undefined>(
@@ -177,6 +181,8 @@ export default function UserSettings() {
 
 			setViewEnabled(user.view.enabled || false);
 			setViewShowMimetype(user.view.showMimetype || false);
+			setViewShowTags(user.view.showTags || false)
+			setViewShowFolder(user.view.showFolder || false)
 			setViewContent(user.view.content);
 			setViewAlign(user.view.align || "left");
 			setViewEmbed(user.view.embed || false);
@@ -776,8 +782,9 @@ export default function UserSettings() {
 
 									{currentAvatar && (
 										<Button
-											text="Remove Avatar"
+											text="Remove"
 											color="#e03131"
+											icon="close"
 											textColor="white"
 											height="auto"
 											width="28.33%"
@@ -845,7 +852,7 @@ export default function UserSettings() {
 							<View style={styles.settingGroup}>
 								<Text style={styles.headerText}>Viewing Files</Text>
 								<Text style={styles.headerDescription}>
-									All text fields support using variables.
+									All text fields support using <Link style={styles.linkText} href="https://zipline.diced.sh/docs/guides/variables">variables</Link>.
 								</Text>
 
 								<Switch
@@ -861,6 +868,22 @@ export default function UserSettings() {
 									value={viewShowMimetype || false}
 									onValueChange={() => setViewShowMimetype((prev) => !prev)}
 									description="Show the mimetype of the file in the view-route"
+								/>
+
+								<Switch
+									title="Show Tags"
+									disabled={!viewEnabled}
+									value={viewShowTags || false}
+									onValueChange={() => setViewShowTags((prev) => !prev)}
+									description="Show the file's tags in the view-route"
+								/>
+
+								<Switch
+									title="Show Folder"
+									disabled={!viewEnabled}
+									value={viewShowFolder || false}
+									onValueChange={() => setViewShowFolder((prev) => !prev)}
+									description="Show the name/link of the folder if possible in the view-route"
 								/>
 
 								<TextInput
@@ -894,7 +917,7 @@ export default function UserSettings() {
 								/>
 
 								<Switch
-									title="Embed"
+									title="Enable Embed"
 									description="Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
 									disabled={!viewEnabled}
 									value={viewEmbed || false}
@@ -972,6 +995,7 @@ export default function UserSettings() {
 											);
 										}}
 										color="#323ea8"
+										icon="add"
 										text="New Export"
 										margin={{
 											top: 10,
@@ -1000,7 +1024,10 @@ export default function UserSettings() {
 											rowWidth={[230, 130, 60, 90, 90]}
 											rows={exports.map((zlExport) => {
 												const id = (
-													<Text key={zlExport.id} style={styles.rowText}>
+													<Text key={zlExport.id} style={[
+														styles.rowText,
+														zlExport.completed ? styles.rowIdCompleted : styles.rowIdProgress
+													]}>
 														{zlExport.id}
 													</Text>
 												);
@@ -1019,7 +1046,7 @@ export default function UserSettings() {
 
 												const size = (
 													<Text key={zlExport.id} style={styles.rowText}>
-														{convertToBytes(Number.parseInt(zlExport.size), {
+														{convertToBytes(Number.parseInt(zlExport.size, 10), {
 															unitSeparator: " ",
 														})}
 													</Text>
@@ -1179,6 +1206,7 @@ export default function UserSettings() {
 											);
 										}}
 										color="#323ea8"
+										icon="delete"
 										text="Clear Zero Byte Files"
 										width="45%"
 										margin={{
@@ -1191,6 +1219,7 @@ export default function UserSettings() {
 									<Button
 										onPress={() => setClearTempFilesPopupOpen(true)}
 										color="#323ea8"
+										icon="delete"
 										text="Clear Temp Files"
 										width="45%"
 										margin={{
@@ -1205,6 +1234,7 @@ export default function UserSettings() {
 									<Button
 										onPress={() => setRequerySizeOfFilesPopupOpen(true)}
 										color="#323ea8"
+										icon="quick_reference_all"
 										text="Requery Size of Files"
 										width="45%"
 										margin={{
@@ -1217,6 +1247,7 @@ export default function UserSettings() {
 									<Button
 										onPress={() => setGenerateThumbnailsPopupOpen(true)}
 										color="#323ea8"
+										icon="videocam"
 										text="Generate Thumbnails"
 										width="45%"
 										margin={{

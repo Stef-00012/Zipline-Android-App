@@ -1,10 +1,10 @@
+import type { FolderActions } from "@/app/(app)/folders";
+import Dropdown from "@/components/Dropdown";
+import { timeDifference } from "@/functions/util";
 import { styles } from "@/styles/components/largeFolderView";
 import type { APIFolder, DashURL } from "@/types/zipline";
-import type { FolderActions } from "@/app/(app)/folders";
-import { timeDifference } from "@/functions/util";
-import Dropdown from "@/components/Dropdown";
-import { Text, View } from "react-native";
 import { Link } from "expo-router";
+import { Text, View } from "react-native";
 
 interface Props {
 	folder: APIFolder;

@@ -1,6 +1,6 @@
+import { roles } from "@/constants/auth";
 import { AuthContext } from "@/contexts/AuthProvider";
 import type { APIUser } from "@/types/zipline";
-import { roles } from "@/constants/auth";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
 

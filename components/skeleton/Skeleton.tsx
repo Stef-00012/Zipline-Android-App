@@ -1,7 +1,7 @@
-import { Skeleton as NativeSkeleton } from "moti/skeleton";
-import { type DimensionValue, View } from "react-native";
 import { colors } from "@/constants/skeleton";
+import { Skeleton as NativeSkeleton } from "moti/skeleton";
 import type { ReactElement } from "react";
+import { type DimensionValue, View } from "react-native";
 
 interface Props {
 	children?: ReactElement | null;

@@ -1,15 +1,15 @@
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import Button from "@/components/Button";
+import TextInput from "@/components/TextInput";
+import { minimumVersion } from "@/constants/auth";
+import { AuthContext } from "@/contexts/AuthProvider";
+import * as db from "@/functions/database";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { getVersion } from "@/functions/zipline/version";
-import { AuthContext } from "@/contexts/AuthProvider";
-import { minimumVersion } from "@/constants/auth";
-import TextInput from "@/components/TextInput";
-import { useContext, useState } from "react";
-import * as db from "@/functions/database";
-import { Text, View } from "react-native";
-import Button from "@/components/Button";
-import { useRouter } from "expo-router";
 import { styles } from "@/styles/login";
+import { useRouter } from "expo-router";
+import { useContext, useState } from "react";
+import { Text, View } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import semver from "semver";
 
 export default function Login() {

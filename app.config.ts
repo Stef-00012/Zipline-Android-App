@@ -1,4 +1,4 @@
-import type { ExpoConfig, ConfigContext } from "expo/config";
+import type { ConfigContext, ExpoConfig } from "expo/config";
 import {
 	version as appVersion,
 	versionCode as appVersionCode,
@@ -35,6 +35,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	newArchEnabled: true,
 	userInterfaceStyle: "automatic",
 	platforms: ["android"],
+	// description: "",
+	// primaryColor: "",
+	// githubUrl: "",
+	owner: "stef_dp",
 	ios: {
 		bundleIdentifier: appId,
 	},
@@ -44,6 +48,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			monochromeImage: `${assetsPath}/monochromatic-adaptive-icon.png`,
 			backgroundColor: "#121317",
 		},
+		playStoreUrl: "https://play.google.com/store/apps/details?id=com.stefdp.zipline",
+		// backgroundColor: "",
+		predictiveBackGestureEnabled: true,
 		versionCode: appVersionCode,
 		version: appVersion,
 		package: appId,
@@ -54,7 +61,35 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	},
 	plugins: [
 		"expo-router",
-		"expo-font",
+		[
+			"expo-font",
+			{
+				fonts: [
+					"./assets/material-symbols.ttf"
+				],
+				android: {
+					fonts: [
+						{
+							fontFamily: "MaterialSymbols",
+							fontDefinitions: [
+								{
+									path: "./assets/material-symbols.ttf",
+									weight: "400",
+									style: "normal",
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		[
+			"expo-dev-client",
+			{
+				launchMode: "most-recent",
+				addGeneratedScheme: false,
+			},
+		],
 		[
 			"expo-splash-screen",
 			{
@@ -78,6 +113,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	],
 	experiments: {
 		typedRoutes: true,
+		reactCompiler: true,
 	},
 	extra: {
 		router: {

@@ -162,4 +162,16 @@ export const styles = StyleSheet.create({
 	versionContainer: {
 		flexDirection: "row",
 	},
+	linkText: {
+		color: "#5259AB",
+		textDecorationColor: "#5259AB",
+		textDecorationLine: "underline",
+		textDecorationStyle: "solid",
+	},
+	rowIdCompleted: {
+		color: "#66D57B",
+	},
+	rowIdProgress: {
+		color: "#69788A"
+	}
 });

@@ -1,6 +1,6 @@
 import { styles } from "@/styles/components/versionDisplay";
-import { type ExternalPathString, Link } from "expo-router";
 import type { /*APIUser,*/ APIVersion } from "@/types/zipline";
+import { type ExternalPathString, Link } from "expo-router";
 import { /*useContext, useEffect,*/ useState } from "react";
 import { Pressable, Text, View } from "react-native";
 // import { ZiplineContext } from "@/contexts/ZiplineProvider";

@@ -45,10 +45,14 @@ export default function ShareIntentShorten({ defaultUrl }: Props) {
 							icon="link"
 							color="transparent"
 							iconColor="#2d3f70"
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 						/>
 					</View>
@@ -109,7 +113,7 @@ export default function ShareIntentShorten({ defaultUrl }: Props) {
 						};
 
 						if (vanity) urlData.vanity = vanity;
-						if (maxViews) urlData.maxViews = Number.parseInt(maxViews);
+						if (maxViews) urlData.maxViews = Number.parseInt(maxViews, 10);
 						if (password) urlData.password = password;
 
 						const shortenedUrlData = await createURL(urlData);
@@ -132,8 +136,8 @@ export default function ShareIntentShorten({ defaultUrl }: Props) {
 
 						setOutputUrl(shortenedUrlData.url);
 					}}
-					margin={{
-						top: 15,
+					containerStyle={{
+						marginTop: 15
 					}}
 				/>
 

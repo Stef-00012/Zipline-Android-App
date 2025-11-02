@@ -212,10 +212,10 @@ export default function Users() {
 							<Text style={styles.popupHeaderText}>Avatar:</Text>
 							<Button
 								color="transparent"
-								borderWidth={2}
-								borderColor="#222c47"
-								margin={{
-									top: 5,
+								containerStyle={{
+									borderColor: "#222c47",
+									borderWidth: 2,
+									marginTop: 5
 								}}
 								rippleColor="gray"
 								text={
@@ -430,8 +430,8 @@ export default function Users() {
 
 									setUserToEdit(null);
 								}}
-								margin={{
-									top: 15,
+								containerStyle={{
+									marginTop: 15
 								}}
 							/>
 
@@ -482,10 +482,10 @@ export default function Users() {
 						<Text style={styles.popupHeaderText}>Avatar:</Text>
 						<Button
 							color="transparent"
-							borderWidth={2}
-							borderColor="#222c47"
-							margin={{
-								top: 5,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginTop: 5
 							}}
 							rippleColor="gray"
 							text={
@@ -612,8 +612,8 @@ export default function Users() {
 							}}
 							color="#323ea8"
 							text="Create"
-							margin={{
-								top: 10,
+							containerStyle={{
+								marginTop: 10
 							}}
 						/>
 
@@ -655,11 +655,11 @@ export default function Users() {
 										}}
 										color="#323ea8"
 										text="Cancel"
-										width="40%"
-										margin={{
-											top: 15,
-											right: 10,
-											left: "auto",
+										containerStyle={{
+											width: "40%",
+											marginTop: 15,
+											marginRight: 10,
+											marginLeft: "auto",
 										}}
 									/>
 
@@ -670,11 +670,10 @@ export default function Users() {
 										}}
 										color="#CF4238"
 										text="Delete"
-										width="40%"
-										margin={{
-											top: 15,
-											right: "auto",
-											left: "auto",
+										containerStyle={{
+											width: "40%",
+											marginTop: 15,
+											marginHorizontal: "auto",
 										}}
 									/>
 								</View>
@@ -737,8 +736,8 @@ export default function Users() {
 									}}
 									color="#323ea8"
 									text="No, keep everything & only delete user"
-									margin={{
-										top: 15,
+									containerStyle={{
+										marginTop: 15
 									}}
 								/>
 
@@ -767,8 +766,8 @@ export default function Users() {
 									}}
 									color="#CF4238"
 									text="Yes, delete everything"
-									margin={{
-										top: 15,
+									containerStyle={{
+										marginTop: 15
 									}}
 								/>
 
@@ -790,16 +789,17 @@ export default function Users() {
 							icon="person_add"
 							color="transparent"
 							iconColor={users && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!users || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 
 						<Button
@@ -814,16 +814,17 @@ export default function Users() {
 							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={users && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!users || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 					</View>
 				</View>
@@ -839,9 +840,16 @@ export default function Users() {
 								onPress={() => setShowSearch(false)}
 								icon="close"
 								color="#191b27"
-								width={30}
-								height={30}
-								padding={5}
+								containerStyle={{
+									width: 30,
+									height: 30,
+								}}
+								buttonStyle={{
+									padding: 5
+								}}
+								iconStyle={{
+									marginBottom: 7
+								}}
 							/>
 						</View>
 
@@ -1019,9 +1027,13 @@ export default function Users() {
 																onAction("viewFiles", user);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -1031,9 +1043,13 @@ export default function Users() {
 																onAction("edit", user);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -1043,9 +1059,13 @@ export default function Users() {
 																onAction("delete", user);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 													</View>
 												);

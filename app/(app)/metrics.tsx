@@ -168,8 +168,8 @@ export default function Metrics() {
 					<Button
 						text="Show All Time"
 						color="#171c39"
-						margin={{
-							bottom: 10,
+						containerStyle={{
+							marginBottom: 10,
 						}}
 						onPress={() => {
 							setDatePickerOpen(false);
@@ -207,13 +207,11 @@ export default function Metrics() {
 					}}
 					color="transparent"
 					text="Change Date Range"
-					borderWidth={2}
-					borderColor="#222c47"
-					margin={{
-						right: 10,
-						left: 10,
-						// top: 10,
-						bottom: 10,
+					containerStyle={{
+						borderWidth: 2,
+						borderColor: "#222c47",
+						marginHorizontal: 10,
+						marginBottom: 10
 					}}
 					rippleColor="#283557"
 					disabled={!filteredStats || !mainStat}

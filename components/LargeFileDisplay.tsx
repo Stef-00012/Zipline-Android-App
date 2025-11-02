@@ -158,9 +158,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								setDeleteFilePopup(false);
 								setTempHidden(false);
 							}}
-							margin={{
-								top: 10,
-								right: 10,
+							containerStyle={{
+								marginTop: 10,
+								marginRight: 10
 							}}
 						/>
 
@@ -190,9 +190,9 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 									ToastAndroid.SHORT,
 								);
 							}}
-							margin={{
-								top: 10,
-								right: 10,
+							containerStyle={{
+								marginTop: 10,
+								marginRight: 10
 							}}
 						/>
 					</View>
@@ -283,8 +283,8 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 									ToastAndroid.SHORT,
 								);
 							}}
-							margin={{
-								top: 10,
+							containerStyle={{
+								marginTop: 10
 							}}
 						/>
 					) : (
@@ -347,8 +347,8 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 								ToastAndroid.SHORT,
 							);
 						}}
-						margin={{
-							top: 10,
+						containerStyle={{
+							marginTop: 10
 						}}
 					/>
 				</View>
@@ -591,8 +591,8 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 											ToastAndroid.SHORT,
 										);
 									}}
-									margin={{
-										top: 5,
+									containerStyle={{
+										marginTop: 5
 									}}
 								/>
 							) : (
@@ -651,12 +651,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										setTempHidden(true);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 								/>
 
@@ -668,12 +672,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										setTempHidden(true);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 								/>
 
@@ -700,12 +708,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 								/>
 
@@ -716,12 +728,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										router.push(`${dashUrl}${file.url}` as ExternalPathString);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 								/>
 
@@ -745,12 +761,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 								/>
 
@@ -813,12 +833,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 								/>
 
@@ -892,12 +916,16 @@ export default function LargeFileDisplay({ file, hidden, onClose }: Props) {
 										setTempHidden(false);
 									}}
 									iconSize={20}
-									width={30}
-									height={30}
-									padding={5}
-									margin={{
-										left: 5,
-										right: 5,
+									containerStyle={{
+										width: 30,
+										height: 30,
+										marginHorizontal: 5
+									}}
+									buttonStyle={{
+										padding: 5
+									}}
+									iconStyle={{
+										marginBottom: 7
 									}}
 									disabled={!file.name.endsWith(".apk") || file.password}
 								/>

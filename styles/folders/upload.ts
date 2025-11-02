@@ -114,4 +114,14 @@ export const styles = StyleSheet.create({
 	folderStatusLink: {
 		color: "#575db5",
 	},
+	selectDescription: {
+		color: "#6c7a8d",
+		marginBottom: 5,
+	},
+	linkText: {
+		color: "#575db5",
+		textDecorationStyle: "solid",
+		textDecorationLine: "underline",
+		textDecorationColor: "#575db5",
+	}
 });

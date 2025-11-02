@@ -166,12 +166,13 @@ export default function FolderUpload() {
 											);
 										}}
 										iconSize={20}
-										width={32}
-										height={32}
-										padding={6}
-										margin={{
-											left: 5,
-											right: 5,
+										containerStyle={{
+											width: 32,
+											height: 32,
+											marginHorizontal: 5
+										}}
+										iconStyle={{
+											marginBottom: 7
 										}}
 									/>
 
@@ -182,12 +183,13 @@ export default function FolderUpload() {
 											router.push(file.url as ExternalPathString);
 										}}
 										iconSize={20}
-										width={32}
-										height={32}
-										padding={6}
-										margin={{
-											left: 5,
-											right: 5,
+										containerStyle={{
+											width: 32,
+											height: 32,
+											marginHorizontal: 5
+										}}
+										iconStyle={{
+											marginBottom: 7
 										}}
 									/>
 								</View>
@@ -275,7 +277,11 @@ export default function FolderUpload() {
 
 			<View>
 				<Button
-					width="90%"
+					containerStyle={{
+						width: "90%",
+						marginHorizontal: "auto",
+						marginTop: 10,
+					}}
 					disabled={uploading || isCopying}
 					onPress={async () => {
 						const output = await DocumentPicker.getDocumentAsync({
@@ -337,11 +343,6 @@ export default function FolderUpload() {
 					text="Select File(s)"
 					color={uploading || isCopying ? "#373d79" : "#323ea8"}
 					textColor={uploading || isCopying ? "gray" : "white"}
-					margin={{
-						left: "auto",
-						right: "auto",
-						top: 10,
-					}}
 				/>
 
 				{folder?.public ? (
@@ -377,6 +378,9 @@ export default function FolderUpload() {
 				>
 					Deletes At:
 				</Text>
+				<Text style={styles.selectDescription}>
+					The file will automatically delete itself after this time. You can set a default expiration time in the <Link style={styles.linkText} href="/admin/settings">settings</Link>.
+				</Text>
 				<Select
 					data={dates}
 					placeholder="Select Date..."
@@ -401,7 +405,10 @@ export default function FolderUpload() {
 						...((uploading || isCopying) && styles.inputHeaderDisabled),
 					}}
 				>
-					Format:
+					Name Format:
+				</Text>
+				<Text style={styles.selectDescription}>
+					The file name format to use when upload this file, the "File name" field will override this value.
 				</Text>
 				<Select
 					data={[
@@ -424,8 +431,9 @@ export default function FolderUpload() {
 
 				<TextInput
 					title="Compression:"
+					description="The compression level to use on images (only). The above format will be used to compress images. Leave blank to disable compression."
 					onValueChange={(content) => {
-						let compressionPercentage = Number.parseInt(content);
+						let compressionPercentage = Number.parseInt(content, 10);
 
 						if (compressionPercentage > 100) compressionPercentage = 100;
 						if (compressionPercentage < 0) compressionPercentage = 0;
@@ -441,8 +449,9 @@ export default function FolderUpload() {
 
 				<TextInput
 					title="Max Views:"
+					description="The maximum number of views the files can have before they are deleted. Leave blank to allow as many views as you want."
 					onValueChange={(content) => {
-						let maxViewsAmount = Number.parseInt(content);
+						let maxViewsAmount = Number.parseInt(content, 10);
 
 						if (maxViewsAmount < 0) maxViewsAmount = 0;
 
@@ -462,6 +471,9 @@ export default function FolderUpload() {
 					}}
 				>
 					Override Domain:
+				</Text>
+				<Text style={styles.selectDescription}>
+					Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.
 				</Text>
 				<Select
 					data={[
@@ -490,6 +502,7 @@ export default function FolderUpload() {
 
 				<TextInput
 					title="Override File Name:"
+					description={'Override the file name with this value. Leave blank to use the "Name Format" option. This value is ignored if you are uploading more than one file. This value is not saved to your browser, and is cleared after uploading.'}
 					disableContext={fileNameEnabled || uploading || isCopying}
 					disabled={fileNameEnabled || uploading || isCopying}
 					onValueChange={(content) => setFileName(content)}
@@ -499,6 +512,7 @@ export default function FolderUpload() {
 
 				<TextInput
 					title="Password:"
+					description="Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading."
 					onValueChange={(content) => setPassword(content)}
 					disableContext={uploading || isCopying}
 					disabled={uploading || isCopying}
@@ -509,6 +523,7 @@ export default function FolderUpload() {
 
 				<Switch
 					title="Add Original Name"
+					description={'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for its file name.'}
 					value={originalName || false}
 					disabled={uploading || isCopying}
 					onValueChange={() => setOriginalName((prev) => !prev)}
@@ -517,7 +532,11 @@ export default function FolderUpload() {
 
 			<View>
 				<Button
-					width="90%"
+					containerStyle={{
+						width: "90%",
+						marginHorizontal: "auto",
+						marginVertical: 10,
+					}}
 					disabled={uploading || isCopying || uploadButtonDisabled}
 					onPress={async () => {
 						setUploading(true);
@@ -608,12 +627,6 @@ export default function FolderUpload() {
 					textColor={
 						uploading || isCopying || uploadButtonDisabled ? "gray" : "white"
 					}
-					margin={{
-						left: "auto",
-						right: "auto",
-						top: 10,
-						bottom: 10,
-					}}
 				/>
 			</View>
 		</View>

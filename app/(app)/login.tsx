@@ -106,8 +106,8 @@ export default function Login() {
 					onPress={() => setTokenLogin((prev) => !prev)}
 					color="#616060"
 					text={`Use ${tokenLogin ? "Password" : "Token"} Login`}
-					margin={{
-						top: 5,
+					containerStyle={{
+						marginTop: 5
 					}}
 				/>
 
@@ -208,8 +208,8 @@ export default function Login() {
 					}}
 					text="Login"
 					color="#323ea8"
-					margin={{
-						top: 5,
+					containerStyle={{
+						marginTop: 5,
 					}}
 				/>
 			</View>

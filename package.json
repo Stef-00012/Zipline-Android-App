@@ -1,7 +1,7 @@
 {
   "name": "zipline",
   "main": "expo-router/entry",
-  "version": "1.18.2",
+  "version": "1.18.1",
   "versionCode": 18,
   "scripts": {
     "start": "expo start",

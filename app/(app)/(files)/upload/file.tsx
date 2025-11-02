@@ -238,12 +238,13 @@ export default function UploadFile({
 											);
 										}}
 										iconSize={20}
-										width={32}
-										height={32}
-										padding={6}
-										margin={{
-											left: 5,
-											right: 5,
+										containerStyle={{
+											width: 32,
+											height: 32,
+											marginHorizontal: 5
+										}}
+										iconStyle={{
+											marginBottom: 7
 										}}
 									/>
 
@@ -254,12 +255,13 @@ export default function UploadFile({
 											router.push(file.url as ExternalPathString);
 										}}
 										iconSize={20}
-										width={32}
-										height={32}
-										padding={6}
-										margin={{
-											left: 5,
-											right: 5,
+										containerStyle={{
+											width: 32,
+											height: 32,
+											marginHorizontal: 5
+										}}
+										iconStyle={{
+											marginBottom: 7
 										}}
 									/>
 								</View>
@@ -319,8 +321,8 @@ export default function UploadFile({
 						color="#323ea8"
 						text="Save"
 						icon="save"
-						margin={{
-							top: 10,
+						containerStyle={{
+							marginTop: 10,
 						}}
 						onPress={() => {
 							setNewPresetError(null);
@@ -385,8 +387,8 @@ export default function UploadFile({
 						color="#323ea8"
 						text="Save"
 						icon="save"
-						margin={{
-							top: 10,
+						containerStyle={{
+							marginTop: 10,
 						}}
 						onPress={() => {
 							setEditPresetError(null);
@@ -494,15 +496,16 @@ export default function UploadFile({
 							icon="camera_alt"
 							color="transparent"
 							iconColor="#2d3f70"
-							borderColor="#222c47"
-							borderWidth={2}
-							iconSize={30}
-							padding={4}
-							rippleColor="#283557"
-							margin={{
-								left: 2,
-								right: 2,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
 							}}
+							buttonStyle={{
+								padding: 4
+							}}
+							iconSize={30}
+							rippleColor="#283557"
 						/>
 
 						<Button
@@ -514,15 +517,16 @@ export default function UploadFile({
 							icon="folder_open"
 							color="transparent"
 							iconColor="#2d3f70"
-							borderColor="#222c47"
-							borderWidth={2}
-							iconSize={30}
-							padding={4}
-							rippleColor="#283557"
-							margin={{
-								left: 2,
-								right: 2,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
 							}}
+							buttonStyle={{
+								padding: 4
+							}}
+							iconSize={30}
+							rippleColor="#283557"
 						/>
 					</View>
 				</View>
@@ -579,7 +583,11 @@ export default function UploadFile({
 					</Text>
 
 					<Button
-						width="90%"
+						containerStyle={{
+							width: "90%",
+							marginHorizontal: "auto",
+							marginTop: 10,
+						}}
 						disabled={uploading || isCopying}
 						onPress={async () => {
 							const output = await DocumentPicker.getDocumentAsync({
@@ -641,11 +649,6 @@ export default function UploadFile({
 						text="Select File(s)"
 						color={uploading || isCopying ? "#373d79" : "#323ea8"}
 						textColor={uploading || isCopying ? "gray" : "white"}
-						margin={{
-							left: "auto",
-							right: "auto",
-							top: 10,
-						}}
 					/>
 				</View>
 			)}
@@ -907,14 +910,19 @@ export default function UploadFile({
 
 											closeSelect();
 										}}
-										width={30}
-										height={30}
+										containerStyle={{
+											width: 30,
+											height: 30,
+											marginRight: 5
+										}}
+										iconStyle={{
+											marginBottom: 7
+										}}
+										buttonStyle={{
+											padding: 5
+										}}
 										icon="edit"
 										iconSize={20}
-										padding={5}
-										margin={{
-											right: 5,
-										}}
 									/>
 
 									<Button
@@ -935,14 +943,19 @@ export default function UploadFile({
 
 											if (newPresets.length <= 0) closeSelect();
 										}}
-										width={30}
-										height={30}
+										containerStyle={{
+											width: 30,
+											height: 30,
+											marginRight: 5
+										}}
+										iconStyle={{
+											marginBottom: 7
+										}}
+										buttonStyle={{
+											padding: 5
+										}}
 										icon="delete"
 										iconSize={20}
-										padding={5}
-										margin={{
-											left: 5,
-										}}
 									/>
 								</View>
 							</View>
@@ -950,25 +963,28 @@ export default function UploadFile({
 					/>
 
 					<Button
-						width={"45%"}
+						containerStyle={{
+							width: "45%",
+							marginHorizontal: "2.5%",
+							marginTop: 5
+						}}
 						text="Save Preset"
 						onPress={() => {
 							setSavePreset(true);
 						}}
 						disabled={uploading || isCopying}
 						color={uploading || isCopying ? "#373d79" : "#323ea8"}
-						margin={{
-							left: "2.5%",
-							right: "2.5%",
-							top: 5,
-						}}
 					/>
 				</View>
 			</KeyboardAwareScrollView>
 
 			<View>
 				<Button
-					width="90%"
+					containerStyle={{
+						width: "90%",
+						marginHorizontal: "auto",
+						marginVertical: 10
+					}}
 					disabled={uploading || uploadButtonDisabled || isCopying}
 					onPress={async () => {
 						setUploading(true);
@@ -1072,12 +1088,6 @@ export default function UploadFile({
 					textColor={
 						uploading || isCopying || uploadButtonDisabled ? "gray" : "white"
 					}
-					margin={{
-						left: "auto",
-						right: "auto",
-						top: 10,
-						bottom: 10,
-					}}
 					textJsx={(disabled, hasIcon) => (
 						<View
 							style={

@@ -150,9 +150,8 @@ export default function VersionDisplay({ versionData }: Props) {
 							<Button
 								color="#323ea8"
 								text={`Changelog for ${version.latest.tag}`}
-								margin={{
-									top: 5,
-									bottom: 5,
+								containerStyle={{
+									marginVertical: 5
 								}}
 								onPress={() => {
 									openURL(version.latest.url);
@@ -162,9 +161,8 @@ export default function VersionDisplay({ versionData }: Props) {
 							<Button
 								color="#323ea8"
 								text={`Update to ${version.latest.tag}`}
-								margin={{
-									top: 5,
-									bottom: 5,
+								containerStyle={{
+									marginVertical: 5
 								}}
 								onPress={() => {
 									openURL(

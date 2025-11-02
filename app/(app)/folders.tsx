@@ -256,8 +256,8 @@ export default function Folders() {
 							}}
 							text="Create"
 							color="#323ea8"
-							margin={{
-								top: 5,
+							containerStyle={{
+								marginTop: 5,
 							}}
 						/>
 					</View>
@@ -315,8 +315,8 @@ export default function Folders() {
 									}}
 									text="Save"
 									color="#323ea8"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10,
 									}}
 								/>
 							</View>
@@ -334,16 +334,17 @@ export default function Folders() {
 							icon="create_new_folder"
 							color="transparent"
 							iconColor={folders && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							buttonStyle={{
+								padding: 4,
+							}}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!folders || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 
 						<Button
@@ -358,16 +359,18 @@ export default function Folders() {
 							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={folders && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							
+							buttonStyle={{
+								padding: 4,
+							}}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!folders || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 					</View>
 				</View>
@@ -383,9 +386,13 @@ export default function Folders() {
 								onPress={() => setShowSearch(false)}
 								icon="close"
 								color="#191b27"
-								width={30}
-								height={30}
-								padding={5}
+								buttonStyle={{
+									padding: 5,
+								}}
+								containerStyle={{
+									width: 30,
+									height: 30,
+								}}
 							/>
 						</View>
 
@@ -581,10 +588,14 @@ export default function Folders() {
 															onPress={() => {
 																onAction("viewFiles", folder);
 															}}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
 														/>
 
 														<Button
@@ -596,18 +607,26 @@ export default function Folders() {
 															}}
 															disabled={!folder.public}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
 															icon={folder.public ? "lock_open" : "lock"}
 															color={folder.public ? "#323ea8" : "#343a40"}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 															onPress={async () => {
 																onAction("visibility", folder);
 															}}
@@ -619,9 +638,13 @@ export default function Folders() {
 																folder.allowUploads ? "#323ea8" : "#343a40"
 															}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 															onPress={async () => {
 																onAction("uploadPolicy", folder);
 															}}
@@ -634,9 +657,13 @@ export default function Folders() {
 																onAction("edit", folder);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -646,9 +673,13 @@ export default function Folders() {
 															color="#CF4238"
 															icon="delete"
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 													</View>
 												);

@@ -125,7 +125,15 @@ export default function Sidebar({
 			return (
 				<Button
 					key={route}
-					borderRadius={7}
+					containerStyle={{
+						borderRadius: 7,
+					}}
+					buttonStyle={{
+						justifyContent: "flex-start",
+					}}
+					textStyle={{
+						fontWeight: "normal"
+					}}
 					icon={option.icon}
 					onPress={() => {
 						setOpen(false);
@@ -139,9 +147,7 @@ export default function Sidebar({
 					color={isActive ? "#14192F" : "transparent"}
 					textColor={isActive ? "#6D71B1" : "white"}
 					text={option.name}
-					position="left"
 					rippleColor={isActive ? undefined : "#283557"}
-					bold={false}
 				/>
 			);
 		}
@@ -173,9 +179,13 @@ export default function Sidebar({
 						color="transparent"
 						icon={option.icon}
 						text={option.name}
-						position="left"
+						buttonStyle={{
+							justifyContent: "flex-start",
+						}}
+						textStyle={{
+							fontWeight: "normal"
+						}}
 						rippleColor="#283557"
-						bold={false}
 						open={open}
 					/>
 					<Animated.View

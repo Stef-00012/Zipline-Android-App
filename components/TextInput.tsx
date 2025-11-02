@@ -138,8 +138,10 @@ export default function TextInput({
 						}}
 						icon={displayPassword ? "visibility_off" : "visibility"}
 						color={sideButtonColor}
-						margin={{
-							left: 10,
+						containerStyle={{
+							marginLeft: 10,
+							height: 40,
+							width: 40,
 						}}
 					/>
 				</View>
@@ -204,8 +206,10 @@ export default function TextInput({
 						icon={sideButtonIcon}
 						iconColor={sideButtonIconColor}
 						color={sideButtonColor}
-						margin={{
-							left: 10,
+						containerStyle={{
+							marginLeft: 10,
+							height: 40,
+							width: 40,
 						}}
 					/>
 				</View>

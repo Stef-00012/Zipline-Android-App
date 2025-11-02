@@ -79,8 +79,10 @@ export default function SkeletonTextInput({
 						icon={sideButtonIcon}
 						iconColor={sideButtonIconColor}
 						color={sideButtonColor}
-						margin={{
-							left: 10,
+						containerStyle={{
+							marginLeft: 10,
+							height: 40,
+							width: 40,
 						}}
 					/>
 				)}

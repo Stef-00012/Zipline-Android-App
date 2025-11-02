@@ -267,17 +267,17 @@ export default function UserSettings() {
 								}}
 								text="Cancel"
 								color="#181c28"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 							/>
 
 							<Button
 								color="#CF4238"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 								text="Yes, Delete"
 								onPress={async () => {
@@ -325,17 +325,17 @@ export default function UserSettings() {
 								}}
 								text="Cancel"
 								color="#181c28"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 							/>
 
 							<Button
 								color="#CF4238"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 								text="Yes, Delete"
 								onPress={async () => {
@@ -398,17 +398,17 @@ export default function UserSettings() {
 								}}
 								text="Cancel"
 								color="#181c28"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 							/>
 
 							<Button
 								color="#CF4238"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 								text="Requery"
 								onPress={async () => {
@@ -470,17 +470,17 @@ export default function UserSettings() {
 								}}
 								text="Cancel"
 								color="#181c28"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 							/>
 
 							<Button
 								color="#CF4238"
-								margin={{
-									right: 10,
-									top: 10,
+								containerStyle={{
+									marginRight: 10,
+									marginTop: 10
 								}}
 								text="Generate"
 								onPress={async () => {
@@ -521,10 +521,10 @@ export default function UserSettings() {
 
 						<Button
 							color="transparent"
-							borderWidth={2}
-							borderColor="#222c47"
-							margin={{
-								top: 5,
+							containerStyle={{
+								borderWidth: 2,
+								borderColor: "#222c47",
+								marginTop: 5
 							}}
 							rippleColor="gray"
 							text="Upload Image"
@@ -592,10 +592,10 @@ export default function UserSettings() {
 
 						<Button
 							color="transparent"
-							borderWidth={2}
-							borderColor="#222c47"
-							margin={{
-								top: 5,
+							containerStyle={{
+								borderWidth: 2,
+								borderColor: "#222c47",
+								marginTop: 5
 							}}
 							rippleColor="gray"
 							text="Take Picture"
@@ -724,8 +724,8 @@ export default function UserSettings() {
 										color="#323ea8"
 										text="Save"
 										icon="save"
-										margin={{
-											top: 10,
+										containerStyle={{
+											marginTop: 10
 										}}
 									/>
 								</View>
@@ -737,10 +737,10 @@ export default function UserSettings() {
 
 								<Button
 									color="transparent"
-									borderWidth={2}
-									borderColor="#222c47"
-									margin={{
-										top: 5,
+									containerStyle={{
+										borderWidth: 2,
+										borderColor: "#222c47",
+										marginTop: 5
 									}}
 									rippleColor="gray"
 									text={avatar ? (avatarName as string) : "Select an Avatar..."}
@@ -763,16 +763,14 @@ export default function UserSettings() {
 											text="Cancel"
 											color="transparent"
 											textColor="white"
-											height="auto"
-											width="28.33%"
-											margin={{
-												left: "2.5%",
-												right: "2.5%",
-												top: 10,
+											containerStyle={{
+												width: "28.33%",
+												marginHorizontal: "2.5%",
+												marginTop: 10,
+												borderWidth: 2,
+												borderColor: "#ff8787"
 											}}
 											rippleColor="gray"
-											borderWidth={2}
-											borderColor="#ff8787"
 											onPress={() => {
 												setAvatar(undefined);
 												setAvatarName(null);
@@ -786,12 +784,11 @@ export default function UserSettings() {
 											color="#e03131"
 											icon="close"
 											textColor="white"
-											height="auto"
-											width="28.33%"
-											margin={{
-												left: "2.5%",
-												right: "2.5%",
-												top: 10,
+											containerStyle={{
+												width: "28.33%",
+												marginHorizontal: "2.5%",
+												marginTop: 10,
+												borderWidth: 2,
 											}}
 											onPress={async () => {
 												const success = await editCurrentUser({
@@ -818,12 +815,10 @@ export default function UserSettings() {
 										text="Save"
 										color={avatar ? "#323ea8" : "#181c28"}
 										textColor={avatar ? "white" : "gray"}
-										height="auto"
-										width="28.33%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "28.33%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
 										}}
 										disabled={!avatar}
 										onPress={async () => {
@@ -965,8 +960,8 @@ export default function UserSettings() {
 									color="#323ea8"
 									text="Save"
 									icon="save"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 							</View>
@@ -997,8 +992,8 @@ export default function UserSettings() {
 										color="#323ea8"
 										icon="add"
 										text="New Export"
-										margin={{
-											top: 10,
+										containerStyle={{
+											marginTop: 10
 										}}
 									/>
 
@@ -1085,9 +1080,13 @@ export default function UserSettings() {
 																);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -1172,9 +1171,13 @@ export default function UserSettings() {
 																);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 													</View>
 												);
@@ -1208,11 +1211,13 @@ export default function UserSettings() {
 										color="#323ea8"
 										icon="delete"
 										text="Clear Zero Byte Files"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 
@@ -1221,11 +1226,13 @@ export default function UserSettings() {
 										color="#323ea8"
 										icon="delete"
 										text="Clear Temp Files"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 								</View>
@@ -1236,11 +1243,13 @@ export default function UserSettings() {
 										color="#323ea8"
 										icon="quick_reference_all"
 										text="Requery Size of Files"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 
@@ -1249,11 +1258,13 @@ export default function UserSettings() {
 										color="#323ea8"
 										icon="videocam"
 										text="Generate Thumbnails"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 								</View>
@@ -1329,8 +1340,8 @@ export default function UserSettings() {
 												: "Download Update"
 										}
 										disabled={isDownloading}
-										margin={{
-											top: 10,
+										containerStyle={{
+											marginTop: 10
 										}}
 									/>
 								) : (
@@ -1350,8 +1361,8 @@ export default function UserSettings() {
 												: "Check for Updates"
 										}
 										disabled={isCheckingUpdate}
-										margin={{
-											top: 10,
+										containerStyle={{
+											marginTop: 10
 										}}
 									/>
 								)}
@@ -1376,8 +1387,8 @@ export default function UserSettings() {
 									}}
 									color="#323244"
 									text="Change Export Download Folder"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1401,8 +1412,8 @@ export default function UserSettings() {
 									}}
 									color="#323244"
 									text="Change File Download Folder"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1426,8 +1437,8 @@ export default function UserSettings() {
 									}}
 									color="#323244"
 									text="Change Updates Download Folder"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1440,8 +1451,8 @@ export default function UserSettings() {
 									}}
 									color="#CF4238"
 									text="Logout"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 							</View>
@@ -1477,8 +1488,8 @@ export default function UserSettings() {
 									text="Save"
 									icon="save"
 									iconColor="gray"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 							</View>
@@ -1490,10 +1501,10 @@ export default function UserSettings() {
 								<Button
 									color="transparent"
 									disabled
-									borderWidth={2}
-									borderColor="#222c47"
-									margin={{
-										top: 5,
+									containerStyle={{
+										borderWidth: 2,
+										borderColor: "#222c47",
+										marginTop: 5
 									}}
 									textColor="gray"
 									text="Select an Avatar..."
@@ -1509,12 +1520,10 @@ export default function UserSettings() {
 									text="Save"
 									color="#181c28"
 									textColor="gray"
-									height="auto"
-									width="28.33%"
-									margin={{
-										left: "2.5%",
-										right: "2.5%",
-										top: 10,
+									containerStyle={{
+										width: "28.33%",
+										marginHorizontal: "2.5%",
+										marginTop: 10,
 									}}
 									disabled
 									onPress={() => {}}
@@ -1591,8 +1600,8 @@ export default function UserSettings() {
 									icon="save"
 									textColor="gray"
 									iconColor="gray"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 							</View>
@@ -1607,8 +1616,8 @@ export default function UserSettings() {
 									disabled
 									text="New Export"
 									textColor="gray"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1633,16 +1642,18 @@ export default function UserSettings() {
 
 								<View style={styles.serverActionButtonRow}>
 									<Button
-										onPress={async () => {}}
+										onPress={async () => { setClearZeroByteFilesPopupOpen(true) }}
 										color="#373d79"
 										textColor="gray"
 										disabled
 										text="Clear Zero Byte Files"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 
@@ -1652,11 +1663,13 @@ export default function UserSettings() {
 										textColor="gray"
 										disabled
 										text="Clear Temp Files"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 								</View>
@@ -1668,11 +1681,13 @@ export default function UserSettings() {
 										textColor="gray"
 										disabled
 										text="Requery Size of Files"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 
@@ -1682,11 +1697,13 @@ export default function UserSettings() {
 										textColor="gray"
 										disabled
 										text="Generate Thumbnails"
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 10,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 10,
+										}}
+										textStyle={{
+											fontSize: 13
 										}}
 									/>
 								</View>
@@ -1727,8 +1744,8 @@ export default function UserSettings() {
 									text="Check for Updates"
 									textColor="gray"
 									disabled
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1738,8 +1755,8 @@ export default function UserSettings() {
 									disabled
 									text="Change Export Download Folder"
 									textColor="gray"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1749,8 +1766,8 @@ export default function UserSettings() {
 									disabled
 									textColor="gray"
 									text="Change File Download Folder"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1760,8 +1777,8 @@ export default function UserSettings() {
 									textColor="gray"
 									disabled
 									text="Change Updates Download Folder"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 
@@ -1771,8 +1788,8 @@ export default function UserSettings() {
 									text="Logout"
 									disabled
 									textColor="gray"
-									margin={{
-										top: 10,
+									containerStyle={{
+										marginTop: 10
 									}}
 								/>
 							</View>

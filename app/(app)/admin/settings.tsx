@@ -752,14 +752,17 @@ export default function ServerSettings() {
 								onPress={() => {
 									setCreateNewUrl(true);
 								}}
-								width={30}
-								height={30}
-								padding={0}
+								containerStyle={{
+									width: 30,
+									height: 30,
+									marginRight: 10
+								}}
+								iconStyle={{
+									marginTop: -7,
+									marginLeft: -4
+								}}
 								icon="add"
 								iconSize={30}
-								margin={{
-									right: 10,
-								}}
 							/>
 						</View>
 
@@ -894,11 +897,10 @@ export default function ServerSettings() {
 							disabled={
 								skeleton || saving || settings?.tampered.includes("domains")
 							}
-							margin={{
-								left: 10,
-								right: 10,
-								top: 5,
-								bottom: 10,
+							containerStyle={{
+								marginHorizontal: 10,
+								marginTop: 5,
+								marginBottom: 10
 							}}
 							onPress={() => {
 								setAddNewDomain(true);
@@ -1004,8 +1006,8 @@ export default function ServerSettings() {
 						iconColor={skeleton || saving ? "gray" : "white"}
 						text="Save"
 						icon="save"
-						margin={{
-							top: 10,
+						containerStyle={{
+							marginTop: 10
 						}}
 					/>
 				);
@@ -1076,8 +1078,8 @@ export default function ServerSettings() {
 							color="#323ea8"
 							text="Edit"
 							icon="edit"
-							margin={{
-								top: 10,
+							containerStyle={{
+								marginTop: 10
 							}}
 							onPress={async () => {
 								setEditUrlError(null);
@@ -1158,8 +1160,8 @@ export default function ServerSettings() {
 							color="#323ea8"
 							text="Add"
 							icon="add"
-							margin={{
-								top: 10,
+							containerStyle={{
+								marginTop: 10
 							}}
 							onPress={async () => {
 								setNewUrlError(null);
@@ -1230,8 +1232,8 @@ export default function ServerSettings() {
 							color="#323ea8"
 							text="Add"
 							icon="add"
-							margin={{
-								top: 10,
+							containerStyle={{
+								marginTop: 10
 							}}
 							onPress={async () => {
 								setNewDomainError(null);
@@ -1318,10 +1320,14 @@ export default function ServerSettings() {
 								icon="refresh"
 								color="transparent"
 								iconColor="#2d3f70"
-								borderColor="#222c47"
-								borderWidth={2}
+								containerStyle={{
+									borderColor: "#222c47",
+									borderWidth: 2
+								}}
+								buttonStyle={{
+									padding: 4
+								}}
 								iconSize={30}
-								padding={4}
 								rippleColor="#283557"
 							/>
 						</View>

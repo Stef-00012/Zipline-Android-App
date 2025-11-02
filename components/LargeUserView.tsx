@@ -48,17 +48,23 @@ export default function LargeUserView({
 						color="transparent"
 						icon="folder_open"
 						rippleColor="#464953"
-						borderWidth={2}
-						borderColor="#222c47"
-						borderRadius={7}
-						iconSize={20}
-						padding={5}
-						iconColor="#575DB5"
-						width={30}
-						height={30}
-						margin={{
-							right: 4,
+						containerStyle={{
+							borderColor: "#222c47",
+							borderWidth: 2,
+							borderRadius: 7,
+							width: 30,
+							height: 30,
+							marginRight: 4
 						}}
+						buttonStyle={{
+							padding: 5
+						}}
+						iconStyle={{
+							marginBottom: 12,
+							marginLeft: -1
+						}}
+						iconSize={20}
+						iconColor="#575DB5"
 					/>
 
 					<Dropdown

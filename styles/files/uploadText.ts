@@ -103,9 +103,9 @@ export const styles = StyleSheet.create({
 		marginBottom: 5,
 	},
 	linkText: {
-		color: "#CAA8E9",
+		color: "#575db5",
 		textDecorationStyle: "solid",
 		textDecorationLine: "underline",
-		textDecorationColor: "#CAA8E9",
+		textDecorationColor: "#575db5",
 	}
 });

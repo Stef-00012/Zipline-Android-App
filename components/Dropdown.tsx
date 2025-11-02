@@ -1,16 +1,16 @@
 import Button from "@/components/Button";
 import { useRef, useState } from "react";
 import {
-    Dimensions,
-    Modal,
-    Pressable,
-    ScrollView,
-    TouchableOpacity,
-    View,
-    type ColorValue,
-    type DimensionValue,
-    type StyleProp,
-    type ViewStyle,
+	Dimensions,
+	Modal,
+	Pressable,
+	ScrollView,
+	TouchableOpacity,
+	View,
+	type ColorValue,
+	type DimensionValue,
+	type StyleProp,
+	type ViewStyle,
 } from "react-native";
 import MaterialSymbols from "./MaterialSymbols";
 
@@ -192,8 +192,12 @@ export default function Dropdown({
 						{data.map((item) => (
 							<Button
 								disabled={item.disabled}
-								position="left"
-								bold={false}
+								buttonStyle={{
+									justifyContent: "flex-start",
+								}}
+								textStyle={{
+									fontWeight: "normal"
+								}}
 								text={item.name}
 								icon={item.icon}
 								color="#191b27"

@@ -47,12 +47,11 @@ export default function ExternalUrl({
 						}}
 						disabled={disabled}
 						color="#323ea8"
-						width="45%"
-						margin={{
-							top: 7,
-							bottom: 5,
-							left: "2.5%",
-							right: "2.5%",
+						containerStyle={{
+							width: "45%",
+							marginTop: 7,
+							marginBottom: 5,
+							marginHorizontal: "2.5%",
 						}}
 						text="Edit"
 						icon="edit"
@@ -64,12 +63,11 @@ export default function ExternalUrl({
 						}}
 						disabled={disabled}
 						color="#CF4238"
-						width="45%"
-						margin={{
-							top: 7,
-							bottom: 5,
-							left: "2.5%",
-							right: "2.5%",
+						containerStyle={{
+							width: "45%",
+							marginTop: 7,
+							marginBottom: 5,
+							marginHorizontal: "2.5%",
 						}}
 						text="Delete"
 						icon="delete"
@@ -88,15 +86,19 @@ export default function ExternalUrl({
 					}}
 					disabled={disabled}
 					color="#323ea8"
-					width={25}
-					height={25}
-					margin={{
-						top: 10,
-						bottom: 10,
-						left: 5,
+					containerStyle={{
+						width: 25,
+						height: 25,
+						marginVertical: 10,
+						marginLeft: 5
+					}}
+					buttonStyle={{
+						padding: 4
+					}}
+					iconStyle={{
+						marginBottom: 12
 					}}
 					icon="north"
-					padding={4}
 					iconSize={16}
 				/>
 
@@ -106,15 +108,19 @@ export default function ExternalUrl({
 					}}
 					disabled={disabled}
 					color="#323ea8"
-					width={25}
-					height={25}
-					margin={{
-						top: 10,
-						bottom: 10,
-						left: 5,
+					containerStyle={{
+						width: 25,
+						height: 25,
+						marginVertical: 10,
+						marginLeft: 5
+					}}
+					buttonStyle={{
+						padding: 4
+					}}
+					iconStyle={{
+						marginBottom: 12
 					}}
 					icon="south"
-					padding={4}
 					iconSize={16}
 				/>
 			</View>

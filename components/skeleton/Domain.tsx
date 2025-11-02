@@ -14,9 +14,13 @@ export default function SkeletonDomain() {
 				iconColor="#CF4238"
 				onPress={() => {}}
 				iconSize={20}
-				width={32}
-				height={32}
-				padding={6}
+				containerStyle={{
+					width: 32,
+					height: 32,
+				}}
+				iconStyle={{
+					marginBottom: 7
+				}}
 				disabled={true}
 			/>
 		</View>

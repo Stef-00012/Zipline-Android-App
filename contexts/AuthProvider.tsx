@@ -13,7 +13,6 @@ import React, {
 	useMemo,
 	useState,
 } from "react";
-import { BackHandler } from "react-native";
 import semver from "semver";
 
 interface Props {
@@ -109,7 +108,7 @@ export default function AuthProvider({ children }: Props) {
 
 		setRole(userRole);
 		setVersion(serverVersion);
-	}, []);
+	}, [pathname, router]);
 
 	const updateUser = useCallback(async () => {
 		const currentUser = await getCurrentUser();
@@ -121,12 +120,16 @@ export default function AuthProvider({ children }: Props) {
 
 	const updateBiometricsSetting = useCallback((enabled: boolean) => {
 		setUnlockWithBiometrics(enabled);
+
 		db.set("unlockWithBiometrics", enabled ? "true" : "false");
 	}, []);
 
-	const requestBiometricsAuthentication = useCallback(async () => {
-		if (unlockWithBiometrics) {
-			setIsAuthenticating(true);
+	const requestBiometricsAuthentication = useCallback(async (
+			hideBiometricOverlay?: boolean,
+			ignoreBiometricAuthState?: boolean,
+		) => {
+		if (unlockWithBiometrics || ignoreBiometricAuthState) {
+			if (!hideBiometricOverlay) setIsAuthenticating(true);
 
 			const output = await LocalAuthentication.authenticateAsync({
 				biometricsSecurityLevel: "weak",
@@ -135,9 +138,11 @@ export default function AuthProvider({ children }: Props) {
 				requireConfirmation: true,
 			});
 
-			setIsAuthenticating(false);
+			if (output.success) {
+				if (!hideBiometricOverlay) setIsAuthenticating(false);
 
-			if (output.success) return true;
+				return true;
+			}
 
 			return false;
 		}
@@ -190,21 +195,32 @@ export default function AuthProvider({ children }: Props) {
 
 			setSupportsBiometrics(hasHardware);
 			setHasEnrolledBiometrics(isEnrolled);
-			setSupportsAuthenticationTypes(supportedAuthTypes);
+			setSupportsAuthenticationTypes((prev) => {
+				if (JSON.stringify(prev) === JSON.stringify(supportedAuthTypes))
+					return prev;
+
+				return supportedAuthTypes;
+			});
 		})();
-	}, []);
+	}, [updateAuth, updateUser]);
 
 	useEffect(() => {
 		(async () => {
-			if (unlockWithBiometrics) {
-				const authenticated = await requestBiometricsAuthentication();
-
-				if (!authenticated) return BackHandler.exitApp();
-
-				return;
-			}
+			if (
+				unlockWithBiometrics &&
+				supportsBiometrics &&
+				hasEnrolledBiometrics &&
+				supportsAuthenticationTypes.length > 0
+			)
+				return await requestBiometricsAuthentication();
 		})();
-	}, [unlockWithBiometrics]);
+	}, [
+		// unlockWithBiometrics,
+		hasEnrolledBiometrics,
+		supportsAuthenticationTypes,
+		supportsBiometrics,
+		// requestBiometricsAuthentication,
+	]);
 
 	return (
 		<AuthContext.Provider value={authData}>{children}</AuthContext.Provider>

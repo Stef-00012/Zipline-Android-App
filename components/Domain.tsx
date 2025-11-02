@@ -19,9 +19,13 @@ export default function Domain({ domain, disabled, onDelete }: Props) {
 				iconColor="#CF4238"
 				onPress={onDelete}
 				iconSize={20}
-				width={32}
-				height={32}
-				padding={6}
+				containerStyle={{
+					width: 32,
+					height: 32,
+				}}
+				iconStyle={{
+					marginBottom: 7
+				}}
 				disabled={disabled}
 			/>
 		</View>

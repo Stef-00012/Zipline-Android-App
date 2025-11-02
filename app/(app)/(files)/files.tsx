@@ -178,7 +178,7 @@ export default function Files() {
 
 		let fetchPage = page;
 
-		if (searchParams.page && Number.parseInt(searchParams.page) > 0) {
+		if (searchParams.page && Number.parseInt(searchParams.page, 10) > 0) {
 			fetchPage = searchParams.page;
 
 			setPage(fetchPage);
@@ -266,10 +266,14 @@ export default function Files() {
 									icon="add"
 									color="transparent"
 									iconColor="#2d3f70"
-									borderColor="#222c47"
-									borderWidth={2}
+									containerStyle={{
+										borderColor: "#222c47",
+										borderWidth: 2
+									}}
+									buttonStyle={{
+										padding: 4
+									}}
 									iconSize={30}
-									padding={4}
 									rippleColor="#283557"
 								/>
 							</View>
@@ -302,12 +306,13 @@ export default function Files() {
 												setTagsMenuOpen(false);
 											}}
 											iconSize={20}
-											width={32}
-											height={32}
-											padding={6}
-											margin={{
-												left: 5,
-												right: 5,
+											containerStyle={{
+												width: 32,
+												height: 32,
+												marginHorizontal: 5,
+											}}
+											iconStyle={{
+												marginBottom: 5
 											}}
 										/>
 
@@ -335,12 +340,13 @@ export default function Files() {
 												);
 											}}
 											iconSize={20}
-											width={32}
-											height={32}
-											padding={6}
-											margin={{
-												left: 5,
-												right: 5,
+											containerStyle={{
+												width: 32,
+												height: 32,
+												marginHorizontal: 5,
+											}}
+											iconStyle={{
+												marginBottom: 5
 											}}
 										/>
 									</View>
@@ -391,11 +397,10 @@ export default function Files() {
 
 									setNewTagColor(guess);
 								}}
-								width="45%"
-								margin={{
-									left: "2.5%",
-									right: "2.5%",
-									top: 15,
+								containerStyle={{
+									width: "45%",
+									marginHorizontal: "2.5%",
+									marginTop: 15
 								}}
 							/>
 
@@ -425,11 +430,10 @@ export default function Files() {
 									setCreateNewTag(false);
 									setTagsMenuOpen(true);
 								}}
-								width="45%"
-								margin={{
-									left: "2.5%",
-									right: "2.5%",
-									top: 15,
+								containerStyle={{
+									width: "45%",
+									marginHorizontal: "2.5%",
+									marginTop: 15
 								}}
 							/>
 						</View>
@@ -481,11 +485,10 @@ export default function Files() {
 
 											setEditTagColor(guess);
 										}}
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 15,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 15
 										}}
 									/>
 
@@ -523,11 +526,10 @@ export default function Files() {
 											setTagToEdit(null);
 											setTagsMenuOpen(true);
 										}}
-										width="45%"
-										margin={{
-											left: "2.5%",
-											right: "2.5%",
-											top: 15,
+										containerStyle={{
+											width: "45%",
+											marginHorizontal: "2.5%",
+											marginTop: 15
 										}}
 									/>
 								</View>
@@ -594,16 +596,17 @@ export default function Files() {
 												? "#2d3f70"
 												: "#2d3f7055"
 									}
-									borderColor="#222c47"
-									borderWidth={2}
+									containerStyle={{
+										borderColor: "#222c47",
+										borderWidth: 2,
+										marginHorizontal: 2
+									}}
+									buttonStyle={{
+										padding: 4
+									}}
 									iconSize={30}
-									padding={4}
 									rippleColor="#283557"
 									disabled={!files}
-									margin={{
-										left: 2,
-										right: 2,
-									}}
 								/>
 
 								{!name && (
@@ -614,16 +617,17 @@ export default function Files() {
 										icon="sell"
 										color="transparent"
 										iconColor={files ? "#2d3f70" : "#2d3f7055"}
-										borderColor="#222c47"
-										borderWidth={2}
+										containerStyle={{
+											borderColor: "#222c47",
+											borderWidth: 2,
+											marginHorizontal: 2
+										}}
+										buttonStyle={{
+											padding: 4
+										}}
 										iconSize={30}
 										disabled={!files}
-										padding={4}
 										rippleColor="#283557"
-										margin={{
-											left: 2,
-											right: 2,
-										}}
 									/>
 								)}
 							</>
@@ -644,16 +648,17 @@ export default function Files() {
 									? "#2d3f70"
 									: "#2d3f7055"
 							}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
 							disabled={!files || (isFolder && !allowUploads)}
-							padding={4}
 							rippleColor="#283557"
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 
 						<Button
@@ -670,16 +675,17 @@ export default function Files() {
 							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={files ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!files}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 					</View>
 				</View>
@@ -697,9 +703,16 @@ export default function Files() {
 										onPress={() => setShowSearch(false)}
 										icon="close"
 										color="#191b27"
-										width={30}
-										height={30}
-										padding={5}
+										containerStyle={{
+											width: 30,
+											height: 30,
+										}}
+										iconStyle={{
+											marginBottom: 7
+										}}
+										buttonStyle={{
+											padding: 5
+										}}
 									/>
 								</View>
 
@@ -792,11 +805,14 @@ export default function Files() {
 										icon="delete"
 										color="transparent"
 										rippleColor="gray"
-										borderWidth={2}
-										borderColor="#ff8787"
+										containerStyle={{
+											borderColor: "#ff8787",
+											borderWidth: 2,
+											width: "47%",
+											marginHorizontal: 5
+										}}
 										textColor="#ff8787"
 										iconColor="#ff8787"
-										width={"47%"}
 										onPress={async () => {
 											const success = await bulkEditFiles({
 												files: selectedFiles,
@@ -819,21 +835,20 @@ export default function Files() {
 											);
 										}}
 										text={`Delete ${selectedFiles.length} File${selectedFiles.length > 1 ? "s" : ""}`}
-										margin={{
-											left: 5,
-											right: 5,
-										}}
 									/>
 
 									<Button
 										icon="star"
 										color="transparent"
 										rippleColor="gray"
-										borderWidth={2}
-										borderColor="#f7d55a"
+										containerStyle={{
+											borderColor: "#f7d55a",
+											borderWidth: 2,
+											width: "47%",
+											marginHorizontal: 5
+										}}
 										iconColor="#f7d55a"
 										textColor="#f7d55a"
-										width={"47%"}
 										onPress={async () => {
 											const success = await bulkEditFiles({
 												files: selectedFiles,
@@ -856,10 +871,6 @@ export default function Files() {
 											);
 										}}
 										text={`Favorite ${selectedFiles.length} File${selectedFiles.length > 1 ? "s" : ""}`}
-										margin={{
-											left: 5,
-											right: 5,
-										}}
 									/>
 								</View>
 
@@ -905,16 +916,16 @@ export default function Files() {
 									<Button
 										color="transparent"
 										rippleColor="gray"
-										borderWidth={2}
-										borderColor="#585daf"
+										containerStyle={{
+											borderColor: "#585daf",
+											borderWidth: 2,
+											width: "47%",
+											marginLeft: 5
+										}}
 										textColor="#585daf"
 										iconColor="#585daf"
-										width={"47%"}
 										onPress={() => setSelectedFiles([])}
 										text="Clear Selection"
-										margin={{
-											left: 5,
-										}}
 									/>
 								</View>
 							</>
@@ -1118,9 +1129,13 @@ export default function Files() {
 														setFocusedFile(file);
 													}}
 													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
+													containerStyle={{
+														width: 32,
+														height: 32,
+													}}
+													iconStyle={{
+														marginBottom: 7
+													}}
 												/>
 
 												<Button
@@ -1130,9 +1145,13 @@ export default function Files() {
 														router.push(`${dashUrl}${file.url}`);
 													}}
 													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
+													containerStyle={{
+														width: 32,
+														height: 32,
+													}}
+													iconStyle={{
+														marginBottom: 7
+													}}
 												/>
 
 												<Button
@@ -1155,9 +1174,13 @@ export default function Files() {
 														);
 													}}
 													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
+													containerStyle={{
+														width: 32,
+														height: 32,
+													}}
+													iconStyle={{
+														marginBottom: 7
+													}}
 												/>
 
 												<Button
@@ -1232,9 +1255,13 @@ export default function Files() {
 														);
 													}}
 													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
+													containerStyle={{
+														width: 32,
+														height: 32,
+													}}
+													iconStyle={{
+														marginBottom: 7
+													}}
 												/>
 
 												<Button
@@ -1313,9 +1340,13 @@ export default function Files() {
 														!file.name.endsWith(".apk") || file.password
 													}
 													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
+													containerStyle={{
+														width: 32,
+														height: 32,
+													}}
+													iconStyle={{
+														marginBottom: 7
+													}}
 												/>
 
 												<Button
@@ -1338,9 +1369,13 @@ export default function Files() {
 														);
 													}}
 													iconSize={20}
-													width={32}
-													height={32}
-													padding={6}
+													containerStyle={{
+														width: 32,
+														height: 32,
+													}}
+													iconStyle={{
+														marginBottom: 7
+													}}
 												/>
 											</View>
 										);
@@ -1435,13 +1470,13 @@ export default function Files() {
 								setNextPageDisabled(false);
 
 								if (page === "1") return;
-								if (Number.parseInt(page) - 1 === 1) setPrevPageDisabled(true);
-								if ((files?.pages || 1) < Number.parseInt(page)) {
+								if (Number.parseInt(page, 10) - 1 === 1) setPrevPageDisabled(true);
+								if ((files?.pages || 1) < Number.parseInt(page, 10)) {
 									setNextPageDisabled(true);
 									return setPage(String(files?.pages || "1"));
 								}
 
-								const newPage = String(Number.parseInt(page) - 1);
+								const newPage = String(Number.parseInt(page, 10) - 1);
 
 								setPage(newPage);
 								setSelectedPage(newPage);
@@ -1449,15 +1484,14 @@ export default function Files() {
 							text="PREV"
 							color="transparent"
 							textColor={allPageDisabled || prevPageDisabled ? "gray" : "white"}
-							borderColor="#222c47"
-							borderWidth={2}
-							rippleColor="#283557"
-							flex={1}
-							disabled={allPageDisabled || prevPageDisabled}
-							margin={{
-								left: 5,
-								right: 5,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								flex: 1,
+								marginHorizontal: 5
 							}}
+							rippleColor="#283557"
+							disabled={allPageDisabled || prevPageDisabled}
 						/>
 
 						<Button
@@ -1473,15 +1507,14 @@ export default function Files() {
 							text="1"
 							color="transparent"
 							textColor={allPageDisabled || prevPageDisabled ? "gray" : "white"}
-							borderColor="#222c47"
-							borderWidth={2}
-							rippleColor="#283557"
-							flex={1}
-							disabled={allPageDisabled || prevPageDisabled}
-							margin={{
-								left: 5,
-								right: 5,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								flex: 1,
+								marginHorizontal: 5
 							}}
+							rippleColor="#283557"
+							disabled={allPageDisabled || prevPageDisabled}
 						/>
 
 						<TextInput
@@ -1492,7 +1525,7 @@ export default function Files() {
 							returnKeyType="done"
 							onChange={(event) => setSelectedPage(event.nativeEvent.text)}
 							onSubmitEditing={(event) => {
-								let selectedPage = Number.parseInt(event.nativeEvent.text);
+								let selectedPage = Number.parseInt(event.nativeEvent.text, 10);
 
 								if (
 									!selectedPage ||
@@ -1527,15 +1560,14 @@ export default function Files() {
 							text={files?.pages ? String(files?.pages) : "..."}
 							color="transparent"
 							textColor={nextPageDisabled || allPageDisabled ? "gray" : "white"}
-							borderColor="#222c47"
-							borderWidth={2}
-							rippleColor="#283557"
-							flex={1}
-							disabled={nextPageDisabled || allPageDisabled}
-							margin={{
-								left: 5,
-								right: 5,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								flex: 1,
+								marginHorizontal: 5
 							}}
+							rippleColor="#283557"
+							disabled={nextPageDisabled || allPageDisabled}
 						/>
 
 						<Button
@@ -1543,10 +1575,10 @@ export default function Files() {
 								setPrevPageDisabled(false);
 
 								if (page === String(files?.pages)) return;
-								if (Number.parseInt(page) + 1 === files?.pages)
+								if (Number.parseInt(page, 10) + 1 === files?.pages)
 									setNextPageDisabled(true);
 
-								const newPage = String(Number.parseInt(page) + 1);
+								const newPage = String(Number.parseInt(page, 10) + 1);
 
 								setPage(newPage);
 								setSelectedPage(newPage);
@@ -1554,15 +1586,14 @@ export default function Files() {
 							text="NEXT"
 							color="transparent"
 							textColor={nextPageDisabled || allPageDisabled ? "gray" : "white"}
-							borderColor="#222c47"
-							borderWidth={2}
-							rippleColor="#283557"
-							flex={1}
-							disabled={nextPageDisabled || allPageDisabled}
-							margin={{
-								left: 5,
-								right: 5,
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								flex: 1,
+								marginHorizontal: 5
 							}}
+							rippleColor="#283557"
+							disabled={nextPageDisabled || allPageDisabled}
 						/>
 					</View>
 				)}

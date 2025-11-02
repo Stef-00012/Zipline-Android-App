@@ -284,8 +284,8 @@ export default function Urls() {
 						<Button
 							color="#323ea8"
 							text="Shorten"
-							margin={{
-								top: 5,
+							containerStyle={{
+								marginTop: 5,
 							}}
 							onPress={async () => {
 								setNewUrlError(undefined);
@@ -301,7 +301,7 @@ export default function Urls() {
 
 								if (newUrlVanity) urlData.vanity = newUrlVanity;
 								if (newUrlMaxViews)
-									urlData.maxViews = Number.parseInt(newUrlMaxViews);
+									urlData.maxViews = Number.parseInt(newUrlMaxViews, 10);
 								if (newUrlPassword) urlData.password = newUrlPassword;
 
 								const shortenedUrlData = await createURL(urlData);
@@ -416,8 +416,8 @@ export default function Urls() {
 								<Button
 									color="#323ea8"
 									text="Edit"
-									margin={{
-										top: 5,
+									containerStyle={{
+										marginTop: 5
 									}}
 									onPress={async () => {
 										setEditUrlError(undefined);
@@ -438,7 +438,7 @@ export default function Urls() {
 										)
 											urlData.vanity = editUrlVanity;
 										if (editUrlMaxViews)
-											urlData.maxViews = Number.parseInt(editUrlMaxViews);
+											urlData.maxViews = Number.parseInt(editUrlMaxViews, 10);
 										if (editUrlPassword) urlData.password = editUrlPassword;
 
 										const editedUrlData = await editURL(urlToEdit.id, urlData);
@@ -478,16 +478,17 @@ export default function Urls() {
 							icon="add_link"
 							color="transparent"
 							iconColor={urls && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2,
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!urls || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 
 						<Button
@@ -502,16 +503,17 @@ export default function Urls() {
 							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={urls && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2,
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!urls || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 					</View>
 				</View>
@@ -529,9 +531,16 @@ export default function Urls() {
 										onPress={() => setShowSearch(false)}
 										icon="close"
 										color="#191b27"
-										width={30}
-										height={30}
-										padding={5}
+										containerStyle={{
+											width: 30,
+											height: 30,
+										}}
+										buttonStyle={{
+											padding: 5
+										}}
+										iconStyle={{
+											marginBottom: 5
+										}}
 									/>
 								</View>
 
@@ -757,9 +766,13 @@ export default function Urls() {
 																onAction("copyShortLink", url);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -769,9 +782,13 @@ export default function Urls() {
 																onAction("edit", url);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -781,9 +798,13 @@ export default function Urls() {
 																onAction("delete", url);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 													</View>
 												);

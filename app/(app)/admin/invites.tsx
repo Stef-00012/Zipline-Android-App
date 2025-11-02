@@ -206,8 +206,8 @@ export default function Invites() {
 							}}
 							text="Create"
 							color="#323ea8"
-							margin={{
-								top: 15,
+							containerStyle={{
+								marginTop: 15
 							}}
 						/>
 					</View>
@@ -222,18 +222,18 @@ export default function Invites() {
 							}}
 							icon="add"
 							color="transparent"
-							// iconColor="#2d3f70"
 							iconColor={invites && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!invites || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 
 						<Button
@@ -248,16 +248,17 @@ export default function Invites() {
 							icon={compactModeEnabled ? "view_module" : "view_agenda"}
 							color="transparent"
 							iconColor={invites && dashUrl ? "#2d3f70" : "#2d3f7055"}
-							borderColor="#222c47"
-							borderWidth={2}
+							containerStyle={{
+								borderColor: "#222c47",
+								borderWidth: 2,
+								marginHorizontal: 2
+							}}
+							buttonStyle={{
+								padding: 4
+							}}
 							iconSize={30}
-							padding={4}
 							rippleColor="#283557"
 							disabled={!invites || !dashUrl}
-							margin={{
-								left: 2,
-								right: 2,
-							}}
 						/>
 					</View>
 				</View>
@@ -273,9 +274,16 @@ export default function Invites() {
 								onPress={() => setShowSearch(false)}
 								icon="close"
 								color="#191b27"
-								width={30}
-								height={30}
-								padding={5}
+								containerStyle={{
+									width: 30,
+									height: 30,
+								}}
+								buttonStyle={{
+									padding: 5
+								}}
+								iconStyle={{
+									marginBottom: 7
+								}}
 							/>
 						</View>
 
@@ -495,9 +503,13 @@ export default function Invites() {
 																onAction("copy", invite);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 
 														<Button
@@ -507,9 +519,13 @@ export default function Invites() {
 																onAction("delete", invite);
 															}}
 															iconSize={20}
-															width={32}
-															height={32}
-															padding={6}
+															containerStyle={{
+																width: 32,
+																height: 32,
+															}}
+															iconStyle={{
+																marginBottom: 7
+															}}
 														/>
 													</View>
 												);

@@ -5,18 +5,14 @@ import ZiplineProvider from "@/contexts/ZiplineProvider";
 import BiometricAuthenticationPage from "@/pages/biometricAuth";
 import NoInternetPage from "@/pages/noInternet";
 import NetInfo from "@react-native-community/netinfo";
-// import { useFonts } from 'expo-font';
 import { Slot, useRouter } from "expo-router";
 import { ShareIntentProvider } from "expo-share-intent";
-import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Host } from "react-native-portalize";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-SplashScreen.preventAutoHideAsync();
 
 export default function Layout() {
 	const router = useRouter();

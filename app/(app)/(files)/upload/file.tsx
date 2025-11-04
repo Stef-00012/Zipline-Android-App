@@ -54,7 +54,7 @@ export default function UploadFile({
 
 	const maxFileSize = webSettings
 		? webSettings.config.files.maxFileSize
-		: "99TB";
+		: "??? MB";
 
 	const stringifiedPresets = db.get("uploadPresets") || "[]";
 

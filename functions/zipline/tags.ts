@@ -29,6 +29,8 @@ export async function getTags(): Promise<APITags | string> {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -70,6 +72,8 @@ export async function createTag(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -100,6 +104,8 @@ export async function deleteTag(id: string): Promise<APITag | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -141,6 +147,8 @@ export async function editTag(id: string, options: EditTagOptions = {}) {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

@@ -2,34 +2,42 @@ import { repoName, username } from "@/constants/updates";
 import type { GitHubRelease } from "@/types/githubApi";
 import axios from "axios";
 
-export async function getLatestRelease(prerelease?: boolean): Promise<GitHubRelease | null> {
-    if (prerelease) {
-        try {
-            const res = await axios.get(
-                `https://api.github.com/repos/${username}/${repoName}/releases`,
-            );
+export async function getLatestRelease(
+	prerelease?: boolean,
+): Promise<GitHubRelease | null> {
+	if (prerelease) {
+		try {
+			const res = await axios.get(
+				`https://api.github.com/repos/${username}/${repoName}/releases`,
+			);
 
-            const releasesData = res.data as GitHubRelease[];
+			const releasesData = res.data as GitHubRelease[];
 
-            const latestPrerelease = releasesData.find(release => release.prerelease);
+			const latestPrerelease = releasesData.find(
+				(release) => release.prerelease,
+			);
 
-            if (!latestPrerelease) return null;
+			if (!latestPrerelease) return null;
 
-            return latestPrerelease;
-        } catch(_e) {
-            return null;
-        }
-    }
+			return latestPrerelease;
+		} catch (e) {
+			console.error(e);
 
-    try {
-        const res = await axios.get(
-            `https://api.github.com/repos/${username}/${repoName}/releases/latest`,
-        );
+			return null;
+		}
+	}
 
-        const releaseData = res.data as GitHubRelease;
+	try {
+		const res = await axios.get(
+			`https://api.github.com/repos/${username}/${repoName}/releases/latest`,
+		);
 
-        return releaseData;
-    } catch(_e) {
-        return null;
-    }
+		const releaseData = res.data as GitHubRelease;
+
+		return releaseData;
+	} catch (e) {
+		console.error(e);
+
+		return null;
+	}
 }

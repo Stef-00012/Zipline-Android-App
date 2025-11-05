@@ -27,7 +27,9 @@ export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 		if (res.status === 200) return data.role;
 
 		return false;
-	} catch (_e) {
+	} catch (e) {
+		console.error(e);
+
 		return false;
 	}
 }
@@ -88,6 +90,8 @@ export async function getAuthCookie(
 
 		if (data) return data.error;
 
+		console.error(error);
+
 		return "Something went wrong...";
 	}
 }
@@ -138,6 +142,8 @@ export async function getToken(getCookieResponse?: GetAuthCookieResponse) {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -179,6 +185,8 @@ export async function getTokenWithToken(): Promise<APITokenResponse | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

@@ -30,6 +30,8 @@ export async function clearZeroByteFiles(): Promise<
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -68,6 +70,8 @@ export async function getZeroByteFiles(): Promise<
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -97,6 +101,8 @@ export async function clearTempFiles(): Promise<ServerActionResponse | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -142,6 +148,8 @@ export async function requeryFileSize({
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -179,6 +187,8 @@ export async function generateThumbnails(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

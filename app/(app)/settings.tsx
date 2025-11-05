@@ -41,6 +41,7 @@ import { version as appVersion } from "@/package.json";
 import { styles } from "@/styles/settings";
 import type { Mimetypes } from "@/types/mimetypes";
 import type { APIExports, APIVersion, DashURL } from "@/types/zipline";
+import * as Sentry from "@sentry/react-native";
 import * as Clipboard from "expo-clipboard";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
@@ -1444,6 +1445,17 @@ export default function UserSettings() {
 
 								<Button
 									onPress={async () => {
+										Sentry.showFeedbackWidget();
+									}}
+									color="#323ea8"
+									text="Leave a Feedback"
+									containerStyle={{
+										marginTop: 10
+									}}
+								/>
+
+								<Button
+									onPress={async () => {
 										await db.del("url");
 										await db.del("token");
 
@@ -1786,6 +1798,17 @@ export default function UserSettings() {
 									onPress={() => {}}
 									color="#CF423877"
 									text="Logout"
+									disabled
+									textColor="gray"
+									containerStyle={{
+										marginTop: 10
+									}}
+								/>
+
+								<Button
+									onPress={() => {}}
+									color="#373d79"
+									text="Leave a Feedback"
 									disabled
 									textColor="gray"
 									containerStyle={{

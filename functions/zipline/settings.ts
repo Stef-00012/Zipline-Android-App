@@ -34,6 +34,8 @@ export async function getSettings(): Promise<APISettings | string> {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -76,6 +78,8 @@ export async function updateSettings(
 					`${settingNames[issue.path.join(".") as keyof typeof settingNames] || issue.path.join(".")} - ${issue.message}`,
 			);
 
+		console.error(e);
+
 		return ["Something went wrong..."];
 	}
 }
@@ -106,6 +110,8 @@ export async function getPublicSettings(): Promise<APIPublicSettings | string> {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -135,6 +141,8 @@ export async function getWebSettings(): Promise<APIWebSettings | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

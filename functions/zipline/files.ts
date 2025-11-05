@@ -66,6 +66,8 @@ export async function getFiles(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -97,6 +99,8 @@ export async function getFile(id: string): Promise<APIFile | string> {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -127,6 +131,8 @@ export async function deleteFile(id: string): Promise<APIFile | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -182,6 +188,8 @@ export async function updateFileTags(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -224,6 +232,8 @@ export async function editFile(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -436,6 +446,8 @@ export async function uploadFiles(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -499,6 +511,8 @@ export async function bulkEditFiles({
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

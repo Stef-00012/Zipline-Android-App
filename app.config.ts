@@ -107,6 +107,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				disableIOS: true,
 			},
 		],
+		[
+			"@sentry/react-native/expo",
+			{
+				url: "https://sentry.io/",
+				project: "zipline-android",
+				organization: "stefdp"
+			}
+		],
 		["expo-secure-store"],
 		["expo-image-picker"],
 		["expo-local-authentication"],

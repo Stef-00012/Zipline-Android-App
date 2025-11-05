@@ -29,6 +29,8 @@ export async function getInvites(): Promise<APIInvites | string> {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -69,6 +71,8 @@ export async function createInvite(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -98,6 +102,8 @@ export async function deleteInvite(code: string): Promise<APIInvite | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

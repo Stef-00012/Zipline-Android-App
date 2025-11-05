@@ -40,6 +40,8 @@ export async function getUsers<T extends boolean | undefined = undefined>(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -69,6 +71,8 @@ export async function getUser(id: string): Promise<APIUser | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -115,6 +119,8 @@ export async function createUser(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -151,6 +157,8 @@ export async function deleteUser(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -211,6 +219,8 @@ export async function editUser(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

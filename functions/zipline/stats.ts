@@ -45,6 +45,8 @@ export async function getStats({
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -75,6 +77,8 @@ export async function getUserStats(): Promise<APIUserStats | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

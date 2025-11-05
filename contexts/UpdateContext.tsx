@@ -195,6 +195,8 @@ export default function UpdateProvider({ children }: Props) {
 
 			return "Successfully downloaded the update";
 		} catch (e) {
+			console.error(e);
+
 			setIsDownloading(false);
 			return `Something went wrong...`;
 		}
@@ -278,6 +280,8 @@ export default function UpdateProvider({ children }: Props) {
 
 			return "Successfully downloaded the update";
 		} catch (e) {
+			console.error(e);
+
 			return "Something went wrong...";
 		}
 	}, []);

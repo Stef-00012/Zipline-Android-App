@@ -46,3 +46,4 @@ package-lock.json
 /error.log
 
 devlog.md
+.env.local

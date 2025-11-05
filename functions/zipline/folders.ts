@@ -35,6 +35,8 @@ export async function getFolders<T extends boolean | undefined = undefined>(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -65,6 +67,8 @@ export async function getFolder(id: string): Promise<APIFolder | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -107,6 +111,8 @@ export async function createFolder(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -147,6 +153,8 @@ export async function editFolder(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -180,6 +188,8 @@ export async function deleteFolder(id: string): Promise<APIFolder | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -218,6 +228,8 @@ export async function removeFileFromFolder(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -258,6 +270,8 @@ export async function addFileToFolder(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

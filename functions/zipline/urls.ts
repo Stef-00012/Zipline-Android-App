@@ -42,6 +42,8 @@ export async function getURLs(
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -72,6 +74,8 @@ export async function getURL(id: string): Promise<APIURL | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -131,6 +135,8 @@ export async function createURL({
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -161,6 +167,8 @@ export async function deleteURL(id: string): Promise<APIURL | string> {
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}
@@ -202,6 +210,8 @@ export async function editURL(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

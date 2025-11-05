@@ -29,6 +29,8 @@ export async function getUserExports(): Promise<APIExports | string> {
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -63,6 +65,8 @@ export async function createUserExport(): Promise<
 
 		if (data) return data.error;
 
+		console.error(e);
+
 		return "Something went wrong...";
 	}
 }
@@ -95,6 +99,8 @@ export async function deleteUserExport(
 			| undefined;
 
 		if (data) return data.error;
+
+		console.error(e);
 
 		return "Something went wrong...";
 	}

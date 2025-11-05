@@ -346,10 +346,16 @@ export async function uploadFiles(
 
 				if (data) return data.error;
 
+				console.error("uploadFiles: 'uploadTask.uploadAsync' returned invalid status:", res.status);
+
 				return "Something went wrong...";
 			}
 
-			if (!res) return "Something went wrong...";
+			if (!res) {
+				console.error("uploadFiles: Missing 'uploadTask.uploadAsync' response")
+
+				return "Something went wrong...";
+			}
 
 			const fetchedData = JSON.parse(res.body) as APIUploadResponse;
 
@@ -419,10 +425,16 @@ export async function uploadFiles(
 
 				if (data) return data.error;
 
+				console.error("uploadFiles: 'uploadTask.uploadAsync' returned invalid status:", res.status);
+
 				return "Something went wrong...";
 			}
 
-			if (!res) return "Something went wrong...";
+			if (!res) {
+				console.error("uploadFiles: Missing 'uploadTask.uploadAsync' response")
+
+				return "Something went wrong...";
+			}
 
 			const fetchedData = JSON.parse(res.body) as APIUploadPartialResponse;
 
@@ -432,6 +444,8 @@ export async function uploadFiles(
 				return fetchedData.files;
 			}
 		}
+
+		console.error("uploadFiles: for loop completed without returning files");
 
 		return "Something went wrong...";
 	} catch (e) {

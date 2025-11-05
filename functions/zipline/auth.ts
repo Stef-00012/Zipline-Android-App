@@ -27,9 +27,7 @@ export async function isAuthenticated(): Promise<APISelfUser["role"] | false> {
 		if (res.status === 200) return data.role;
 
 		return false;
-	} catch (e) {
-		console.error(e);
-
+	} catch (_e) {
 		return false;
 	}
 }
@@ -69,11 +67,19 @@ export async function getAuthCookie(
 
 		const setCookieHeader = res.headers["set-cookie"];
 
-		if (!setCookieHeader) return "Something went wrong...";
+		if (!setCookieHeader) {
+			console.error("getAuthCookie: Missing set-cookie header");
+
+			return "Something went wrong...";
+		}
 
 		const authCookie = setCookieHeader[0].split(";")[0];
 
-		if (!authCookie) return "Something went wrong...";
+		if (!authCookie) {
+			console.error("getAuthCookie: Missing auth cookie");
+
+			return "Something went wrong...";
+		}
 
 		return {
 			data: authCookie,
@@ -101,7 +107,11 @@ export async function getToken(getCookieResponse?: GetAuthCookieResponse) {
 
 	if (!url) return "Missing URL";
 
-	if (!getCookieResponse) return "Something went wrong...";
+	if (!getCookieResponse) {
+		console.error("getToken: Missing getCookieResponse");
+
+		return "Something went wrong...";
+	}
 
 	if (typeof getCookieResponse === "string") return getCookieResponse;
 	if (getCookieResponse.totp)
@@ -111,7 +121,11 @@ export async function getToken(getCookieResponse?: GetAuthCookieResponse) {
 
 	const cookie = getCookieResponse.data;
 
-	if (!cookie) return "Something went wrong...";
+	if (!cookie) {
+		console.error("getToken: Missing getCookieResponse.data")
+
+		return "Something went wrong...";
+	}
 
 	try {
 		const res = await axios.get(`${url}/api/user/token`, {
@@ -124,10 +138,13 @@ export async function getToken(getCookieResponse?: GetAuthCookieResponse) {
 
 		if (data.token) {
 			db.set("token", data.token);
+
 			return {
 				token: data.token,
 			};
 		}
+
+		console.error("getToken: Missing token in '/api/user/token' response");
 
 		return "Something went wrong...";
 	} catch (e) {

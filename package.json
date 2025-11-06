@@ -1,8 +1,8 @@
 {
   "name": "zipline",
   "main": "expo-router/entry",
-  "version": "1.18.4",
-  "versionCode": 21,
+  "version": "1.18.5",
+  "versionCode": 22,
   "scripts": {
     "start": "expo start",
     "start:dev": "APP_VARIANT=development EDGE_PATH=/etc/profiles/per-user/stef/bin/chromium expo start --dev-client --host localhost",

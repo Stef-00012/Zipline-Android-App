@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import TextInput from "@/components/TextInput";
 import { minimumVersion } from "@/constants/auth";
 import { AuthContext } from "@/contexts/AuthProvider";
+import { ZiplineContext } from "@/contexts/ZiplineProvider";
 import * as db from "@/functions/database";
 import { isAuthenticated, login } from "@/functions/zipline/auth";
 import { getVersion } from "@/functions/zipline/version";
@@ -15,6 +16,7 @@ import semver from "semver";
 export default function Login() {
 	const router = useRouter();
 	const { updateAuth, updateUser } = useContext(AuthContext);
+	const { updateSettings } = useContext(ZiplineContext)
 
 	const [error, setError] = useState<string>();
 	const [tokenLogin, setTokenLogin] = useState<boolean>(false);
@@ -157,6 +159,7 @@ export default function Login() {
 
 							await updateAuth();
 							await updateUser();
+							await updateSettings();
 
 							return router.replace("/");
 						}
@@ -203,6 +206,7 @@ export default function Login() {
 
 						await updateAuth();
 						await updateUser();
+						await updateSettings();
 
 						return router.replace("/");
 					}}

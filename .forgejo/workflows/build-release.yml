@@ -31,6 +31,10 @@ jobs:
       - name: Setup Repo
         uses: actions/checkout@v4
 
+      - name: Install jq
+        run: |
+          apt-get update && apt-get install -y jq
+
       - name: Get App Version
         id: version
         run: |
@@ -67,31 +71,21 @@ jobs:
       - name: Build Android App APK
         run: eas build --clear-cache --platform android --profile preview --local --output ${{ forgejo.workspace }}/app-release.apk
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-            name: app-apk-release
-            path: ${{ format('{0}/app-release.apk', forgejo.workspace) }}
-
       - name: Build Android App AAB
         run: APP_VARIANT=production eas build --clear-cache --platform android --profile production --local --output ${{ forgejo.workspace }}/app-release.aab
 
-      - name: Upload AAB Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-aab-release
-          path: ${{ forgejo.workspace }}/app-release.aab
-
       - name: Publish Release
-        uses: ncipollo/release-action@v1
+        uses: actions/forgejo-release@v2.7.3
         env:
           GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
         with:
-          prerelease: false
-          artifacts: "app-release.apk,app-release.aab"
-          artifactContentType: application/vnd.android.package-archive
-          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
-          generateReleaseNotes: true
+          direction: upload
+          prerelease: true
+          url: https://git.stefdp.com
+          repo: Stef/Zipline-Android-App
+          token: ${{ secrets.FORGEJO_TOKEN }}
+          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}-pre"
+          release-dir: ${{ forgejo.workspace }}
 
       - name: Announce Release
         run: |

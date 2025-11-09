@@ -45,14 +45,6 @@ jobs:
         run: |
           echo "commit_sha=$(git rev-parse --short HEAD)" >> $FORGEJO_OUTPUT
 
-      - name: test
-        run: |
-          echo "$FORGEJO_OUTPUT"
-          echo "Version: ${{ steps.version.outputs.app_version }}"
-          echo "SHA: ${{ steps.sha.outputs.commit_sha }}"
-          echo "Workspace: ${{ forgejo.workspace }}"
-          echo "test secret: ${{ secrets.TEST_SECRET }}"
-
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -79,31 +71,14 @@ jobs:
       - name: Build Android App APK
         run: APP_VARIANT=prerelease eas build --clear-cache --platform android --profile preview --local --output ${{ forgejo.workspace }}/app-pre-release.apk
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-            name: app-apk-pre-release
-            path: ${{ format('{0}/app-pre-release.apk', forgejo.workspace) }}
-
       - name: Build Android App AAB
         run:  APP_VARIANT=production eas build --clear-cache --platform android --profile production --local --output ${{ forgejo.workspace }}/app-pre-release.aab
-
-      - name: Upload AAB Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-aab-pre-release
-          path: ${{ forgejo.workspace }}/app-pre-release.aab
 
       - name: Publish Release
         uses: actions/forgejo-release@v2.7.3
         env:
           GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
         with:
-          # prerelease: true
-          # artifacts: app-pre-release.apk,app-pre-release.aab
-          # artifactContentType: application/vnd.android.package-archive
-          # tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}-pre"
-          # generateReleaseNotes: true
           direction: upload
           prerelease: true
           url: https://git.stefdp.com
@@ -111,7 +86,6 @@ jobs:
           token: ${{ secrets.FORGEJO_TOKEN }}
           tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}-pre"
           release-dir: ${{ forgejo.workspace }}
-          release-notes-assistant: true
 
       - name: Announce Release
         run: |

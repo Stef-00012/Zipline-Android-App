@@ -91,7 +91,7 @@ jobs:
           url: https://git.stefdp.com
           repo: Stef/Zipline-Android-App
           token: ${{ secrets.FORGEJO_TOKEN }}
-          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}-pre"
+          tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
           release-dir: ${{ forgejo.workspace }}/output
 
       - name: Announce Release

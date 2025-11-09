@@ -45,6 +45,10 @@ jobs:
         run: |
           echo "commit_sha=$(git rev-parse --short HEAD)" >> $FORGEJO_OUTPUT
 
+      - name: Create output directory
+        run: |
+          mkdir -p ${{ forgejo.workspace }}/output
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -69,10 +73,10 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build Android App APK
-        run: eas build --clear-cache --platform android --profile preview --local --output ${{ forgejo.workspace }}/app-release.apk
+        run: eas build --clear-cache --platform android --profile preview --local --output ${{ forgejo.workspace }}/output/app-release.apk
 
       - name: Build Android App AAB
-        run: APP_VARIANT=production eas build --clear-cache --platform android --profile production --local --output ${{ forgejo.workspace }}/app-release.aab
+        run: APP_VARIANT=production eas build --clear-cache --platform android --profile production --local --output ${{ forgejo.workspace }}/output/app-release.aab
 
       - name: Publish Release
         uses: actions/forgejo-release@v2.7.3
@@ -85,7 +89,7 @@ jobs:
           repo: Stef/Zipline-Android-App
           token: ${{ secrets.FORGEJO_TOKEN }}
           tag: "v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}-pre"
-          release-dir: ${{ forgejo.workspace }}
+          release-dir: ${{ forgejo.workspace }}/output
 
       - name: Announce Release
         run: |

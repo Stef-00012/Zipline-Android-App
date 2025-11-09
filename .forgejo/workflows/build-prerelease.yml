@@ -2,6 +2,8 @@ name: Build Prerelease
 
 on:
   push:
+    branches:
+      - main
     paths:
       - components/**
       - constants/**

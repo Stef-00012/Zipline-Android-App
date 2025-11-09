@@ -52,7 +52,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: https://github.com/android-actions/setup-android@v3
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8

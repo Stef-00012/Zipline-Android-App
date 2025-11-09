@@ -8,6 +8,7 @@ on:
       - components/**
       - constants/**
       - functions/**
+      - contexts/**
       - hooks/**
       - styles/**
       - types/**
@@ -86,7 +87,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
         with:
           direction: upload
-          prerelease: true
+          prerelease: false
           url: https://git.stefdp.com
           repo: Stef/Zipline-Android-App
           token: ${{ secrets.FORGEJO_TOKEN }}
@@ -95,37 +96,45 @@ jobs:
 
       - name: Announce Release
         run: |
-          curl https://ntfy.stefdp.com \
-          -H "Authorization: Bearer ${{ secrets.NTFY_TOKEN }}" \
-          -d '{
-            "topic": "ziplineAndroid",
-            "priority": 4,
-            "title": "A new release of Zipline Android has been published",
-            "message": "v${{ steps.version.outputs.app_version }} is out",
-            "actions": [
-              {
-                "action": "view",
-                "label": "View on Forgejo",
-                "url": "https://git.stefdp.com/Stef/Zipline-Android-App/releases/tag/v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
-              }
-            ]
-          }'
+          if curl -s --max-time 5 --head https://ntfy.stefdp.com | grep "200" > /dev/null; then
+            curl https://ntfy.stefdp.com \
+            -H "Authorization: Bearer ${{ secrets.NTFY_TOKEN }}" \
+            -d '{
+              "topic": "ziplineAndroid",
+              "priority": 4,
+              "title": "A new release of Zipline Android has been published",
+              "message": "v${{ steps.version.outputs.app_version }} is out",
+              "actions": [
+                {
+                  "action": "view",
+                  "label": "View on Forgejo",
+                  "url": "https://git.stefdp.com/Stef/Zipline-Android-App/releases/tag/v${{ steps.version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
+                }
+              ]
+            }'
+          else
+            echo "ntfy server is unreachable, skipping notification"
+          fi
 
       - name: Announce Failure
         if: failure()
         run: |
-          curl https://ntfy.stefdp.com \
-          -H "Authorization: Bearer ${{ secrets.NTFY_TOKEN }}" \
-          -d '{
-            "topic": "ziplineAndroid",
-            "priority": 4,
-            "title": "Something went wrong while building a new release of Zipline Android",
-            "message": "v${{ steps.version.outputs.app_version }} failed to build",
-            "actions": [
-              {
-                "action": "view",
-                "label": "View Logs",
-                "url": "https://git.stefdp.com/Stef/Zipline-Android-App/actions/runs/${{ forgejo.run_id }}/job/${{ forgejo.job }}"
-              }
-            ]
-          }'
+          if curl -s --max-time 5 --head https://ntfy.stefdp.com | grep "200" > /dev/null; then
+            curl https://ntfy.stefdp.com \
+            -H "Authorization: Bearer ${{ secrets.NTFY_TOKEN }}" \
+            -d '{
+              "topic": "ziplineAndroid",
+              "priority": 4,
+              "title": "Something went wrong while building a new release of Zipline Android",
+              "message": "v${{ steps.version.outputs.app_version }} failed to build",
+              "actions": [
+                {
+                  "action": "view",
+                  "label": "View Logs",
+                  "url": "https://git.stefdp.com/Stef/Zipline-Android-App/actions/runs/${{ forgejo.run_id }}/job/${{ forgejo.job }}"
+                }
+              ]
+            }'
+          else
+            echo "ntfy server is unreachable, skipping notification"
+          fi

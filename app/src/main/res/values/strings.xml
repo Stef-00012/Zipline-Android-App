@@ -1,0 +1,46 @@
+<resources>
+    <!--  utils.Biometric  -->
+    <string name="biometric_prompt_default_title">Authenticate with biometrics</string>
+    <string name="biometric_prompt_default_negative_button">Cancel</string>
+
+    <!--  utils.Time  -->
+    <plurals name="seconds_unit">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
+    <string name="seconds_short">s</string>
+
+    <plurals name="minutes_unit">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <string name="minutes_short">m</string>
+
+    <plurals name="hours_unit">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <string name="hours_short">h</string>
+
+    <plurals name="days_unit">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="days_short">d</string>
+
+    <plurals name="months_unit">
+        <item quantity="one">month</item>
+        <item quantity="other">months</item>
+    </plurals>
+    <string name="months_short">mo</string>
+
+    <plurals name="years_unit">
+        <item quantity="one">year</item>
+        <item quantity="other">years</item>
+    </plurals>
+    <string name="years_short">y</string>
+
+    <!--  AndroidManifest  -->
+    <string name="app_name">Zipline</string>
+    <string name="app_description">An Android app to manage your self-hosted zipline V4 instance.</string>
+</resources>

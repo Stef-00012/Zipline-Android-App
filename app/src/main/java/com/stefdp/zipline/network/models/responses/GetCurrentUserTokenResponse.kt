@@ -1,0 +1,8 @@
+package com.stefdp.zipline.network.models.responses
+
+import com.stefdp.zipline.network.models.User
+
+data class GetCurrentUserTokenResponse(
+    val user: User? = null,
+    val token: String? = null
+)

@@ -1,7 +1,9 @@
 package com.stefdp.zipline.network.models.requests
 
-data class BulkUpdateCurrentUserFilesBody(
+import com.google.gson.annotations.SerializedName
+
+data class BulkUpdateFilesBody(
     val files: List<String>,
     val favorite: Boolean? = null,
-    val folder: String? = null,
+    @SerializedName("folder") val folderId: String? = null,
 )

@@ -2,7 +2,7 @@ package com.stefdp.zipline.network.models.requests
 
 import com.google.gson.annotations.SerializedName
 
-enum class GetCurrentUserFilesQueryFilter(val value: String) {
+enum class GetFilesQueryFilter(val value: String) {
     @SerializedName("dashboard")
     DASHBOARD("dashboard"),
 
@@ -15,7 +15,7 @@ enum class GetCurrentUserFilesQueryFilter(val value: String) {
     override fun toString(): String = value
 }
 
-enum class GetCurrentUserFilesQuerySortBy(val value: String) {
+enum class GetFilesQuerySortBy(val value: String) {
     @SerializedName("id")
     ID("id"),
 
@@ -49,7 +49,7 @@ enum class GetCurrentUserFilesQuerySortBy(val value: String) {
     override fun toString(): String = value
 }
 
-enum class GetCurrentUserFilesQueryOrder(val value: String) {
+enum class GetFilesQueryOrder(val value: String) {
     @SerializedName("asc")
     ASC("asc"),
 
@@ -59,7 +59,7 @@ enum class GetCurrentUserFilesQueryOrder(val value: String) {
     override fun toString(): String = value
 }
 
-enum class GetCurrentUserFilesQuerySearchField(val value: String) {
+enum class GetFilesQuerySearchField(val value: String) {
     @SerializedName("name")
     NAME("name"),
 

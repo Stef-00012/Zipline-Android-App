@@ -2,7 +2,7 @@ package com.stefdp.zipline.network.models.requests
 
 import com.google.gson.annotations.SerializedName
 
-enum class GetCurrentUserUrlsQuerySearchField(val value: String) {
+enum class GetUrlsQuerySearchField(val value: String) {
     @SerializedName("destination")
     DESTINATION("destination"),
 

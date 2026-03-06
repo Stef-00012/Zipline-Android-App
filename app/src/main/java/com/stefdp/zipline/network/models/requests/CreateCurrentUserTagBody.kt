@@ -1,6 +1,6 @@
 package com.stefdp.zipline.network.models.requests
 
-data class CreateCurrentUserTagBody(
+data class CreateTagBody(
     val name: String,
     val color: String,
 )

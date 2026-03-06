@@ -1,5 +1,5 @@
 package com.stefdp.zipline.network.models.responses
 
-data class DeleteCurrentUserExportResponse(
+data class DeleteExportResponse(
     val deleted: Boolean
 )

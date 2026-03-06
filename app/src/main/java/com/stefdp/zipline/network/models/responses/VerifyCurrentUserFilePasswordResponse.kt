@@ -1,5 +1,5 @@
 package com.stefdp.zipline.network.models.responses
 
-data class VerifyCurrentUserFilePasswordResponse(
+data class VerifyFilePasswordResponse(
     val success: Boolean
 )

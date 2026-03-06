@@ -1,5 +1,5 @@
 package com.stefdp.zipline.network.models.responses
 
-data class DeleteCurrentUserTagResponse(
+data class DeleteTagResponse(
     val success: Boolean
 )

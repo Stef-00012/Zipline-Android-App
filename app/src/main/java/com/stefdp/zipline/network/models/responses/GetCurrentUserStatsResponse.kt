@@ -2,7 +2,7 @@ package com.stefdp.zipline.network.models.responses
 
 import com.google.gson.annotations.SerializedName
 
-data class GetCurrentUserStatsResponse(
+data class GetStatsResponse(
     val filesUploaded: Long,
     val favoriteFiles: Long,
     val views: Long,

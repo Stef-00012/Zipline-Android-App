@@ -1,5 +1,5 @@
 package com.stefdp.zipline.network.models.requests
 
-data class VerifyCurrentUserUrlPasswordBody(
+data class VerifyUrlPasswordBody(
     val password: String
 )

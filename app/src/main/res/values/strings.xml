@@ -1,4 +1,8 @@
 <resources>
+    <!--  AndroidManifest  -->
+    <string name="app_name">Zipline</string>
+    <string name="app_description">An Android app to manage your self-hosted zipline V4 instance.</string>
+
     <!--  utils.Biometric  -->
     <string name="biometric_prompt_default_title">Authenticate with biometrics</string>
     <string name="biometric_prompt_default_negative_button">Cancel</string>
@@ -40,7 +44,9 @@
     </plurals>
     <string name="years_short">y</string>
 
-    <!--  AndroidManifest  -->
-    <string name="app_name">Zipline</string>
-    <string name="app_description">An Android app to manage your self-hosted zipline V4 instance.</string>
+    <!--  network.requests.*  -->
+    <string name="missing_token">Missing Token</string>
+    <string name="invalid_token">Invalid Token</string>
+    <string name="missing_server_url">Missing Server URL</string>
+    <string name="generic_error">Something went wrong…</string>
 </resources>

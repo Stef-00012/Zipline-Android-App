@@ -1,5 +1,5 @@
 package com.stefdp.zipline.network.models.responses
 
-data class StartCurrentUserExportResponse(
+data class StartExportResponse(
     val running: Boolean
 )

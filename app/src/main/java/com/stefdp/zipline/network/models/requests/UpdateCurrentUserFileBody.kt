@@ -1,6 +1,6 @@
 package com.stefdp.zipline.network.models.requests
 
-data class UpdateCurrentUserFileBody(
+data class UpdateFileBody(
     val favorite: Boolean? = null,
     val maxViews: Long? = null,
     val password: String? = null,

@@ -1,5 +1,5 @@
 package com.stefdp.zipline.network.models.responses
 
-data class DeleteCurrentUserIncompleteFilesResponse(
+data class DeleteIncompleteFilesResponse(
     val count: Long
 )

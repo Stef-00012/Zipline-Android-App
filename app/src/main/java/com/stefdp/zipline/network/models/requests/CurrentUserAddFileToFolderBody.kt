@@ -1,5 +1,7 @@
 package com.stefdp.zipline.network.models.requests
 
-data class CurrentUserAddFileToFolderBody(
-    val id: String,
+import com.google.gson.annotations.SerializedName
+
+data class AddFileToFolderBody(
+    @SerializedName("id") val fileId: String,
 )

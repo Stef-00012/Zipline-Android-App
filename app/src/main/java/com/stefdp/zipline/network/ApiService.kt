@@ -14,52 +14,53 @@ import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.Url
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings
-import com.stefdp.zipline.network.models.requests.BulkDeleteCurrentUserFilesBody
-import com.stefdp.zipline.network.models.requests.BulkUpdateCurrentUserFilesBody
-import com.stefdp.zipline.network.models.requests.CreateCurrentUserFolderBody
-import com.stefdp.zipline.network.models.requests.CreateCurrentUserTagBody
+import com.stefdp.zipline.network.models.requests.BulkDeleteFilesBody
+import com.stefdp.zipline.network.models.requests.BulkUpdateFilesBody
+import com.stefdp.zipline.network.models.requests.CreateFolderBody
+import com.stefdp.zipline.network.models.requests.CreateTagBody
 import com.stefdp.zipline.network.models.requests.CreateInviteBody
 import com.stefdp.zipline.network.models.requests.CreateUrlBody
 import com.stefdp.zipline.network.models.requests.CreateUserBody
-import com.stefdp.zipline.network.models.requests.CurrentUserAddFileToFolderBody
-import com.stefdp.zipline.network.models.requests.CurrentUserRemoveFileFromFolderBody
-import com.stefdp.zipline.network.models.requests.DeleteCurrentUserFolderBody
-import com.stefdp.zipline.network.models.requests.DeleteCurrentUserSessionBody
+import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
+import com.stefdp.zipline.network.models.requests.RemoveFileFromFolderBody
+import com.stefdp.zipline.network.models.requests.DeleteFolderBody
+import com.stefdp.zipline.network.models.requests.DeleteSessionBody
 import com.stefdp.zipline.network.models.requests.DeleteUserBody
-import com.stefdp.zipline.network.models.requests.GetCurrentUserFilesQueryFilter
-import com.stefdp.zipline.network.models.requests.GetCurrentUserFilesQueryOrder
-import com.stefdp.zipline.network.models.requests.GetCurrentUserFilesQuerySearchField
-import com.stefdp.zipline.network.models.requests.GetCurrentUserFilesQuerySortBy
-import com.stefdp.zipline.network.models.requests.GetCurrentUserUrlsQuerySearchField
+import com.stefdp.zipline.network.models.requests.GetFilesQueryFilter
+import com.stefdp.zipline.network.models.requests.GetFilesQueryOrder
+import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
+import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
+import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.requests.RunRequerySizeJobBody
 import com.stefdp.zipline.network.models.requests.RunThumbnailGenerationJobBody
-import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
-import com.stefdp.zipline.network.models.requests.UpdateCurrentUserFileBody
+import com.stefdp.zipline.network.models.requests.UpdateCurrenUserBody
+import com.stefdp.zipline.network.models.requests.UpdateFileBody
+import com.stefdp.zipline.network.models.requests.UpdateTagBody
 import com.stefdp.zipline.network.models.requests.UpdateUrlBody
 import com.stefdp.zipline.network.models.requests.UpdateUserBody
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
-import com.stefdp.zipline.network.models.requests.VerifyCurrentUserFilePasswordBody
-import com.stefdp.zipline.network.models.requests.VerifyCurrentUserUrlPasswordBody
-import com.stefdp.zipline.network.models.responses.BulkDeleteCurrentUserFilesResponse
-import com.stefdp.zipline.network.models.responses.BulkUpdateCurrentUserFilesResponse
+import com.stefdp.zipline.network.models.requests.VerifyFilePasswordBody
+import com.stefdp.zipline.network.models.requests.VerifyUrlPasswordBody
+import com.stefdp.zipline.network.models.responses.BulkDeleteFilesResponse
+import com.stefdp.zipline.network.models.responses.BulkUpdateFilesResponse
 import com.stefdp.zipline.network.models.responses.CreateUrlResponse
-import com.stefdp.zipline.network.models.responses.DeleteCurrentUserExportResponse
-import com.stefdp.zipline.network.models.responses.DeleteCurrentUserIncompleteFilesResponse
-import com.stefdp.zipline.network.models.responses.DeleteCurrentUserTagResponse
-import com.stefdp.zipline.network.models.responses.GetCurrentUserFilesResponse
+import com.stefdp.zipline.network.models.responses.DeleteExportResponse
+import com.stefdp.zipline.network.models.responses.DeleteIncompleteFilesResponse
+import com.stefdp.zipline.network.models.responses.DeleteTagResponse
+import com.stefdp.zipline.network.models.responses.GetFilesResponse
 import com.stefdp.zipline.network.models.responses.GetCurrentUserResponse
-import com.stefdp.zipline.network.models.responses.GetCurrentUserSessions
-import com.stefdp.zipline.network.models.responses.GetCurrentUserStatsResponse
-import com.stefdp.zipline.network.models.responses.GetCurrentUserTokenResponse
+import com.stefdp.zipline.network.models.responses.GetSessionsResponse
+import com.stefdp.zipline.network.models.responses.GetStatsResponse
+import com.stefdp.zipline.network.models.responses.GetTokenResponse
 import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
 import com.stefdp.zipline.network.models.responses.HealthCheckResponse
 import com.stefdp.zipline.network.models.responses.LoginResponse
 import com.stefdp.zipline.network.models.responses.RunJobResponse
 import com.stefdp.zipline.network.models.responses.UploadFileResponse
 import com.stefdp.zipline.network.models.responses.UploadPartialFileResponse
-import com.stefdp.zipline.network.models.responses.VerifyCurrentUserFilePasswordResponse
-import com.stefdp.zipline.network.models.responses.VerifyCurrentUserUrlPasswordResponse
+import com.stefdp.zipline.network.models.responses.VerifyFilePasswordResponse
+import com.stefdp.zipline.network.models.responses.VerifyUrlPasswordResponse
 import com.stefdp.zipline.network.models.responses.ZeroByteFilesResponse
 //import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -133,7 +134,7 @@ interface ZiplineApiService {
     suspend fun getPublicFolderData(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
-        @Query("uploads") uploads: Boolean? = null,
+        @Query("uploads") filterAllowedUploadsOnly: Boolean? = null,
     ): Response<Folder>
 
     @Streaming
@@ -207,24 +208,24 @@ interface ZiplineApiService {
 //        }
 //    }
 
-    @Multipart
-    @POST("upload")
-    suspend fun uploadFileNoJson(
-        @Header("Authorization") token: String,
-        @Header("x-zipline-deletes-at") deletesAt: String? = null,
-        @Header("x-zipline-format") format: FilesFormat? = null,
-        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Int? = null,
-        @Header("x-zipline-image-compression-type") imageCompressionType: UploadCompressionType? = null,
-        @Header("x-zipline-password") password: String? = null,
-        @Header("x-zipline-max-views") maxViews: Long? = null,
-        @Header("x-zipline-original-name") originalName: String? = null,
-        @Header("x-zipline-folder") folder: String? = null,
-        @Header("x-zipline-filename") filename: String? = null,
-        @Header("x-zipline-domain") domain: String? = null,
-        @Header("x-zipline-file-extension") fileExtension: String? = null,
-        @Header("x-zipline-no-json") noJson: Boolean = true,
-        @Part file: MultipartBody.Part
-    ): Response<String>
+//    @Multipart
+//    @POST("upload")
+//    suspend fun uploadFileNoJson(
+//        @Header("Authorization") token: String,
+//        @Header("x-zipline-deletes-at") deletesAt: String? = null,
+//        @Header("x-zipline-format") format: FilesFormat? = null,
+//        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Int? = null,
+//        @Header("x-zipline-image-compression-type") imageCompressionType: UploadCompressionType? = null,
+//        @Header("x-zipline-password") password: String? = null,
+//        @Header("x-zipline-max-views") maxViews: Long? = null,
+//        @Header("x-zipline-original-name") originalName: String? = null,
+//        @Header("x-zipline-folder") folder: String? = null,
+//        @Header("x-zipline-filename") filename: String? = null,
+//        @Header("x-zipline-domain") domain: String? = null,
+//        @Header("x-zipline-file-extension") fileExtension: String? = null,
+//        @Header("x-zipline-no-json") noJson: Boolean = true,
+//        @Part file: MultipartBody.Part
+//    ): Response<String>
 
     @Multipart
     @POST("upload/partial")
@@ -234,6 +235,7 @@ interface ZiplineApiService {
         @Header("x-zipline-p-content-type") partialContentType: String,
         @Header("x-zipline-p-lastchunk") isLastChunk: Boolean,
         @Header("x-zipline-p-content-length") partialContentLength: Long,
+        @Header("Content-Range") contentRange: String,
         @Header("x-zipline-p-identifier") identifier: String? = null, // not required on first request, required on next ones
         @Header("x-zipline-deletes-at") deletesAt: String? = null,
         @Header("x-zipline-format") format: FilesFormat? = null,
@@ -249,29 +251,29 @@ interface ZiplineApiService {
         @Part file: MultipartBody.Part
     ): Response<UploadPartialFileResponse>
 
-    @Multipart
-    @POST("upload/partial")
-    suspend fun uploadPartialFileNoJson(
-        @Header("Authorization") token: String,
-        @Header("x-zipline-p-filename") partialFilename: String,
-        @Header("x-zipline-p-content-type") partialContentType: String,
-        @Header("x-zipline-p-lastchunk") isLastChunk: Boolean,
-        @Header("x-zipline-p-content-length") partialContentLength: Long,
-        @Header("x-zipline-p-identifier") identifier: String? = null, // not required on first request, required on next ones
-        @Header("x-zipline-deletes-at") deletesAt: String? = null,
-        @Header("x-zipline-format") format: FilesFormat? = null,
-        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Int? = null,
-        @Header("x-zipline-image-compression-type") imageCompressionType: UploadCompressionType? = null,
-        @Header("x-zipline-password") password: String? = null,
-        @Header("x-zipline-max-views") maxViews: Long? = null,
-        @Header("x-zipline-original-name") originalName: String? = null,
-        @Header("x-zipline-folder") folder: String? = null,
-        @Header("x-zipline-filename") filename: String? = null,
-        @Header("x-zipline-domain") domain: String? = null,
-        @Header("x-zipline-file-extension") fileExtension: String? = null,
-        @Header("x-zipline-no-json") noJson: Boolean = true,
-        @Part file: MultipartBody.Part
-    ): Response<String>
+//    @Multipart
+//    @POST("upload/partial")
+//    suspend fun uploadPartialFileNoJson(
+//        @Header("Authorization") token: String,
+//        @Header("x-zipline-p-filename") partialFilename: String,
+//        @Header("x-zipline-p-content-type") partialContentType: String,
+//        @Header("x-zipline-p-lastchunk") isLastChunk: Boolean,
+//        @Header("x-zipline-p-content-length") partialContentLength: Long,
+//        @Header("x-zipline-p-identifier") identifier: String? = null, // not required on first request, required on next ones
+//        @Header("x-zipline-deletes-at") deletesAt: String? = null,
+//        @Header("x-zipline-format") format: FilesFormat? = null,
+//        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Int? = null,
+//        @Header("x-zipline-image-compression-type") imageCompressionType: UploadCompressionType? = null,
+//        @Header("x-zipline-password") password: String? = null,
+//        @Header("x-zipline-max-views") maxViews: Long? = null,
+//        @Header("x-zipline-original-name") originalName: String? = null,
+//        @Header("x-zipline-folder") folder: String? = null,
+//        @Header("x-zipline-filename") filename: String? = null,
+//        @Header("x-zipline-domain") domain: String? = null,
+//        @Header("x-zipline-file-extension") fileExtension: String? = null,
+//        @Header("x-zipline-no-json") noJson: Boolean = true,
+//        @Part file: MultipartBody.Part
+//    ): Response<String>
 
     @GET("user")
     suspend fun getCurrentUser(
@@ -281,77 +283,78 @@ interface ZiplineApiService {
     @PATCH("user")
     suspend fun updateCurrentUser(
         @Header("Authorization") token: String,
-        @Body data: UpdateCurrentUserBody,
+        @Body data: UpdateCurrenUserBody,
     ): Response<GetCurrentUserResponse>
 
     @GET("user/token")
-    suspend fun getCurrentUserToken(
+    suspend fun getToken(
         @Header("Cookie") cookie: String,
-    ): Response<GetCurrentUserTokenResponse>
+    ): Response<GetTokenResponse>
 
     @PATCH("user/token")
-    suspend fun refreshCurrentUserToken(
+    suspend fun refreshToken(
         @Header("Authorization") token: String,
     ): Response<LoginResponse>
 
     @GET("user/stats")
-    suspend fun getCurrentUserStats(
+    suspend fun getStats(
         @Header("Authorization") token: String,
-    ): Response<GetCurrentUserStatsResponse>
+    ): Response<GetStatsResponse>
 
     @GET("user/sessions")
-    suspend fun getCurrentUserSessions(
+    suspend fun getSessions(
         @Header("Authorization") token: String,
-    ): Response<GetCurrentUserSessions>
+    ): Response<GetSessionsResponse>
 
     @DELETE("user/sessions")
-    suspend fun deleteCurrentUserSession(
+    suspend fun deleteSession(
         @Header("Authorization") token: String,
-        @Body data: DeleteCurrentUserSessionBody
-    ): Response<GetCurrentUserSessions>
+        @Body data: DeleteSessionBody
+    ): Response<GetSessionsResponse>
 
     @GET("user/recent")
-    suspend fun getCurrentUserRecentFiles(
+    suspend fun getRecentFiles(
         @Header("Authorization") token: String,
-        @Query("take") limit: Int? = null,
+        @Query("take") count: Int? = null,
     ): Response<List<File>>
 
     @GET("user/export")
-    suspend fun getCurrentUserExports(
+    suspend fun getExports(
         @Header("Authorization") token: String,
     ): Response<List<Export>>
 
+    @Streaming
     @GET("user/export")
-    suspend fun downloadCurrentUserExport(
+    suspend fun downloadExport(
         @Header("Authorization") token: String,
         @Query("id") exportId: String,
     ): Response<ResponseBody>
 
     @DELETE("user/export")
-    suspend fun deleteCurrentUserExport(
+    suspend fun deleteExport(
         @Header("Authorization") token: String,
         @Query("id") exportId: String,
-    ): Response<DeleteCurrentUserExportResponse>
+    ): Response<DeleteExportResponse>
 
     @POST("user/export")
-    suspend fun startCurrentUserExport(
+    suspend fun startExport(
         @Header("Authorization") token: String,
     ): Response<Export>
 
     @GET("user/avatar")
-    suspend fun getCurrentUserAvatar(
+    suspend fun getAvatar(
         @Header("Authorization") token: String,
     ): Response<String>
 
     @GET("user/urls")
-    suspend fun getCurrentUserUrls(
+    suspend fun getUrls(
         @Header("Authorization") token: String,
-        @Query("searchField") searchField: GetCurrentUserUrlsQuerySearchField? = null,
+        @Query("searchField") searchField: GetUrlsQuerySearchField? = null,
         @Query("searchQuery") searchQuery: String? = null,
     ): Response<List<Url>>
 
     @POST("user/urls")
-    suspend fun createCurrentUserUrl(
+    suspend fun createUrl(
         @Header("Authorization") token: String,
         @Header("x-zipline-max-views") maxViews: Long? = null,
         @Header("x-zipline-domain") domain: String? = null,
@@ -359,181 +362,183 @@ interface ZiplineApiService {
         @Body data: CreateUrlBody,
     ): Response<CreateUrlResponse>
 
-    @POST("user/urls")
-    suspend fun createCurrentUserUrlNoJson(
-        @Header("Authorization") token: String,
-        @Header("x-zipline-max-views") maxViews: Long? = null,
-        @Header("x-zipline-domain") domain: String? = null,
-        @Header("x-zipline-password") password: String? = null,
-        @Header("x-zipline-no-json") noJson: Boolean = true,
-        @Body data: CreateUrlBody,
-    ): Response<String>
+//    @POST("user/urls")
+//    suspend fun createUrlNoJson(
+//        @Header("Authorization") token: String,
+//        @Header("x-zipline-max-views") maxViews: Long? = null,
+//        @Header("x-zipline-domain") domain: String? = null,
+//        @Header("x-zipline-password") password: String? = null,
+//        @Header("x-zipline-no-json") noJson: Boolean = true,
+//        @Body data: CreateUrlBody,
+//    ): Response<String>
 
     @GET("user/urls/{urlId}")
-    suspend fun getCurrentUserUrl(
+    suspend fun getUrl(
         @Header("Authorization") token: String,
         @Path("urlId") urlId: String,
     ): Response<Url>
 
     @PATCH("user/urls/{urlId}")
-    suspend fun updateCurrentUserUrl(
+    suspend fun updateUrl(
         @Header("Authorization") token: String,
         @Path("urlId") urlId: String,
         @Body data: UpdateUrlBody
     ): Response<Url>
 
     @DELETE("user/urls/{urlId}")
-    suspend fun deleteCurrentUserUrl(
+    suspend fun deleteUrl(
         @Header("Authorization") token: String,
         @Path("urlId") urlId: String,
     ): Response<Url>
 
     @POST("user/urls/{urlId}/password")
-    suspend fun verifyCurrentUserUrlPassword(
+    suspend fun verifyUrlPassword(
         @Header("Authorization") token: String,
         @Path("urlId") urlId: String,
-        @Body data: VerifyCurrentUserUrlPasswordBody
-    ): Response<VerifyCurrentUserUrlPasswordResponse>
+        @Body data: VerifyUrlPasswordBody
+    ): Response<VerifyUrlPasswordResponse>
 
     @GET("user/tags")
-    suspend fun getCurrentUserTags(
+    suspend fun getTags(
         @Header("Authorization") token: String,
     ): Response<List<Tag>>
 
     @POST("user/tags")
-    suspend fun createCurrentUserTag(
+    suspend fun createTag(
         @Header("Authorization") token: String,
-        @Body data: CreateCurrentUserTagBody
+        @Body data: CreateTagBody
     ): Response<Tag>
 
     @GET("user/tags/{tagId}")
-    suspend fun getCurrentUserTag(
+    suspend fun getTag(
         @Header("Authorization") token: String,
         @Path("tagId") tagId: String,
     ): Response<Tag>
 
     @DELETE("user/tags/{tagId}")
-    suspend fun deleteCurrentUserTag(
+    suspend fun deleteTag(
         @Header("Authorization") token: String,
         @Path("tagId") tagId: String,
-    ): Response<DeleteCurrentUserTagResponse>
+    ): Response<DeleteTagResponse>
 
     @PATCH("user/tags/{tagId}")
-    suspend fun updateCurrentUserTag(
+    suspend fun updateTag(
         @Header("Authorization") token: String,
         @Path("tagId") tagId: String,
-        @Body data: CreateCurrentUserTagBody
+        @Body data: UpdateTagBody
     ): Response<Tag>
 
     @GET("user/folders")
-    suspend fun getCurrentUserFolders(
+    suspend fun getFolders(
         @Header("Authorization") token: String,
     ): Response<List<Folder>>
 
     @POST("user/folders")
-    suspend fun createCurrentUserFolder(
+    suspend fun createFolder(
         @Header("Authorization") token: String,
-        @Body data: CreateCurrentUserFolderBody
+        @Body data: CreateFolderBody
     ): Response<Folder>
 
     @GET("user/folders/{folderId}")
-    suspend fun getCurrentUserFolder(
+    suspend fun getFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
     ) : Response<Folder>
 
     @PUT("user/folders/{folderId}")
-    suspend fun currentUserAddFileToFolder(
+    suspend fun addFileToFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
-        @Body data: CurrentUserAddFileToFolderBody,
+        @Body data: AddFileToFolderBody,
     ): Response<Folder>
 
     @DELETE("user/folders/{folderId}/")
-    suspend fun deleteCurrentUserFolder(
+    suspend fun deleteFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
-        @Body data: DeleteCurrentUserFolderBody,
+        @Body data: DeleteFolderBody,
     ): Response<Folder>
 
     @DELETE("user/folders/{folderId}")
-    suspend fun currentUserRemoveFileFromFolder(
+    suspend fun removeFileFromFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
-        @Body data: CurrentUserRemoveFileFromFolderBody,
+        @Body data: RemoveFileFromFolderBody,
     ): Response<Folder>
 
+    @Streaming
     @GET("user/folders/{folderId}/export")
-    suspend fun exportCurrentUserFolder(
+    suspend fun exportFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
     ): Response<ResponseBody>
 
     @GET("user/files")
-    suspend fun getCurrentUserFiles(
+    suspend fun getFiles(
         @Header("Authorization") token: String,
         @Query("page") page: Long = 1,
         @Query("perpage") perPage: Long? = null,
-        @Query("filter") filter: GetCurrentUserFilesQueryFilter? = null,
-        @Query("favorite") favorite: Boolean? = null,
-        @Query("sortBy") sortBy: GetCurrentUserFilesQuerySortBy? = null,
-        @Query("order") order: GetCurrentUserFilesQueryOrder? = null,
-        @Query("searchField") searchField: GetCurrentUserFilesQuerySearchField? = null,
+        @Query("filter") filter: GetFilesQueryFilter? = null,
+        @Query("favorite") filterFavorite: Boolean? = null,
+        @Query("sortBy") sortBy: GetFilesQuerySortBy? = null,
+        @Query("order") sortOrder: GetFilesQueryOrder? = null,
+        @Query("searchField") searchField: GetFilesQuerySearchField? = null,
         @Query("searchQuery") searchQuery: String? = null,
         @Query("id") userId: String? = null,
         @Query("folder") folderId: String? = null,
-    ): Response<GetCurrentUserFilesResponse>
+    ): Response<GetFilesResponse>
 
     @PATCH("user/files/transaction")
-    suspend fun bulkUpdateCurrentUserFiles(
+    suspend fun bulkUpdateFiles(
         @Header("Authorization") token: String,
-        @Body data: BulkUpdateCurrentUserFilesBody,
-    ): Response<BulkUpdateCurrentUserFilesResponse>
+        @Body data: BulkUpdateFilesBody,
+    ): Response<BulkUpdateFilesResponse>
 
     @DELETE("user/files/transaction")
-    suspend fun bulkDeleteCurrentUserFiles(
+    suspend fun bulkDeleteFiles(
         @Header("Authorization") token: String,
-        @Body data: BulkDeleteCurrentUserFilesBody,
-    ): Response<BulkDeleteCurrentUserFilesResponse>
+        @Body data: BulkDeleteFilesBody,
+    ): Response<BulkDeleteFilesResponse>
 
     @GET("user/files/incomplete")
-    suspend fun getCurrentUserIncompleteFiles(
+    suspend fun getIncompleteFiles(
         @Header("Authorization") token: String,
     ): Response<List<IncompleteFile>>
 
     @DELETE("user/files/incomplete")
-    suspend fun deleteCurrentUserIncompleteFiles(
+    suspend fun deleteIncompleteFiles(
         @Header("Authorization") token: String,
-    ): Response<DeleteCurrentUserIncompleteFilesResponse>
+    ): Response<DeleteIncompleteFilesResponse>
 
     @GET("user/files/{fileId}")
-    suspend fun getCurrentUserFile(
+    suspend fun getFile(
         @Header("Authorization") token: String,
         @Path("fileId") fileId: String,
     ): Response<File>
 
     @PATCH("user/files/{fileId}")
-    suspend fun updateCurrentUserFile(
+    suspend fun updateFile(
         @Header("Authorization") token: String,
         @Path("fileId") fileId: String,
-        @Body data: UpdateCurrentUserFileBody,
+        @Body data: UpdateFileBody,
     ): Response<File>
 
     @DELETE("user/files/{fileId}")
-    suspend fun deleteCurrentUserFile(
+    suspend fun deleteFile(
         @Header("Authorization") token: String,
         @Path("fileId") fileId: String,
     ): Response<File>
 
     @POST("user/files/{fileId}/password")
-    suspend fun verifyCurrentUserFilePassword(
+    suspend fun verifyFilePassword(
         @Header("Authorization") token: String,
         @Path("fileId") fileId: String,
-        @Body data: VerifyCurrentUserFilePasswordBody
-    ): Response<VerifyCurrentUserFilePasswordResponse>
+        @Body data: VerifyFilePasswordBody
+    ): Response<VerifyFilePasswordResponse>
 
+    @Streaming
     @GET("user/files/{fileId}/raw")
-    suspend fun downloadCurrentUserFile(
+    suspend fun downloadFile(
         @Header("Authorization") token: String,
         @Path("fileId") fileId: String,
         @Query("pw") password: String? = null,
@@ -543,7 +548,7 @@ interface ZiplineApiService {
     @GET("users")
     suspend fun getUsers(
         @Header("Authorization") token: String,
-        @Query("noIncl") excludeCurrentUser: Boolean? = null,
+        @Query("noIncl") exclude: Boolean? = null,
     ): Response<List<User>>
 
     @POST("users")

@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.Folder
+import com.stefdp.zipline.network.models.PublicFolder
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.utils.SecureStorage
 
@@ -15,7 +16,7 @@ suspend fun getPublicFolderData(
     context: Context,
     folderId: String,
     filterAllowedUploadsOnly: Boolean? = null
-): Result<Folder> {
+): Result<PublicFolder> {
     try {
         val secureStore = SecureStorage.getInstance(context)
 

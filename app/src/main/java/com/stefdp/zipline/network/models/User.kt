@@ -1,7 +1,11 @@
 package com.stefdp.zipline.network.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
+@Parcelize
 data class User(
     val id: String,
     val username: String,
@@ -17,8 +21,9 @@ data class User(
     val avatar: String? = null,
     val password: String? = null,
     val token: String? = null,
-)
+) : Parcelable
 
+@Parcelize
 data class UserViewSettings(
     val enabled: Boolean? = null,
     val align: UserViewSettingsAlign? = null,
@@ -31,9 +36,10 @@ data class UserViewSettings(
     val embedDescription: String? = null,
     val embedColor: String? = null,
     val embedSiteName: String? = null,
-)
+) : Parcelable
 
-enum class UserViewSettingsAlign(val value: String) {
+@Parcelize
+enum class UserViewSettingsAlign(val value: String) : Parcelable {
     @SerializedName("left")
     LEFT("left"),
 
@@ -46,6 +52,7 @@ enum class UserViewSettingsAlign(val value: String) {
     override fun toString(): String = value
 }
 
+@Parcelize
 data class UserSession(
     val id: String,
     val createdAt: String,
@@ -53,8 +60,9 @@ data class UserSession(
     val client: String,
     val device: String,
     val userId: String,
-)
+) : Parcelable
 
+@Parcelize
 data class OAuthProvider(
     val id: String,
     val createdAt: String,
@@ -65,9 +73,10 @@ data class OAuthProvider(
     val accessToken: String,
     val refreshToken: String,
     val oauthId: String,
-)
+) : Parcelable
 
-enum class OAuthProviderProvider(val value: String) {
+@Parcelize
+enum class OAuthProviderProvider(val value: String) : Parcelable {
     @SerializedName("DISCORD")
     DISCORD("DISCORD"),
 
@@ -83,6 +92,7 @@ enum class OAuthProviderProvider(val value: String) {
     override fun toString(): String = value
 }
 
+@Parcelize
 data class UserPasskey(
     val id: String,
     val createdAt: String,
@@ -91,26 +101,30 @@ data class UserPasskey(
     val name: String,
     val reg: UserPasskeyReg,
     val userId: String,
-)
+) : Parcelable
 
+@Parcelize
 data class UserPasskeyReg(
     val id: String,
     val type: String,
     val rawId: String,
     val response: UserPasskeyRegResponse,
     val clientExtensionResults: UserPasskeyRegClientExtensionResults,
-)
+) : Parcelable
 
+@Parcelize
 data class UserPasskeyRegResponse(
     val transports: List<String>,
     val attestationObject: String,
     val clientDataJSON: String,
-)
+) : Parcelable
 
+@Parcelize
 data class UserPasskeyRegClientExtensionResults(
-    val credProps: Any? = null,
-)
+    val credProps: @RawValue Any? = null,
+) : Parcelable
 
+@Parcelize
 data class UserQuota(
     val id: String,
     val createdAt: String,
@@ -120,9 +134,10 @@ data class UserQuota(
     val maxFiles: Long?,
     val maxUrls: Long?,
     val userId: String,
-)
+) : Parcelable
 
-enum class UserQuotaFilesQuota(val value: String) {
+@Parcelize
+enum class UserQuotaFilesQuota(val value: String) : Parcelable {
     @SerializedName("NONE")
     NONE("NONE"),
 

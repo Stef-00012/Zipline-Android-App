@@ -1,6 +1,8 @@
 package com.stefdp.zipline.network.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 data class ServerSettings(
     val settings: ServerSettingsSettings,
@@ -37,6 +39,7 @@ data class ServerSettingsSettings(
     val filesRandomWordsNumAdjectives: Long,
     val filesRandomWordsSeparator: String,
     val filesDefaultCompressionFormat: String? = null,
+    val filesMaxFilesPerUpload: Long,
 
     val urlsRoute: String,
     val urlsLength: Long,
@@ -170,6 +173,7 @@ data class PartialServerSettingsSettings(
     val filesRandomWordsNumAdjectives: Long? = null,
     val filesRandomWordsSeparator: String? = null,
     val filesDefaultCompressionFormat: String? = null,
+    val filesMaxFilesPerUpload: Long? = null,
 
     val urlsRoute: String? = null,
     val urlsLength: Long? = null,
@@ -273,10 +277,11 @@ data class PartialServerSettingsSettings(
     val domains: List<String>? = null,
 )
 
+@Parcelize
 data class WebsiteExternalLink(
     val name: String,
     val url: String,
-)
+) : Parcelable
 
 data class ServerSettingsSettingsDiscordUploadEmbed(
     val url: Boolean,

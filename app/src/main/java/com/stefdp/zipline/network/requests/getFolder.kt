@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
+import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.Folder
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.Url
@@ -19,7 +20,7 @@ private const val TAG = "ZiplineApi[getFolder]"
 suspend fun getFolder(
     context: Context,
     folderId: String
-): Result<Folder> {
+): Result<BaseFolder> {
     try {
         val secureStore = SecureStorage.getInstance(context)
 

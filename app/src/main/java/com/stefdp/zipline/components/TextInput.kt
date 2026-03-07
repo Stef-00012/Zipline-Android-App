@@ -1,0 +1,217 @@
+package com.stefdp.zipline.components
+
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.stefdp.zipline.BASE_CORNER_RADIUS
+import com.stefdp.zipline.R
+import com.stefdp.zipline.ui.theme.ZiplineTheme
+import com.stefdp.zipline.ui.theme.getOutlinedTextFieldColors
+import com.stefdp.zipline.utils.toAnnotatedString
+
+@Composable
+fun TextInput(
+    modifier: Modifier = Modifier,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    label: CharSequence? = null,
+    placeholder: CharSequence?= null,
+    enabled: Boolean = true,
+    isPassword: Boolean = false,
+    singleLine: Boolean = true,
+    onPasswordToggle: (
+        visible: Boolean
+    ) -> Unit = { },
+    sideButtonIcon: Painter? = null,
+    onSideButtonPress: () -> Unit = {},
+    sideButtonContentDescription: String? = null,
+    colors: TextFieldColors = getOutlinedTextFieldColors()
+) {
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        textStyle = LocalTextStyle.current.copy(
+            color = if (enabled)
+                MaterialTheme.colorScheme.onBackground
+            else
+                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+        ),
+        modifier = modifier
+            .fillMaxWidth(),
+        singleLine = singleLine,
+        label = if (label != null) {
+            {
+                Text(
+                    text = label.toAnnotatedString(),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    color = if (enabled)
+                        MaterialTheme.colorScheme.onBackground
+                    else
+                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                )
+            }
+        } else null,
+        placeholder = if (placeholder != null) {
+            {
+                Text(
+                    text = placeholder.toAnnotatedString(),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    color = if (enabled)
+                        MaterialTheme.colorScheme.onBackground
+                    else
+                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                )
+            }
+        } else null,
+        enabled = enabled,
+        colors = colors,
+        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
+        visualTransformation = if (isPassword && !passwordVisible) {
+            PasswordVisualTransformation()
+        } else VisualTransformation.None,
+        trailingIcon = if (isPassword || sideButtonIcon != null) {
+            {
+                IconButton(
+                    modifier = Modifier.padding(end = 4.dp),
+                    onClick = if (isPassword) {
+                        {
+                            passwordVisible = !passwordVisible
+                            onPasswordToggle(passwordVisible)
+                        }
+                    } else onSideButtonPress
+                ) {
+                    Icon(
+                        painter = if (isPassword) {
+                            if (passwordVisible) {
+                                painterResource(R.drawable.visibility_off)
+                            } else {
+                                painterResource(R.drawable.visibility)
+                            }
+                        } else {
+                            /*
+                                This is safe because this button only appears if the
+                                (isPassword || sideButtonIcon != null) condition passes,
+                                and this "else" is only reached if "isPassword" is false,
+                                which means "sideButtonIcon" must be non-null
+                            */
+                            sideButtonIcon as Painter
+                        },
+                        contentDescription = if (isPassword) {
+                            if (passwordVisible)
+                                "TMP"//stringResource(R.string.side_button_content_description_password_hide)
+                            else "TMP"//stringResource(R.string.side_button_content_description_password_show)
+                        } else sideButtonContentDescription ?: "TMP", //stringResource(R.string.side_button_content_description_generic),
+                        modifier = Modifier.requiredSize(28.dp)
+                    )
+                }
+            }
+        } else null
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+fun TextInputPreview() {
+    ZiplineTheme {
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { innerPadding ->
+            Surface(
+                modifier = Modifier.padding(innerPadding),
+                color = Color.Transparent
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    TextInput(
+                        value = TextFieldValue(""),
+                        onValueChange = { },
+                        label = "Label",
+                        isPassword = true,
+                        placeholder = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    TextInput(
+                        value = TextFieldValue(""),
+                        onValueChange = { },
+                        enabled = false,
+                        label = "Label",
+                        isPassword = true,
+                        placeholder = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    TextInput(
+                        value = TextFieldValue("aaa"),
+                        onValueChange = { },
+                        enabled = false,
+                        label = "Label",
+                        isPassword = true,
+                        placeholder = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    TextInput(
+                        value = TextFieldValue("aaa"),
+                        onValueChange = { },
+                        enabled = false,
+                        label = "Label",
+                        isPassword = false,
+                        placeholder = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+                    )
+                }
+            }
+
+        }
+    }
+}

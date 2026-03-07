@@ -1,5 +1,6 @@
 package com.stefdp.zipline.network
 
+import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.Export
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.FilesFormat
@@ -8,6 +9,8 @@ import com.stefdp.zipline.network.models.IncompleteFile
 import com.stefdp.zipline.network.models.Invite
 import com.stefdp.zipline.network.models.Metric
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
+import com.stefdp.zipline.network.models.PublicFolder
+import com.stefdp.zipline.network.models.PublicFolderParent
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.Tag
@@ -50,6 +53,7 @@ import com.stefdp.zipline.network.models.responses.DeleteIncompleteFilesResponse
 import com.stefdp.zipline.network.models.responses.DeleteTagResponse
 import com.stefdp.zipline.network.models.responses.GetFilesResponse
 import com.stefdp.zipline.network.models.responses.GetCurrentUserResponse
+import com.stefdp.zipline.network.models.responses.GetServerDataCountsResponse
 import com.stefdp.zipline.network.models.responses.GetSessionsResponse
 import com.stefdp.zipline.network.models.responses.GetStatsResponse
 import com.stefdp.zipline.network.models.responses.GetTokenResponse
@@ -135,13 +139,20 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
         @Query("uploads") filterAllowedUploadsOnly: Boolean? = null,
-    ): Response<Folder>
+    ): Response<PublicFolder>
 
     @Streaming
     @GET("server/export")
     suspend fun exportData(
         @Header("Authorization") token: String,
+        @Query("nometrics") noMetrics: Boolean? = null,
     ): Response<ResponseBody>
+
+    @GET("server/export")
+    suspend fun getServerDataCounts(
+        @Header("Authorization") token: String,
+        @Query("counts") noMetrics: Boolean = true,
+    ): Response<GetServerDataCountsResponse>
 
     @GET("server/clear_zeros")
     suspend fun scanForZeroByteFiles(
@@ -431,40 +442,40 @@ interface ZiplineApiService {
     @GET("user/folders")
     suspend fun getFolders(
         @Header("Authorization") token: String,
-    ): Response<List<Folder>>
+    ): Response<List<BaseFolder>>
 
     @POST("user/folders")
     suspend fun createFolder(
         @Header("Authorization") token: String,
         @Body data: CreateFolderBody
-    ): Response<Folder>
+    ): Response<BaseFolder>
 
     @GET("user/folders/{folderId}")
     suspend fun getFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
-    ) : Response<Folder>
+    ) : Response<BaseFolder>
 
     @PUT("user/folders/{folderId}")
     suspend fun addFileToFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
         @Body data: AddFileToFolderBody,
-    ): Response<Folder>
+    ): Response<BaseFolder>
 
     @DELETE("user/folders/{folderId}/")
     suspend fun deleteFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
         @Body data: DeleteFolderBody,
-    ): Response<Folder>
+    ): Response<BaseFolder>
 
     @DELETE("user/folders/{folderId}")
     suspend fun removeFileFromFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
         @Body data: RemoveFileFromFolderBody,
-    ): Response<Folder>
+    ): Response<BaseFolder>
 
     @Streaming
     @GET("user/folders/{folderId}/export")

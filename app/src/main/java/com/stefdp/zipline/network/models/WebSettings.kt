@@ -1,12 +1,16 @@
 package com.stefdp.zipline.network.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class WebSettings(
     val config: WebSettingsConfig,
     val codeMap: List<CodeMapEntry>,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfig(
     val chunks: WebSettingsConfigChunks,
     val tasks: WebSettingsConfigTasks,
@@ -21,14 +25,16 @@ data class WebSettingsConfig(
     val oauthEnabled: WebSettingsConfigOauthEnabled,
     val oauth: WebSettingsConfigOauth,
     val version: String
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigChunks(
     val max: String,
     val size: String,
     val enabled: Boolean,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigTasks(
     val deleteInterval: String,
     val clearInvitesInterval: String,
@@ -36,8 +42,9 @@ data class WebSettingsConfigTasks(
     val thumbnailsInterval: String,
     val metricsInterval: String,
     val cleanThumbnailsInterval: String,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigFiles(
     val route: String,
     val length: Long,
@@ -52,13 +59,16 @@ data class WebSettingsConfigFiles(
     val randomWordsNumAdjectives: Long,
     val randomWordsSeparator: String,
     val defaultCompressionFormat: String,
-)
+    val maxFilesPerUpload: Long,
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigUrls(
     val route: String,
     val length: Long,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigFeatures(
     val imageCompression: Boolean,
     val robotsTxt: Boolean,
@@ -70,25 +80,29 @@ data class WebSettingsConfigFeatures(
     val metrics: WebSettingsConfigFeaturesMetrics,
     val versionChecking: Boolean,
     val versionAPI: String,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigFeaturesThumbnails(
     val enabled: Boolean,
     @SerializedName("num_threads") val threadsCount: Long,
     val format: ThumbnailFormat
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigFeaturesMetrics(
     val enabled: Boolean,
     val adminOnly: Boolean,
     val showUserSpecific: Boolean,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigInvites(
     val enabled: Boolean,
     val length: Long,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigWebsite(
     val title: String,
     val titleLogo: String? = null,
@@ -98,30 +112,35 @@ data class WebSettingsConfigWebsite(
     val defaultAvatar: String? = null,
     val theme: WebSettingsConfigWebsiteTheme,
     val tos: String? = null,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigWebsiteTheme(
     val default: String,
     val dark: String,
     val light: String,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigMfa(
     val totp: WebSettingsConfigMfaTotp,
     val passkeys: WebSettingsConfigMfaPasskeys,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigMfaTotp(
     val enabled: Boolean,
     val issuer: String,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigMfaPasskeys(
     val enabled: Boolean,
     val rpID: String? = null,
     val origin: String? = null,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigPwa(
     val enabled: Boolean,
     val title: String,
@@ -129,22 +148,25 @@ data class WebSettingsConfigPwa(
     val description: String,
     val themeColor: String,
     val backgroundColor: String,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigOauthEnabled(
     val discord: Boolean,
     val github: Boolean,
     val google: Boolean,
     val oidc: Boolean,
-)
+) : Parcelable
 
+@Parcelize
 data class WebSettingsConfigOauth(
     val bypassLocalLogin: Boolean,
     val loginOnly: Boolean,
-)
+) : Parcelable
 
+@Parcelize
 data class CodeMapEntry(
     @SerializedName("ext") val extension: String,
     @SerializedName("mime") val mimetype: String,
     val name: String,
-)
+) : Parcelable

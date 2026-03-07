@@ -21,7 +21,8 @@ object HomeScreen : AppScreen
 object MetricsScreen : AppScreen
 
 @Serializable
-object FilesScreen : AppScreen
+data class FilesScreen(val userId: String? = null) : AppScreen
+
 
 @Serializable
 object FoldersScreen : AppScreen
@@ -33,7 +34,7 @@ object UploadFileScreen : AppScreen
 object UploadTextScreen : AppScreen
 
 @Serializable
-object ShortenURLScreen : AppScreen
+object UrlsScreen : AppScreen
 
 @Serializable
 object AdminSettingsScreen : AppScreen

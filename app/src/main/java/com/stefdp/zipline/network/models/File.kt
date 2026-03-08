@@ -12,7 +12,7 @@ data class File(
     val type: String,
     val views: Long,
     val maxViews: Long? = null,
-    val password: PasswordState? = null,
+    val password: Boolean? = null,
     val folderId: String? = null,
     val thumbnail: FileThumbnail? = null,
     val tags: List<Tag>? = null,

@@ -16,8 +16,13 @@ fun Modifier.shimmerable(
     enabled: Boolean,
     color: Color = MaterialTheme.colorScheme.surfaceVariant,
     shape: Shape = RoundedCornerShape(8.dp),
+    keepBackground: Boolean = false
 ): Modifier {
-    if (!enabled) return this
+    if (!enabled) {
+        if (keepBackground) return this
+            .background(color = color, shape = shape)
+        else return this
+    }
 
     return this
         .shimmer()

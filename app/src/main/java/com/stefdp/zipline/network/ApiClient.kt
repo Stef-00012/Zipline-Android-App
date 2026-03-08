@@ -1,13 +1,11 @@
 package com.stefdp.zipline.network
 
 import com.stefdp.zipline.DEBUG_NETWORK
-import com.stefdp.zipline.network.models.PasswordState
-import com.stefdp.zipline.network.models.PasswordStateDeserializer
-import com.stefdp.zipline.network.models.passwordStateConverterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object ZiplineApiClient {
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -30,7 +28,8 @@ object ZiplineApiClient {
         }
 
         return retrofit
-            .addConverterFactory(GsonConverterFactory.create(passwordStateConverterFactory))
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ZiplineApiService::class.java)
     }

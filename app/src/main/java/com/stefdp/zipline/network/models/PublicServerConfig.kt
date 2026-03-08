@@ -59,7 +59,7 @@ data class PublicServerConfigMfa(
 
 @Parcelize
 data class PublicServerConfigFiles(
-    val maxFileSize: Long,
+    val maxFileSize: String,
     val defaultFormat: FilesFormat,
     val maxExpiration: String? = null,
 ) : Parcelable

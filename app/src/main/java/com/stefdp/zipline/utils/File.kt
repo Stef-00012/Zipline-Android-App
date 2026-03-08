@@ -4,8 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
+import com.google.common.math.LongMath.pow
+import nl.jacobras.humanreadable.HumanReadable
 import java.io.File
-import java.util.Locale
+import kotlin.math.roundToLong
 
 data class SelectedFile(
     val uri: Uri,
@@ -22,20 +24,55 @@ fun getDisplayPath(uri: Uri): String {
 }
 
 fun formatSpeed(bytesPerSecond: Double): String {
-    return when {
-        bytesPerSecond >= 1_000_000 -> String.format(Locale.US, "%.1f MB/s", bytesPerSecond / 1_000_000)
-        bytesPerSecond >= 1_000 -> String.format(Locale.US, "%.1f KB/s", bytesPerSecond / 1_000)
-        else -> String.format(Locale.US, "%.0f B/s", bytesPerSecond)
-    }
+    val bps = HumanReadable.fileSize(bytesPerSecond.toLong(), decimals = 2)
+    return "$bps/s"
+
+//    return when {
+//        bytesPerSecond >= 1_000_000 -> String.format(Locale.US, "%.1f MB/s", bytesPerSecond / 1_000_000)
+//        bytesPerSecond >= 1_000 -> String.format(Locale.US, "%.1f KB/s", bytesPerSecond / 1_000)
+//        else -> String.format(Locale.US, "%.0f B/s", bytesPerSecond)
+//    }
 }
 
 fun formatBytes(bytes: Long): String {
-    return when {
-        bytes >= 1_000_000_000 -> String.format(Locale.US, "%.1f GB", bytes / 1_000_000_000.0)
-        bytes >= 1_000_000 -> String.format(Locale.US, "%.1f MB", bytes / 1_000_000.0)
-        bytes >= 1_000 -> String.format(Locale.US, "%.1f KB", bytes / 1_000.0)
-        else -> "$bytes B"
+    return HumanReadable.fileSize(bytes, decimals = 2)
+}
+
+fun parseBytes(
+    size: String?,
+    useBase1024: Boolean = true
+): Long {
+    if (size.isNullOrEmpty()) return 0L
+
+    val cleanedSize = size
+        .trim()
+        .lowercase()
+        .replace(',', '.')
+
+    val regex = Regex("""^([0-9]+(?:\.[0-9]+)?)\s*([kmgtp]i?b?|b)?$""")
+    val match = regex.matchEntire(cleanedSize) ?: return 0L
+
+    val numberPart = match.groupValues[1]
+    val unitPart = match.groupValues[2].ifEmpty { "b" }
+
+    val value = numberPart.toLongOrNull() ?: return 0L
+
+    val base = if (useBase1024) 1024L else 1000L
+
+    val multiplier: Long = when (unitPart) {
+        "b" -> 1L
+        "k", "kb", "kib" -> base
+        "m", "mb", "mib" -> pow(base, 2)
+        "g", "gb", "gib" -> pow(base, 3)
+        "t", "tb", "tib" -> pow(base, 4)
+        "p", "pb", "pib" -> pow(base, 5)
+        else -> return 0L
     }
+
+    val bytes = value * multiplier
+
+    if (bytes < 0) return Long.MAX_VALUE
+    return bytes
 }
 
 fun copyUriToTempFile(context: Context, uri: Uri, displayName: String): File? {

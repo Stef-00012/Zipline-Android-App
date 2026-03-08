@@ -79,6 +79,7 @@ dependencies {
 
     // HTTP Requests
     implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.scalars)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.retrofit.logging.interceptor)
 
@@ -100,4 +101,27 @@ dependencies {
     implementation(libs.glance.appwidget.preview)
     debugImplementation(libs.glance.preview)
     debugImplementation(libs.glance.appwidget.preview)
+
+    // Network Image Display
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
+
+    // Network Video Display
+    //// Core
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.common.ktx)
+
+    //// UI
+    implementation(libs.media3.ui)
+    implementation(libs.media3.ui.compose)
+    implementation(libs.media3.ui.compose.material3)
+
+    //// Extensions
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.extractor)
+    implementation(libs.media3.session)
+    implementation(libs.media3.datasource.okhttp)
 }

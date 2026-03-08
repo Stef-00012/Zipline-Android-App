@@ -1,12 +1,16 @@
 package com.stefdp.zipline.components
 
+import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import com.stefdp.zipline.R
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -18,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,10 +53,21 @@ fun Header(
 
     if (currentDestination?.route in invalidRoutes) return
 
+    val outlineColor = MaterialTheme.colorScheme.outline
+
     Surface(
         shadowElevation = 4.dp,
         color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .drawBehind {
+                drawLine(
+                    color = outlineColor,
+                    start = androidx.compose.ui.geometry.Offset(0f, size.height),
+                    end = androidx.compose.ui.geometry.Offset(size.width, size.height),
+                    strokeWidth = 5.dp.toPx()
+                )
+            },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -64,26 +80,24 @@ fun Header(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.menu),
-                    contentDescription = "Open Sidebar"
+                    contentDescription = "Open Sidebar",
+                    modifier = Modifier.size(50.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            val username = LocalLoggedUser.current?.username
-
-            Text(
-                text = username ?: "Unknown", //stringResource(R.string.unknown_username),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+            Spacer(
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.weight(1f))
+
             Box(
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
                 val isInSettings = currentDestination?.route == SettingsScreen::class.qualifiedName
 
-
+                UserAvatar(
+                    enabled = !isInSettings,
+                    navController = navController
+                )
             }
         }
     }

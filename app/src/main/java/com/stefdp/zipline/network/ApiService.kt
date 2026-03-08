@@ -4,13 +4,11 @@ import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.Export
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.FilesFormat
-import com.stefdp.zipline.network.models.Folder
 import com.stefdp.zipline.network.models.IncompleteFile
 import com.stefdp.zipline.network.models.Invite
 import com.stefdp.zipline.network.models.Metric
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.PublicFolder
-import com.stefdp.zipline.network.models.PublicFolderParent
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.Tag
@@ -66,9 +64,7 @@ import com.stefdp.zipline.network.models.responses.UploadPartialFileResponse
 import com.stefdp.zipline.network.models.responses.VerifyFilePasswordResponse
 import com.stefdp.zipline.network.models.responses.VerifyUrlPasswordResponse
 import com.stefdp.zipline.network.models.responses.ZeroByteFilesResponse
-//import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-//import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -83,7 +79,6 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Streaming
-//import java.io.File
 
 interface ZiplineApiService {
     @GET("version")

@@ -40,6 +40,7 @@ import com.stefdp.zipline.components.Sidebar
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings
+import com.stefdp.zipline.network.requests.getAvatar
 import com.stefdp.zipline.network.requests.getCurrentUser
 import com.stefdp.zipline.network.requests.getPublicConfig
 import com.stefdp.zipline.network.requests.getWebServerSettings
@@ -66,6 +67,15 @@ const val BASE_CORNER_RADIUS = 10
 
 val LocalLoggedUser = compositionLocalOf<User?> { null }
 val LocalUpdateLoggedUser = compositionLocalOf<suspend () -> Result<User>> {
+    {
+        Result.failure(
+            Exception("Placeholder")
+        )
+    }
+}
+
+val LocalLoggedUserAvatar = compositionLocalOf<String?> { null }
+val LocalUpdateLoggedUserAvatar = compositionLocalOf<suspend () -> Result<String>> {
     {
         Result.failure(
             Exception("Placeholder")
@@ -106,6 +116,10 @@ class MainActivity : FragmentActivity() {
                    mutableStateOf<User?>(null)
                 }
 
+                var loggedUserAvatar by rememberSaveable {
+                    mutableStateOf<String?>(null)
+                }
+
                 var publicSettings by rememberSaveable {
                     mutableStateOf<PublicServerConfig?>(null)
                 }
@@ -119,7 +133,7 @@ class MainActivity : FragmentActivity() {
                 val isConnected by networkMonitor.isConnected.collectAsState(initial = true)
 
                 suspend fun updateLoggedUser(): Result<User> {
-                    val tag = "MainActivity[updateUserStats]"
+                    val tag = "MainActivity[updateLoggedUser]"
 
                     Log.d(tag, "Checking if user is already logged in...")
 
@@ -153,8 +167,34 @@ class MainActivity : FragmentActivity() {
                     )
                 }
 
+                suspend fun updateLoggedUserAvatar(): Result<String> {
+                    val tag = "MainActivity[updateLoggedUserAvatar]"
+
+                    val loggedUserAvatarRes = getAvatar(
+                        context = context
+                    )
+
+                    loggedUserAvatarRes
+                        .onSuccess { avatarBase64 ->
+                            loggedUserAvatar = avatarBase64
+
+                            return@updateLoggedUserAvatar Result.success(avatarBase64)
+                        }
+                        .onFailure { error ->
+                            Log.e(tag, "Failed to fetch user avatar: ${error.message}")
+
+                            webSettings = null
+
+                            return@updateLoggedUserAvatar Result.failure(error)
+                        }
+
+                    return Result.failure(
+                        Exception("Something went wrong...")
+                    )
+                }
+
                 suspend fun updatePublicSettings(): Result<PublicServerConfig> {
-                    val tag = "MainActivity[updateUserStats]"
+                    val tag = "MainActivity[updatePublicSettings]"
 
                     val publicConfigRes = getPublicConfig(
                         context = context
@@ -180,7 +220,7 @@ class MainActivity : FragmentActivity() {
                 }
 
                 suspend fun updateWebSettings(): Result<WebSettings> {
-                    val tag = "MainActivity[updateUserStats]"
+                    val tag = "MainActivity[updateWebSettings]"
 
                     val webSettingsRes = getWebServerSettings(
                         context = context
@@ -208,6 +248,7 @@ class MainActivity : FragmentActivity() {
                 LaunchedEffect(isConnected) {
                     if (isConnected) {
                         updateLoggedUser()
+                        updateLoggedUserAvatar()
                         updateWebSettings()
                         updatePublicSettings()
                     }
@@ -219,17 +260,32 @@ class MainActivity : FragmentActivity() {
                 CompositionLocalProvider(
                     LocalLoggedUser provides loggedUser,
                     LocalUpdateLoggedUser provides ::updateLoggedUser,
+                    LocalLoggedUserAvatar provides loggedUserAvatar,
+                    LocalUpdateLoggedUserAvatar provides ::updateLoggedUserAvatar,
                     LocalPublicSettings provides publicSettings,
                     LocalUpdatePublicSettings provides ::updatePublicSettings,
                     LocalWebSettings provides webSettings,
                     LocalUpdateWebSettings provides ::updateWebSettings,
                 ) {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+
+                    val invalidRoutes = listOf(
+                        LoginScreen::class.qualifiedName,
+                        LoadingScreen::class.qualifiedName,
+                        BiometricAuthScreen::class.qualifiedName
+                    )
+
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                         topBar = {
                             Header(
                                 navController = navController,
                                 onMenuClick = {
+                                    if (currentDestination?.route in invalidRoutes) {
+                                        return@Header
+                                    }
+
                                     scope.launch {
                                         if (drawerState.isClosed) drawerState.open() else drawerState.close()
                                     }
@@ -240,41 +296,25 @@ class MainActivity : FragmentActivity() {
                         Surface(
                             color = MaterialTheme.colorScheme.background
                         ) {
-                            val navBackStackEntry by navController.currentBackStackEntryAsState()
-                            val currentDestination = navBackStackEntry?.destination
-
-                            val invalidRoutes = listOf(
-                                LoginScreen::class.qualifiedName,
-                                LoadingScreen::class.qualifiedName,
-                                BiometricAuthScreen::class.qualifiedName
-                            )
-
-                            if (currentDestination?.route in invalidRoutes) {
+                            ModalNavigationDrawer(
+                                modifier = Modifier.padding(innerPadding),
+                                drawerState = drawerState,
+                                drawerContent = {
+                                    Sidebar(
+                                        onItemClick = { screen ->
+                                            scope.launch { drawerState.close() }
+                                            navController.navigate(screen)
+                                        },
+                                        navController = navController
+                                    )
+                                },
+                                gesturesEnabled = currentDestination?.route !in invalidRoutes
+                            ) {
                                 AppNavigation(
                                     navController = navController,
                                     context = context,
                                     activity = activity
                                 )
-                            } else {
-                                ModalNavigationDrawer(
-                                    modifier = Modifier.padding(innerPadding),
-                                    drawerState = drawerState,
-                                    drawerContent = {
-                                        Sidebar(
-                                            onItemClick = { screen ->
-                                                scope.launch { drawerState.close() }
-                                                navController.navigate(screen)
-                                            },
-                                            navController = navController
-                                        )
-                                    }
-                                ) {
-                                    AppNavigation(
-                                        navController = navController,
-                                        context = context,
-                                        activity = activity
-                                    )
-                                }
                             }
                         }
                     }

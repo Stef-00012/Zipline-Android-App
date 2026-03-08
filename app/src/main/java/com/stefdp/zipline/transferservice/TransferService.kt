@@ -16,6 +16,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.stefdp.zipline.R
+import com.stefdp.zipline.utils.formatBytes
+import com.stefdp.zipline.utils.formatSpeed
 import java.io.File
 import java.util.Locale
 import java.util.UUID
@@ -302,22 +304,5 @@ class TransferService : Service() {
         }
 
         return builder.build()
-    }
-
-    private fun formatSpeed(bytesPerSecond: Double): String {
-        return when {
-            bytesPerSecond >= 1_000_000 -> String.format(Locale.US, "%.1f MB/s", bytesPerSecond / 1_000_000)
-            bytesPerSecond >= 1_000 -> String.format(Locale.US, "%.1f KB/s", bytesPerSecond / 1_000)
-            else -> String.format(Locale.US, "%.0f B/s", bytesPerSecond)
-        }
-    }
-
-    private fun formatBytes(bytes: Long): String {
-        return when {
-            bytes >= 1_000_000_000 -> String.format(Locale.US, "%.1f GB", bytes / 1_000_000_000.0)
-            bytes >= 1_000_000 -> String.format(Locale.US, "%.1f MB", bytes / 1_000_000.0)
-            bytes >= 1_000 -> String.format(Locale.US, "%.1f KB", bytes / 1_000.0)
-            else -> "$bytes B"
-        }
     }
 }

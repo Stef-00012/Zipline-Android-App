@@ -18,11 +18,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.ui.theme.ZiplineTheme
 
 @Composable
@@ -39,7 +43,11 @@ fun Popup(
 ) {
     if (showPopup) {
         val windowInfo = LocalWindowInfo.current
-        val maxHeight = (windowInfo.containerSize.height * 0.65f).dp
+        val density = LocalDensity.current
+
+        val maxHeight = with(density) {
+            (windowInfo.containerSize.height * 0.75f).toDp()
+        }
 
         Dialog(
             onDismissRequest = onDismissRequest,
@@ -53,8 +61,9 @@ fun Popup(
                     .heightIn(
                         max = maxHeight,
                     )
+                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
                     .verticalScroll(scrollState),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 )

@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.verticalScroll
+import com.stefdp.zipline.ui.theme.Gray
 import kotlin.math.max
 
 fun Modifier.scrollbar(
@@ -123,7 +124,7 @@ fun Modifier.scrollbar(
 
 data class ScrollbarConfig(
     val indicatorThickness: Dp = 4.dp,
-    val indicatorColor: Color = Color.Gray.copy(alpha = 0.7f),
+    val indicatorColor: Color = Gray.copy(alpha = 0.7f),
     val indicatorCornerRadius: Dp = indicatorThickness / 2,
     val alpha: Float? = null,
     val alphaAnimationSpec: AnimationSpec<Float>? = null,

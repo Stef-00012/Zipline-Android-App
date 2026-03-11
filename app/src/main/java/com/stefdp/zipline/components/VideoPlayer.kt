@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -25,8 +26,12 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     context: Context,
     videoUrl: String,
+    onError: (PlaybackException) -> Unit,
+    onSuccess: () -> Unit,
+    autoPlay: Boolean = false
 ) {
     var isLoading by remember { mutableStateOf(true) }
+    var hasNotifiedSuccess by remember { mutableStateOf(false) }
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
@@ -35,11 +40,22 @@ fun VideoPlayer(
             setMediaItem(mediaItem)
             prepare()
 
-            playWhenReady = true
+            playWhenReady = autoPlay
 
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     isLoading = (playbackState == Player.STATE_BUFFERING)
+
+                    if (!hasNotifiedSuccess && playbackState == Player.STATE_READY) {
+                        onSuccess()
+                        hasNotifiedSuccess = true
+                    }
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    isLoading = false
+
+                    onError(error)
                 }
             })
         }
@@ -53,7 +69,6 @@ fun VideoPlayer(
                     useController = true
                 }
             },
-            modifier = Modifier.fillMaxSize()
         )
 
         if (isLoading) {

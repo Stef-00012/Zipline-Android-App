@@ -15,8 +15,8 @@ fun getOutlinedTextFieldColors() = OutlinedTextFieldDefaults.colors(
         backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
     ),
     cursorColor = MaterialTheme.colorScheme.primary,
-    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedBorderColor = MaterialTheme.colorScheme.outline,
     unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
     focusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
     focusedLabelColor = MaterialTheme.colorScheme.onBackground,
@@ -27,7 +27,7 @@ fun getOutlinedTextFieldColors() = OutlinedTextFieldDefaults.colors(
     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
     disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
     errorContainerColor = MaterialTheme.colorScheme.surface,
-    disabledBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+    disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
 )
 
 @Composable

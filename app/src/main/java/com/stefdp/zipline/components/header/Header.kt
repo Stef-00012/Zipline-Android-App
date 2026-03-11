@@ -1,36 +1,27 @@
-package com.stefdp.zipline.components
+package com.stefdp.zipline.components.header
 
-import android.content.Context
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import com.stefdp.zipline.R
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.stefdp.zipline.LocalLoggedUser
 //import com.stefdp.hackatime.LocalLoggedUser
 import com.stefdp.zipline.screens.BiometricAuthScreen
 import com.stefdp.zipline.screens.LoadingScreen
@@ -63,8 +54,8 @@ fun Header(
             .drawBehind {
                 drawLine(
                     color = outlineColor,
-                    start = androidx.compose.ui.geometry.Offset(0f, size.height),
-                    end = androidx.compose.ui.geometry.Offset(size.width, size.height),
+                    start = Offset(0f, size.height),
+                    end = Offset(size.width, size.height),
                     strokeWidth = 5.dp.toPx()
                 )
             },

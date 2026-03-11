@@ -7,14 +7,13 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.Folder
-import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
 import com.stefdp.zipline.network.models.requests.RemoveFileFromFolderBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[removeFileToFolder]"
+private const val TAG = "ZiplineApi[removeFileFromFolder]"
 
-suspend fun removeFileToFolder(
+suspend fun removeFileFromFolder(
     context: Context,
     folderId: String,
     fileId: String

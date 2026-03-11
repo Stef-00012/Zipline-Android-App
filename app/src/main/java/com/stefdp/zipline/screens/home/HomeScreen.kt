@@ -1,6 +1,8 @@
 package com.stefdp.zipline.screens.home
 
 import android.content.Context
+import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
@@ -37,6 +40,7 @@ import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.components.FilePreview
+import com.stefdp.zipline.components.LargeFileDisplay
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
@@ -86,10 +90,10 @@ fun HomeScreen(
     var userStats by remember { mutableStateOf<GetStatsResponse?>(null) }
     var recentFiles by remember { mutableStateOf<List<File>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
+    suspend fun updateData() {
         val recentFilesRes = getRecentFiles(
             context = context,
-            count = 5
+            count = 8
         )
 
         val userStatsRes = getStats(
@@ -103,6 +107,10 @@ fun HomeScreen(
         userStatsRes.onSuccess {
             userStats = it
         }
+    }
+
+    LaunchedEffect(Unit) {
+        updateData()
     }
 
     val mainScrollState = rememberScrollState()
@@ -223,8 +231,27 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.surface),
             scrollbar = true
         ) {
+            var clickedFile by remember { mutableStateOf<File?>(null) }
+
+            LaunchedEffect(recentFiles) {
+                if (clickedFile != null) {
+                    val updatedFile = recentFiles.find { it.id == clickedFile?.id }
+
+                    if (updatedFile != null) {
+                        clickedFile = updatedFile
+                    }
+                }
+            }
+
+            LargeFileDisplay(
+                context = context,
+                file = clickedFile,
+                onDismissRequest = { clickedFile = null },
+                updateData = ::updateData
+            )
+
             if (recentFiles.isEmpty()) {
-                repeat(5) {
+                repeat(8) {
                     Box(
                         modifier = Modifier
                             .padding(10.dp)
@@ -243,7 +270,10 @@ fun HomeScreen(
                     FilePreview(
                         file = file,
                         context = context,
-                        modifier = Modifier.size(200.dp)
+                        modifier = Modifier.size(200.dp),
+                        onClick = { file ->
+                            clickedFile = file
+                        }
                     )
                 }
             }
@@ -353,7 +383,11 @@ fun HomeScreen(
         Container(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(500.dp)
+                .height(
+                    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT)
+                        500.dp
+                    else 280.dp
+                )
                 .background(MaterialTheme.colorScheme.surface),
             scrollable = false
         ) {
@@ -404,6 +438,7 @@ fun HomeScreen(
 
             Table(
                 modifier = Modifier.fillMaxSize(),
+//                modifier = Modifier.fillMaxWidth(),
                 headers = headers,
                 rows = rows ?: emptyList(),
                 loading = userStats == null

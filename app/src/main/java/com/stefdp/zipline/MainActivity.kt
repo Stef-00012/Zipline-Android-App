@@ -35,7 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.stefdp.zipline.components.Header
+import com.stefdp.zipline.components.header.Header
 import com.stefdp.zipline.components.Sidebar
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.User
@@ -183,7 +183,7 @@ class MainActivity : FragmentActivity() {
                         .onFailure { error ->
                             Log.e(tag, "Failed to fetch user avatar: ${error.message}")
 
-                            webSettings = null
+                            loggedUserAvatar = null
 
                             return@updateLoggedUserAvatar Result.failure(error)
                         }
@@ -305,7 +305,6 @@ class MainActivity : FragmentActivity() {
                                             scope.launch { drawerState.close() }
                                             navController.navigate(screen)
                                         },
-                                        navController = navController
                                     )
                                 },
                                 gesturesEnabled = currentDestination?.route !in invalidRoutes

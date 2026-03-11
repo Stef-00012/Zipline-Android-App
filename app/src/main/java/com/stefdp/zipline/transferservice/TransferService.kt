@@ -86,7 +86,19 @@ class TransferService : Service() {
         // This will be replaced immediately by the real transfer notification
         if (activeTransfers.isEmpty()) {
             val notification = buildPlaceholderNotification()
-            startForeground(ONGOING_NOTIFICATION_ID_BASE, notification)
+//            startForeground(ONGOING_NOTIFICATION_ID_BASE, notification)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                startForeground(
+                    ONGOING_NOTIFICATION_ID_BASE,
+                    notification,
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING
+                )
+            } else {
+                startForeground(
+                    ONGOING_NOTIFICATION_ID_BASE,
+                    notification
+                )
+            }
         }
         return START_NOT_STICKY
     }
@@ -106,7 +118,7 @@ class TransferService : Service() {
 
     private fun buildPlaceholderNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle("Transfer Service")
             .setContentText("Preparing...")
             .setSilent(true)
@@ -135,7 +147,19 @@ class TransferService : Service() {
         val notification = buildProgressNotification(info)
 
         if (activeTransfers.size == 1) {
-            startForeground(notificationId, notification)
+//            startForeground(notificationId, notification)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                startForeground(
+                    notificationId,
+                    notification,
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING
+                )
+            } else {
+                startForeground(
+                    notificationId,
+                    notification
+                )
+            }
         } else {
             val manager = getSystemService(NotificationManager::class.java)
             manager.notify(notificationId, notification)
@@ -179,7 +203,7 @@ class TransferService : Service() {
         val info = activeTransfers[transferId] ?: return
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_notify_error)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(info.title)
             .setContentText("Failed: $errorMessage")
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -198,7 +222,7 @@ class TransferService : Service() {
         info.isCancelled = true
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download_done)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(info.title)
             .setContentText("Cancelled")
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -249,7 +273,7 @@ class TransferService : Service() {
         }
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(info.title)
             .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -272,7 +296,7 @@ class TransferService : Service() {
 
     private fun buildCompleteNotification(info: TransferInfo): Notification {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download_done)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(info.title)
             .setContentText("Complete")
             .setPriority(NotificationCompat.PRIORITY_LOW)

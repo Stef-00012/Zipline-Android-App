@@ -27,13 +27,17 @@ fun TableHeader(
             .horizontalScroll(scrollState)
             .height(IntrinsicSize.Max)
     ) {
-        headers.forEach { header ->
-            header()
+        headers.forEachIndexed { index, header ->
+            if (index < headers.lastIndex) {
+                header()
 
-            VerticalDivider(
-                color = MaterialTheme.colorScheme.outline.copy(alpha = TABLE_BORDER_ALPHA),
-                thickness = 2.dp,
-            )
+                VerticalDivider(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = TABLE_BORDER_ALPHA),
+                    thickness = 2.dp,
+                )
+            } else {
+                header()
+            }
         }
     }
 }

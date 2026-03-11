@@ -27,6 +27,7 @@ fun Table(
     Column(
         modifier = modifier
             .fillMaxSize()
+//            .fillMaxWidth()
             .shimmerable(
                 enabled = loading,
                 color = MaterialTheme.colorScheme.surface,

@@ -107,6 +107,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
+    implementation(libs.coil.video)
 
     // Network Video Display
     //// Core

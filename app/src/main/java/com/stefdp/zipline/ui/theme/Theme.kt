@@ -13,35 +13,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xff343fa2),
-    onPrimary = Color(0xffffffff),
-    secondary = Color(0xff565aad),
-    onSecondary = Color(0xffffffff),
-    background = Color(0xff0c101c),
-    onBackground = Color(0xffffffff),
-    surface = Color(0xff141722),
-    onSurface = Color(0xffffffff),
-    surfaceVariant = Color(0xff1e222b),
-    onSurfaceVariant = Color(0xffffffff),
-    outline = Color(0xff262f47),
-    errorContainer = Color(0xffd83333),
-    error = Color(0xfff25151)
+    primary = PrimaryDark,
+    onPrimary = OnPrimaryDark,
+    secondary = SecondaryDark,
+    onSecondary = OnSecondaryDark,
+    background = BackgroundDark,
+    onBackground = OnBackgroundDark,
+    surface = SurfaceDark,
+    onSurface = OnSurfaceDark,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    errorContainer = ErrorContainerDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xff424aa8),
-    onPrimary = Color(0xffffffff),
-    secondary = Color(0xff424aa7),
-    onSecondary = Color(0xffffffff),
-    background = Color(0xfff2f2f2),
-    onBackground = Color(0xff010101),
-    surface = Color(0xfff7f7f7),
-    onSurface = Color(0xff010101),
-    surfaceVariant = Color(0xfff7f7f7),
-    onSurfaceVariant = Color(0xff010101),
-    outline = Color(0xffd6dade),
-    errorContainer = Color(0xffe73f3f),
-    error = Color(0xfff25151)
+    primary = PrimaryLight,
+    onPrimary = OnPrimaryLight,
+    secondary = SecondaryLight,
+    onSecondary = OnSecondaryLight,
+    background = BackgroundLight,
+    onBackground = OnBackgroundLight,
+    surface = SurfaceLight,
+    onSurface = OnSurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    errorContainer = ErrorContainerLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
 )
 
 @Composable

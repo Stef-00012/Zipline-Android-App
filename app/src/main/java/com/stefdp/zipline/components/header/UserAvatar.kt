@@ -1,6 +1,5 @@
-package com.stefdp.zipline.components
+package com.stefdp.zipline.components.header
 
-import android.content.Context
 import android.util.Base64
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +30,7 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalLoggedUserAvatar
 import com.stefdp.zipline.R
+import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.screens.SettingsScreen
 import com.stefdp.zipline.ui.theme.getButtonColors
 
@@ -40,8 +41,6 @@ fun UserAvatar(
 ) {
     val username = LocalLoggedUser.current?.username ?: "Unknown" //stringResource(R.string.unknown_username),
     val avatar = LocalLoggedUserAvatar.current
-
-    Log.d("UserAvatar", "Username: $username, Avatar: $avatar")
 
     Button(
         onClick = {
@@ -86,7 +85,9 @@ fun UserAvatar(
                 Icon(
                     painter = painterResource(R.drawable.group),
                     contentDescription = "Default Avatar",
-                    tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                        alpha = 0.5f
+                    ),
                 )
             }
         }
@@ -99,7 +100,11 @@ fun UserAvatar(
             text = username,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = if (enabled)
+                    MaterialTheme.colorScheme.onSurface
+                else
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             ),
         )
     }

@@ -94,6 +94,7 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil-compose" }
 coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coil-compose" }
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil-compose" }
+coil-video = { group = "io.coil-kt.coil3", name = "coil-video", version.ref = "coil-compose" }
 
 # Network Video Display
 ## Core

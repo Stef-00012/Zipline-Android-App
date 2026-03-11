@@ -31,10 +31,13 @@ fun TableContent(
 
     LazyColumn(
         state = lazyListState,
-        modifier = modifier.fillMaxSize().verticalLazyScrollbar(
-            listState = lazyListState,
-            scrollbarConfig = ScrollbarConfig(alwaysKeepScrollbar = true)
-        )
+        modifier = modifier
+//            .fillMaxWidth()
+            .fillMaxSize()
+            .verticalLazyScrollbar(
+                listState = lazyListState,
+                scrollbarConfig = ScrollbarConfig(alwaysKeepScrollbar = true)
+            )
     ) {
         items(rows.size) { rowNumber ->
             Row(
@@ -42,13 +45,17 @@ fun TableContent(
                     .horizontalScroll(scrollState)
                     .height(IntrinsicSize.Max)
             ) {
-                rows[rowNumber].forEach { cell ->
-                    cell()
+                rows[rowNumber].forEachIndexed { index, cell ->
+                    if (index < rows[rowNumber].lastIndex) {
+                        cell()
 
-                    VerticalDivider(
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = TABLE_BORDER_ALPHA),
-                        thickness = 2.dp
-                    )
+                        VerticalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = TABLE_BORDER_ALPHA),
+                            thickness = 2.dp
+                        )
+                    } else {
+                        cell()
+                    }
                 }
             }
 

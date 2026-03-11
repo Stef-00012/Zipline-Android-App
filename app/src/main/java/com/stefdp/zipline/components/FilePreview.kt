@@ -1,6 +1,7 @@
 package com.stefdp.zipline.components
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -56,9 +59,48 @@ const val APK_MIMETYPE = "application/vnd.android.package-archive"
 fun FilePreview(
     file: File,
     context: Context,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (File) -> Unit = {},
+    clickEnabled: Boolean = true,
+    previewVideos: Boolean = false,
+    onImageLoaded: () -> Unit = { },
 ) {
     var imageLoading by remember { mutableStateOf(true) }
+    var imageFailed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(imageLoading) {
+        if (!imageLoading) {
+            onImageLoaded()
+        }
+    }
+
+    @Composable
+    fun DefaultPreview(
+        icon: Painter,
+        iconContentDescription: String,
+        label: String,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                painter = icon,
+                contentDescription = iconContentDescription,
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
+
+            Text(
+                text = label,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -69,6 +111,12 @@ fun FilePreview(
                 enabled = imageLoading,
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 keepBackground = true
+            )
+            .clickable(
+                enabled = clickEnabled && !imageLoading,
+                onClick = { onClick(file) },
+                role = Role.Image,
+                onClickLabel = "Open large file display"
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -77,25 +125,11 @@ fun FilePreview(
                 imageLoading = false
             }
 
-            Column(
-                modifier = Modifier.padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.lock),
-                    contentDescription = "Password protected file",
-                    modifier = Modifier.size(40.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
-
-                Text(
-                    text = "Click to view protected ${file.name}",
-                    textAlign = TextAlign.Center
-                )
-            }
+            DefaultPreview(
+                icon = painterResource(R.drawable.lock),
+                iconContentDescription = "Password protected file",
+                label = "Password protected file"
+            )
 
             return@Box
         }
@@ -109,56 +143,78 @@ fun FilePreview(
         }
 
         if (file.type in embeddableMimetypes && serverUrl != null) {
-            AsyncImage(
-                model = "$serverUrl/raw${file.url}",
-                contentDescription = file.originalName ?: file.name,
-                onSuccess = {
-                    imageLoading = false
-                },
-            )
+            if (imageFailed) {
+                DefaultPreview(
+                    icon = painterResource(R.drawable.description),
+                    iconContentDescription = "${file.type} file",
+                    label = "Click to view file ${file.name}"
+                )
+            } else {
+                AsyncImage(
+                    model = "$serverUrl/raw${file.url}",
+                    contentDescription = file.originalName ?: file.name,
+                    onSuccess = {
+                        imageLoading = false
+                    },
+                    onError = {
+                        imageFailed = true
+                    }
+                )
+            }
 
             return@Box
         }
 
         if (file.type.startsWith("video/")) {
-            if (file.thumbnail?.path != null && serverUrl != null) {
-                AsyncImage(
-                    model = "$serverUrl/raw/${file.thumbnail.path}",
-                    contentDescription = file.originalName ?: file.name,
-                    onSuccess = {
+            if (imageFailed || serverUrl == null) {
+                DefaultPreview(
+                    icon = painterResource(R.drawable.videocam),
+                    iconContentDescription = "Video file",
+                    label = "Click to play video ${file.name}"
+                )
+            } else if (previewVideos) {
+                VideoPlayer(
+                    context = context,
+                    videoUrl = "$serverUrl/raw${file.url}",
+                    onError = {
+                        imageFailed = true
                         imageLoading = false
                     },
+                    onSuccess = {
+                        imageLoading = false
+                    }
                 )
+            } else {
+                if (file.thumbnail?.path != null) {
+                    AsyncImage(
+                        model = "$serverUrl/raw/${file.thumbnail.path}",
+                        contentDescription = file.originalName ?: file.name,
+                        onSuccess = {
+                            imageLoading = false
+                        },
+                        onError = {
+                            imageFailed = true
+                        }
+                    )
+                } else {
+                    AsyncImage(
+                        model = "$serverUrl/raw${file.url}",
+                        contentDescription = file.originalName ?: file.name,
+                        onSuccess = {
+                            imageLoading = false
+                        },
+                        onError = {
+                            imageFailed = true
+                        }
+                    )
+                }
 
                 Icon(
                     painter = painterResource(R.drawable.play_arrow),
                     contentDescription = "Play video icon",
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(40.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
-            } else {
-                LaunchedEffect(Unit) {
-                    imageLoading = false
-                }
-
-                Column(
-                    modifier = Modifier.padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.videocam),
-                        contentDescription = "Video file",
-                        modifier = Modifier.size(40.dp)
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(10.dp)
-                    )
-
-                    Text(
-                        text = "Click to play video ${file.name}",
-                        textAlign = TextAlign.Center
-                    )
-                }
             }
 
             return@Box
@@ -169,71 +225,29 @@ fun FilePreview(
         }
 
         if (file.type == APK_MIMETYPE) {
-            Column(
-                modifier = Modifier.padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.apk_document),
-                    contentDescription = "APK file",
-                    modifier = Modifier.size(40.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
-
-                Text(
-                    text = "Click to view file ${file.name}",
-                    textAlign = TextAlign.Center
-                )
-            }
+            DefaultPreview(
+                icon = painterResource(R.drawable.apk_document),
+                iconContentDescription = "APK file",
+                label = "Click to view file ${file.name}"
+            )
 
             return@Box
         }
 
         if (file.type in zipMimetypes) {
-            Column(
-                modifier = Modifier.padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.folder_zip),
-                    contentDescription = "Compressed file",
-                    modifier = Modifier.size(40.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
-
-                Text(
-                    text = "Click to view file ${file.name}",
-                    textAlign = TextAlign.Center
-                )
-            }
+            DefaultPreview(
+                icon = painterResource(R.drawable.folder_zip),
+                iconContentDescription = "Compressed file",
+                label = "Click to view file ${file.name}"
+            )
 
             return@Box
         }
 
-        Column(
-            modifier = Modifier.padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.description),
-                contentDescription = "${file.type} file",
-                modifier = Modifier.size(40.dp)
-            )
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
-
-            Text(
-                text = "Click to view file ${file.name}",
-                textAlign = TextAlign.Center
-            )
-        }
+        DefaultPreview(
+            icon = painterResource(R.drawable.description),
+            iconContentDescription = "${file.type} file",
+            label = "Click to view file ${file.name}"
+        )
     }
 }

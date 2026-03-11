@@ -68,9 +68,12 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -97,7 +100,6 @@ const val DRAWER_CORNER_RADIUS = BASE_CORNER_RADIUS + 5
 
 @Composable
 fun Sidebar(
-    navController: NavHostController,
     onItemClick: (AppScreen) -> Unit
 ) {
     ModalDrawerSheet(
@@ -105,125 +107,32 @@ fun Sidebar(
         drawerShape = RoundedCornerShape(
             topEnd = DRAWER_CORNER_RADIUS.dp,
             bottomEnd = DRAWER_CORNER_RADIUS.dp
-        )
+        ),
     ) {
-        NavigationDrawerItem(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.home),
-                        contentDescription = "Home Screen"
-                    )
+        val scrollState = rememberScrollState()
 
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("Home")
-                }
-            },
-            selected = false,
-            onClick = { onItemClick(HomeScreen) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-        )
-
-        NavigationDrawerItem(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.bar_chart),
-                        contentDescription = "Metrics Screen"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("Metrics")
-                }
-            },
-            selected = false,
-            onClick = { onItemClick(MetricsScreen) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-        )
-
-        NavigationDrawerItem(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.draft),
-                        contentDescription = "Files Screen"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("Files")
-                }
-            },
-            selected = false,
-            onClick = { onItemClick(FilesScreen()) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-        )
-
-        NavigationDrawerItem(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.folder),
-                        contentDescription = "Folders Screen"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("Folders")
-                }
-            },
-            selected = false,
-            onClick = { onItemClick(FoldersScreen) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-        )
-
-        ExpandableDrawerSection(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.upload),
-                        contentDescription = "Upload Menu"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("Upload")
-                }
-            },
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .verticalScroll(scrollState)
         ) {
             NavigationDrawerItem(
                 label = {
                     Row {
                         Icon(
-                            painter = painterResource(R.drawable.upload_file),
-                            contentDescription = "Upload File Screen"
+                            painter = painterResource(R.drawable.home),
+                            contentDescription = "Home Screen"
                         )
 
                         Spacer(
                             modifier = Modifier.width(6.dp)
                         )
 
-                        Text("File")
+                        Text("Home")
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(UploadFileScreen) },
+                onClick = { onItemClick(HomeScreen) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -232,78 +141,19 @@ fun Sidebar(
                 label = {
                     Row {
                         Icon(
-                            painter = painterResource(R.drawable.text_fields),
-                            contentDescription = "Upload Text Screen"
+                            painter = painterResource(R.drawable.bar_chart),
+                            contentDescription = "Metrics Screen"
                         )
 
                         Spacer(
                             modifier = Modifier.width(6.dp)
                         )
 
-                        Text("Text")
+                        Text("Metrics")
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(UploadTextScreen) },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-            )
-        }
-
-        NavigationDrawerItem(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.link_2),
-                        contentDescription = "URLs Screen"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("URLs")
-                }
-            },
-            selected = false,
-            onClick = { onItemClick(UrlsScreen) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-        )
-
-        ExpandableDrawerSection(
-            label = {
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.home),
-                        contentDescription = "Administration Menu"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(6.dp)
-                    )
-
-                    Text("Administrator")
-                }
-            },
-        ) {
-            NavigationDrawerItem(
-                label = {
-                    Row {
-                        Icon(
-                            painter = painterResource(R.drawable.settings),
-                            contentDescription = "Administrator Settings Screen"
-                        )
-
-                        Spacer(
-                            modifier = Modifier.width(6.dp)
-                        )
-
-                        Text("Settings")
-                    }
-                },
-                selected = false,
-                onClick = { onItemClick(AdminSettingsScreen) },
+                onClick = { onItemClick(MetricsScreen) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -312,19 +162,19 @@ fun Sidebar(
                 label = {
                     Row {
                         Icon(
-                            painter = painterResource(R.drawable.group),
-                            contentDescription = "Administrator Users Screen"
+                            painter = painterResource(R.drawable.draft),
+                            contentDescription = "Files Screen"
                         )
 
                         Spacer(
                             modifier = Modifier.width(6.dp)
                         )
 
-                        Text("Users")
+                        Text("Files")
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(AdminUsersScreen) },
+                onClick = { onItemClick(FilesScreen()) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -333,59 +183,219 @@ fun Sidebar(
                 label = {
                     Row {
                         Icon(
-                            painter = painterResource(R.drawable.mail),
-                            contentDescription = "Administrator Invites Screen"
+                            painter = painterResource(R.drawable.folder),
+                            contentDescription = "Folders Screen"
                         )
 
                         Spacer(
                             modifier = Modifier.width(6.dp)
                         )
 
-                        Text("Invites")
+                        Text("Folders")
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(AdminInvitesScreen) },
+                onClick = { onItemClick(FoldersScreen) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
-        }
 
-        DebugWrapper {
             ExpandableDrawerSection(
                 label = {
-                    Text("Debug")
+                    Row {
+                        Icon(
+                            painter = painterResource(R.drawable.upload),
+                            contentDescription = "Upload Menu"
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(6.dp)
+                        )
+
+                        Text("Upload")
+                    }
                 },
             ) {
                 NavigationDrawerItem(
                     label = {
-                        Text("Login")
+                        Row {
+                            Icon(
+                                painter = painterResource(R.drawable.upload_file),
+                                contentDescription = "Upload File Screen"
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(6.dp)
+                            )
+
+                            Text("File")
+                        }
                     },
                     selected = false,
-                    onClick = { onItemClick(LoginScreen) },
+                    onClick = { onItemClick(UploadFileScreen) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
 
                 NavigationDrawerItem(
                     label = {
-                        Text("Loading")
+                        Row {
+                            Icon(
+                                painter = painterResource(R.drawable.text_fields),
+                                contentDescription = "Upload Text Screen"
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(6.dp)
+                            )
+
+                            Text("Text")
+                        }
                     },
                     selected = false,
-                    onClick = { onItemClick(LoadingScreen) },
+                    onClick = { onItemClick(UploadTextScreen) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                )
+            }
+
+            NavigationDrawerItem(
+                label = {
+                    Row {
+                        Icon(
+                            painter = painterResource(R.drawable.link_2),
+                            contentDescription = "URLs Screen"
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(6.dp)
+                        )
+
+                        Text("URLs")
+                    }
+                },
+                selected = false,
+                onClick = { onItemClick(UrlsScreen) },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+            )
+
+            ExpandableDrawerSection(
+                label = {
+                    Row {
+                        Icon(
+                            painter = painterResource(R.drawable.home),
+                            contentDescription = "Administration Menu"
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(6.dp)
+                        )
+
+                        Text("Administrator")
+                    }
+                },
+            ) {
+                NavigationDrawerItem(
+                    label = {
+                        Row {
+                            Icon(
+                                painter = painterResource(R.drawable.settings),
+                                contentDescription = "Administrator Settings Screen"
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(6.dp)
+                            )
+
+                            Text("Settings")
+                        }
+                    },
+                    selected = false,
+                    onClick = { onItemClick(AdminSettingsScreen) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
 
                 NavigationDrawerItem(
                     label = {
-                        Text("Biometric Authentication")
+                        Row {
+                            Icon(
+                                painter = painterResource(R.drawable.group),
+                                contentDescription = "Administrator Users Screen"
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(6.dp)
+                            )
+
+                            Text("Users")
+                        }
                     },
                     selected = false,
-                    onClick = { onItemClick(BiometricAuthScreen) },
+                    onClick = { onItemClick(AdminUsersScreen) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
+
+                NavigationDrawerItem(
+                    label = {
+                        Row {
+                            Icon(
+                                painter = painterResource(R.drawable.mail),
+                                contentDescription = "Administrator Invites Screen"
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(6.dp)
+                            )
+
+                            Text("Invites")
+                        }
+                    },
+                    selected = false,
+                    onClick = { onItemClick(AdminInvitesScreen) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                )
+            }
+
+            DebugWrapper {
+                ExpandableDrawerSection(
+                    label = {
+                        Text("Debug")
+                    },
+                ) {
+                    NavigationDrawerItem(
+                        label = {
+                            Text("Login")
+                        },
+                        selected = false,
+                        onClick = { onItemClick(LoginScreen) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                    )
+
+                    NavigationDrawerItem(
+                        label = {
+                            Text("Loading")
+                        },
+                        selected = false,
+                        onClick = { onItemClick(LoadingScreen) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                    )
+
+                    NavigationDrawerItem(
+                        label = {
+                            Text("Biometric Authentication")
+                        },
+                        selected = false,
+                        onClick = { onItemClick(BiometricAuthScreen) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                    )
+                }
             }
         }
     }

@@ -70,6 +70,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -99,7 +100,6 @@ interface ZiplineApiService {
 
     @POST("auth/login")
     suspend fun login(
-        @Header("x-zipline-client") client: String = "Zipline Android App",
         @Body data: LoginBody,
     ): Response<LoginResponse>
 
@@ -458,14 +458,22 @@ interface ZiplineApiService {
         @Body data: AddFileToFolderBody,
     ): Response<BaseFolder>
 
-    @DELETE("user/folders/{folderId}/")
+    @HTTP(
+        method = "DELETE",
+        path = "user/folders/{folderId}",
+        hasBody = true
+    )
     suspend fun deleteFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
         @Body data: DeleteFolderBody,
     ): Response<BaseFolder>
 
-    @DELETE("user/folders/{folderId}")
+    @HTTP(
+        method = "DELETE",
+        path = "user/folders/{folderId}",
+        hasBody = true
+    )
     suspend fun removeFileFromFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,

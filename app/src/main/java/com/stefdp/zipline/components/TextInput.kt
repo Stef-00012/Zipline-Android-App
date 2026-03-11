@@ -92,10 +92,7 @@ fun TextInput(
                     text = placeholder.toAnnotatedString(),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
-                    color = if (enabled)
-                        MaterialTheme.colorScheme.onBackground
-                    else
-                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                 )
             }
         } else null,

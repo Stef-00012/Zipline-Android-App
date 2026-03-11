@@ -6,6 +6,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -101,10 +102,14 @@ fun parseTimeToMillis(input: String): Long? {
     return totalMillis
 }
 
-fun formatGoalDate(date: String): String = Instant
+fun formatDate(date: String): String = Instant
     .parse(date)
-    .atZone(ZoneOffset.UTC)
-    .format(DateTimeFormatter.ISO_LOCAL_DATE)
+    .atZone(ZoneOffset.systemDefault())
+    .format(
+        DateTimeFormatter.ofLocalizedDateTime(
+            FormatStyle.MEDIUM
+        )
+    )
 
 fun isSameDate(isoString: String, instant: Instant): Boolean {
     val isoStringDate = Instant.parse(isoString).atZone(ZoneOffset.UTC).toLocalDate()

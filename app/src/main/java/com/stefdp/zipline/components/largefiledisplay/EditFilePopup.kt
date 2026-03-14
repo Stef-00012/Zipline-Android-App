@@ -1,0 +1,212 @@
+package com.stefdp.zipline.components.largefiledisplay
+
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import com.stefdp.zipline.R
+import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Popup
+import com.stefdp.zipline.components.TextInput
+import com.stefdp.zipline.network.models.File
+import com.stefdp.zipline.network.requests.updateFile
+import com.stefdp.zipline.ui.theme.getButtonColors
+import kotlinx.coroutines.launch
+
+val intRegex = Regex("^[0-9]*$")
+
+@Composable
+internal fun EditFilePopup(
+    context: Context,
+    showPopup: Boolean,
+    file: File,
+    isLoading: Boolean,
+    onDismissRequest: () -> Unit,
+    updateData: suspend () -> Unit,
+    setLoading: (Boolean) -> Unit
+)  {
+    val coroutineScope = rememberCoroutineScope()
+
+    Popup(
+        showPopup = showPopup,
+        onDismissRequest = onDismissRequest
+    ) {
+        Text(
+            text = "Editing ${file.originalName ?: file.name}",
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold
+            ),
+        )
+
+        Spacer()
+
+        var name by remember { mutableStateOf(TextFieldValue(file.name)) }
+
+        TextInput(
+            label = "Name",
+            onValueChange = { name = it },
+            value = name,
+            placeholder = file.name
+        )
+
+        Spacer()
+
+        var maxViews by remember {
+            val value = if (file.maxViews != null) file.maxViews.toString() else ""
+
+            mutableStateOf(TextFieldValue(value))
+        }
+
+        TextInput(
+            label = "Max Views",
+            onValueChange = {
+                if (intRegex.matches(it.text)) maxViews = it
+            },
+            value = maxViews,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            placeholder = if (file.maxViews != null) file.maxViews.toString() else "Unlimited"
+        )
+
+        Spacer()
+
+        var originalName by remember { mutableStateOf(TextFieldValue(file.originalName ?: "")) }
+
+        TextInput(
+            label = "Original Name",
+            onValueChange = { originalName = it },
+            value = originalName,
+            placeholder = file.originalName ?: "None"
+        )
+
+        Spacer()
+
+        var type by remember { mutableStateOf(TextFieldValue(file.type)) }
+
+        TextInput(
+            label = "Type",
+            onValueChange = { type = it },
+            value = type,
+            placeholder = file.type
+        )
+
+        Spacer()
+
+        var password by remember { mutableStateOf(TextFieldValue("")) }
+
+        if (file.password == true) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        setLoading(true)
+
+                        val editFileRes = updateFile(
+                            context = context,
+                            fileId = file.id,
+                            password = ""
+                        )
+
+                        editFileRes.onSuccess {
+                            updateData()
+                            onDismissRequest()
+                        }
+                        editFileRes.onFailure {
+                            Toast.makeText(
+                                context,
+                                "Failed to remove password: ${it.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        setLoading(false)
+                    }
+                },
+                colors = getButtonColors().copy(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
+            ) {
+                Text(
+                    text = "Remove Password"
+                )
+            }
+        } else {
+            TextInput(
+                label = "Password",
+                onValueChange = { password = it },
+                value = password,
+                isPassword = true,
+                placeholder = "mYC00lP4sSw0rD"
+            )
+        }
+
+        Spacer()
+
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    setLoading(true)
+
+                    val editFileRes = updateFile(
+                        context = context,
+                        fileId = file.id,
+                        maxViews = if (maxViews.text.isBlank()) null else maxViews.text.toLong(),
+                        originalName = originalName.text.ifBlank { null },
+                        name = name.text.ifBlank { null },
+                        type = type.text.ifBlank { null },
+                        password = password.text.ifBlank { null }
+                    )
+
+                    editFileRes.onSuccess {
+                        updateData()
+                        onDismissRequest()
+                    }
+                    editFileRes.onFailure {
+                        Toast.makeText(
+                            context,
+                            "Failed to update file: ${it.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                    setLoading(false)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.save),
+                contentDescription = "Save changes"
+            )
+
+            Spacer(
+                modifier = Modifier.width(5.dp)
+            )
+
+            Text(
+                text = "Save Changes"
+            )
+        }
+    }
+}

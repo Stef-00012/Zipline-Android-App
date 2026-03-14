@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,7 +41,7 @@ import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.components.FilePreview
-import com.stefdp.zipline.components.LargeFileDisplay
+import com.stefdp.zipline.components.largefiledisplay.LargeFileDisplay
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
@@ -118,13 +119,13 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp)
+            .padding(
+                start = 12.dp,
+                end = 12.dp,
+                top = 12.dp
+            )
             .verticalScroll(mainScrollState)
     ) {
-        Spacer(
-            modifier = Modifier.height(12.dp)
-        )
-
         val username = localLoggedUser?.username ?: "Unknown" //stringResource(R.string.unknown_username)
 
         Text(
@@ -383,8 +384,8 @@ fun HomeScreen(
         Container(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(
-                    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT)
+                .heightIn(
+                    max = if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT)
                         500.dp
                     else 280.dp
                 )
@@ -438,7 +439,6 @@ fun HomeScreen(
 
             Table(
                 modifier = Modifier.fillMaxSize(),
-//                modifier = Modifier.fillMaxWidth(),
                 headers = headers,
                 rows = rows ?: emptyList(),
                 loading = userStats == null

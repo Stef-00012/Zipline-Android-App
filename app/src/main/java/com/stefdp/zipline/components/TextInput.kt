@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -57,7 +58,8 @@ fun TextInput(
     sideButtonIcon: Painter? = null,
     onSideButtonPress: () -> Unit = {},
     sideButtonContentDescription: String? = null,
-    colors: TextFieldColors = getOutlinedTextFieldColors()
+    colors: TextFieldColors = getOutlinedTextFieldColors(),
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -102,6 +104,7 @@ fun TextInput(
         visualTransformation = if (isPassword && !passwordVisible) {
             PasswordVisualTransformation()
         } else VisualTransformation.None,
+        keyboardOptions = keyboardOptions,
         trailingIcon = if (isPassword || sideButtonIcon != null) {
             {
                 IconButton(

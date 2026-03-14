@@ -26,12 +26,10 @@ fun Table(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
-//            .fillMaxWidth()
             .shimmerable(
                 enabled = loading,
-                color = MaterialTheme.colorScheme.surface,
-                keepBackground = true
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                height = 250.dp
             )
     ) {
         TableHeader(

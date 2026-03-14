@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.utils.ScrollbarConfig
+import com.stefdp.zipline.utils.horizontalScrollWithScrollbar
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 
 @Composable
@@ -32,17 +33,17 @@ fun TableContent(
     LazyColumn(
         state = lazyListState,
         modifier = modifier
-//            .fillMaxWidth()
-            .fillMaxSize()
             .verticalLazyScrollbar(
                 listState = lazyListState,
                 scrollbarConfig = ScrollbarConfig(alwaysKeepScrollbar = true)
+            )
+            .horizontalScrollWithScrollbar(
+                scrollState = scrollState,
             )
     ) {
         items(rows.size) { rowNumber ->
             Row(
                 modifier = Modifier
-                    .horizontalScroll(scrollState)
                     .height(IntrinsicSize.Max)
             ) {
                 rows[rowNumber].forEachIndexed { index, cell ->

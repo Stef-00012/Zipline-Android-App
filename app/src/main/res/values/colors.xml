@@ -1,10 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="primary_dark">#ff343fa2</color>
+    <color name="on_primary_dark">#ffffffff</color>
+    <color name="secondary_dark">#ff565aad</color>
+    <color name="on_secondary_dark">#ffffffff</color>
+    <color name="background_dark">#ff0c101c</color>
+    <color name="on_background_dark">#ffffffff</color>
+    <color name="surface_dark">#ff141722</color>
+    <color name="on_surface_dark">#ffffffff</color>
+    <color name="surface_variant_dark">#ff1e222b</color>
+    <color name="on_surface_variant_dark">#ffffffff</color>
+    <color name="outline_dark">#ff262f47</color>
+    <color name="error_container_dark">#ffd83333</color>
+    <color name="error_dark">#fff25151</color>
+    <color name="on_error_dark">#ffffffff</color>
+
+    <color name="primary_light">#ff424aa8</color>
+    <color name="on_primary_light">#ffffffff</color>
+    <color name="secondary_light">#ff424aa7</color>
+    <color name="on_secondary_light">#ffffffff</color>
+    <color name="background_light">#fff2f2f2</color>
+    <color name="on_background_light">#ff010101</color>
+    <color name="surface_light">#fff7f7f7</color>
+    <color name="on_surface_light">#ff010101</color>
+    <color name="surface_variant_light">#FFD8D8D8</color>
+    <color name="on_surface_variant_light">#ff010101</color>
+    <color name="outline_light">#ffd6dade</color>
+    <color name="error_container_light">#ffe73f3f</color>
+    <color name="error_light">#fff25151</color>
+    <color name="on_error_light">#ffffffff</color>
+
+    <color name="gray">#FF888888</color>
+    <color name="dark_gray">#FF444444</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="orange">#ffe8590c</color>
+    <color name="yellow">#fff08c00</color>
+
+    <color name="splash_background">#ff121317</color>
 </resources>

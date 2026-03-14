@@ -28,7 +28,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,6 +64,7 @@ import com.stefdp.zipline.screens.settings.SettingsScreen
 import com.stefdp.zipline.screens.urls.UrlsScreen
 import com.stefdp.zipline.screens.upload.file.UploadFileScreen
 import com.stefdp.zipline.screens.upload.text.UploadTextScreen
+import kotlinx.coroutines.delay
 
 const val BASE_CORNER_RADIUS = 10
 
@@ -102,8 +105,22 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
 }
 
 class MainActivity : FragmentActivity() {
+    private var isAppReady by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition {
+            !isAppReady
+        }
+
+        lifecycleScope.launch {
+            delay(100L)
+            isAppReady = true
+        }
+
         enableEdgeToEdge()
         setContent {
             ZiplineTheme {
@@ -305,6 +322,10 @@ class MainActivity : FragmentActivity() {
                                             scope.launch { drawerState.close() }
                                             navController.navigate(screen)
                                         },
+                                        navController = navController,
+                                        closeSidebar = {
+                                            scope.launch { drawerState.close() }
+                                        }
                                     )
                                 },
                                 gesturesEnabled = currentDestination?.route !in invalidRoutes
@@ -331,7 +352,7 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = LoadingScreen,
+        startDestination = if (IS_DEBUG) DEBUG_SCREEN else LoadingScreen,
         enterTransition = {
             slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(400))
         },

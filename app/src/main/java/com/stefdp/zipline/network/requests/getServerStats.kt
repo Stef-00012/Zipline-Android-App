@@ -12,7 +12,10 @@ import com.stefdp.zipline.utils.SecureStorage
 private const val TAG = "ZiplineApi[getServerStats]"
 
 suspend fun getServerStats(
-    context: Context
+    context: Context,
+    from: String? = null,
+    to: String? = null,
+    all: Boolean? = null
 ): Result<List<Metric>> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -33,7 +36,10 @@ suspend fun getServerStats(
         }
 
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).getServerStats(
-            token = token
+            token = token,
+            from = from,
+            to = to,
+            all = all
         )
 
         val body = response.body()

@@ -1,64 +1,6 @@
-//package com.stefdp.zipline.components
-//
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.material3.ModalDrawerSheet
-//import androidx.compose.material3.NavigationDrawerItem
-//import androidx.compose.material3.NavigationDrawerItemDefaults
-//import androidx.compose.material3.Text
-//import androidx.compose.runtime.Composable
-//import androidx.compose.ui.Modifier
-//import com.stefdp.zipline.screens.*
-//
-//@Composable
-//fun Sidebar(onItemClick: (AppScreen) -> Unit) {
-//    ModalDrawerSheet {
-////        Spacer(Modifier.height(12.dp))
-////        Text("Sidebar Menu", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
-////        HorizontalDivider()
-//
-//        NavigationDrawerItem(
-//            label = { Text("Home") },
-//            selected = false,
-//            onClick = { onItemClick(HomeScreen) },
-//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//        )
-//
-//        NavigationDrawerItem(
-//            label = { Text("Metrics") },
-//            selected = false,
-//            onClick = { onItemClick(MetricsScreen) },
-//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//        )
-//
-//        NavigationDrawerItem(
-//            label = { Text("Files") },
-//            selected = false,
-//            onClick = { onItemClick(FilesScreen()) },
-//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//        )
-//
-//        NavigationDrawerItem(
-//            label = { Text("Folders") },
-//            selected = false,
-//            onClick = { onItemClick(FoldersScreen) },
-//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//        )
-//
-//        // UPLOAD
-//
-//        NavigationDrawerItem(
-//            label = { Text("URLs") },
-//            selected = false,
-//            onClick = { onItemClick(UrlsScreen) },
-//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//        )
-//
-//        // ADMIN
-//    }
-//}
-
 package com.stefdp.zipline.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -91,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.DebugWrapper
 import com.stefdp.zipline.R
@@ -100,8 +43,13 @@ const val DRAWER_CORNER_RADIUS = BASE_CORNER_RADIUS + 5
 
 @Composable
 fun Sidebar(
-    onItemClick: (AppScreen) -> Unit
+    onItemClick: (AppScreen) -> Unit,
+    navController: NavHostController,
+    closeSidebar: () -> Unit
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
     ModalDrawerSheet(
         drawerContainerColor = MaterialTheme.colorScheme.surface,
         drawerShape = RoundedCornerShape(
@@ -132,7 +80,13 @@ fun Sidebar(
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(HomeScreen) },
+                onClick = {
+                    if (currentDestination?.route != HomeScreen::class.qualifiedName) {
+                        onItemClick(HomeScreen)
+                    } else {
+                        closeSidebar()
+                    }
+                },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -153,7 +107,13 @@ fun Sidebar(
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(MetricsScreen) },
+                onClick = {
+                    if (currentDestination?.route != MetricsScreen::class.qualifiedName) {
+                        onItemClick(MetricsScreen)
+                    } else {
+                        closeSidebar()
+                    }
+                },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -174,7 +134,19 @@ fun Sidebar(
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(FilesScreen()) },
+                onClick = {
+                    val userId = runCatching { navBackStackEntry?.toRoute<FilesScreen>()?.userId }.getOrNull()
+                    val destination = currentDestination?.route?.split("?")?.first()
+
+                    if (
+                        destination == FilesScreen::class.qualifiedName &&
+                        userId == null
+                    ) {
+                        closeSidebar()
+                    } else {
+                        onItemClick(FilesScreen())
+                    }
+                },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -195,7 +167,13 @@ fun Sidebar(
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(FoldersScreen) },
+                onClick = {
+                    if (currentDestination?.route != FoldersScreen::class.qualifiedName) {
+                        onItemClick(FoldersScreen)
+                    } else {
+                        closeSidebar()
+                    }
+                },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -232,7 +210,13 @@ fun Sidebar(
                         }
                     },
                     selected = false,
-                    onClick = { onItemClick(UploadFileScreen) },
+                    onClick = {
+                        if (currentDestination?.route != UploadFileScreen::class.qualifiedName) {
+                            onItemClick(UploadFileScreen)
+                        } else {
+                            closeSidebar()
+                        }
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
@@ -253,7 +237,13 @@ fun Sidebar(
                         }
                     },
                     selected = false,
-                    onClick = { onItemClick(UploadTextScreen) },
+                    onClick = {
+                        if (currentDestination?.route != UploadTextScreen::class.qualifiedName) {
+                            onItemClick(UploadTextScreen)
+                        } else {
+                            closeSidebar()
+                        }
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
@@ -275,7 +265,13 @@ fun Sidebar(
                     }
                 },
                 selected = false,
-                onClick = { onItemClick(UrlsScreen) },
+                onClick = {
+                    if (currentDestination?.route != UrlsScreen::class.qualifiedName) {
+                        onItemClick(UrlsScreen)
+                    } else {
+                        closeSidebar()
+                    }
+                },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
@@ -333,7 +329,13 @@ fun Sidebar(
                         }
                     },
                     selected = false,
-                    onClick = { onItemClick(AdminUsersScreen) },
+                    onClick = {
+                        if (currentDestination?.route != AdminUsersScreen::class.qualifiedName) {
+                            onItemClick(AdminUsersScreen)
+                        } else {
+                            closeSidebar()
+                        }
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
@@ -354,7 +356,13 @@ fun Sidebar(
                         }
                     },
                     selected = false,
-                    onClick = { onItemClick(AdminInvitesScreen) },
+                    onClick = {
+                        if (currentDestination?.route != AdminInvitesScreen::class.qualifiedName) {
+                            onItemClick(AdminInvitesScreen)
+                        } else {
+                            closeSidebar()
+                        }
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                 )
@@ -392,6 +400,16 @@ fun Sidebar(
                         },
                         selected = false,
                         onClick = { onItemClick(BiometricAuthScreen) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                    )
+
+                    NavigationDrawerItem(
+                        label = {
+                            Text("Files with User ID")
+                        },
+                        selected = false,
+                        onClick = { onItemClick(FilesScreen("1")) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                         shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                     )

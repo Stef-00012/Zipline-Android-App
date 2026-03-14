@@ -2,12 +2,14 @@ package com.stefdp.zipline.utils
 
 import android.content.Context
 import com.stefdp.zipline.R
+import com.stefdp.zipline.network.models.Metric
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -102,14 +104,43 @@ fun parseTimeToMillis(input: String): Long? {
     return totalMillis
 }
 
-fun formatDate(date: String): String = Instant
-    .parse(date)
-    .atZone(ZoneOffset.systemDefault())
-    .format(
-        DateTimeFormatter.ofLocalizedDateTime(
-            FormatStyle.MEDIUM
+fun formatDate(
+    date: String,
+    short: Boolean = false,
+    dateOnly: Boolean = false,
+    timeOnly: Boolean = false,
+): String {
+    if (dateOnly) {
+        return Instant
+            .parse(date)
+            .atZone(ZoneOffset.systemDefault())
+            .format(
+                DateTimeFormatter.ofLocalizedDate(
+                    if (short) FormatStyle.SHORT else FormatStyle.MEDIUM
+                )
+            )
+    }
+
+    if (timeOnly) {
+        return Instant
+            .parse(date)
+            .atZone(ZoneOffset.systemDefault())
+            .format(
+                DateTimeFormatter.ofLocalizedTime(
+                    if (short) FormatStyle.SHORT else FormatStyle.MEDIUM
+                )
+            )
+    }
+
+    return Instant
+        .parse(date)
+        .atZone(ZoneOffset.systemDefault())
+        .format(
+            DateTimeFormatter.ofLocalizedDateTime(
+                if (short) FormatStyle.SHORT else FormatStyle.MEDIUM
+            )
         )
-    )
+}
 
 fun isSameDate(isoString: String, instant: Instant): Boolean {
     val isoStringDate = Instant.parse(isoString).atZone(ZoneOffset.UTC).toLocalDate()
@@ -123,4 +154,41 @@ fun getDatesBetween(date1: LocalDate, date2: LocalDate): List<LocalDate> {
     val daysBetween = ChronoUnit.DAYS.between(date1, date2)
 
     return (0..daysBetween).map { date1.plusDays(it) }
+}
+
+fun getMetricDatesInBetween(
+    startDate: String,
+    endDate: String,
+    stats: List<Metric>,
+    numberOfPoints: Int
+): List<Metric> {
+    if (numberOfPoints <= 0 || stats.isEmpty()) return emptyList()
+
+    val startMillis = Instant.parse(startDate).toEpochMilli()
+    val endMillis = Instant.parse(endDate).toEpochMilli()
+
+    val validStats = stats.filter {
+        val time = Instant.parse(it.createdAt).toEpochMilli()
+        time in startMillis..endMillis
+    }
+
+    if (validStats.isEmpty()) return emptyList()
+
+    if (numberOfPoints == 1) {
+        val midPoint = startMillis + (endMillis - startMillis) / 2
+        return listOf(validStats.minByOrNull { abs(Instant.parse(it.createdAt).toEpochMilli() - midPoint) }!!)
+    }
+
+    val gap = (endMillis - startMillis).toDouble() / (numberOfPoints - 1)
+
+    val targetTimestamps = (0 until numberOfPoints).map { index ->
+        (startMillis + index * gap).toLong()
+    }
+
+    return targetTimestamps.mapNotNull { targetTime ->
+        validStats.minByOrNull { metric ->
+            val metricTime = Instant.parse(metric.createdAt).toEpochMilli()
+            abs(metricTime - targetTime)
+        }
+    }.distinct()
 }

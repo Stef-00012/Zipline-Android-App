@@ -5,7 +5,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.requests.UpdateCurrenUserBody
+import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.GetCurrentUserResponse
 import com.stefdp.zipline.utils.SecureStorage
@@ -14,7 +14,7 @@ private const val TAG = "ZiplineApi[updateCurrentUser]"
 
 suspend fun updateCurrentUser(
     context: Context,
-    data: UpdateCurrenUserBody
+    data: UpdateCurrentUserBody
 ): Result<GetCurrentUserResponse> {
     try {
         val secureStore = SecureStorage.getInstance(context)

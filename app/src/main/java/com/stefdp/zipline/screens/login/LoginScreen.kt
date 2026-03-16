@@ -110,6 +110,7 @@ fun LoginScreen(
                 )
 
                 TextInput(
+                    modifier = Modifier.fillMaxWidth(),
                     value = serverUrl,
                     onValueChange = { serverUrl = it },
                     placeholder = "https://example.com",
@@ -119,6 +120,7 @@ fun LoginScreen(
 
                 if (isTokenLogin) {
                     TextInput(
+                        modifier = Modifier.fillMaxWidth(),
                         value = token,
                         onValueChange = { token = it },
                         isPassword = true,
@@ -128,6 +130,7 @@ fun LoginScreen(
                     )
                 } else {
                     TextInput(
+                        modifier = Modifier.fillMaxWidth(),
                         value = username,
                         onValueChange = { username = it },
                         placeholder = "My Username",
@@ -136,6 +139,7 @@ fun LoginScreen(
                     )
 
                     TextInput(
+                        modifier = Modifier.fillMaxWidth(),
                         value = password,
                         onValueChange = { password = it },
                         isPassword = true,
@@ -146,6 +150,7 @@ fun LoginScreen(
 
                     if (isTotpRequired) {
                         TextInput(
+                            modifier = Modifier.fillMaxWidth(),
                             value = totp,
                             onValueChange = { totp = it },
                             placeholder = "123456",
@@ -298,7 +303,7 @@ fun LoginScreen(
                         }
 
                         Text(
-                            text = "Login",//stringResource(R.string.login_button),
+                            text = "Login",
                             fontWeight = FontWeight.Bold,
                             color = LocalContentColor.current,
                         )

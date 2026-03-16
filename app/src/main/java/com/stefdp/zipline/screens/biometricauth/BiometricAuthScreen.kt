@@ -44,7 +44,7 @@ fun BiometricAuthScreen(
             onError = { _, _ ->
                 Toast.makeText(
                     context,
-                    "Biometric authentication failed",// context.getString(R.string.biometric_authentication_failed),
+                    "Biometric authentication failed",
                     Toast.LENGTH_SHORT
                 ).show()
             },
@@ -69,13 +69,13 @@ fun BiometricAuthScreen(
     ) {
         Icon(
             painter = painterResource(R.drawable.lock),
-            contentDescription = "Zipline Locked",//stringResource(R.string.hackatime_locked_content_description),
+            contentDescription = "Zipline Locked",
             modifier = Modifier.size(50.dp),
             tint = MaterialTheme.colorScheme.primary
         )
 
         Text(
-            text = "Zipline Locked",//stringResource(R.string.hackatime_locked_title),
+            text = "Zipline Locked",
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Bold
             )
@@ -89,7 +89,7 @@ fun BiometricAuthScreen(
             onClick = ::promptBiometrics
         ) {
             Text(
-                text = "Unlock",//stringResource(R.string.unlock_button),
+                text = "Unlock",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

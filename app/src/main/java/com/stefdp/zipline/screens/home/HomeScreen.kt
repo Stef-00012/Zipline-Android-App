@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -45,6 +47,7 @@ import com.stefdp.zipline.components.largefiledisplay.LargeFileDisplay
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
+import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.UserQuotaFilesQuota
 import com.stefdp.zipline.network.models.responses.GetStatsResponse
@@ -54,8 +57,10 @@ import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.home.components.Container
 import com.stefdp.zipline.screens.home.components.Stat
 import com.stefdp.zipline.utils.formatBytes
+import com.stefdp.zipline.utils.horizontalLazyScrollbar
 import com.stefdp.zipline.utils.parseBytes
 import com.stefdp.zipline.utils.shimmerable
+import com.stefdp.zipline.utils.verticalLazyScrollbar
 import java.util.Locale
 
 @Composable
@@ -75,16 +80,6 @@ fun HomeScreen(
     if (localLoggedUser == null) {
         navController.navigate(LoginScreen) {
             popUpTo(navController.graph.id) { inclusive = true }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (publicSettings == null) {
-            updatePublicSettings()
-        }
-
-        if (webSettings == null) {
-            updateWebSettings()
         }
     }
 
@@ -111,6 +106,14 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
+        if (publicSettings == null) {
+            updatePublicSettings()
+        }
+
+        if (webSettings == null) {
+            updateWebSettings()
+        }
+
         updateData()
     }
 
@@ -126,7 +129,7 @@ fun HomeScreen(
             )
             .verticalScroll(mainScrollState)
     ) {
-        val username = localLoggedUser?.username ?: "Unknown" //stringResource(R.string.unknown_username)
+        val username = localLoggedUser?.username ?: "Unknown"
 
         Text(
             text = "Welcome back, $username",
@@ -230,7 +233,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(200.dp)
                 .background(MaterialTheme.colorScheme.surface),
-            scrollbar = true
+            scrollable = false
         ) {
             var clickedFile by remember { mutableStateOf<File?>(null) }
 
@@ -251,31 +254,42 @@ fun HomeScreen(
                 updateData = ::updateData
             )
 
-            if (recentFiles.isEmpty()) {
-                repeat(8) {
-                    Box(
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
-                            .size(200.dp)
-                            .shimmerable(
-                                enabled = true,
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                keepBackground = true
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {}
-                }
-            } else {
-                recentFiles.forEach { file ->
-                    FilePreview(
-                        file = file,
-                        context = context,
-                        modifier = Modifier.size(200.dp),
-                        onClick = { file ->
-                            clickedFile = file
-                        }
-                    )
+            val lazyListState = rememberLazyListState()
+
+            LazyRow(
+                state = lazyListState,
+                modifier = Modifier.horizontalLazyScrollbar(
+                    listState = lazyListState
+                )
+            ) {
+                if (recentFiles.isEmpty()) {
+                    items(8) {
+                        Box(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                                .size(200.dp)
+                                .shimmerable(
+                                    enabled = true,
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    keepBackground = true
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {}
+                    }
+                } else {
+                    items(recentFiles.size) { index ->
+                        val file = recentFiles[index]
+
+                        FilePreview(
+                            file = file,
+                            context = context,
+                            modifier = Modifier.size(200.dp).padding(10.dp),
+                            onClick = { file ->
+                                clickedFile = file
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -396,44 +410,48 @@ fun HomeScreen(
             val tableCountWidth = 180.dp
 
             val headers: List<TableHeaderData> = listOf(
-                {
-                    Text(
-                        text = "File Type",
-                        modifier = Modifier
-                            .width(tableTypeWidth)
-                            .padding(12.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                {
-                    Text(
-                        text = "Count",
-                        modifier = Modifier
-                            .width(tableCountWidth)
-                            .padding(12.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            )
-
-            val rows: List<List<TableCellData>>? = userStats?.sortTypeCount?.map { (type, count) ->
-                listOf(
-                    {
+                TableHeaderData(
+                    content = {
                         Text(
-                            text = type,
-                            modifier = Modifier
-                                .width(tableTypeWidth)
-                                .padding(12.dp)
+                            text = "File Type",
+                            fontWeight = FontWeight.Bold
                         )
                     },
-                    {
+                    name = "file type",
+                    width = tableTypeWidth,
+                ),
+                TableHeaderData(
+                    content = {
                         Text(
-                            text = count.toString(),
-                            modifier = Modifier
-                                .width(tableCountWidth)
-                                .padding(12.dp)
+                            text = "Count",
+                            fontWeight = FontWeight.Bold
                         )
-                    }
+                    },
+                    name = "count",
+                    width = tableCountWidth,
+                ),
+            )
+
+            val rows: List<TableRowData>? = userStats?.sortTypeCount?.map { (type, count) ->
+                TableRowData(
+                    cells = listOf(
+                        TableCellData(
+                            content = {
+                                Text(
+                                    text = type,
+                                )
+                            },
+                            width = tableTypeWidth
+                        ),
+                        TableCellData(
+                            content = {
+                                Text(
+                                    text = count.toString(),
+                                )
+                            },
+                            width = tableCountWidth
+                        ),
+                    )
                 )
             }
 

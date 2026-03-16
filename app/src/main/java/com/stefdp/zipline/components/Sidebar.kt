@@ -35,6 +35,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import com.stefdp.zipline.BASE_CORNER_RADIUS
+import com.stefdp.zipline.DEBUG_USER_ID
 import com.stefdp.zipline.DebugWrapper
 import com.stefdp.zipline.R
 import com.stefdp.zipline.screens.*
@@ -409,7 +410,7 @@ fun Sidebar(
                             Text("Files with User ID")
                         },
                         selected = false,
-                        onClick = { onItemClick(FilesScreen("1")) },
+                        onClick = { onItemClick(FilesScreen(DEBUG_USER_ID)) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                         shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                     )

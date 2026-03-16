@@ -1,6 +1,8 @@
 package com.stefdp.zipline.network.models.responses
 
+import com.google.gson.annotations.JsonAdapter
 import com.stefdp.zipline.network.models.File
+import com.stefdp.zipline.utils.StringOrListDeserializer
 
 data class GetFilesResponse(
     val page: List<File>,
@@ -10,6 +12,7 @@ data class GetFilesResponse(
 )
 
 data class GetFilesResponseSearch(
-    val query: String,
+    @JsonAdapter(StringOrListDeserializer::class)
+    val query: List<String>? = null,
     val field: String? = null,
 )

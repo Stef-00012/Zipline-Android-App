@@ -1,9 +1,6 @@
 package com.stefdp.zipline.components.table
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.HorizontalDivider
@@ -11,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.shimmerable
 
 const val TABLE_BORDER_ALPHA = 0.3f
@@ -19,8 +17,9 @@ const val TABLE_BORDER_ALPHA = 0.3f
 fun Table(
     modifier: Modifier = Modifier,
     headers: List<TableHeaderData>,
-    rows: List<List<TableCellData>>,
-    loading: Boolean
+    rows: List<TableRowData>,
+    loading: Boolean,
+    scrollbarConfig: TableScrollbarConfig = TableScrollbarConfig()
 ) {
     val scrollState = rememberScrollState()
 
@@ -46,7 +45,21 @@ fun Table(
 
         TableContent(
             scrollState = scrollState,
-            rows = rows
+            rows = rows,
+            scrollbarConfig = scrollbarConfig
         )
     }
 }
+
+data class TableRowData(
+    val cells: List<TableCellData>,
+    val clickable: Boolean = false,
+    val onClick: () -> Unit = {}
+)
+
+data class TableScrollbarConfig(
+    val vertical: ScrollbarConfig = ScrollbarConfig(
+        alwaysKeepScrollbar = true
+    ),
+    val horizontal: ScrollbarConfig = ScrollbarConfig()
+)

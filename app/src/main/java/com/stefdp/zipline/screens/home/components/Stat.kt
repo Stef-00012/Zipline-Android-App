@@ -28,13 +28,8 @@ fun Stat(
 ) {
     Container(
         modifier = modifier
-//            .padding(12.dp)
             .fillMaxHeight()
             .fillMaxHeight(),
-//            .background(
-//                color = MaterialTheme.colorScheme.surfaceVariant,
-//                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-//            ),
         scrollable = false,
         border = false
     ) {
@@ -59,7 +54,6 @@ fun Stat(
                 text = "$value",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                    fontWeight = FontWeight.Bold,
                 ),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)

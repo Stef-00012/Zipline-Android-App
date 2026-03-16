@@ -1,4 +1,4 @@
-package com.stefdp.zipline.components.largefiledisplay
+package com.stefdp.zipline.components
 
 import android.content.Context
 import android.widget.Toast
@@ -13,8 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.stefdp.zipline.components.Button
-import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.ui.theme.DarkGray
@@ -22,15 +20,17 @@ import com.stefdp.zipline.ui.theme.getButtonColors
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun DeleteFilePromptPopup(
+fun DeleteFilePromptPopup(
     context: Context,
     showPopup: Boolean,
-    file: File,
+    file: File?,
     isLoading: Boolean,
     onDismissRequest: () -> Unit,
     updateData: suspend () -> Unit,
     setLoading: (Boolean) -> Unit
 ) {
+    if (file == null) return
+
     val coroutineScope = rememberCoroutineScope()
 
     Popup(

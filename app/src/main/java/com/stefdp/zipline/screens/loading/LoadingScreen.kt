@@ -83,7 +83,7 @@ fun LoadingScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = "Loading...",//stringResource(R.string.loading_title),
+            text = "Loading...",
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Bold
             )

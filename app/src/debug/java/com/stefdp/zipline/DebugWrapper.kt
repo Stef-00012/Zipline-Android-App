@@ -2,13 +2,16 @@ package com.stefdp.zipline
 
 import androidx.compose.runtime.Composable
 import com.stefdp.zipline.screens.AppScreen
+import com.stefdp.zipline.screens.FilesScreen
+import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoadingScreen
 import com.stefdp.zipline.screens.MetricsScreen
 
 const val IS_DEBUG = true
 const val DEBUG_NETWORK = false
 
-val DEBUG_SCREEN: AppScreen = LoadingScreen//MetricsScreen
+val DEBUG_SCREEN: AppScreen = LoadingScreen//FilesScreen()//LoadingScreen
+val DEBUG_USER_ID = "cmgt5i4ei00ct01n3fou6fd65"
 
 @Composable
 fun DebugWrapper(content: @Composable () -> Unit) {

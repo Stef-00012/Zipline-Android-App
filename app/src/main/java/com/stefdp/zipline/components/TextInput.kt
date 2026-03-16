@@ -1,6 +1,7 @@
 package com.stefdp.zipline.components
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +49,7 @@ fun TextInput(
     modifier: Modifier = Modifier,
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     label: CharSequence? = null,
     placeholder: CharSequence?= null,
     enabled: Boolean = true,
@@ -65,6 +68,7 @@ fun TextInput(
 
     OutlinedTextField(
         value = value,
+        keyboardActions = keyboardActions,
         onValueChange = onValueChange,
         textStyle = LocalTextStyle.current.copy(
             color = if (enabled)
@@ -72,8 +76,7 @@ fun TextInput(
             else
                 MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         ),
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         singleLine = singleLine,
         label = if (label != null) {
             {
@@ -134,9 +137,9 @@ fun TextInput(
                         },
                         contentDescription = if (isPassword) {
                             if (passwordVisible)
-                                "TMP"//stringResource(R.string.side_button_content_description_password_hide)
-                            else "TMP"//stringResource(R.string.side_button_content_description_password_show)
-                        } else sideButtonContentDescription ?: "TMP", //stringResource(R.string.side_button_content_description_generic),
+                                "TMP"
+                            else "TMP"
+                        } else sideButtonContentDescription ?: "TMP",
                         modifier = Modifier.requiredSize(28.dp)
                     )
                 }

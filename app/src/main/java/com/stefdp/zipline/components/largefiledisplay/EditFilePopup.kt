@@ -60,6 +60,7 @@ internal fun EditFilePopup(
         var name by remember { mutableStateOf(TextFieldValue(file.name)) }
 
         TextInput(
+            modifier = Modifier.fillMaxWidth(),
             label = "Name",
             onValueChange = { name = it },
             value = name,
@@ -75,6 +76,7 @@ internal fun EditFilePopup(
         }
 
         TextInput(
+            modifier = Modifier.fillMaxWidth(),
             label = "Max Views",
             onValueChange = {
                 if (intRegex.matches(it.text)) maxViews = it
@@ -91,6 +93,7 @@ internal fun EditFilePopup(
         var originalName by remember { mutableStateOf(TextFieldValue(file.originalName ?: "")) }
 
         TextInput(
+            modifier = Modifier.fillMaxWidth(),
             label = "Original Name",
             onValueChange = { originalName = it },
             value = originalName,
@@ -102,6 +105,7 @@ internal fun EditFilePopup(
         var type by remember { mutableStateOf(TextFieldValue(file.type)) }
 
         TextInput(
+            modifier = Modifier.fillMaxWidth(),
             label = "Type",
             onValueChange = { type = it },
             value = type,
@@ -152,6 +156,7 @@ internal fun EditFilePopup(
             }
         } else {
             TextInput(
+                modifier = Modifier.fillMaxWidth(),
                 label = "Password",
                 onValueChange = { password = it },
                 value = password,

@@ -1,6 +1,5 @@
 package com.stefdp.zipline.components.largefiledisplay
 
-import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -9,50 +8,28 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
+import com.stefdp.zipline.components.DeleteFilePromptPopup
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
@@ -61,18 +38,15 @@ import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.requests.addFileToFolder
-import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.network.requests.downloadFile
 import com.stefdp.zipline.network.requests.getFolders
 import com.stefdp.zipline.network.requests.getTags
 import com.stefdp.zipline.network.requests.removeFileFromFolder
 import com.stefdp.zipline.network.requests.updateFile
-import com.stefdp.zipline.screens.home.components.Stat
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.Orange
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
-import com.stefdp.zipline.ui.theme.getButtonColors
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.formatDate
@@ -207,10 +181,17 @@ fun LargeFileDisplay(
                     file = currentFile,
                     context = context,
                     modifier = heightModifier,
-                    clickEnabled = false,
                     previewVideos = true,
                     onImageLoaded = {
                         isPreviewLoading = false
+                    },
+                    onClick = { clickedFile ->
+                        if (clickedFile.type.startsWith("video/") && clickedFile.password != true) return@FilePreview
+
+                        val fileUrl = "${serverUrl}${clickedFile.url}"
+
+                        val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
+                        context.startActivity(intent)
                     }
                 )
 
@@ -279,8 +260,6 @@ fun LargeFileDisplay(
                         fileTags.map { tag -> tag.id }.toSet()
                     )
                 }
-
-
 
                 Select(
                     label = "Tags",
@@ -493,7 +472,7 @@ fun LargeFileDisplay(
                     CopyUrlButton(
                         enabled = !isLoading || serverUrl == null,
                         standardUrl = "${serverUrl}${currentFile.url}",
-                        rawUrl = "$serverUrl/raw${currentFile.url}"
+                        rawUrl = "$serverUrl/raw/${currentFile.name}"
                     )
 
                     IconButtonSpacer()

@@ -1,6 +1,8 @@
 package com.stefdp.zipline.components
 
 import android.content.Context
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.stefdp.zipline.BASE_CORNER_RADIUS
+import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.utils.SecureStorage
@@ -68,6 +71,17 @@ fun FilePreview(
     var imageLoading by remember { mutableStateOf(true) }
     var imageFailed by remember { mutableStateOf(false) }
 
+    val isVideo = file.type.startsWith("video/")
+    val isEmbeddable = file.type in embeddableMimetypes
+
+    var serverUrl by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        val secureStore = SecureStorage.getInstance(context)
+
+        serverUrl = secureStore.get("serverUrl")
+    }
+
     LaunchedEffect(imageLoading) {
         if (!imageLoading) {
             onImageLoaded()
@@ -102,18 +116,22 @@ fun FilePreview(
         }
     }
 
+    val isShimmerEnabled = imageLoading && (
+        (!isVideo && !previewVideos) ||
+        (!isEmbeddable && !isVideo)
+    )
+
     Box(
         modifier = Modifier
-            .padding(10.dp)
             .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
             .then(modifier)
             .shimmerable(
-                enabled = imageLoading,
+                enabled = isShimmerEnabled,
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 keepBackground = true
             )
             .clickable(
-                enabled = clickEnabled && !imageLoading,
+                enabled = clickEnabled && !isShimmerEnabled,
                 onClick = { onClick(file) },
                 role = Role.Image,
                 onClickLabel = "Open large file display"
@@ -121,28 +139,18 @@ fun FilePreview(
         contentAlignment = Alignment.Center
     ) {
         if (file.password == true) {
-            LaunchedEffect(Unit) {
-                imageLoading = false
-            }
+            imageLoading = false
 
             DefaultPreview(
                 icon = painterResource(R.drawable.lock),
                 iconContentDescription = "Password protected file",
-                label = "Password protected file"
+                label = "Password protected file ${file.name}"
             )
 
             return@Box
         }
 
-        var serverUrl by remember { mutableStateOf<String?>(null) }
-
-        LaunchedEffect(Unit) {
-            val secureStore = SecureStorage.getInstance(context)
-
-            serverUrl = secureStore.get("serverUrl")
-        }
-
-        if (file.type in embeddableMimetypes && serverUrl != null) {
+        if (isEmbeddable && serverUrl != null) {
             if (imageFailed) {
                 DefaultPreview(
                     icon = painterResource(R.drawable.description),
@@ -150,8 +158,16 @@ fun FilePreview(
                     label = "Click to view file ${file.name}"
                 )
             } else {
+                if (imageLoading) {
+                    DefaultPreview(
+                        icon = painterResource(R.drawable.description),
+                        iconContentDescription = "${file.type} file",
+                        label = "Click to view file ${file.name}\nLoading preview..."
+                    )
+                }
+
                 AsyncImage(
-                    model = "$serverUrl/raw${file.url}",
+                    model = "$serverUrl/raw/${file.name}",
                     contentDescription = file.originalName ?: file.name,
                     onSuccess = {
                         imageLoading = false
@@ -165,7 +181,7 @@ fun FilePreview(
             return@Box
         }
 
-        if (file.type.startsWith("video/")) {
+        if (isVideo) {
             if (imageFailed || serverUrl == null) {
                 DefaultPreview(
                     icon = painterResource(R.drawable.videocam),
@@ -175,7 +191,7 @@ fun FilePreview(
             } else if (previewVideos) {
                 VideoPlayer(
                     context = context,
-                    videoUrl = "$serverUrl/raw${file.url}",
+                    videoUrl = "$serverUrl/raw/${file.name}",
                     onError = {
                         imageFailed = true
                         imageLoading = false
@@ -185,6 +201,14 @@ fun FilePreview(
                     }
                 )
             } else {
+                if (imageLoading) {
+                    DefaultPreview(
+                        icon = painterResource(R.drawable.videocam),
+                        iconContentDescription = "Video file",
+                        label = "Click to play video ${file.name}\nLoading preview..."
+                    )
+                }
+
                 if (file.thumbnail?.path != null) {
                     AsyncImage(
                         model = "$serverUrl/raw/${file.thumbnail.path}",
@@ -198,7 +222,7 @@ fun FilePreview(
                     )
                 } else {
                     AsyncImage(
-                        model = "$serverUrl/raw${file.url}",
+                        model = "$serverUrl/raw/${file.name}",
                         contentDescription = file.originalName ?: file.name,
                         onSuccess = {
                             imageLoading = false
@@ -209,20 +233,20 @@ fun FilePreview(
                     )
                 }
 
-                Icon(
-                    painter = painterResource(R.drawable.play_arrow),
-                    contentDescription = "Play video icon",
-                    modifier = Modifier.size(40.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
+                if (!imageLoading) {
+                    Icon(
+                        painter = painterResource(R.drawable.play_arrow),
+                        contentDescription = "Play video icon",
+                        modifier = Modifier.size(40.dp),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
 
             return@Box
         }
 
-        LaunchedEffect(Unit) {
-            imageLoading = false
-        }
+        imageLoading = false
 
         if (file.type == APK_MIMETYPE) {
             DefaultPreview(

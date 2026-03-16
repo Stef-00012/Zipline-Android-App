@@ -48,6 +48,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
+import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
@@ -56,8 +57,10 @@ import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
+import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.network.models.Metric
 import com.stefdp.zipline.network.requests.getServerStats
+import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.metrics.components.Container
 import com.stefdp.zipline.screens.metrics.components.Stat
 import com.stefdp.zipline.utils.colorHash
@@ -89,6 +92,14 @@ fun MetricsScreen(
     context: Context,
     activity: FragmentActivity
 ) {
+    val localLoggedUser = LocalLoggedUser.current
+
+    if (localLoggedUser == null) {
+        navController.navigate(LoginScreen) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+
     val webSettings = LocalWebSettings.current
 
     val today = Instant.now()
@@ -146,20 +157,6 @@ fun MetricsScreen(
                     stats = it.reversed()
                 }
             }
-        }
-
-        isLoading = false
-    }
-
-    LaunchedEffect(Unit) {
-        val serverStatsRes = getServerStats(
-            context = context,
-            from = rangeStart.toString(),
-            to = rangeEnd.toString()
-        )
-
-        serverStatsRes.onSuccess {
-            stats = it.reversed()
         }
 
         isLoading = false
@@ -496,61 +493,66 @@ fun MetricsScreen(
                     val tableViewsWidth = 100.dp
 
                     val headers: List<TableHeaderData> = listOf(
-                        {
-                            Text(
-                                text = "User",
-                                modifier = Modifier
-                                    .width(tableUserWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        {
-                            Text(
-                                text = "URLs",
-                                modifier = Modifier
-                                    .width(tableUrlsWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        {
-                            Text(
-                                text = "Views",
-                                modifier = Modifier
-                                    .width(tableViewsWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "User",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "user",
+                            width = tableUserWidth
+                        ),
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "URLs",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "URLs",
+                            width = tableUrlsWidth
+                        ),
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "Views",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "views",
+                            width = tableViewsWidth
+                        )
                     )
 
-                    val rows: List<List<TableCellData>>? = firstStat?.data?.urlsUsers?.map { userUrl ->
-                        listOf(
-                            {
-                                Text(
-                                    text = userUrl.username ?: "Unknown User",
-                                    modifier = Modifier
-                                        .width(tableUserWidth)
-                                        .padding(12.dp)
+                    val rows: List<TableRowData>? = firstStat?.data?.urlsUsers?.map { userUrl ->
+                        TableRowData(
+                            cells = listOf(
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = userUrl.username ?: "Unknown User",
+                                        )
+                                    },
+                                    width = tableUserWidth
+                                ),
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = userUrl.sum.toString(),
+                                        )
+                                    },
+                                    width = tableUrlsWidth
+                                ),
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = userUrl.views.toString(),
+                                        )
+                                    },
+                                    width = tableViewsWidth
                                 )
-                            },
-                            {
-                                Text(
-                                    text = userUrl.sum.toString(),
-                                    modifier = Modifier
-                                        .width(tableUrlsWidth)
-                                        .padding(12.dp)
-                                )
-                            },
-                            {
-                                Text(
-                                    text = userUrl.views.toString(),
-                                    modifier = Modifier
-                                        .width(tableViewsWidth)
-                                        .padding(12.dp)
-                                )
-                            }
+                            )
                         )
                     }
 
@@ -580,78 +582,84 @@ fun MetricsScreen(
                     val tableViewsWidth = 100.dp
 
                     val headers: List<TableHeaderData> = listOf(
-                        {
-                            Text(
-                                text = "User",
-                                modifier = Modifier
-                                    .width(tableUserWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        {
-                            Text(
-                                text = "Files",
-                                modifier = Modifier
-                                    .width(tableFilesWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        {
-                            Text(
-                                text = "Storage Used",
-                                modifier = Modifier
-                                    .width(tableStorageUsedWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        {
-                            Text(
-                                text = "Views",
-                                modifier = Modifier
-                                    .width(tableViewsWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "User",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "user",
+                            width = tableUserWidth
+                        ),
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "Files",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "files",
+                            width = tableFilesWidth
+                        ),
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "Storage Used",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "storage used",
+                            width = tableStorageUsedWidth
+                        ),
+                        TableHeaderData(
+                            content = {
+                                Text(
+                                    text = "Views",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            name = "views",
+                            width = tableViewsWidth
+                        )
                     )
 
-                    val rows: List<List<TableCellData>>? = firstStat?.data?.filesUsers?.map { userFile ->
-                        listOf(
-                            {
-                                Text(
-                                    text = userFile.username ?: "Unknown User",
-                                    modifier = Modifier
-                                        .width(tableUserWidth)
-                                        .padding(12.dp)
+                    val rows: List<TableRowData>? = firstStat?.data?.filesUsers?.map { userFile ->
+                        TableRowData(
+                            cells = listOf(
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = userFile.username ?: "Unknown User",
+                                        )
+                                    },
+                                    width = tableUserWidth
+                                ),
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = userFile.sum.toString(),
+                                        )
+                                    },
+                                    width = tableFilesWidth
+                                ),
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = formatBytes(userFile.storage),
+                                        )
+                                    },
+                                    width = tableStorageUsedWidth
+                                ),
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = userFile.views.toString(),
+                                        )
+                                    },
+                                    width = tableViewsWidth
                                 )
-                            },
-                            {
-                                Text(
-                                    text = userFile.sum.toString(),
-                                    modifier = Modifier
-                                        .width(tableFilesWidth)
-                                        .padding(12.dp)
-                                )
-                            },
-                            {
-                                Text(
-                                    text = formatBytes(userFile.storage),
-                                    modifier = Modifier
-                                        .width(tableStorageUsedWidth)
-                                        .padding(12.dp)
-                                )
-                            },
-                            {
-                                Text(
-                                    text = userFile.views.toString(),
-                                    modifier = Modifier
-                                        .width(tableViewsWidth)
-                                        .padding(12.dp)
-                                )
-                            }
+                            )
                         )
                     }
 
@@ -681,44 +689,48 @@ fun MetricsScreen(
                     val tableFilesWidth = 100.dp
 
                     val headers: List<TableHeaderData> = listOf(
-                        {
-                            Text(
-                                text = "Type",
-                                modifier = Modifier
-                                    .width(tableTypeWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        {
-                            Text(
-                                text = "Files",
-                                modifier = Modifier
-                                    .width(tableFilesWidth)
-                                    .padding(12.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    )
-
-                    val rows: List<List<TableCellData>>? = firstStat?.data?.types?.map { typeData ->
-                        listOf(
-                            {
+                        TableHeaderData(
+                            content = {
                                 Text(
-                                    text = typeData.type,
-                                    modifier = Modifier
-                                        .width(tableTypeWidth)
-                                        .padding(12.dp)
+                                    text = "Type",
+                                    fontWeight = FontWeight.Bold
                                 )
                             },
-                            {
+                            name = "type",
+                            width = tableTypeWidth
+                        ),
+                        TableHeaderData(
+                            content = {
                                 Text(
-                                    text = typeData.sum.toString(),
-                                    modifier = Modifier
-                                        .width(tableFilesWidth)
-                                        .padding(12.dp)
+                                    text = "Files",
+                                    fontWeight = FontWeight.Bold
                                 )
-                            }
+                            },
+                            name = "files",
+                            width = tableFilesWidth
+                        )
+                    )
+
+                    val rows: List<TableRowData>? = firstStat?.data?.types?.map { typeData ->
+                        TableRowData(
+                            cells = listOf(
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = typeData.type,
+                                        )
+                                    },
+                                    width = tableTypeWidth
+                                ),
+                                TableCellData(
+                                    content = {
+                                        Text(
+                                            text = typeData.sum.toString(),
+                                        )
+                                    },
+                                    width = tableFilesWidth
+                                )
+                            )
                         )
                     }
 

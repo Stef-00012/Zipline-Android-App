@@ -35,7 +35,7 @@ import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.requests.RunRequerySizeJobBody
 import com.stefdp.zipline.network.models.requests.RunThumbnailGenerationJobBody
-import com.stefdp.zipline.network.models.requests.UpdateCurrenUserBody
+import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
 import com.stefdp.zipline.network.models.requests.UpdateFileBody
 import com.stefdp.zipline.network.models.requests.UpdateTagBody
 import com.stefdp.zipline.network.models.requests.UpdateUrlBody
@@ -289,7 +289,7 @@ interface ZiplineApiService {
     @PATCH("user")
     suspend fun updateCurrentUser(
         @Header("Authorization") token: String,
-        @Body data: UpdateCurrenUserBody,
+        @Body data: UpdateCurrentUserBody,
     ): Response<GetCurrentUserResponse>
 
     @GET("user/token")
@@ -492,8 +492,8 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
         @Query("page") page: Long = 1,
         @Query("perpage") perPage: Long? = null,
-        @Query("filter") filter: GetFilesQueryFilter? = null,
         @Query("favorite") filterFavorite: Boolean? = null,
+        @Query("filter") filter: GetFilesQueryFilter? = null,
         @Query("sortBy") sortBy: GetFilesQuerySortBy? = null,
         @Query("order") sortOrder: GetFilesQueryOrder? = null,
         @Query("searchField") searchField: GetFilesQuerySearchField? = null,

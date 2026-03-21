@@ -38,3 +38,11 @@ val Black = Color.Black
 val White = Color.White
 val Orange = Color(0xffe8590c)
 val Yellow = Color(0xfff08c00)
+
+
+val DarkYellow = Color(0xFF967701)
+val LightYellow = Color(0x8B9C750D)
+val DarkGreen = Color(0xFF029925)
+val LightGreen = Color(0x8C26A045)
+val DarkRed = Color(0xFF4E0000)
+val LightRed = Color(0xA6B4000E)

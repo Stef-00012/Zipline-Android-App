@@ -42,6 +42,7 @@ import com.stefdp.zipline.LocalPublicSettings
 import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
 import com.stefdp.zipline.LocalWebSettings
+import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.largefiledisplay.LargeFileDisplay
 import com.stefdp.zipline.components.table.Table
@@ -54,13 +55,11 @@ import com.stefdp.zipline.network.models.responses.GetStatsResponse
 import com.stefdp.zipline.network.requests.getRecentFiles
 import com.stefdp.zipline.network.requests.getStats
 import com.stefdp.zipline.screens.LoginScreen
-import com.stefdp.zipline.screens.home.components.Container
 import com.stefdp.zipline.screens.home.components.Stat
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.horizontalLazyScrollbar
 import com.stefdp.zipline.utils.parseBytes
 import com.stefdp.zipline.utils.shimmerable
-import com.stefdp.zipline.utils.verticalLazyScrollbar
 import java.util.Locale
 
 @Composable
@@ -284,7 +283,10 @@ fun HomeScreen(
                         FilePreview(
                             file = file,
                             context = context,
-                            modifier = Modifier.size(200.dp).padding(10.dp),
+                            modifier = Modifier
+                                .size(200.dp)
+                                .padding(10.dp)
+                                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
                             onClick = { file ->
                                 clickedFile = file
                             }

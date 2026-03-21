@@ -13,6 +13,7 @@ data class SelectedFile(
     val uri: Uri,
     val displayName: String,
     val size: Long,
+    val type: String,
 )
 
 fun getDisplayPath(uri: Uri): String {
@@ -34,8 +35,8 @@ fun formatSpeed(bytesPerSecond: Double): String {
 //    }
 }
 
-fun formatBytes(bytes: Long): String {
-    return HumanReadable.fileSize(bytes, decimals = 2)
+fun formatBytes(bytes: Long, decimals: Int = 2): String {
+    return HumanReadable.fileSize(bytes, decimals)
 }
 
 fun parseBytes(
@@ -89,8 +90,10 @@ fun copyUriToTempFile(context: Context, uri: Uri, displayName: String): File? {
     }
 }
 
-fun getFileInfo(context: Context, uri: Uri): Pair<String, Long>? {
+fun getFileInfo(context: Context, uri: Uri): Triple<String, Long, String>? {
     return try {
+        val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
+
         context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -99,7 +102,7 @@ fun getFileInfo(context: Context, uri: Uri): Pair<String, Long>? {
                 val name = if (nameIndex >= 0) cursor.getString(nameIndex) else "unknown"
                 val size = if (sizeIndex >= 0) cursor.getLong(sizeIndex) else 0L
 
-                Pair(name, size)
+                Triple(name, size, mimeType)
             } else {
                 null
             }

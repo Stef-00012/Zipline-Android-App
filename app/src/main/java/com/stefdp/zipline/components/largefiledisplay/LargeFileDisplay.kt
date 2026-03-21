@@ -63,11 +63,12 @@ fun LargeFileDisplay(
     file: File?,
     onDismissRequest: () -> Unit,
     updateData: suspend () -> Unit,
+    tags: List<Tag>? = null,
 ) {
     var activeFile by remember { mutableStateOf<File?>(null) }
     var isPopupVisible by remember { mutableStateOf(true) }
 
-    var allTags by remember { mutableStateOf<List<Tag>>(emptyList()) }
+    var allTags by remember(tags) { mutableStateOf(tags ?: emptyList()) }
     var allFolders by remember { mutableStateOf<List<BaseFolder>>(emptyList()) }
 
     var isLoading by remember { mutableStateOf(true) }
@@ -79,17 +80,20 @@ fun LargeFileDisplay(
 
         serverUrl = secureStore.get("serverUrl")
 
-        val tagsRes = getTags(
-            context = context
-        )
+        if (tags == null) {
+            val tagsRes = getTags(
+                context = context
+            )
+
+            tagsRes.onSuccess { tags ->
+                allTags = tags
+            }
+        }
 
         val foldersRes = getFolders(
-            context = context
+            context = context,
+            excludeFiles = true
         )
-
-        tagsRes.onSuccess { tags ->
-            allTags = tags
-        }
 
         foldersRes.onSuccess { folders ->
             allFolders = listOf(
@@ -480,6 +484,17 @@ fun LargeFileDisplay(
                     var selectedUri by remember { mutableStateOf<Uri?>(null) }
                     var selectedPath by remember { mutableStateOf<String?>(null) }
 
+                    LaunchedEffect(Unit) {
+                        val secureStore = SecureStorage.getInstance(context)
+
+                        val fileDownloadFolder = secureStore.get("fileDownloadFolder")
+
+                        if (fileDownloadFolder != null) {
+                            selectedUri = fileDownloadFolder.toUri()
+                            selectedPath = getDisplayPath(fileDownloadFolder.toUri())
+                        }
+                    }
+
                     fun showToast(message: String) {
                         coroutineScope.launch(Dispatchers.Main) {
                             Toast.makeText(
@@ -563,6 +578,8 @@ fun LargeFileDisplay(
                         contract = ActivityResultContracts.OpenDocumentTree()
                     ) { uri: Uri? ->
                         uri?.let {
+                            val secureStore = SecureStorage.getInstance(context)
+
                             context.contentResolver.takePersistableUriPermission(
                                 it,
                                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
@@ -570,6 +587,11 @@ fun LargeFileDisplay(
                             )
                             selectedUri = it
                             selectedPath = getDisplayPath(it)
+
+                            coroutineScope.launch {
+                                secureStore.set("fileDownloadFolder", selectedUri.toString())
+                            }
+
                             performDownload()
                         }
                     }

@@ -19,6 +19,10 @@ private const val TAG = "ZiplineApi[getFolders]"
 
 suspend fun getFolders(
     context: Context,
+    userId: String? = null,
+    parent: String? = null,
+    root: Boolean? = null,
+    excludeFiles: Boolean? = null,
 ): Result<List<BaseFolder>> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -40,6 +44,10 @@ suspend fun getFolders(
 
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).getFolders(
             token = token,
+            user = userId,
+            parent = parent,
+            root = root,
+            excludeFiles = excludeFiles
         )
 
         val body = response.body()

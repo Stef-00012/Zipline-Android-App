@@ -39,6 +39,7 @@ fun Popup(
         dismissOnClickOutside = true,
         usePlatformDefaultWidth = false
     ),
+    scrollable: Boolean = true,
     content: @Composable (ColumnScope.() -> Unit),
 ) {
     if (showPopup) {
@@ -55,14 +56,15 @@ fun Popup(
         ) {
             val scrollState = rememberScrollState()
 
+            val mainModifier = modifier
+                .fillMaxWidth(0.95f)
+                .heightIn(
+                    max = maxHeight,
+                )
+                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+
             Card(
-                modifier = modifier
-                    .fillMaxWidth(0.95f)
-                    .heightIn(
-                        max = maxHeight,
-                    )
-                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
-                    .verticalScroll(scrollState),
+                modifier = if (scrollable) mainModifier.verticalScroll(scrollState) else mainModifier,
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface

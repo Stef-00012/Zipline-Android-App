@@ -51,8 +51,12 @@ fun Switch(
             if (description != null) {
                 Text(
                     text = description.toAnnotatedString(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (enabled) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    ),
+                    modifier = Modifier.padding(
+                        horizontal = 8.dp
+                    )
                 )
             }
         }

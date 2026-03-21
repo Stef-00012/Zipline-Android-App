@@ -16,6 +16,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,6 +57,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -68,6 +70,7 @@ import com.stefdp.zipline.components.DeleteFilePromptPopup
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.Pager
+import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Tag
@@ -79,19 +82,23 @@ import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.components.table.TableScrollbarConfig
 import com.stefdp.zipline.network.models.File
+import com.stefdp.zipline.network.models.IncompleteFile
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.models.requests.GetFilesQueryOrder
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
-import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.network.requests.downloadFile
 import com.stefdp.zipline.network.requests.getFiles
+import com.stefdp.zipline.network.requests.getIncompleteFiles
 import com.stefdp.zipline.network.requests.getTags
 import com.stefdp.zipline.network.requests.getUser
 import com.stefdp.zipline.screens.HomeScreen
+import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.UploadFileScreen
 import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.screens.files.components.PendingFile
+import com.stefdp.zipline.screens.files.components.tags.TagsPopup
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
@@ -123,6 +130,8 @@ fun FilesScreen(
     var username by remember { mutableStateOf<String?>(null) }
     var files by remember { mutableStateOf<List<File>?>(null) }
 
+    var incompleteFiles by remember { mutableStateOf<List<IncompleteFile>?>(null) }
+
     var tags by remember { mutableStateOf<List<Tag>?>(null) }
 
     val validRoles = listOf(
@@ -130,17 +139,17 @@ fun FilesScreen(
         UserRole.SUPERADMIN
     )
 
-//    if (currentUser == null) {
-//        navController.navigate(LoginScreen) {
-//            popUpTo(navController.graph.id) { inclusive = true }
-//        }
-//    }
-//
-//    if (userId != null && currentUser?.role !in validRoles) {
-//        navController.navigate(HomeScreen) {
-//            popUpTo(HomeScreen) { inclusive = true }
-//        }
-//    }
+    if (currentUser == null) {
+        navController.navigate(LoginScreen) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+
+    if (userId != null && currentUser?.role !in validRoles) {
+        navController.navigate(HomeScreen) {
+            popUpTo(HomeScreen) { inclusive = true }
+        }
+    }
 
     var serverUrl by remember { mutableStateOf<String?>(null) }
 
@@ -149,11 +158,9 @@ fun FilesScreen(
 
     var manageTagsPopupOpen by remember { mutableStateOf(false) }
     var pendingFilesPopupOpen by remember { mutableStateOf(false) }
-    var showDeleteConfirmationPopup by remember { mutableStateOf(false) }
 
     var favoriteFilter by remember { mutableStateOf(false) }
-//    var compactView by remember { mutableStateOf(false) }
-    var compactView by remember { mutableStateOf(true) }
+    var compactView by remember { mutableStateOf(false) }
 
     var currentPage by remember { mutableLongStateOf(1L) }
     var totalPages by remember { mutableLongStateOf(1L) }
@@ -225,6 +232,16 @@ fun FilesScreen(
         isLoading = false
     }
 
+    suspend fun updateIncompleteFiles() {
+        val incompleteFilesRes = getIncompleteFiles(
+            context = context,
+        )
+
+        incompleteFilesRes.onSuccess {
+            incompleteFiles = it
+        }
+    }
+
     suspend fun updateTags() {
         tagsLoading = true
 
@@ -243,8 +260,101 @@ fun FilesScreen(
         val secureStore = SecureStorage.getInstance(context)
         serverUrl = secureStore.get("serverUrl")
 
-//        updateFiles()
+        updateIncompleteFiles()
         updateTags()
+    }
+
+    TagsPopup(
+        showPopup = manageTagsPopupOpen,
+        onDismissRequest = {
+            manageTagsPopupOpen = false
+        },
+        tags = tags ?: emptyList(),
+        updateTags = ::updateTags,
+        context = context
+    )
+
+    Popup(
+        showPopup = pendingFilesPopupOpen,
+        onDismissRequest = {
+            pendingFilesPopupOpen = false
+        },
+        scrollable = false
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Pending Files",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable(
+                        onClick = {
+                            pendingFilesPopupOpen = false
+                        }
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.close),
+                    contentDescription = "Close pending files",
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        if (incompleteFiles != null && incompleteFiles!!.isNotEmpty()) {
+            var pendingFilesLoading by remember { mutableStateOf(false) }
+
+            val lazyListState = rememberLazyListState()
+
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalLazyScrollbar(
+                        listState = lazyListState,
+                    )
+            ) {
+                items(incompleteFiles!!.size) {
+                    val incompleteFile = incompleteFiles!![it]
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    PendingFile(
+                        context = context,
+                        file = incompleteFile,
+                        updateData = ::updateIncompleteFiles,
+                        updateIsLoading = { pendingFilesLoading = it },
+                        isLoading = pendingFilesLoading,
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = "No pending files.",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center
+                ),
+            )
+        }
     }
 
     Column(
@@ -409,11 +519,22 @@ fun FilesScreen(
             clickedFile = null
         }
 
+        LaunchedEffect(files) {
+            if (clickedFile != null) {
+                val updatedFile = files?.find { it.id == clickedFile?.id }
+
+                if (updatedFile != null) {
+                    clickedFile = updatedFile
+                }
+            }
+        }
+
         LargeFileDisplay(
             context = context,
             file = clickedFile,
             onDismissRequest = { clickedFile = null },
-            updateData = ::updateFiles
+            updateData = ::updateFiles,
+            tags = tags
         )
 
         if (compactView) {
@@ -752,13 +873,15 @@ fun FilesScreen(
                             ),
                             TableCellData(
                                 content = {
-                                    file.tags?.forEachIndexed { index, tag ->
-                                        Tag(
-                                            tag = tag,
-                                        )
-
-                                        if (index < file.tags.lastIndex) {
-                                            Spacer(modifier = Modifier.width(4.dp))
+                                    FlowRow(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        file.tags?.forEach { tag ->
+                                            Tag(tag = tag)
                                         }
                                     }
                                 },
@@ -818,6 +941,7 @@ fun FilesScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = { clickedFile = file },
+                                        enabled = !isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -833,7 +957,7 @@ fun FilesScreen(
                                             val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
                                             context.startActivity(intent)
                                         },
-                                        enabled = serverUrl != null
+                                        enabled = serverUrl != null && !isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -855,13 +979,24 @@ fun FilesScreen(
                                                 clipboardManager.setClipEntry(clipData)
                                             }
                                         },
-                                        enabled = serverUrl != null
+                                        enabled = serverUrl != null && !isLoading
                                     )
 
                                     ActionButtonSpacer()
 
                                     var selectedUri by remember { mutableStateOf<Uri?>(null) }
                                     var selectedPath by remember { mutableStateOf<String?>(null) }
+
+                                    LaunchedEffect(Unit) {
+                                        val secureStore = SecureStorage.getInstance(context)
+
+                                        val fileDownloadFolder = secureStore.get("fileDownloadFolder")
+
+                                        if (fileDownloadFolder != null) {
+                                            selectedUri = fileDownloadFolder.toUri()
+                                            selectedPath = getDisplayPath(fileDownloadFolder.toUri())
+                                        }
+                                    }
 
                                     fun showToast(message: String) {
                                         coroutineScope.launch(Dispatchers.Main) {
@@ -946,6 +1081,8 @@ fun FilesScreen(
                                         contract = ActivityResultContracts.OpenDocumentTree()
                                     ) { uri: Uri? ->
                                         uri?.let {
+                                            val secureStore = SecureStorage.getInstance(context)
+
                                             context.contentResolver.takePersistableUriPermission(
                                                 it,
                                                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
@@ -953,6 +1090,11 @@ fun FilesScreen(
                                             )
                                             selectedUri = it
                                             selectedPath = getDisplayPath(it)
+
+                                            coroutineScope.launch {
+                                                secureStore.set("fileDownloadFolder", selectedUri.toString())
+                                            }
+
                                             performDownload()
                                         }
                                     }
@@ -971,7 +1113,7 @@ fun FilesScreen(
 
                                             performDownload()
                                         },
-                                        enabled = serverUrl != null
+                                        enabled = serverUrl != null && !isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -984,7 +1126,7 @@ fun FilesScreen(
                                         onClick = {
                                             deleteFile = file
                                         },
-                                        enabled = serverUrl != null
+                                        enabled = serverUrl != null && !isLoading
                                     )
                                 },
                                 width = tableActionsWidth,

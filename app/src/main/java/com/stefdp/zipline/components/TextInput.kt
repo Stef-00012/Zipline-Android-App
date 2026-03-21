@@ -51,6 +51,7 @@ fun TextInput(
     onValueChange: (TextFieldValue) -> Unit,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     label: CharSequence? = null,
+    description: CharSequence? = null,
     placeholder: CharSequence?= null,
     enabled: Boolean = true,
     isPassword: Boolean = false,
@@ -146,6 +147,18 @@ fun TextInput(
             }
         } else null
     )
+
+    if (description != null) {
+        Text(
+            text = description.toAnnotatedString(),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+            ),
+            modifier = Modifier.padding(
+                horizontal = 8.dp
+            )
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true,

@@ -6,11 +6,12 @@ import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoadingScreen
 import com.stefdp.zipline.screens.MetricsScreen
+import com.stefdp.zipline.screens.UploadFileScreen
 
 const val IS_DEBUG = true
 const val DEBUG_NETWORK = false
 
-val DEBUG_SCREEN: AppScreen = LoadingScreen//FilesScreen()//LoadingScreen
+val DEBUG_SCREEN: AppScreen = UploadFileScreen//LoadingScreen
 val DEBUG_USER_ID = "cmgt5i4ei00ct01n3fou6fd65"
 
 @Composable

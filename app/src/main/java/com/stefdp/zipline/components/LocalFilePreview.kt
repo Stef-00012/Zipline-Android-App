@@ -1,6 +1,7 @@
 package com.stefdp.zipline.components
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,54 +30,26 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
-import com.stefdp.zipline.network.models.File
-import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.FileUploadState
 import com.stefdp.zipline.utils.shimmerable
 
-val embeddableMimetypes = listOf(
-    "image/webp",
-    "image/apng",
-    "image/png",
-    "image/avif",
-    "image/heic",
-    "image/jpeg",
-    "image/gif",
-    "image/x-icon",
-    "image/svg+xml"
-)
-
-val zipMimetypes = listOf(
-    "application/zip",
-    "application/x-zip-compressed",
-    "application/x-zip",
-    "application/octet-stream"
-)
-
-const val APK_MIMETYPE = "application/vnd.android.package-archive"
-
 @Composable
-fun FilePreview(
-    file: File,
-    context: Context,
+fun LocalFilePreview(
+    fileState: FileUploadState,
     modifier: Modifier = Modifier,
-    onClick: (File) -> Unit = {},
+    onClick: (FileUploadState) -> Unit = {},
     clickEnabled: Boolean = true,
-    previewVideos: Boolean = false,
     onImageLoaded: () -> Unit = { },
 ) {
     var imageLoading by remember { mutableStateOf(true) }
     var imageFailed by remember { mutableStateOf(false) }
 
-    val isVideo = file.type.startsWith("video/")
-    val isEmbeddable = file.type in embeddableMimetypes
+    val fileName = fileState.file.displayName
+    val fileType = fileState.file.type
+    val fileUri = fileState.file.uri
 
-    var serverUrl by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        serverUrl = secureStore.get("serverUrl")
-    }
+    val isVideo = fileType.startsWith("video/")
+    val isEmbeddable = fileType in embeddableMimetypes
 
     LaunchedEffect(imageLoading) {
         if (!imageLoading) {
@@ -112,59 +85,37 @@ fun FilePreview(
         }
     }
 
-    val isShimmerEnabled = imageLoading && (
-        (!isVideo && !previewVideos) ||
-        (!isEmbeddable && !isVideo)
-    )
-
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
             .then(modifier)
-            .shimmerable(
-                enabled = isShimmerEnabled,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                keepBackground = true
-            )
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(
-                enabled = clickEnabled && !isShimmerEnabled,
-                onClick = { onClick(file) },
+                enabled = clickEnabled,
+                onClick = { onClick(fileState) },
                 role = Role.Image,
                 onClickLabel = "Open large file display"
             ),
         contentAlignment = Alignment.Center
     ) {
-        if (file.password == true) {
-            imageLoading = false
-
-            DefaultPreview(
-                icon = painterResource(R.drawable.lock),
-                iconContentDescription = "Password protected file",
-                label = "Password protected file ${file.name}"
-            )
-
-            return@Box
-        }
-
-        if (isEmbeddable && serverUrl != null) {
+        if (isEmbeddable) {
             if (imageFailed) {
                 DefaultPreview(
                     icon = painterResource(R.drawable.description),
-                    iconContentDescription = "${file.type} file",
-                    label = "Click to view file ${file.name}"
+                    iconContentDescription = "$fileType file",
+                    label = fileName
                 )
             } else {
                 if (imageLoading) {
                     DefaultPreview(
                         icon = painterResource(R.drawable.description),
-                        iconContentDescription = "${file.type} file",
-                        label = "Click to view file ${file.name}\nLoading preview..."
+                        iconContentDescription = "$fileType file",
+                        label = "${fileName}\nLoading preview..."
                     )
                 }
 
                 AsyncImage(
-                    model = "$serverUrl/raw/${file.name}",
-                    contentDescription = file.originalName ?: file.name,
+                    model = fileUri,
+                    contentDescription = fileName,
                     onSuccess = {
                         imageLoading = false
                     },
@@ -178,56 +129,31 @@ fun FilePreview(
         }
 
         if (isVideo) {
-            if (imageFailed || serverUrl == null) {
+            if (imageFailed) {
                 DefaultPreview(
                     icon = painterResource(R.drawable.videocam),
                     iconContentDescription = "Video file",
-                    label = "Click to play video ${file.name}"
+                    label = fileName
                 )
-            } else if (previewVideos) {
-                VideoPlayer(
-                    context = context,
-                    videoUrl = "$serverUrl/raw/${file.name}",
-                    onError = {
-                        imageFailed = true
-                        imageLoading = false
-                    },
-                    onSuccess = {
-                        imageLoading = false
-                    }
-                )
-            } else {
+            }  else {
                 if (imageLoading) {
                     DefaultPreview(
                         icon = painterResource(R.drawable.videocam),
                         iconContentDescription = "Video file",
-                        label = "Click to play video ${file.name}\nLoading preview..."
+                        label = "${fileName}\nLoading preview..."
                     )
                 }
 
-                if (file.thumbnail?.path != null) {
-                    AsyncImage(
-                        model = "$serverUrl/raw/${file.thumbnail.path}",
-                        contentDescription = file.originalName ?: file.name,
-                        onSuccess = {
-                            imageLoading = false
-                        },
-                        onError = {
-                            imageFailed = true
-                        }
-                    )
-                } else {
-                    AsyncImage(
-                        model = "$serverUrl/raw/${file.name}",
-                        contentDescription = file.originalName ?: file.name,
-                        onSuccess = {
-                            imageLoading = false
-                        },
-                        onError = {
-                            imageFailed = true
-                        }
-                    )
-                }
+                AsyncImage(
+                    model = fileUri,
+                    contentDescription = fileName,
+                    onSuccess = {
+                        imageLoading = false
+                    },
+                    onError = {
+                        imageFailed = true
+                    }
+                )
 
                 if (!imageLoading) {
                     Icon(
@@ -244,21 +170,21 @@ fun FilePreview(
 
         imageLoading = false
 
-        if (file.type == APK_MIMETYPE) {
+        if (fileType == APK_MIMETYPE) {
             DefaultPreview(
                 icon = painterResource(R.drawable.apk_document),
                 iconContentDescription = "APK file",
-                label = "Click to view file ${file.name}"
+                label = fileName
             )
 
             return@Box
         }
 
-        if (file.type in zipMimetypes) {
+        if (fileType in zipMimetypes) {
             DefaultPreview(
                 icon = painterResource(R.drawable.folder_zip),
                 iconContentDescription = "Compressed file",
-                label = "Click to view file ${file.name}"
+                label = fileName
             )
 
             return@Box
@@ -266,8 +192,8 @@ fun FilePreview(
 
         DefaultPreview(
             icon = painterResource(R.drawable.description),
-            iconContentDescription = "${file.type} file",
-            label = "Click to view file ${file.name}"
+            iconContentDescription = "${fileType} file",
+            label = fileName
         )
     }
 }

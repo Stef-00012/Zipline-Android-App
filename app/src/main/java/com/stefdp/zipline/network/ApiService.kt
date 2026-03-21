@@ -25,6 +25,7 @@ import com.stefdp.zipline.network.models.requests.CreateUserBody
 import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
 import com.stefdp.zipline.network.models.requests.RemoveFileFromFolderBody
 import com.stefdp.zipline.network.models.requests.DeleteFolderBody
+import com.stefdp.zipline.network.models.requests.DeleteIncompleteFilesBody
 import com.stefdp.zipline.network.models.requests.DeleteSessionBody
 import com.stefdp.zipline.network.models.requests.DeleteUserBody
 import com.stefdp.zipline.network.models.requests.GetFilesQueryFilter
@@ -437,6 +438,10 @@ interface ZiplineApiService {
     @GET("user/folders")
     suspend fun getFolders(
         @Header("Authorization") token: String,
+        @Query("noincl") excludeFiles: Boolean? = null,
+        @Query("user") user: String? = null,
+        @Query("parent") parent: String? = null,
+        @Query("root") root: Boolean? = null,
     ): Response<List<BaseFolder>>
 
     @POST("user/folders")
@@ -519,9 +524,14 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
     ): Response<List<IncompleteFile>>
 
-    @DELETE("user/files/incomplete")
+    @HTTP(
+        method = "DELETE",
+        path = "user/files/incomplete",
+        hasBody = true
+    )
     suspend fun deleteIncompleteFiles(
         @Header("Authorization") token: String,
+        @Body data: DeleteIncompleteFilesBody
     ): Response<DeleteIncompleteFilesResponse>
 
     @GET("user/files/{fileId}")

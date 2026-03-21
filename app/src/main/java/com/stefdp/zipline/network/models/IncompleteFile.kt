@@ -35,6 +35,6 @@ data class IncompleteFileMetadata(
 
 data class IncompleteFileMetadataFile(
     val filename: String,
-    val type: Long,
+    val type: String,
     val id: String
 )

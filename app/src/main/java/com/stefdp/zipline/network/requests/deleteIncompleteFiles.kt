@@ -7,6 +7,7 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.Folder
 import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
+import com.stefdp.zipline.network.models.requests.DeleteIncompleteFilesBody
 import com.stefdp.zipline.network.models.responses.DeleteIncompleteFilesResponse
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.utils.SecureStorage
@@ -15,6 +16,7 @@ private const val TAG = "ZiplineApi[deleteIncompleteFiles]"
 
 suspend fun deleteIncompleteFiles(
     context: Context,
+    ids: List<String>
 ): Result<Long> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -36,6 +38,7 @@ suspend fun deleteIncompleteFiles(
 
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).deleteIncompleteFiles(
             token = token,
+            data = DeleteIncompleteFilesBody(id = ids)
         )
 
         val body = response.body()

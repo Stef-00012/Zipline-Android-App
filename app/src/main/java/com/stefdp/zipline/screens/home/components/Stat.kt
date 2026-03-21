@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.BASE_CORNER_RADIUS
+import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.utils.shimmerable
 
 @Composable

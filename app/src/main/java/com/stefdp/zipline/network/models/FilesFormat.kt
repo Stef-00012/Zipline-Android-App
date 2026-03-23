@@ -15,8 +15,8 @@ enum class FilesFormat(val value: String) {
     @SerializedName("gfycat")
     GFYCAT("gfycat"),
 
-    @SerializedName("random-words")
-    RANDOM_WORDS("random-words");
+    @SerializedName("name")
+    NAME("name");
 
     override fun toString(): String = value
 }

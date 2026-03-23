@@ -6,10 +6,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CancellationException
 
-/**
- * Copies an InputStream to an OutputStream with progress reporting.
- * Used by all download functions to track bytes and speed.
- */
 suspend fun copyStreamWithProgress(
     inputStream: InputStream,
     outputStream: OutputStream,
@@ -30,20 +26,23 @@ suspend fun copyStreamWithProgress(
         }
 
         outputStream.write(buffer, 0, bytesRead)
+
         totalRead += bytesRead
 
         val now = System.currentTimeMillis()
-        // Throttle notification updates to ~4 per second
+
         if (now - lastNotifyTime >= 250) {
             val speed = tracker.update(totalRead)
+
             service.updateProgress(transferId, totalBytes, totalRead, speed)
             onProgress(totalBytes, totalRead, speed)
+
             lastNotifyTime = now
         }
     }
 
-    // Final update
     val speed = tracker.update(totalRead)
+
     service.updateProgress(transferId, totalBytes, totalRead, speed)
     onProgress(totalBytes, totalRead, speed)
 }

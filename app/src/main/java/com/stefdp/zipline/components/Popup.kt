@@ -71,7 +71,7 @@ fun Popup(
                 )
             ) {
                 Column(
-                    modifier = Modifier.padding(6.dp)
+                    modifier = Modifier.padding(12.dp)
                 ) {
                     content()
                 }

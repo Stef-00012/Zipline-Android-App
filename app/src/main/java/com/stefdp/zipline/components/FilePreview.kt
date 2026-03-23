@@ -112,10 +112,7 @@ fun FilePreview(
         }
     }
 
-    val isShimmerEnabled = imageLoading && (
-        (!isVideo && !previewVideos) ||
-        (!isEmbeddable && !isVideo)
-    )
+    val isShimmerEnabled = isVideo && previewVideos && imageLoading
 
     Box(
         modifier = Modifier

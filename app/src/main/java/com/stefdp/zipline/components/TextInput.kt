@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -60,10 +61,12 @@ fun TextInput(
         visible: Boolean
     ) -> Unit = { },
     sideButtonIcon: Painter? = null,
+    sideButtonColor: Color = LocalContentColor.current,
     onSideButtonPress: () -> Unit = {},
     sideButtonContentDescription: String? = null,
     colors: TextFieldColors = getOutlinedTextFieldColors(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    readOnly: Boolean = false,
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -78,6 +81,7 @@ fun TextInput(
                 MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         ),
         modifier = modifier,
+        readOnly = readOnly,
         singleLine = singleLine,
         label = if (label != null) {
             {
@@ -136,6 +140,7 @@ fun TextInput(
                             */
                             sideButtonIcon as Painter
                         },
+                        tint = sideButtonColor,
                         contentDescription = if (isPassword) {
                             if (passwordVisible)
                                 "TMP"
@@ -149,6 +154,10 @@ fun TextInput(
     )
 
     if (description != null) {
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
         Text(
             text = description.toAnnotatedString(),
             style = MaterialTheme.typography.bodyMedium.copy(

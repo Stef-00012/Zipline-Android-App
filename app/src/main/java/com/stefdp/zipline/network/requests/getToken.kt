@@ -19,13 +19,6 @@ suspend fun getToken(
         val secureStore = SecureStorage.getInstance(context)
 
         val serverUrl = secureStore.get("serverUrl")
-        val token = secureStore.get("token")
-
-        if (token.isNullOrEmpty()) {
-            return Result.failure(
-                Exception(context.getString(R.string.missing_token))
-            )
-        }
 
         if (serverUrl.isNullOrEmpty()) {
             return Result.failure(

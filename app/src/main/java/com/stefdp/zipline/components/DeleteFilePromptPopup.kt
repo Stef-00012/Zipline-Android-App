@@ -27,7 +27,8 @@ fun DeleteFilePromptPopup(
     isLoading: Boolean,
     onDismissRequest: () -> Unit,
     updateData: suspend () -> Unit,
-    setLoading: (Boolean) -> Unit
+    setLoading: (Boolean) -> Unit,
+    onDelete: () -> Unit
 ) {
     if (file == null) return
 
@@ -79,6 +80,7 @@ fun DeleteFilePromptPopup(
 
                         deleteRes
                             .onSuccess {
+                                onDelete()
                                 updateData()
                                 onDismissRequest()
                             }

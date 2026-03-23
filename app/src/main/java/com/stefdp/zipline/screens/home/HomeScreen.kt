@@ -250,7 +250,8 @@ fun HomeScreen(
                 context = context,
                 file = clickedFile,
                 onDismissRequest = { clickedFile = null },
-                updateData = ::updateData
+                updateData = ::updateData,
+                onDelete = { clickedFile = null }
             )
 
             val lazyListState = rememberLazyListState()

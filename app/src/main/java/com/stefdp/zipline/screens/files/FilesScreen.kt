@@ -534,7 +534,8 @@ fun FilesScreen(
             file = clickedFile,
             onDismissRequest = { clickedFile = null },
             updateData = ::updateFiles,
-            tags = tags
+            tags = tags,
+            onDelete = { clickedFile = null }
         )
 
         if (compactView) {
@@ -855,7 +856,8 @@ fun FilesScreen(
                     onDismissRequest = { deleteFile = null },
                     updateData = ::updateFiles,
                     setLoading = { isLoading = it },
-                    isLoading = isLoading
+                    isLoading = isLoading,
+                    onDelete = { deleteFile = null }
                 )
 
                 val rows: List<TableRowData> = files?.map { file ->

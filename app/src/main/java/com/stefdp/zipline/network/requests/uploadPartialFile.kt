@@ -16,6 +16,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okio.BufferedSink
+import okio.IOException
 import java.io.File
 import java.io.RandomAccessFile
 import java.util.concurrent.CancellationException
@@ -26,7 +27,7 @@ suspend fun uploadPartialFile(
     chunkSize: Long = 25 * 1024 * 1024,
     deletesAt: String? = null,
     format: FilesFormat? = null,
-    imageCompressionPercent: Int? = null,
+    imageCompressionPercent: Float? = null,
     imageCompressionType: UploadCompressionType? = null,
     password: String? = null,
     maxViews: Long? = null,
@@ -35,6 +36,7 @@ suspend fun uploadPartialFile(
     filename: String? = null,
     domain: String? = null,
     fileExtension: String? = null,
+    fileMimeType: String? = null,
     notificationTitle: String = "Uploading file (chunked)",
     notificationContent: String = "Upload in progress",
     onProgress: (totalBytes: Long, bytesTransferred: Long, speedBytesPerSecond: Double) -> Unit = { _, _, _ -> },
@@ -63,7 +65,8 @@ suspend fun uploadPartialFile(
         val file = File(filePath)
         val totalFileSize = file.length()
 
-        val mimeType = java.net.URLConnection.guessContentTypeFromName(file.name)
+        val mimeType = fileMimeType
+            ?: java.net.URLConnection.guessContentTypeFromName(file.name)
             ?: "application/octet-stream"
 
         var offset = 0L
@@ -89,39 +92,53 @@ suspend fun uploadPartialFile(
                 override fun contentLength() = currentChunkSize
 
                 override fun writeTo(sink: BufferedSink) {
-                    val raf = RandomAccessFile(file, "r")
+                    try {
+                        val raf = RandomAccessFile(file, "r")
 
-                    raf.use {
-                        it.seek(currentOffset)
-                        val buffer = ByteArray(8192)
-                        var bytesRemaining = currentChunkSize
-                        var lastNotifyTime = 0L
+                        raf.use {
+                            it.seek(currentOffset)
+                            val buffer = ByteArray(8192)
+                            var bytesRemaining = currentChunkSize
+                            var lastNotifyTime = 0L
 
-                        while (bytesRemaining > 0) {
-                            if (service.isTransferCancelled(transferId)) {
-                                throw CancellationException("Upload cancelled")
-                            }
+                            while (bytesRemaining > 0) {
+                                if (service.isTransferCancelled(transferId)) {
+                                    throw CancellationException("Upload cancelled")
+                                }
 
-                            val toRead = minOf(buffer.size.toLong(), bytesRemaining).toInt()
-                            val read = it.read(buffer, 0, toRead)
+                                val toRead = minOf(buffer.size.toLong(), bytesRemaining).toInt()
+                                val read = it.read(buffer, 0, toRead)
 
-                            if (read == -1) break
+                                if (read == -1) break
 
-                            sink.write(buffer, 0, read)
-                            bytesRemaining -= read
+                                sink.write(buffer, 0, read)
+                                bytesRemaining -= read
 
-                            val totalBytesUploaded = currentOffset + (currentChunkSize - bytesRemaining)
-                            val now = System.currentTimeMillis()
+                                val totalBytesUploaded = currentOffset + (currentChunkSize - bytesRemaining)
+                                val now = System.currentTimeMillis()
 
-                            if (now - lastNotifyTime >= 250) {
-                                val speed = tracker.update(totalBytesUploaded)
+                                if (now - lastNotifyTime >= 250) {
+                                    val speed = tracker.update(totalBytesUploaded)
 
-                                service.updateProgress(transferId, totalFileSize, totalBytesUploaded, speed)
-                                onProgress(totalFileSize, totalBytesUploaded, speed)
+                                    service.updateProgress(
+                                        transferId,
+                                        totalFileSize,
+                                        totalBytesUploaded,
+                                        speed
+                                    )
 
-                                lastNotifyTime = now
+                                    onProgress(
+                                        totalFileSize,
+                                        totalBytesUploaded,
+                                        speed
+                                    )
+
+                                    lastNotifyTime = now
+                                }
                             }
                         }
+                    } catch(e: CancellationException) {
+                        throw IOException("Upload cancelled", e)
                     }
                 }
             }
@@ -184,8 +201,19 @@ suspend fun uploadPartialFile(
             offset += currentChunkSize
 
             val speed = tracker.update(offset)
-            service.updateProgress(transferId, totalFileSize, offset, speed)
-            onProgress(totalFileSize, offset, speed)
+
+            service.updateProgress(
+                transferId,
+                totalFileSize,
+                offset,
+                speed
+            )
+
+            onProgress(
+                totalFileSize,
+                offset,
+                speed
+            )
         }
 
         if (lastResponse == null) {

@@ -2,6 +2,7 @@ package com.stefdp.zipline.network.models
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.stefdp.zipline.network.models.requests.UploadCompressionType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -58,7 +59,7 @@ data class WebSettingsConfigFiles(
     val removeGpsMetadata: Boolean,
     val randomWordsNumAdjectives: Long,
     val randomWordsSeparator: String,
-    val defaultCompressionFormat: String,
+    val defaultCompressionFormat: UploadCompressionType,
     val maxFilesPerUpload: Long,
 ) : Parcelable
 

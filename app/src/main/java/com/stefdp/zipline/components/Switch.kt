@@ -1,16 +1,21 @@
 package com.stefdp.zipline.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,36 +34,44 @@ fun Switch(
     label: CharSequence,
     description: CharSequence? = null,
 ) {
-    Row(
+    Column(
         modifier = modifier
     ) {
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            enabled = enabled,
-            colors = getSwitchColors()
-        )
-
-        Column(
-            modifier = Modifier.padding(start = 10.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                enabled = enabled,
+                colors = getSwitchColors()
+            )
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
             Text(
                 text = label.toAnnotatedString(),
                 fontWeight = FontWeight.Bold,
                 color = if (enabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
+        }
 
-            if (description != null) {
-                Text(
-                    text = description.toAnnotatedString(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                    ),
-                    modifier = Modifier.padding(
-                        horizontal = 8.dp
-                    )
+        if (description != null) {
+            Spacer(
+                modifier = Modifier.height(4.dp)
+            )
+
+            Text(
+                text = description.toAnnotatedString(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.padding(
+                    horizontal = 8.dp
                 )
-            }
+            )
         }
     }
 }

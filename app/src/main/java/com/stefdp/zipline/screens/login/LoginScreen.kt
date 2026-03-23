@@ -1,6 +1,7 @@
 package com.stefdp.zipline.screens.login
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -234,6 +235,7 @@ fun LoginScreen(
                                             isTotpRequired = true
                                             isLoading = false
                                         } else if (loginStatus is LoginResult.Success) {
+                                            Log.d("LoginScreen", "Login successful, retrieving token...")
                                             val authCookie = loginStatus.authCookie
 
                                             val tokenRes = getToken(
@@ -241,38 +243,46 @@ fun LoginScreen(
                                                 cookie = authCookie,
                                             )
 
-                                            tokenRes.onSuccess { tokenData ->
-                                                if (tokenData.token == null) {
-                                                    errorMessage = "Failed to retrieve token"
-                                                    isLoading = false
+                                            Log.d("LoginScreen", "Token retrieval result: ${tokenRes.isSuccess}")
 
-                                                    return@launch
+                                            tokenRes
+                                                .onSuccess { tokenData ->
+                                                    if (tokenData.token == null) {
+                                                        errorMessage = "Failed to retrieve token"
+                                                        isLoading = false
+
+                                                        return@launch
+                                                    }
+
+                                                    secureStore.set("token", tokenData.token)
+
+                                                    val userStatsRes = updateLoggedUser()
+
+                                                    userStatsRes
+                                                        .onSuccess {
+                                                            updatePublicSettings()
+                                                            updateWebSettings()
+                                                            updateLoggedUserAvatar()
+
+                                                            if (currentDestination?.route == LoginScreen::class.qualifiedName) {
+                                                                navController.navigate(HomeScreen) {
+                                                                    popUpTo(navController.graph.id) { inclusive = true }
+                                                                }
+                                                            }
+
+                                                            isLoading = false
+                                                        }
+                                                        .onFailure { error ->
+                                                            errorMessage = error.message
+
+                                                            isLoading = false
+                                                        }
+                                                }
+                                                .onFailure { error ->
+                                                    errorMessage = error.message
+                                                    isLoading = false
                                                 }
 
-                                                secureStore.set("token", tokenData.token)
-
-                                                val userStatsRes = updateLoggedUser()
-
-                                                userStatsRes
-                                                    .onSuccess {
-                                                        updatePublicSettings()
-                                                        updateWebSettings()
-                                                        updateLoggedUserAvatar()
-
-                                                        if (currentDestination?.route == LoginScreen::class.qualifiedName) {
-                                                            navController.navigate(HomeScreen) {
-                                                                popUpTo(navController.graph.id) { inclusive = true }
-                                                            }
-                                                        }
-
-                                                        isLoading = false
-                                                    }
-                                                    .onFailure { error ->
-                                                        errorMessage = error.message
-
-                                                        isLoading = false
-                                                    }
-                                            }
                                         }
                                     }
                                     .onFailure { error ->

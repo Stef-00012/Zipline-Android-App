@@ -64,6 +64,7 @@ fun LargeFileDisplay(
     onDismissRequest: () -> Unit,
     updateData: suspend () -> Unit,
     tags: List<Tag>? = null,
+    onDelete: () -> Unit
 ) {
     var activeFile by remember { mutableStateOf<File?>(null) }
     var isPopupVisible by remember { mutableStateOf(true) }
@@ -136,7 +137,8 @@ fun LargeFileDisplay(
             updateData = updateData,
             setLoading = { loadingState ->
                 isLoading = loadingState
-            }
+            },
+            onDelete = onDelete
         )
 
         EditFilePopup(

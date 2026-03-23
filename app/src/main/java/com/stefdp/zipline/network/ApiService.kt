@@ -187,7 +187,7 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
         @Header("x-zipline-deletes-at") deletesAt: String? = null,
         @Header("x-zipline-format") format: FilesFormat? = null,
-        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Int? = null,
+        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Float? = null,
         @Header("x-zipline-image-compression-type") imageCompressionType: UploadCompressionType? = null,
         @Header("x-zipline-password") password: String? = null,
         @Header("x-zipline-max-views") maxViews: Long? = null,
@@ -246,7 +246,7 @@ interface ZiplineApiService {
         @Header("x-zipline-p-identifier") identifier: String? = null, // not required on first request, required on next ones
         @Header("x-zipline-deletes-at") deletesAt: String? = null,
         @Header("x-zipline-format") format: FilesFormat? = null,
-        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Int? = null,
+        @Header("x-zipline-image-compression-percent") imageCompressionPercent: Float? = null,
         @Header("x-zipline-image-compression-type") imageCompressionType: UploadCompressionType? = null,
         @Header("x-zipline-password") password: String? = null,
         @Header("x-zipline-max-views") maxViews: Long? = null,

@@ -71,7 +71,7 @@ data class OAuthProvider(
     val provider: OAuthProviderProvider,
     val username: String,
     val accessToken: String,
-    val refreshToken: String,
+    val refreshToken: String? = null,
     val oauthId: String,
 ) : Parcelable
 

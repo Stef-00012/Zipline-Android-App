@@ -29,7 +29,6 @@ import com.stefdp.zipline.network.models.requests.DeleteIncompleteFilesBody
 import com.stefdp.zipline.network.models.requests.DeleteSessionBody
 import com.stefdp.zipline.network.models.requests.DeleteUserBody
 import com.stefdp.zipline.network.models.requests.GetFilesQueryFilter
-import com.stefdp.zipline.network.models.requests.GetFilesQueryOrder
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
 import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
@@ -65,6 +64,7 @@ import com.stefdp.zipline.network.models.responses.UploadPartialFileResponse
 import com.stefdp.zipline.network.models.responses.VerifyFilePasswordResponse
 import com.stefdp.zipline.network.models.responses.VerifyUrlPasswordResponse
 import com.stefdp.zipline.network.models.responses.ZeroByteFilesResponse
+import com.stefdp.zipline.utils.SortOrder
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -500,7 +500,7 @@ interface ZiplineApiService {
         @Query("favorite") filterFavorite: Boolean? = null,
         @Query("filter") filter: GetFilesQueryFilter? = null,
         @Query("sortBy") sortBy: GetFilesQuerySortBy? = null,
-        @Query("order") sortOrder: GetFilesQueryOrder? = null,
+        @Query("order") sortOrder: SortOrder? = null,
         @Query("searchField") searchField: GetFilesQuerySearchField? = null,
         @Query("searchQuery") searchQuery: String? = null,
         @Query("id") userId: String? = null,

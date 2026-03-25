@@ -42,6 +42,9 @@ coil-compose = "3.4.0"
 # Network Video Display
 media3 = "1.9.3"
 
+# QR Code
+zxing-core = "3.5.4"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -112,6 +115,9 @@ media3-exoplayer-hls = { group = "androidx.media3", name = "media3-exoplayer-hls
 media3-extractor = { group = "androidx.media3", name = "media3-extractor", version.ref = "media3" }
 media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3" }
 media3-datasource-okhttp = { group = "androidx.media3", name = "media3-datasource-okhttp", version.ref = "media3" }
+
+# QR Code
+zxing-core = { group = "com.google.zxing", "name" = "core", version.ref = "zxing-core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -18,6 +18,9 @@ suspend fun createUrl(
     destination: String,
     vanity: String? = null,
     enabled: Boolean? = null,
+    maxViews: Long? = null,
+    password: String? = null,
+    domain: String? = null
 ): Result<CreateUrlResponse> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -45,7 +48,10 @@ suspend fun createUrl(
 
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).createUrl(
             token = token,
-            data = requestBody
+            data = requestBody,
+            domain = domain,
+            maxViews = maxViews,
+            password = password
         )
 
         val body = response.body()

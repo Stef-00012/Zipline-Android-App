@@ -12,7 +12,6 @@ data class CreateUrlResponse(
     override val destination: String,
     override val views: Long,
     override val maxViews: Long? = null,
-    override val password: String? = null,
     override val enabled: Boolean,
     override val userId: String,
     val url: String

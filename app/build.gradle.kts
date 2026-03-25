@@ -125,4 +125,7 @@ dependencies {
     implementation(libs.media3.extractor)
     implementation(libs.media3.session)
     implementation(libs.media3.datasource.okhttp)
+
+    // QR Code
+    implementation(libs.zxing.core)
 }

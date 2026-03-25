@@ -18,10 +18,10 @@ data class SelectedFile(
 
 fun getDisplayPath(uri: Uri): String {
     val docId = DocumentsContract.getTreeDocumentId(uri)
-    // docId is typically "primary:Download/subfolder"
+
     return docId.replace("primary:", "Internal Storage/")
         .replace("home:", "Documents/")
-        .ifBlank { uri.path ?: "Selected folder" }
+        .ifBlank { uri.path ?: "Unknown Folder" }
 }
 
 fun formatSpeed(bytesPerSecond: Double): String {

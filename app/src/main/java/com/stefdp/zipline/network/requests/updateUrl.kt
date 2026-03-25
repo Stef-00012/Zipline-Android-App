@@ -18,7 +18,7 @@ suspend fun updateUrl(
     urlId: String,
     destination: String? = null,
     vanity: String? = null,
-    enabled: Boolean? = null,
+    enabled: Boolean = true,
     maxViews: Long? = null,
     password: String? = null,
 ): Result<Url> {
@@ -48,7 +48,10 @@ suspend fun updateUrl(
             password = password
         )
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).updateUrl(
+        val response = ZiplineApiClient.getZiplineApiService(
+            baseUrl = serverUrl,
+            includeNull = true
+        ).updateUrl(
             token = token,
             urlId = urlId,
             data = requestBody

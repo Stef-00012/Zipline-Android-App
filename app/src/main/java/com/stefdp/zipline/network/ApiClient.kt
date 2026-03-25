@@ -1,5 +1,6 @@
 package com.stefdp.zipline.network
 
+import com.google.gson.GsonBuilder
 import com.stefdp.zipline.DEBUG_NETWORK
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,7 +17,7 @@ object ZiplineApiClient {
         .addInterceptor(loggingInterceptor)
         .build()
 
-    fun getZiplineApiService(baseUrl: String): ZiplineApiService {
+    fun getZiplineApiService(baseUrl: String, includeNull: Boolean = false): ZiplineApiService {
         val formattedUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
         val fullUrl = formattedUrl + "api/"
 
@@ -27,9 +28,19 @@ object ZiplineApiClient {
             retrofit.client(okHttpClient)
         }
 
+        retrofit.addConverterFactory(ScalarsConverterFactory.create())
+
+        if (includeNull) {
+            val gson = GsonBuilder()
+                .serializeNulls()
+                .create()
+
+            retrofit.addConverterFactory(GsonConverterFactory.create(gson))
+        } else {
+            retrofit.addConverterFactory(GsonConverterFactory.create())
+        }
+
         return retrofit
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ZiplineApiService::class.java)
     }

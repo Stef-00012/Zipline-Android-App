@@ -8,13 +8,13 @@ import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.Folder
 import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
 import com.stefdp.zipline.network.models.requests.GetFilesQueryFilter
-import com.stefdp.zipline.network.models.requests.GetFilesQueryOrder
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
 import com.stefdp.zipline.network.models.requests.RemoveFileFromFolderBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.GetFilesResponse
 import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.SortOrder
 
 private const val TAG = "ZiplineApi[getFiles]"
 
@@ -25,7 +25,7 @@ suspend fun getFiles(
     filter: GetFilesQueryFilter? = null,
     filterFavorite: Boolean? = null,
     sortBy: GetFilesQuerySortBy? = null,
-    sortOrder: GetFilesQueryOrder? = null,
+    sortOrder: SortOrder? = null,
     searchField: GetFilesQuerySearchField? = null,
     searchQuery: String? = null,
     userId: String? = null,

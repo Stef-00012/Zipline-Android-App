@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.DeleteFilePromptPopup
+import com.stefdp.zipline.components.DeletePromptPopup
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
@@ -38,6 +38,7 @@ import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.requests.addFileToFolder
+import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.network.requests.downloadFile
 import com.stefdp.zipline.network.requests.getFolders
 import com.stefdp.zipline.network.requests.getTags
@@ -125,20 +126,43 @@ fun LargeFileDisplay(
 
         val coroutineScope = rememberCoroutineScope()
 
-        DeleteFilePromptPopup(
-            context = context,
+        DeletePromptPopup(
             showPopup = showConfirmDeletePopup,
-            file = currentFile,
             isLoading = isLoading,
             onDismissRequest = {
                 showConfirmDeletePopup = false
                 isPopupVisible = true
             },
-            updateData = updateData,
-            setLoading = { loadingState ->
-                isLoading = loadingState
-            },
-            onDelete = onDelete
+            title = "Are you sure?",
+            description = "Are you sure you want to delete ${currentFile.originalName ?: currentFile.name}? This action cannot be undone.",
+            onDelete = {
+                coroutineScope.launch {
+                    isLoading = true
+
+                    val deleteRes = deleteFile(
+                        context = context,
+                        fileId = currentFile.id
+                    )
+
+                    deleteRes
+                        .onSuccess {
+                            onDelete()
+                            updateData()
+                            onDismissRequest()
+                        }
+                        .onFailure {
+                            Toast.makeText(
+                                context,
+                                "Failed to delete file: ${it.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                    onDelete()
+
+                    isLoading = false
+                }
+            }
         )
 
         EditFilePopup(
@@ -476,6 +500,7 @@ fun LargeFileDisplay(
                     IconButtonSpacer()
 
                     CopyUrlButton(
+                        context = context,
                         enabled = !isLoading || serverUrl == null,
                         standardUrl = "${serverUrl}${currentFile.url}",
                         rawUrl = "$serverUrl/raw/${currentFile.name}"

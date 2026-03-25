@@ -49,19 +49,6 @@ enum class GetFilesQuerySortBy(val value: String) {
     override fun toString(): String = value
 }
 
-enum class GetFilesQueryOrder(val value: String?) {
-    @SerializedName("asc")
-    ASC("asc"),
-
-    @SerializedName("desc")
-    DESC("desc"),
-
-    @SerializedName("")
-    UNSPECIFIED(null);
-
-    override fun toString(): String = value.toString()
-}
-
 enum class GetFilesQuerySearchField(val value: String) {
     @SerializedName("name")
     NAME("name"),

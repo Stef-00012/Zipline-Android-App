@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
-import com.stefdp.zipline.network.models.requests.GetFilesQueryOrder
+import com.stefdp.zipline.utils.SortOrder
 
 @Composable
 fun TableHeader(
@@ -51,15 +51,15 @@ fun TableHeader(
             fun HeaderOptions() {
                 if (header.sortable) {
                     val sortIcon = when (header.sortOrder) {
-                        GetFilesQueryOrder.ASC -> painterResource(R.drawable.north)
-                        GetFilesQueryOrder.DESC -> painterResource(R.drawable.south)
-                        GetFilesQueryOrder.UNSPECIFIED -> painterResource(R.drawable.sort)
+                        SortOrder.ASC -> painterResource(R.drawable.north)
+                        SortOrder.DESC -> painterResource(R.drawable.south)
+                        SortOrder.UNSPECIFIED -> painterResource(R.drawable.sort)
                     }
 
                     val sortDescription = when (header.sortOrder) {
-                        GetFilesQueryOrder.ASC -> "Sorted ascending"
-                        GetFilesQueryOrder.DESC -> "Sorted descending"
-                        GetFilesQueryOrder.UNSPECIFIED -> "Not sorted"
+                        SortOrder.ASC -> "Sorted ascending"
+                        SortOrder.DESC -> "Sorted descending"
+                        SortOrder.UNSPECIFIED -> "Not sorted"
                     }
 
                     Spacer(modifier.weight(1f))
@@ -140,7 +140,7 @@ data class TableHeaderData(
     val padding: Dp = 12.dp,
     val searchable: Boolean = false,
     val sortable: Boolean = false,
-    val sortOrder: GetFilesQueryOrder = GetFilesQueryOrder.UNSPECIFIED,
+    val sortOrder: SortOrder = SortOrder.UNSPECIFIED,
     val onSortChanged: () -> Unit = {},
     val onSearchClick: () -> Unit = {},
     val searchEnabled: Boolean = true,

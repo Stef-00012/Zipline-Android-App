@@ -81,7 +81,9 @@ import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.SettingsScreen
 import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.utils.DecimalRegex
 import com.stefdp.zipline.utils.FileUploadState
+import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SelectedFile
 import com.stefdp.zipline.utils.UploadStatus
@@ -104,9 +106,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.time.Clock
 import kotlin.time.Duration
-
-val DecimalRegex = Regex("""^(\d)+\.?(\d?)+$""")
-val NumberRegex = Regex("""^(\d)*$""")
 
 @Composable
 fun UploadFileScreen(
@@ -263,6 +262,12 @@ fun UploadFileScreen(
                                         val clipData = ClipData.newRawUri("File URL", fileState.url?.toUri()).toClipEntry()
 
                                         clipboardManager.setClipEntry(clipData)
+
+                                        Toast.makeText(
+                                            context,
+                                            "File link copied to clipboard",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
                                 },
                                 color = MaterialTheme.colorScheme.primary,

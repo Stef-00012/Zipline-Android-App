@@ -66,7 +66,7 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.DeleteFilePromptPopup
+import com.stefdp.zipline.components.DeletePromptPopup
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.Pager
@@ -85,9 +85,9 @@ import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.IncompleteFile
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.UserRole
-import com.stefdp.zipline.network.models.requests.GetFilesQueryOrder
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
+import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.network.requests.downloadFile
 import com.stefdp.zipline.network.requests.getFiles
 import com.stefdp.zipline.network.requests.getIncompleteFiles
@@ -104,6 +104,7 @@ import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.SortOrder
 import com.stefdp.zipline.utils.camelCaseToHumanReadable
 import com.stefdp.zipline.utils.canInteract
 import com.stefdp.zipline.utils.formatBytes
@@ -168,8 +169,8 @@ fun FilesScreen(
     val filesPerPage = if (compactView) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
 
     var sortKey by remember { mutableStateOf(GetFilesQuerySortBy.CREATED_AT) }
-    var sortOrder by remember { mutableStateOf(GetFilesQueryOrder.DESC) }
-    val defaultSortOrder = GetFilesQueryOrder.UNSPECIFIED
+    var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
+    val defaultSortOrder = SortOrder.UNSPECIFIED
     
     var searchKey by remember { mutableStateOf<GetFilesQuerySearchField?>(null) }
     var searchValue by remember { mutableStateOf(TextFieldValue("")) }
@@ -691,11 +692,11 @@ fun FilesScreen(
                         onSortChanged = {
                             if (sortKey != GetFilesQuerySortBy.NAME) {
                                 sortKey = GetFilesQuerySortBy.NAME
-                                sortOrder = GetFilesQueryOrder.ASC
-                            } else if (sortOrder == GetFilesQueryOrder.UNSPECIFIED || sortOrder == GetFilesQueryOrder.DESC) {
-                                sortOrder = GetFilesQueryOrder.ASC
+                                sortOrder = SortOrder.ASC
+                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
+                                sortOrder = SortOrder.ASC
                             } else {
-                                sortOrder = GetFilesQueryOrder.DESC
+                                sortOrder = SortOrder.DESC
                             }
                         },
                         onSearchClick = {
@@ -732,11 +733,11 @@ fun FilesScreen(
                         onSortChanged = {
                             if (sortKey != GetFilesQuerySortBy.TYPE) {
                                 sortKey = GetFilesQuerySortBy.TYPE
-                                sortOrder = GetFilesQueryOrder.ASC
-                            } else if (sortOrder == GetFilesQueryOrder.UNSPECIFIED || sortOrder == GetFilesQueryOrder.DESC) {
-                                sortOrder = GetFilesQueryOrder.ASC
+                                sortOrder = SortOrder.ASC
+                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
+                                sortOrder = SortOrder.ASC
                             } else {
-                                sortOrder = GetFilesQueryOrder.DESC
+                                sortOrder = SortOrder.DESC
                             }
                         },
                         onSearchClick = {
@@ -757,11 +758,11 @@ fun FilesScreen(
                         onSortChanged = {
                             if (sortKey != GetFilesQuerySortBy.SIZE) {
                                 sortKey = GetFilesQuerySortBy.SIZE
-                                sortOrder = GetFilesQueryOrder.ASC
-                            } else if (sortOrder == GetFilesQueryOrder.UNSPECIFIED || sortOrder == GetFilesQueryOrder.DESC) {
-                                sortOrder = GetFilesQueryOrder.ASC
+                                sortOrder = SortOrder.ASC
+                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
+                                sortOrder = SortOrder.ASC
                             } else {
-                                sortOrder = GetFilesQueryOrder.DESC
+                                sortOrder = SortOrder.DESC
                             }
                         }
                     ),
@@ -779,11 +780,11 @@ fun FilesScreen(
                         onSortChanged = {
                             if (sortKey != GetFilesQuerySortBy.CREATED_AT) {
                                 sortKey = GetFilesQuerySortBy.CREATED_AT
-                                sortOrder = GetFilesQueryOrder.ASC
-                            } else if (sortOrder == GetFilesQueryOrder.UNSPECIFIED || sortOrder == GetFilesQueryOrder.DESC) {
-                                sortOrder = GetFilesQueryOrder.ASC
+                                sortOrder = SortOrder.ASC
+                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
+                                sortOrder = SortOrder.ASC
                             } else {
-                                sortOrder = GetFilesQueryOrder.DESC
+                                sortOrder = SortOrder.DESC
                             }
                         }
                     ),
@@ -801,11 +802,11 @@ fun FilesScreen(
                         onSortChanged = {
                             if (sortKey != GetFilesQuerySortBy.FAVORITE) {
                                 sortKey = GetFilesQuerySortBy.FAVORITE
-                                sortOrder = GetFilesQueryOrder.ASC
-                            } else if (sortOrder == GetFilesQueryOrder.UNSPECIFIED || sortOrder == GetFilesQueryOrder.DESC) {
-                                sortOrder = GetFilesQueryOrder.ASC
+                                sortOrder = SortOrder.ASC
+                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
+                                sortOrder = SortOrder.ASC
                             } else {
-                                sortOrder = GetFilesQueryOrder.DESC
+                                sortOrder = SortOrder.DESC
                             }
                         }
                     ),
@@ -824,11 +825,11 @@ fun FilesScreen(
                         onSortChanged = {
                             if (sortKey != GetFilesQuerySortBy.ID) {
                                 sortKey = GetFilesQuerySortBy.ID
-                                sortOrder = GetFilesQueryOrder.ASC
-                            } else if (sortOrder == GetFilesQueryOrder.UNSPECIFIED || sortOrder == GetFilesQueryOrder.DESC) {
-                                sortOrder = GetFilesQueryOrder.ASC
+                                sortOrder = SortOrder.ASC
+                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
+                                sortOrder = SortOrder.ASC
                             } else {
-                                sortOrder = GetFilesQueryOrder.DESC
+                                sortOrder = SortOrder.DESC
                             }
                         },
                         onSearchClick = {
@@ -848,16 +849,42 @@ fun FilesScreen(
                 )
 
                 var deleteFile by remember { mutableStateOf<File?>(null) }
+                val coroutineScope = rememberCoroutineScope()
 
-                DeleteFilePromptPopup(
-                    context = context,
+                DeletePromptPopup(
                     showPopup = deleteFile != null,
-                    file = deleteFile,
                     onDismissRequest = { deleteFile = null },
-                    updateData = ::updateFiles,
-                    setLoading = { isLoading = it },
                     isLoading = isLoading,
-                    onDelete = { deleteFile = null }
+                    title = "Are you sure?",
+                    description = "Are you sure you want to delete ${deleteFile?.originalName ?: deleteFile?.name}? This action cannot be undone.",
+                    onDelete = {
+                        coroutineScope.launch {
+                            if (deleteFile == null) return@launch
+
+                            isLoading = true
+
+                            val deleteRes = deleteFile(
+                                context = context,
+                                fileId = deleteFile!!.id
+                            )
+
+                            deleteRes
+                                .onSuccess {
+                                    updateFiles()
+                                }
+                                .onFailure {
+                                    Toast.makeText(
+                                        context,
+                                        "Failed to delete file: ${it.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+
+                            deleteFile = null
+
+                            isLoading = false
+                        }
+                    }
                 )
 
                 val rows: List<TableRowData> = files?.map { file ->
@@ -965,7 +992,6 @@ fun FilesScreen(
                                     ActionButtonSpacer()
 
                                     val clipboardManager = LocalClipboard.current
-                                    val coroutineScope = rememberCoroutineScope()
 
                                     IconButton(
                                         icon = painterResource(R.drawable.content_copy),
@@ -979,6 +1005,12 @@ fun FilesScreen(
 
                                             coroutineScope.launch {
                                                 clipboardManager.setClipEntry(clipData)
+
+                                                Toast.makeText(
+                                                    context,
+                                                    "File link copied to clipboard",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
                                         },
                                         enabled = serverUrl != null && !isLoading

@@ -1,6 +1,8 @@
 package com.stefdp.zipline.components.largefiledisplay
 
 import android.content.ClipData
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.wrapContentSize
@@ -31,6 +33,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun CopyUrlButton(
+    context: Context,
     standardUrl: String,
     rawUrl: String,
     enabled: Boolean = true,
@@ -75,6 +78,12 @@ internal fun CopyUrlButton(
 
                         clipboardManager.setClipEntry(clipData)
 
+                        Toast.makeText(
+                            context,
+                            "File link copied to clipboard",
+                            Toast.LENGTH_LONG
+                        ).show()
+
                         expanded = false
                     }
                 },
@@ -96,6 +105,12 @@ internal fun CopyUrlButton(
                         val clipData = ClipData.newRawUri("File URL", rawUrl.toUri()).toClipEntry()
 
                         clipboardManager.setClipEntry(clipData)
+
+                        Toast.makeText(
+                            context,
+                            "Raw file link copied to clipboard",
+                            Toast.LENGTH_LONG
+                        ).show()
 
                         expanded = false
                     }

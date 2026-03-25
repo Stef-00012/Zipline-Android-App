@@ -10,7 +10,6 @@ interface BaseUrl {
     val destination: String
     val views: Long
     val maxViews: Long?
-    val password: String?
     val enabled: Boolean
     val userId: String
 }
@@ -25,7 +24,6 @@ data class Url(
     override val destination: String,
     override val views: Long,
     override val maxViews: Long? = null,
-    override val password: String? = null,
     override val enabled: Boolean,
     override val userId: String,
 ) : BaseUrl

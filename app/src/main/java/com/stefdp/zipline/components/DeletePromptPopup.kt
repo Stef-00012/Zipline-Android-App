@@ -20,33 +20,27 @@ import com.stefdp.zipline.ui.theme.getButtonColors
 import kotlinx.coroutines.launch
 
 @Composable
-fun DeleteFilePromptPopup(
-    context: Context,
+fun DeletePromptPopup(
     showPopup: Boolean,
-    file: File?,
     isLoading: Boolean,
     onDismissRequest: () -> Unit,
-    updateData: suspend () -> Unit,
-    setLoading: (Boolean) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    title: String,
+    description: String,
 ) {
-    if (file == null) return
-
-    val coroutineScope = rememberCoroutineScope()
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest
     ) {
         Text(
-            text = "Are you sure?",
+            text = title,
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold
             ),
         )
 
         Text(
-            text = "Are you sure you want to delete ${file.originalName ?: file.name}? This action cannot be undone."
+            text = description
         )
 
         Row(
@@ -70,31 +64,7 @@ fun DeleteFilePromptPopup(
 
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
-
-                        val deleteRes = deleteFile(
-                            context = context,
-                            fileId = file.id
-                        )
-
-                        deleteRes
-                            .onSuccess {
-                                onDelete()
-                                updateData()
-                                onDismissRequest()
-                            }
-                            .onFailure {
-                                Toast.makeText(
-                                    context,
-                                    "Failed to delete file: ${it.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-
-                        setLoading(false)
-                        onDismissRequest()
-                    }
+                    onDelete()
                 },
                 colors = getButtonColors().copy(
                     containerColor = MaterialTheme.colorScheme.error,

@@ -68,8 +68,8 @@ import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.SettingsScreen
 import com.stefdp.zipline.screens.files.components.IconButton
-import com.stefdp.zipline.screens.upload.file.DecimalRegex
-import com.stefdp.zipline.screens.upload.file.NumberRegex
+import com.stefdp.zipline.utils.DecimalRegex
+import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.ui.theme.getButtonColors
 import com.stefdp.zipline.utils.FileUploadState
 import com.stefdp.zipline.utils.ScrollbarConfig
@@ -274,6 +274,12 @@ fun UploadTextScreen(
                                 val clipData = ClipData.newRawUri("File URL", fileState?.url?.toUri()).toClipEntry()
 
                                 clipboardManager.setClipEntry(clipData)
+
+                                Toast.makeText(
+                                    context,
+                                    "File link copied to clipboard",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         },
                         color = MaterialTheme.colorScheme.primary,

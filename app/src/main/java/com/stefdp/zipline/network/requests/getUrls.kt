@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.Url
+import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.models.responses.DeleteExportResponse
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.LoginResponse
@@ -15,7 +16,8 @@ private const val TAG = "ZiplineApi[getUrls]"
 
 suspend fun getUrls(
     context: Context,
-    exportId: String,
+    searchField: GetUrlsQuerySearchField? = null,
+    searchQuery: String? = null,
 ): Result<List<Url>> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -37,6 +39,8 @@ suspend fun getUrls(
 
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).getUrls(
             token = token,
+            searchField = searchField,
+            searchQuery = searchQuery
         )
 
         val body = response.body()

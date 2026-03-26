@@ -138,8 +138,6 @@ fun UploadTextScreen(
     val defaultNameFormat = webSettings?.config?.files?.defaultFormat ?: FilesFormat.RANDOM
     val defaultCompressionFormat = webSettings?.config?.files?.defaultCompressionFormat ?: UploadCompressionType.PNG
 
-    Log.d("UploadTextScreen", "default compression format: $defaultCompressionFormat")
-
     var fileState by remember { mutableStateOf<FileUploadState?>(null) }
     var uploadText by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -161,8 +159,6 @@ fun UploadTextScreen(
 
                     return@rememberLauncherForActivityResult
                 }
-
-                Log.d("UploadTextScreen", "Selected file: $name, size: ${formatBytes(size)}, mimeType: $mimeType")
 
                 context.contentResolver.takePersistableUriPermission(
                     uri,
@@ -380,7 +376,15 @@ fun UploadTextScreen(
 
         if (fileState == null) {
             Button(
-                onClick = { filePicker.launch(arrayOf("*/*")) },
+                onClick = { filePicker.launch(arrayOf(
+                    "text/*",
+                    "application/json",
+                    "application/xml",
+                    "application/x-yaml",
+                    "application/x-sh",
+                    "application/xhtml+xml",
+                    "application/ld+json"
+                )) },
                 enabled = !isUploading,
                 modifier = Modifier.fillMaxWidth()
             ) {

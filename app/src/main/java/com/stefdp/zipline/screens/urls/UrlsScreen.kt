@@ -140,13 +140,13 @@ fun UrlsScreen(
 
         val ascending = when (sortKey) {
             GetUrlsQuerySortBy.CODE ->
-                urls.sortedBy { it.code.lowercase() }
+                urls.sortedBy { it.code }
 
             GetUrlsQuerySortBy.VANITY ->
-                urls.sortedBy { it.vanity.orEmpty().lowercase() }
+                urls.sortedBy { it.vanity.orEmpty() }
 
             GetUrlsQuerySortBy.DESTINATION ->
-                urls.sortedBy { it.destination.lowercase() }
+                urls.sortedBy { it.destination }
 
             GetUrlsQuerySortBy.VIEWS ->
                 urls.sortedBy { it.views }
@@ -205,6 +205,7 @@ fun UrlsScreen(
     DeletePromptPopup(
         showPopup = deleteUrl != null,
         onDismissRequest = { deleteUrl = null },
+        onCancel = { deleteUrl = null },
         isLoading = isLoading,
         title = "Are you sure?",
         description = "Are you sure you want to delete ${deleteUrl?.code}? This action cannot be undone.",

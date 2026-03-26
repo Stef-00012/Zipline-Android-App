@@ -74,30 +74,37 @@ fun MoreActionsButton(
             }
         }
 
-        Box(
-            modifier = modifier
-                .size(35.dp)
-                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
-                .background(
-                    color = Color.Transparent,
-                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                )
-                .clickable(
-                    enabled = enabled,
-                    onClick = { expanded = true }
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.more_horiz),
-                contentDescription = "More options",
-                tint = if (enabled)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                modifier = Modifier.size(25.dp)
-            )
-        }
+        LargeDisplayIconButton(
+            onClick = { expanded = true },
+            icon = painterResource(R.drawable.more_horiz),
+            iconContentDescription = "More options",
+            enabled = enabled
+        )
+
+//        Box(
+//            modifier = modifier
+//                .size(35.dp)
+//                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+//                .background(
+//                    color = Color.Transparent,
+//                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+//                )
+//                .clickable(
+//                    enabled = enabled,
+//                    onClick = {  }
+//                ),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Icon(
+//                painter = painterResource(R.drawable.more_horiz),
+//                contentDescription = "More options",
+//                tint = if (enabled)
+//                    MaterialTheme.colorScheme.primary
+//                else
+//                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+//                modifier = Modifier.size(25.dp)
+//            )
+//        }
     }
 }
 

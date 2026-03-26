@@ -572,7 +572,7 @@ interface ZiplineApiService {
     @GET("users")
     suspend fun getUsers(
         @Header("Authorization") token: String,
-        @Query("noIncl") exclude: Boolean? = null,
+        @Query("noincl") excludeSelf: Boolean? = null,
     ): Response<List<User>>
 
     @POST("users")
@@ -594,7 +594,11 @@ interface ZiplineApiService {
         @Body data: UpdateUserBody,
     ): Response<User>
 
-    @DELETE("users/{userId}")
+    @HTTP(
+        method = "DELETE",
+        path = "users/{userId}",
+        hasBody = true
+    )
     suspend fun deleteUser(
         @Header("Authorization") token: String,
         @Path("userId") userId: String,

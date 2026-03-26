@@ -1,7 +1,5 @@
 package com.stefdp.zipline.utils
 
-import androidx.compose.material3.Text
-import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.FilesFormat
 import com.stefdp.zipline.network.models.requests.UploadCompressionType

@@ -30,7 +30,9 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalLoggedUserAvatar
 import com.stefdp.zipline.R
+import com.stefdp.zipline.components.Avatar
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.screens.SettingsScreen
 import com.stefdp.zipline.ui.theme.getButtonColors
 
@@ -39,7 +41,9 @@ fun UserAvatar(
     enabled: Boolean,
     navController: NavHostController
 ) {
-    val username = LocalLoggedUser.current?.username ?: "Unknown" //stringResource(R.string.unknown_username),
+    val user = LocalLoggedUser.current
+
+    val username = user?.username ?: "Unknown" //stringResource(R.string.unknown_username),
     val avatar = LocalLoggedUserAvatar.current
 
     Button(
@@ -52,45 +56,11 @@ fun UserAvatar(
         ),
         enabled = enabled
     ) {
-        if (avatar != null) {
-            val avatarBase64 = avatar.substringAfter("base64,")
-            val imageBitmap = Base64
-                .decode(avatarBase64, Base64.DEFAULT)
-                .decodeToImageBitmap()
-
-            Image(
-                bitmap = imageBitmap,
-                contentDescription = "User Avatar",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(
-                        RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                    ),
-                alpha = if (enabled) 1f else 0.5f
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(
-                        RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                    )
-                    .background(
-                        MaterialTheme.colorScheme.surfaceVariant
-                    )
-                    .padding(5.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.group),
-                    contentDescription = "Default Avatar",
-                    tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                        alpha = 0.5f
-                    ),
-                )
-            }
-        }
+        Avatar(
+            avatar = avatar,
+            enabled = enabled,
+            isAdmin = user != null && user.role.level <= UserRole.ADMIN.level,
+        )
 
         Spacer(
             modifier = Modifier.width(10.dp)

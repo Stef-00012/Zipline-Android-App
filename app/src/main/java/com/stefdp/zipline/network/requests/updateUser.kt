@@ -22,10 +22,10 @@ private const val TAG = "ZiplineApi[updateUser]"
 suspend fun updateUser(
     context: Context,
     userId: String,
-    username: String,
-    password: String,
+    username: String? = null,
+    password: String? = null,
     avatar: String? = null,
-    role: UserRole,
+    role: UserRole? = null,
     quota: UpdateUserBodyQuota? = null
 ): Result<User> {
     try {

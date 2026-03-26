@@ -67,6 +67,7 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.DeletePromptPopup
+import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.Pager
@@ -415,18 +416,20 @@ fun FilesScreen(
                     iconColor = if (favoriteFilter) Yellow else MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(
-                    modifier = Modifier.width(5.dp)
-                )
+                if (userId == null) {
+                    Spacer(
+                        modifier = Modifier.width(5.dp)
 
-                HeaderButton(
-                    icon = painterResource(R.drawable.upload_file),
-                    contentDescription = "Upload file",
-                    onClick = {
-                        navController.navigate(UploadFileScreen)
-                    },
-                    enabled = !isLoading,
-                )
+                    )
+                    HeaderButton(
+                        icon = painterResource(R.drawable.upload_file),
+                        contentDescription = "Upload file",
+                        onClick = {
+                            navController.navigate(UploadFileScreen)
+                        },
+                        enabled = !isLoading,
+                    )
+                }
 
                 Spacer(
                     modifier = Modifier.width(5.dp)
@@ -854,6 +857,7 @@ fun FilesScreen(
                 DeletePromptPopup(
                     showPopup = deleteFile != null,
                     onDismissRequest = { deleteFile = null },
+                    onCancel = { deleteFile = null },
                     isLoading = isLoading,
                     title = "Are you sure?",
                     description = "Are you sure you want to delete ${deleteFile?.originalName ?: deleteFile?.name}? This action cannot be undone.",
@@ -1042,7 +1046,15 @@ fun FilesScreen(
                                         }
                                     }
 
+                                    var downloadFilePassword by remember { mutableStateOf<String?>(null) }
+                                    var fileRequiresPassword by remember { mutableStateOf(false) }
+
                                     fun performDownload() {
+                                        if (file.password == true && downloadFilePassword.isNullOrBlank()) {
+                                            fileRequiresPassword = true
+                                            return
+                                        }
+
                                         coroutineScope.launch(Dispatchers.IO) {
                                             showToast("Starting download...")
 
@@ -1058,7 +1070,8 @@ fun FilesScreen(
                                                 fileId = file.id,
                                                 destinationPath = tempDestinationPath,
                                                 notificationTitle = "Downloading file",
-                                                notificationContent = "Downloading ${file.name}"
+                                                notificationContent = "Downloading ${file.name}",
+                                                password = downloadFilePassword
                                             )
 
                                             downloadRes
@@ -1108,8 +1121,26 @@ fun FilesScreen(
 
                                                     showToast("Failed to download file: ${it.message}")
                                                 }
+
+                                            fileRequiresPassword = false
+                                            downloadFilePassword = null
                                         }
                                     }
+
+                                    DownloadFilePasswordPrompt(
+                                        context = context,
+                                        fileId = file.id,
+                                        showPopup = fileRequiresPassword && downloadFilePassword == null,
+                                        onDismissRequest = {
+                                            fileRequiresPassword = false
+                                            downloadFilePassword = null
+                                        },
+                                        onDownload = {
+                                            downloadFilePassword = it
+
+                                            performDownload()
+                                        }
+                                    )
 
                                     val directoryPicker = rememberLauncherForActivityResult(
                                         contract = ActivityResultContracts.OpenDocumentTree()

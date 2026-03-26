@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.DeletePromptPopup
+import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
@@ -130,6 +131,10 @@ fun LargeFileDisplay(
             showPopup = showConfirmDeletePopup,
             isLoading = isLoading,
             onDismissRequest = {
+                showConfirmDeletePopup = false
+                isPopupVisible = true
+            },
+            onCancel = {
                 showConfirmDeletePopup = false
                 isPopupVisible = true
             },
@@ -532,7 +537,15 @@ fun LargeFileDisplay(
                         }
                     }
 
+                    var downloadFilePassword by remember { mutableStateOf<String?>(null) }
+                    var fileRequiresPassword by remember { mutableStateOf(false) }
+
                     fun performDownload() {
+                        if (currentFile.password == true && downloadFilePassword.isNullOrBlank()) {
+                            fileRequiresPassword = true
+                            return
+                        }
+
                         coroutineScope.launch(Dispatchers.IO) {
                             showToast("Starting download...")
 
@@ -548,7 +561,8 @@ fun LargeFileDisplay(
                                 fileId = currentFile.id,
                                 destinationPath = tempDestinationPath,
                                 notificationTitle = "Downloading file",
-                                notificationContent = "Downloading ${currentFile.name}"
+                                notificationContent = "Downloading ${currentFile.name}",
+                                password = downloadFilePassword
                             )
 
                             downloadRes
@@ -600,6 +614,21 @@ fun LargeFileDisplay(
                                 }
                         }
                     }
+
+                    DownloadFilePasswordPrompt(
+                        context = context,
+                        fileId = currentFile.id,
+                        showPopup = fileRequiresPassword && downloadFilePassword == null,
+                        onDismissRequest = {
+                            fileRequiresPassword = false
+                            downloadFilePassword = null
+                        },
+                        onDownload = {
+                            downloadFilePassword = it
+
+                            performDownload()
+                        }
+                    )
 
                     val directoryPicker = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.OpenDocumentTree()

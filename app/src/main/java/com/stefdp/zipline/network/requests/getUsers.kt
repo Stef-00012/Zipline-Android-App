@@ -17,6 +17,7 @@ private const val TAG = "ZiplineApi[getUsers]"
 
 suspend fun getUsers(
     context: Context,
+    excludeSelf: Boolean = false
 ): Result<List<User>> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -38,6 +39,7 @@ suspend fun getUsers(
 
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).getUsers(
             token = token,
+            excludeSelf = excludeSelf
         )
 
         val body = response.body()

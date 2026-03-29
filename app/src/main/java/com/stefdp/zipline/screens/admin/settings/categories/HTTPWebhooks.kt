@@ -34,7 +34,8 @@ internal fun HTTPWebhooksCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -66,7 +67,7 @@ internal fun HTTPWebhooksCategory(
                 }
             }
 
-            var onUpload by remember(settings?.settings?.httpWebhookOnUpload) {
+            var onUpload by remember(settings?.settings?.httpWebhookOnUpload, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.httpWebhookOnUpload ?: ""))
             }
 
@@ -79,7 +80,7 @@ internal fun HTTPWebhooksCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var onShorten by remember(settings?.settings?.httpWebhookOnUpload) {
+            var onShorten by remember(settings?.settings?.httpWebhookOnUpload, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.httpWebhookOnUpload ?: ""))
             }
 

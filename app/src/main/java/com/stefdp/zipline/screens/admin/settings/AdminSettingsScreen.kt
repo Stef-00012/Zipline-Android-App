@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,6 +42,7 @@ import com.stefdp.zipline.screens.admin.settings.categories.CoreCategory
 import com.stefdp.zipline.screens.admin.settings.categories.DiscordWebhookCategory
 import com.stefdp.zipline.screens.admin.settings.categories.DiscordWebhookOnShortenCategory
 import com.stefdp.zipline.screens.admin.settings.categories.DiscordWebhookOnUploadCategory
+import com.stefdp.zipline.screens.admin.settings.categories.DomainsCategory
 import com.stefdp.zipline.screens.admin.settings.categories.FeaturesCategory
 import com.stefdp.zipline.screens.admin.settings.categories.FilesCategory
 import com.stefdp.zipline.screens.admin.settings.categories.HTTPWebhooksCategory
@@ -82,6 +84,7 @@ fun AdminSettingsScreen(
     var isLoading by remember { mutableStateOf(false) }
 
     var settings by remember { mutableStateOf<ServerSettings?>(null) }
+    var settingsUpdateTick by remember { mutableIntStateOf(0) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -116,6 +119,8 @@ fun AdminSettingsScreen(
                             "Settings updated successfully",
                             Toast.LENGTH_SHORT
                         ).show()
+
+                        settingsUpdateTick += 1
                     }
                 }
                 .onFailure {
@@ -129,6 +134,8 @@ fun AdminSettingsScreen(
             settingsRes.onSuccess {
                 settings = it
             }
+
+            settingsUpdateTick += 1
         }
 
         isLoading = false
@@ -227,7 +234,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.CORE.categoryName
+                    title = SettingCategory.CORE.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.CHUNKS.toString() -> ChunksCategory(
@@ -235,7 +243,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.CHUNKS.categoryName
+                    title = SettingCategory.CHUNKS.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.TASKS.toString() -> TasksCategory(
@@ -243,7 +252,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.TASKS.categoryName
+                    title = SettingCategory.TASKS.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.MFA.toString() -> MFACategory(
@@ -251,7 +261,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.MFA.categoryName
+                    title = SettingCategory.MFA.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.FEATURES.toString() -> FeaturesCategory(
@@ -259,7 +270,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.FEATURES.categoryName
+                    title = SettingCategory.FEATURES.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.FILES.toString() -> FilesCategory(
@@ -267,7 +279,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.FILES.categoryName
+                    title = SettingCategory.FILES.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.URL_SHORTENER.toString() -> UrlShortenerCategory(
@@ -275,7 +288,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.URL_SHORTENER.categoryName
+                    title = SettingCategory.URL_SHORTENER.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.RATELIMIT.toString() -> RatelimitCategory(
@@ -283,7 +297,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.RATELIMIT.categoryName
+                    title = SettingCategory.RATELIMIT.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.INVITES.toString() -> InvitesCategory(
@@ -291,7 +306,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.INVITES.categoryName
+                    title = SettingCategory.INVITES.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.WEBSITE.toString() -> WebsiteCategory(
@@ -299,7 +315,9 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.WEBSITE.categoryName
+                    title = SettingCategory.WEBSITE.categoryName,
+                    settingsUpdateTick = settingsUpdateTick,
+                    context = context
                 )
 
                 SettingCategory.OAUTH.toString() -> OAuthCategory(
@@ -308,7 +326,8 @@ fun AdminSettingsScreen(
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
                     context = context,
-                    title = SettingCategory.OAUTH.categoryName
+                    title = SettingCategory.OAUTH.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.PWA.toString() -> PWACategory(
@@ -316,7 +335,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.PWA.categoryName
+                    title = SettingCategory.PWA.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.HTTP_WEBHOOKS.toString() -> HTTPWebhooksCategory(
@@ -324,17 +344,26 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.HTTP_WEBHOOKS.categoryName
+                    title = SettingCategory.HTTP_WEBHOOKS.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
-                SettingCategory.DOMAINS.toString() -> TODO()
+                SettingCategory.DOMAINS.toString() -> DomainsCategory(
+                    settings = settings,
+                    isLoading = isLoading,
+                    updateSettings = ::updateSettings,
+                    setLoading = ::setLoading,
+                    title = SettingCategory.DOMAINS.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
+                )
 
                 SettingCategory.DISCORD_WEBHOOK.toString() -> DiscordWebhookCategory(
                     settings = settings,
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.DISCORD_WEBHOOK.categoryName
+                    title = SettingCategory.DISCORD_WEBHOOK.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.toString() -> DiscordWebhookOnUploadCategory(
@@ -342,7 +371,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.categoryName
+                    title = SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.toString() -> DiscordWebhookOnShortenCategory(
@@ -350,7 +380,8 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.categoryName
+                    title = SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
 
                 else -> CoreCategory(
@@ -358,17 +389,10 @@ fun AdminSettingsScreen(
                     isLoading = isLoading,
                     updateSettings = ::updateSettings,
                     setLoading = ::setLoading,
-                    title = SettingCategory.CORE.categoryName
+                    title = SettingCategory.CORE.categoryName,
+                    settingsUpdateTick = settingsUpdateTick
                 )
             }
-            /*
-                TODO:
-                - HTTP Webhooks
-                - Domains
-                - Discord Webhook
-                    - On Upload
-                    - On Shorten
-            */
         }
     }
 }

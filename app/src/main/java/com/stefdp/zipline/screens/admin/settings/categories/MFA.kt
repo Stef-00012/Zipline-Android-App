@@ -38,7 +38,8 @@ internal fun MFACategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -70,7 +71,7 @@ internal fun MFACategory(
                 }
             }
 
-            var passkeys by remember(settings?.settings?.mfaPasskeysEnabled) {
+            var passkeys by remember(settings?.settings?.mfaPasskeysEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.mfaPasskeysEnabled ?: false)
             }
 
@@ -82,7 +83,7 @@ internal fun MFACategory(
                 enabled = !isLoading
             )
 
-            var relyingPartyId by remember(settings?.settings?.mfaPasskeysRpID) {
+            var relyingPartyId by remember(settings?.settings?.mfaPasskeysRpID, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.mfaPasskeysRpID ?: ""))
             }
 
@@ -95,7 +96,7 @@ internal fun MFACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var origin by remember(settings?.settings?.mfaPasskeysOrigin) {
+            var origin by remember(settings?.settings?.mfaPasskeysOrigin, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.mfaPasskeysOrigin ?: ""))
             }
 
@@ -108,7 +109,7 @@ internal fun MFACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var enableTOTP by remember(settings?.settings?.mfaTotpEnabled) {
+            var enableTOTP by remember(settings?.settings?.mfaTotpEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.mfaTotpEnabled ?: false)
             }
 
@@ -121,7 +122,7 @@ internal fun MFACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var issuer by remember(settings?.settings?.mfaTotpIssuer) {
+            var issuer by remember(settings?.settings?.mfaTotpIssuer, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.mfaTotpIssuer ?: ""))
             }
 

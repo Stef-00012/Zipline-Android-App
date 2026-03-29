@@ -41,7 +41,8 @@ internal fun PWACategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -88,7 +89,7 @@ internal fun PWACategory(
                 }
             }
 
-            var pwaEnabled by remember(settings?.settings?.pwaEnabled) {
+            var pwaEnabled by remember(settings?.settings?.pwaEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.pwaEnabled ?: false)
             }
 
@@ -100,7 +101,7 @@ internal fun PWACategory(
                 enabled = !isLoading
             )
 
-            var title by remember(settings?.settings?.pwaTitle) {
+            var title by remember(settings?.settings?.pwaTitle, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.pwaTitle ?: ""))
             }
 
@@ -115,7 +116,7 @@ internal fun PWACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var shortName by remember(settings?.settings?.pwaShortName) {
+            var shortName by remember(settings?.settings?.pwaShortName, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.pwaShortName ?: ""))
             }
 
@@ -130,7 +131,7 @@ internal fun PWACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var description by remember(settings?.settings?.pwaDescription) {
+            var description by remember(settings?.settings?.pwaDescription, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.pwaDescription ?: ""))
             }
 
@@ -145,7 +146,7 @@ internal fun PWACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var themeColor by remember(settings?.settings?.pwaThemeColor) {
+            var themeColor by remember(settings?.settings?.pwaThemeColor, settingsUpdateTick) {
                 val color = settings?.settings?.pwaThemeColor?.toColorInt()
 
                 mutableStateOf(if (color != null) Color(color) else Color.Black)
@@ -160,7 +161,7 @@ internal fun PWACategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var backgroundColor by remember(settings?.settings?.pwaBackgroundColor) {
+            var backgroundColor by remember(settings?.settings?.pwaBackgroundColor, settingsUpdateTick) {
                 val color = settings?.settings?.pwaBackgroundColor?.toColorInt()
 
                 mutableStateOf(if (color != null) Color(color) else Color.Black)

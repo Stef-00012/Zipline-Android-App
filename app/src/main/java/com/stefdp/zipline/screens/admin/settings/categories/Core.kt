@@ -38,7 +38,8 @@ internal fun CoreCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -70,7 +71,7 @@ internal fun CoreCategory(
                 }
             }
 
-            var returnHttpsUrls by remember(settings?.settings?.coreReturnHttpsUrls) {
+            var returnHttpsUrls by remember(settings?.settings?.coreReturnHttpsUrls, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.coreReturnHttpsUrls ?: false)
             }
 
@@ -82,7 +83,7 @@ internal fun CoreCategory(
                 enabled = !isLoading
             )
 
-            var trustProxies by remember(settings?.settings?.coreTrustProxy) {
+            var trustProxies by remember(settings?.settings?.coreTrustProxy, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.coreTrustProxy ?: false)
             }
 
@@ -94,7 +95,7 @@ internal fun CoreCategory(
                 enabled = !isLoading
             )
 
-            var defaultDomain by remember(settings?.settings?.coreDefaultDomain) {
+            var defaultDomain by remember(settings?.settings?.coreDefaultDomain, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.coreDefaultDomain ?: ""))
             }
 
@@ -107,7 +108,7 @@ internal fun CoreCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var temporaryDirectory by remember(settings?.settings?.coreTempDirectory) {
+            var temporaryDirectory by remember(settings?.settings?.coreTempDirectory, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.coreTempDirectory ?: ""))
             }
 

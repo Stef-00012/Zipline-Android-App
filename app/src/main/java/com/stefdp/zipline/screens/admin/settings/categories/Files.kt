@@ -45,7 +45,8 @@ internal fun FilesCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -83,7 +84,7 @@ internal fun FilesCategory(
                 }
             }
 
-            var route by remember(settings?.settings?.filesRoute) {
+            var route by remember(settings?.settings?.filesRoute, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesRoute ?: "/"))
             }
 
@@ -104,7 +105,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var length by remember(settings?.settings?.filesLength) {
+            var length by remember(settings?.settings?.filesLength, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.filesLength ?: "").toString()))
             }
 
@@ -121,7 +122,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var assumeMimetypes by remember(settings?.settings?.filesAssumeMimetypes) {
+            var assumeMimetypes by remember(settings?.settings?.filesAssumeMimetypes, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.filesAssumeMimetypes ?: false)
             }
 
@@ -133,7 +134,7 @@ internal fun FilesCategory(
                 enabled = !isLoading
             )
 
-            var removeGPSMetadata by remember(settings?.settings?.filesRemoveGpsMetadata) {
+            var removeGPSMetadata by remember(settings?.settings?.filesRemoveGpsMetadata, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.filesRemoveGpsMetadata ?: false)
             }
 
@@ -145,7 +146,7 @@ internal fun FilesCategory(
                 enabled = !isLoading
             )
 
-            var selectedDefaultFormat by remember(settings?.settings?.filesDefaultFormat) {
+            var selectedDefaultFormat by remember(settings?.settings?.filesDefaultFormat, settingsUpdateTick) {
                 mutableStateOf(setOf((settings?.settings?.filesDefaultFormat ?: FilesFormat.RANDOM).toString()))
             }
 
@@ -171,7 +172,7 @@ internal fun FilesCategory(
                 enabled = !isLoading
             )
 
-            var disabledExtensions by remember(settings?.settings?.filesDisabledExtensions) {
+            var disabledExtensions by remember(settings?.settings?.filesDisabledExtensions, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesDisabledExtensions?.joinToString(", ") ?: ""))
             }
 
@@ -186,7 +187,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var maxFileSize by remember(settings?.settings?.filesMaxFileSize) {
+            var maxFileSize by remember(settings?.settings?.filesMaxFileSize, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesMaxFileSize ?: ""))
             }
 
@@ -201,7 +202,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var defaultDateFormat by remember(settings?.settings?.filesDefaultDateFormat) {
+            var defaultDateFormat by remember(settings?.settings?.filesDefaultDateFormat, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesDefaultDateFormat ?: ""))
             }
 
@@ -216,7 +217,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var defaultExpiration by remember(settings?.settings?.filesDefaultExpiration) {
+            var defaultExpiration by remember(settings?.settings?.filesDefaultExpiration, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesDefaultExpiration ?: ""))
             }
 
@@ -231,7 +232,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var maxExpiration by remember(settings?.settings?.filesMaxExpiration) {
+            var maxExpiration by remember(settings?.settings?.filesMaxExpiration, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesMaxExpiration ?: ""))
             }
 
@@ -246,7 +247,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var randomWordsAdjectivesNumber by remember(settings?.settings?.filesRandomWordsNumAdjectives) {
+            var randomWordsAdjectivesNumber by remember(settings?.settings?.filesRandomWordsNumAdjectives, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.filesRandomWordsNumAdjectives ?: "").toString()))
             }
 
@@ -263,7 +264,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var randomWordsSeparator by remember(settings?.settings?.filesRandomWordsSeparator) {
+            var randomWordsSeparator by remember(settings?.settings?.filesRandomWordsSeparator, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.filesRandomWordsSeparator ?: ""))
             }
 
@@ -278,7 +279,7 @@ internal fun FilesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var selectedDefaultCompressionFormat by remember(settings?.settings?.filesDefaultCompressionFormat) {
+            var selectedDefaultCompressionFormat by remember(settings?.settings?.filesDefaultCompressionFormat, settingsUpdateTick) {
                 mutableStateOf(setOf((settings?.settings?.filesDefaultCompressionFormat ?: UploadCompressionType.PNG).toString()))
             }
 
@@ -304,7 +305,7 @@ internal fun FilesCategory(
                 enabled = !isLoading
             )
 
-            var maxFilesPerUpload by remember(settings?.settings?.filesMaxFilesPerUpload) {
+            var maxFilesPerUpload by remember(settings?.settings?.filesMaxFilesPerUpload, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.filesMaxFilesPerUpload ?: "").toString()))
             }
 

@@ -48,7 +48,8 @@ internal fun FeaturesCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -86,7 +87,7 @@ internal fun FeaturesCategory(
                 }
             }
 
-            var imageCompression by remember(settings?.settings?.featuresImageCompression) {
+            var imageCompression by remember(settings?.settings?.featuresImageCompression, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresImageCompression ?: false)
             }
 
@@ -98,7 +99,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var robotsTxt by remember(settings?.settings?.featuresRobotsTxt) {
+            var robotsTxt by remember(settings?.settings?.featuresRobotsTxt, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresRobotsTxt ?: false)
             }
 
@@ -110,7 +111,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var healthcheck by remember(settings?.settings?.featuresHealthcheck) {
+            var healthcheck by remember(settings?.settings?.featuresHealthcheck, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresHealthcheck ?: false)
             }
 
@@ -122,7 +123,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var userRegistration by remember(settings?.settings?.featuresUserRegistration) {
+            var userRegistration by remember(settings?.settings?.featuresUserRegistration, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresUserRegistration ?: false)
             }
 
@@ -134,7 +135,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var oauthRegistration by remember(settings?.settings?.featuresOauthRegistration) {
+            var oauthRegistration by remember(settings?.settings?.featuresOauthRegistration, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresOauthRegistration ?: false)
             }
 
@@ -146,7 +147,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var deleteOnMaxViews by remember(settings?.settings?.featuresDeleteOnMaxViews) {
+            var deleteOnMaxViews by remember(settings?.settings?.featuresDeleteOnMaxViews, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresDeleteOnMaxViews ?: false)
             }
 
@@ -158,7 +159,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var enableMetrics by remember(settings?.settings?.featuresMetricsEnabled) {
+            var enableMetrics by remember(settings?.settings?.featuresMetricsEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresMetricsEnabled ?: false)
             }
 
@@ -170,7 +171,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var adminOnlyMetrics by remember(settings?.settings?.featuresMetricsAdminOnly) {
+            var adminOnlyMetrics by remember(settings?.settings?.featuresMetricsAdminOnly, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresMetricsAdminOnly ?: false)
             }
 
@@ -182,7 +183,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var showUserSpecificMetrics by remember(settings?.settings?.featuresMetricsShowUserSpecific) {
+            var showUserSpecificMetrics by remember(settings?.settings?.featuresMetricsShowUserSpecific, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresMetricsShowUserSpecific ?: false)
             }
 
@@ -194,7 +195,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var enableThumbnails by remember(settings?.settings?.featuresThumbnailsEnabled) {
+            var enableThumbnails by remember(settings?.settings?.featuresThumbnailsEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresThumbnailsEnabled ?: false)
             }
 
@@ -206,7 +207,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var thumbnailsNumberThreads by remember(settings?.settings?.featuresThumbnailsNumberThreads) {
+            var thumbnailsNumberThreads by remember(settings?.settings?.featuresThumbnailsNumberThreads, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.featuresThumbnailsNumberThreads?.toString() ?: ""))
             }
 
@@ -223,7 +224,7 @@ internal fun FeaturesCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var selectedThumbnailsFormat by remember(settings?.settings?.featuresThumbnailsFormat) {
+            var selectedThumbnailsFormat by remember(settings?.settings?.featuresThumbnailsFormat, settingsUpdateTick) {
                 mutableStateOf(setOf((settings?.settings?.featuresThumbnailsFormat ?: ThumbnailFormat.PNG).toString()))
             }
 
@@ -246,7 +247,7 @@ internal fun FeaturesCategory(
                 onSelectionChange = { selectedThumbnailsFormat = it },
             )
 
-            var versionChecking by remember(settings?.settings?.featuresVersionChecking) {
+            var versionChecking by remember(settings?.settings?.featuresVersionChecking, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.featuresVersionChecking ?: false)
             }
 
@@ -258,7 +259,7 @@ internal fun FeaturesCategory(
                 enabled = !isLoading
             )
 
-            var versionAPIUrl by remember(settings?.settings?.featuresVersionAPI) {
+            var versionAPIUrl by remember(settings?.settings?.featuresVersionAPI, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.featuresVersionAPI ?: ""))
             }
 

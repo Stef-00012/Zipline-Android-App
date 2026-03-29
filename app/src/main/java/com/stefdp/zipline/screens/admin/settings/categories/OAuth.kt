@@ -46,7 +46,8 @@ internal fun OAuthCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -93,7 +94,7 @@ internal fun OAuthCategory(
                 }
             }
 
-            var bypassLocalLogin by remember(settings?.settings?.oauthBypassLocalLogin) {
+            var bypassLocalLogin by remember(settings?.settings?.oauthBypassLocalLogin, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.oauthBypassLocalLogin ?: false)
             }
 
@@ -105,7 +106,7 @@ internal fun OAuthCategory(
                 enabled = !isLoading
             )
 
-            var loginOnly by remember(settings?.settings?.oauthLoginOnly) {
+            var loginOnly by remember(settings?.settings?.oauthLoginOnly, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.oauthLoginOnly ?: false)
             }
 
@@ -117,19 +118,19 @@ internal fun OAuthCategory(
                 enabled = !isLoading
             )
 
-            var discordClientId by remember(settings?.settings?.oauthDiscordClientId) {
+            var discordClientId by remember(settings?.settings?.oauthDiscordClientId, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordClientId ?: ""))
             }
-            var discordClientSecret by remember(settings?.settings?.oauthDiscordClientSecret) {
+            var discordClientSecret by remember(settings?.settings?.oauthDiscordClientSecret, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordClientSecret ?: ""))
             }
-            var discordAllowedIds by remember(settings?.settings?.oauthDiscordAllowedIds) {
+            var discordAllowedIds by remember(settings?.settings?.oauthDiscordAllowedIds, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordAllowedIds?.joinToString(", ") ?: ""))
             }
-            var discordDeniedIds by remember(settings?.settings?.oauthDiscordDeniedIds) {
+            var discordDeniedIds by remember(settings?.settings?.oauthDiscordDeniedIds, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordDeniedIds?.joinToString(", ") ?: ""))
             }
-            var discordRedirectUrl by remember(settings?.settings?.oauthDiscordRedirectUri) {
+            var discordRedirectUrl by remember(settings?.settings?.oauthDiscordRedirectUri, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordRedirectUri ?: ""))
             }
 
@@ -216,13 +217,13 @@ internal fun OAuthCategory(
                 }
             }
 
-            var googleClientId by remember(settings?.settings?.oauthGoogleClientId) {
+            var googleClientId by remember(settings?.settings?.oauthGoogleClientId, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthGoogleClientId ?: ""))
             }
-            var googleClientSecret by remember(settings?.settings?.oauthGoogleClientSecret) {
+            var googleClientSecret by remember(settings?.settings?.oauthGoogleClientSecret, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthGoogleClientSecret ?: ""))
             }
-            var googleRedirectUrl by remember(settings?.settings?.oauthGoogleRedirectUri) {
+            var googleRedirectUrl by remember(settings?.settings?.oauthGoogleRedirectUri, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthGoogleRedirectUri ?: ""))
             }
 
@@ -287,13 +288,13 @@ internal fun OAuthCategory(
                 }
             }
 
-            var githubClientId by remember(settings?.settings?.oauthGithubClientId) {
+            var githubClientId by remember(settings?.settings?.oauthGithubClientId, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthGithubClientId ?: ""))
             }
-            var githubClientSecret by remember(settings?.settings?.oauthGithubClientSecret) {
+            var githubClientSecret by remember(settings?.settings?.oauthGithubClientSecret, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthGithubClientSecret ?: ""))
             }
-            var githubRedirectUrl by remember(settings?.settings?.oauthGithubRedirectUri) {
+            var githubRedirectUrl by remember(settings?.settings?.oauthGithubRedirectUri, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthGithubRedirectUri ?: ""))
             }
 
@@ -358,22 +359,22 @@ internal fun OAuthCategory(
                 }
             }
 
-            var oidcClientId by remember(settings?.settings?.oauthOidcClientId) {
+            var oidcClientId by remember(settings?.settings?.oauthOidcClientId, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcClientId ?: ""))
             }
-            var oidcClientSecret by remember(settings?.settings?.oauthOidcClientSecret) {
+            var oidcClientSecret by remember(settings?.settings?.oauthOidcClientSecret, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcClientSecret ?: ""))
             }
-            var oidcAuthorizeUrl by remember(settings?.settings?.oauthOidcAuthorizeUrl) {
+            var oidcAuthorizeUrl by remember(settings?.settings?.oauthOidcAuthorizeUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcAuthorizeUrl ?: ""))
             }
-            var oidcTokenUrl by remember(settings?.settings?.oauthOidcTokenUrl) {
+            var oidcTokenUrl by remember(settings?.settings?.oauthOidcTokenUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcTokenUrl ?: ""))
             }
-            var oidcUserinfoUrl by remember(settings?.settings?.oauthOidcUserinfoUrl) {
+            var oidcUserinfoUrl by remember(settings?.settings?.oauthOidcUserinfoUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcUserinfoUrl ?: ""))
             }
-            var oidcRedirectUrl by remember(settings?.settings?.oauthOidcRedirectUri) {
+            var oidcRedirectUrl by remember(settings?.settings?.oauthOidcRedirectUri, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcRedirectUri ?: ""))
             }
 

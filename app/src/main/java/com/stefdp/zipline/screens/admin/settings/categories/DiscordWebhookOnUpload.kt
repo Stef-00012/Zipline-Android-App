@@ -51,7 +51,8 @@ internal fun DiscordWebhookOnUploadCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -89,7 +90,7 @@ internal fun DiscordWebhookOnUploadCategory(
                 }
             }
 
-            var webhookUrl by remember(settings?.settings?.discordOnUploadWebhookUrl) {
+            var webhookUrl by remember(settings?.settings?.discordOnUploadWebhookUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadWebhookUrl ?: ""))
             }
 
@@ -102,7 +103,7 @@ internal fun DiscordWebhookOnUploadCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var username by remember(settings?.settings?.discordOnUploadUsername) {
+            var username by remember(settings?.settings?.discordOnUploadUsername, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadUsername ?: ""))
             }
 
@@ -115,7 +116,7 @@ internal fun DiscordWebhookOnUploadCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var avatarUrl by remember(settings?.settings?.discordOnUploadAvatarUrl) {
+            var avatarUrl by remember(settings?.settings?.discordOnUploadAvatarUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadAvatarUrl ?: ""))
             }
 
@@ -128,7 +129,7 @@ internal fun DiscordWebhookOnUploadCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var content by remember(settings?.settings?.discordOnUploadContent) {
+            var content by remember(settings?.settings?.discordOnUploadContent, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadContent ?: ""))
             }
 
@@ -142,23 +143,23 @@ internal fun DiscordWebhookOnUploadCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var embed by remember(settings?.settings?.discordOnUploadEmbed) {
+            var embed by remember(settings?.settings?.discordOnUploadEmbed, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnUploadEmbed)
             }
 
-            var embedTitle by remember(settings?.settings?.discordOnUploadEmbed?.title) {
+            var embedTitle by remember(settings?.settings?.discordOnUploadEmbed?.title, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadEmbed?.title ?: ""))
             }
 
-            var embedDescription by remember(settings?.settings?.discordOnUploadEmbed?.description) {
+            var embedDescription by remember(settings?.settings?.discordOnUploadEmbed?.description, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadEmbed?.description ?: ""))
             }
 
-            var embedFooter by remember(settings?.settings?.discordOnUploadEmbed?.footer) {
+            var embedFooter by remember(settings?.settings?.discordOnUploadEmbed?.footer, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadEmbed?.footer ?: ""))
             }
 
-            var embedColor by remember(settings?.settings?.discordOnUploadEmbed?.color) {
+            var embedColor by remember(settings?.settings?.discordOnUploadEmbed?.color, settingsUpdateTick) {
                 Log.d("DiscordWebhookOnUploadCategory", "embed: ${settings?.settings?.discordOnUploadEmbed}")
                 Log.d("DiscordWebhookOnUploadCategory", "Initial color: ${settings?.settings?.discordOnUploadEmbed?.color}")
 
@@ -169,19 +170,19 @@ internal fun DiscordWebhookOnUploadCategory(
                 mutableStateOf(if (color != null) Color(color) else Color.Black)
             }
 
-            var thumbnail by remember(settings?.settings?.discordOnUploadEmbed?.thumbnail) {
+            var thumbnail by remember(settings?.settings?.discordOnUploadEmbed?.thumbnail, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnUploadEmbed?.thumbnail ?: false)
             }
 
-            var imageOrVideo by remember(settings?.settings?.discordOnUploadEmbed?.imageOrVideo) {
+            var imageOrVideo by remember(settings?.settings?.discordOnUploadEmbed?.imageOrVideo, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnUploadEmbed?.imageOrVideo ?: false)
             }
 
-            var timestamp by remember(settings?.settings?.discordOnUploadEmbed?.timestamp) {
+            var timestamp by remember(settings?.settings?.discordOnUploadEmbed?.timestamp, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnUploadEmbed?.timestamp ?: false)
             }
 
-            var url by remember(settings?.settings?.discordOnUploadEmbed?.url) {
+            var url by remember(settings?.settings?.discordOnUploadEmbed?.url, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnUploadEmbed?.url ?: false)
             }
 

@@ -38,7 +38,8 @@ internal fun ChunksCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -70,7 +71,7 @@ internal fun ChunksCategory(
                 }
             }
 
-            var enableChunks by remember(settings?.settings?.chunksEnabled) {
+            var enableChunks by remember(settings?.settings?.chunksEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.chunksEnabled ?: false)
             }
 
@@ -82,7 +83,7 @@ internal fun ChunksCategory(
                 enabled = !isLoading
             )
 
-            var maxChunkSize by remember(settings?.settings?.chunksMax) {
+            var maxChunkSize by remember(settings?.settings?.chunksMax, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.chunksMax ?: ""))
             }
 
@@ -95,7 +96,7 @@ internal fun ChunksCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var chunksSize by remember(settings?.settings?.chunksSize) {
+            var chunksSize by remember(settings?.settings?.chunksSize, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.chunksSize ?: ""))
             }
 

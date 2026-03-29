@@ -39,7 +39,8 @@ internal fun RatelimitCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -80,7 +81,7 @@ internal fun RatelimitCategory(
                 }
             }
 
-            var enableRatelimit by remember(settings?.settings?.ratelimitEnabled) {
+            var enableRatelimit by remember(settings?.settings?.ratelimitEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.ratelimitEnabled ?: false)
             }
 
@@ -92,7 +93,7 @@ internal fun RatelimitCategory(
                 enabled = !isLoading
             )
 
-            var adminBypass by remember(settings?.settings?.ratelimitAdminBypass) {
+            var adminBypass by remember(settings?.settings?.ratelimitAdminBypass, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.ratelimitAdminBypass ?: false)
             }
 
@@ -104,7 +105,7 @@ internal fun RatelimitCategory(
                 enabled = !isLoading
             )
 
-            var maxRequests by remember(settings?.settings?.ratelimitMax) {
+            var maxRequests by remember(settings?.settings?.ratelimitMax, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.ratelimitMax ?: "").toString()))
             }
 
@@ -121,7 +122,7 @@ internal fun RatelimitCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var window by remember(settings?.settings?.ratelimitWindow) {
+            var window by remember(settings?.settings?.ratelimitWindow, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.ratelimitWindow ?: "").toString()))
             }
 
@@ -138,7 +139,7 @@ internal fun RatelimitCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var allowList by remember(settings?.settings?.ratelimitAllowList) {
+            var allowList by remember(settings?.settings?.ratelimitAllowList, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.ratelimitAllowList?.joinToString(", ") ?: ""))
             }
 

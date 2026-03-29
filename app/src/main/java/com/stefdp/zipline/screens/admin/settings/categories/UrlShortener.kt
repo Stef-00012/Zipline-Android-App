@@ -39,7 +39,8 @@ internal fun UrlShortenerCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -71,7 +72,7 @@ internal fun UrlShortenerCategory(
                 }
             }
 
-            var route by remember(settings?.settings?.urlsRoute) {
+            var route by remember(settings?.settings?.urlsRoute, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.urlsRoute ?: ""))
             }
 
@@ -92,7 +93,7 @@ internal fun UrlShortenerCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var length by remember(settings?.settings?.urlsLength) {
+            var length by remember(settings?.settings?.urlsLength, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.urlsLength ?: "").toString()))
             }
 

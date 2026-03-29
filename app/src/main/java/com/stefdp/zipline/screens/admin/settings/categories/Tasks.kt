@@ -37,7 +37,8 @@ internal fun TasksCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -84,7 +85,7 @@ internal fun TasksCategory(
                 }
             }
 
-            var deleteFilesInterval by remember(settings?.settings?.tasksDeleteInterval) {
+            var deleteFilesInterval by remember(settings?.settings?.tasksDeleteInterval, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.tasksDeleteInterval ?: ""))
             }
 
@@ -97,7 +98,7 @@ internal fun TasksCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var clearInvitesInterval by remember(settings?.settings?.tasksClearInvitesInterval) {
+            var clearInvitesInterval by remember(settings?.settings?.tasksClearInvitesInterval, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.tasksClearInvitesInterval ?: ""))
             }
 
@@ -110,7 +111,7 @@ internal fun TasksCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var maxViewsInterval by remember(settings?.settings?.tasksMaxViewsInterval) {
+            var maxViewsInterval by remember(settings?.settings?.tasksMaxViewsInterval, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.tasksMaxViewsInterval ?: ""))
             }
 
@@ -123,7 +124,7 @@ internal fun TasksCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var thumbnailsInterval by remember(settings?.settings?.tasksThumbnailsInterval) {
+            var thumbnailsInterval by remember(settings?.settings?.tasksThumbnailsInterval, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.tasksThumbnailsInterval ?: ""))
             }
 
@@ -136,7 +137,7 @@ internal fun TasksCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var cleanThumbnailsInterval by remember(settings?.settings?.tasksCleanThumbnailsInterval) {
+            var cleanThumbnailsInterval by remember(settings?.settings?.tasksCleanThumbnailsInterval, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.tasksCleanThumbnailsInterval ?: ""))
             }
 

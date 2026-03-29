@@ -36,7 +36,8 @@ internal fun InvitesCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -68,7 +69,7 @@ internal fun InvitesCategory(
                 }
             }
 
-            var invitesEnabled by remember(settings?.settings?.invitesEnabled) {
+            var invitesEnabled by remember(settings?.settings?.invitesEnabled, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.invitesEnabled ?: false)
             }
 
@@ -80,7 +81,7 @@ internal fun InvitesCategory(
                 enabled = !isLoading
             )
 
-            var length by remember(settings?.settings?.invitesLength) {
+            var length by remember(settings?.settings?.invitesLength, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue((settings?.settings?.invitesLength ?: "").toString()))
             }
 

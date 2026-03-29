@@ -1,22 +1,34 @@
 package com.stefdp.zipline.screens.admin.settings.categories
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -24,13 +36,18 @@ import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.network.models.WebsiteExternalLink
+import com.stefdp.zipline.screens.admin.settings.categories.components.ExternalLink
+import com.stefdp.zipline.screens.files.components.IconButton
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
+import java.util.Collections
 
 @Composable
 internal fun WebsiteCategory(
@@ -38,7 +55,9 @@ internal fun WebsiteCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int,
+    context: Context,
 ) {
     Container(
         scrollable = false,
@@ -76,7 +95,7 @@ internal fun WebsiteCategory(
                 }
             }
 
-            var title by remember(settings?.settings?.websiteTitle) {
+            var title by remember(settings?.settings?.websiteTitle, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteTitle ?: ""))
             }
 
@@ -89,7 +108,7 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var titleLogo by remember(settings?.settings?.websiteTitleLogo) {
+            var titleLogo by remember(settings?.settings?.websiteTitleLogo, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteTitleLogo ?: ""))
             }
 
@@ -102,9 +121,293 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // TODO: external urls
+            var externalLinks by remember(settings?.settings?.websiteExternalLinks, settingsUpdateTick) {
+                mutableStateOf(settings?.settings?.websiteExternalLinks ?: emptyList())
+            }
 
-            var loginBackground by remember(settings?.settings?.websiteLoginBackground) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                var createNewExternalUrl by remember { mutableStateOf(false) }
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            text = "External Links",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                        Text(
+                            text = "The external links to show in the website footer.",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                            ),
+                        )
+                    }
+
+                    IconButton(
+                        icon = painterResource(R.drawable.add),
+                        iconContentDescription = "Add external link",
+                        color = MaterialTheme.colorScheme.primary,
+                        iconColor = MaterialTheme.colorScheme.onPrimary,
+                        onClick = { createNewExternalUrl = true },
+                        enabled = !isLoading
+                    )
+                }
+
+                Container(
+                    scrollable = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(
+                            min = 100.dp,
+                            max = 300.dp
+                        )
+                ) {
+                    val externalLinksScrollState = rememberScrollState()
+
+                    var editExternalLinkIndex by remember { mutableIntStateOf(-1) }
+
+                    Popup(
+                        showPopup = createNewExternalUrl,
+                        onDismissRequest = { createNewExternalUrl = false },
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Create External Link",
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable(
+                                        onClick = { createNewExternalUrl = false }
+                                    )
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.close),
+                                    contentDescription = "Close create external link menu",
+                                )
+                            }
+                        }
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        var name by remember {
+                            mutableStateOf(TextFieldValue(""))
+                        }
+
+                        TextInput(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = "Name",
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        var url by remember {
+                            mutableStateOf(TextFieldValue(""))
+                        }
+
+                        TextInput(
+                            value = url,
+                            onValueChange = { url = it },
+                            label = "URL",
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                if (name.text.isBlank() || url.text.isBlank()) {
+                                    Toast.makeText(
+                                        context,
+                                        "Please fill in all fields",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    return@Button
+                                }
+
+                                val newExternalLink = WebsiteExternalLink(
+                                    name = name.text,
+                                    url = url.text
+                                )
+
+                                externalLinks = externalLinks + newExternalLink
+
+                                createNewExternalUrl = false
+                            },
+                            enabled = !isLoading
+                        ) {
+                            Text(
+                                text = "Create Link"
+                            )
+                        }
+                    }
+
+                    Popup(
+                        showPopup = editExternalLinkIndex != -1,
+                        onDismissRequest = { editExternalLinkIndex = -1 },
+                    ) {
+                        val externalLink = externalLinks[editExternalLinkIndex]
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Edit External Link",
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable(
+                                        onClick = { editExternalLinkIndex = -1 }
+                                    )
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.close),
+                                    contentDescription = "Close edit external link menu",
+                                )
+                            }
+                        }
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        var name by remember(externalLink.name) {
+                            mutableStateOf(TextFieldValue(externalLink.name))
+                        }
+
+                        TextInput(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = "Name",
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        var url by remember(externalLink.url) {
+                            mutableStateOf(TextFieldValue(externalLink.url))
+                        }
+
+                        TextInput(
+                            value = url,
+                            onValueChange = { url = it },
+                            label = "URL",
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                val updatedExternalLink = WebsiteExternalLink(
+                                    name = name.text,
+                                    url = url.text
+                                )
+
+                                externalLinks = externalLinks.toMutableList().also {
+                                    it[editExternalLinkIndex] = updatedExternalLink
+                                }.toList()
+
+                                editExternalLinkIndex = -1
+                             },
+                            enabled = !isLoading
+                        ) {
+                            Text(
+                                text = "Edit Link"
+                            )
+                        }
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScrollWithScrollbar(
+                                scrollState = externalLinksScrollState,
+                            )
+                            .padding(8.dp)
+                    ) {
+                        externalLinks.forEachIndexed { index, url ->
+                            ExternalLink(
+                                url = url,
+                                isLoading = isLoading,
+                                onEdit = {
+                                    editExternalLinkIndex = index
+                                },
+                                onDelete = {
+                                    externalLinks = externalLinks - url
+                                },
+                                onMoveUp = {
+                                    val _externalLinks = externalLinks.toMutableList()
+
+                                    Collections.swap(_externalLinks, index, index - 1)
+
+                                    externalLinks = _externalLinks.toList()
+                                },
+                                onMoveDown = {
+                                    val _externalLinks = externalLinks.toMutableList()
+
+                                    Collections.swap(_externalLinks, index, index + 1)
+
+                                    externalLinks = _externalLinks.toList()
+                                },
+                                isFirst = index == 0,
+                                isLast = index == externalLinks.lastIndex,
+                            )
+                        }
+                    }
+                }
+            }
+
+            var loginBackground by remember(settings?.settings?.websiteLoginBackground, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteLoginBackground ?: ""))
             }
 
@@ -117,7 +420,7 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var loginBackgroundBlur by remember(settings?.settings?.websiteLoginBackgroundBlur) {
+            var loginBackgroundBlur by remember(settings?.settings?.websiteLoginBackgroundBlur, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.websiteLoginBackgroundBlur ?: false)
             }
 
@@ -129,7 +432,7 @@ internal fun WebsiteCategory(
                 enabled = !isLoading
             )
 
-            var defaultAvatar by remember(settings?.settings?.websiteDefaultAvatar) {
+            var defaultAvatar by remember(settings?.settings?.websiteDefaultAvatar, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteDefaultAvatar ?: ""))
             }
 
@@ -142,7 +445,7 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var termsOfService by remember(settings?.settings?.websiteTos) {
+            var termsOfService by remember(settings?.settings?.websiteTos, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteTos ?: ""))
             }
 
@@ -155,7 +458,7 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var defaultTheme by remember(settings?.settings?.websiteThemeDefault) {
+            var defaultTheme by remember(settings?.settings?.websiteThemeDefault, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteThemeDefault ?: ""))
             }
 
@@ -168,7 +471,7 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var darkTheme by remember(settings?.settings?.websiteThemeDark) {
+            var darkTheme by remember(settings?.settings?.websiteThemeDark, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteThemeDark ?: ""))
             }
 
@@ -181,7 +484,7 @@ internal fun WebsiteCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var lightTheme by remember(settings?.settings?.websiteThemeLight) {
+            var lightTheme by remember(settings?.settings?.websiteThemeLight, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.websiteThemeLight ?: ""))
             }
 
@@ -212,6 +515,7 @@ internal fun WebsiteCategory(
                             websiteThemeDefault = defaultTheme.text,
                             websiteThemeDark = darkTheme.text,
                             websiteThemeLight = lightTheme.text,
+                            websiteExternalLinks = externalLinks
                         )
 
                         val updateSettingsErrors = updateSettings(data)

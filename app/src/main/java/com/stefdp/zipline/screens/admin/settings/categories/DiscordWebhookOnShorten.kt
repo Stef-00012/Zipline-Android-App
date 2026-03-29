@@ -51,7 +51,8 @@ internal fun DiscordWebhookOnShortenCategory(
     updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
-    title: String
+    title: String,
+    settingsUpdateTick: Int
 ) {
     Container(
         scrollable = false,
@@ -89,7 +90,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 }
             }
 
-            var webhookUrl by remember(settings?.settings?.discordOnShortenWebhookUrl) {
+            var webhookUrl by remember(settings?.settings?.discordOnShortenWebhookUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenWebhookUrl ?: ""))
             }
 
@@ -102,7 +103,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var username by remember(settings?.settings?.discordOnShortenUsername) {
+            var username by remember(settings?.settings?.discordOnShortenUsername, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenUsername ?: ""))
             }
 
@@ -115,7 +116,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var avatarUrl by remember(settings?.settings?.discordOnShortenAvatarUrl) {
+            var avatarUrl by remember(settings?.settings?.discordOnShortenAvatarUrl, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenAvatarUrl ?: ""))
             }
 
@@ -128,7 +129,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var content by remember(settings?.settings?.discordOnShortenContent) {
+            var content by remember(settings?.settings?.discordOnShortenContent, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenContent ?: ""))
             }
 
@@ -142,41 +143,41 @@ internal fun DiscordWebhookOnShortenCategory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var embed by remember(settings?.settings?.discordOnShortenEmbed) {
+            var embed by remember(settings?.settings?.discordOnShortenEmbed, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnShortenEmbed)
             }
 
-            var embedTitle by remember(settings?.settings?.discordOnShortenEmbed?.title) {
+            var embedTitle by remember(settings?.settings?.discordOnShortenEmbed?.title, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenEmbed?.title ?: ""))
             }
 
-            var embedDescription by remember(settings?.settings?.discordOnShortenEmbed?.description) {
+            var embedDescription by remember(settings?.settings?.discordOnShortenEmbed?.description, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenEmbed?.description ?: ""))
             }
 
-            var embedFooter by remember(settings?.settings?.discordOnShortenEmbed?.footer) {
+            var embedFooter by remember(settings?.settings?.discordOnShortenEmbed?.footer, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenEmbed?.footer ?: ""))
             }
 
-            var embedColor by remember(settings?.settings?.discordOnShortenEmbed?.color) {
+            var embedColor by remember(settings?.settings?.discordOnShortenEmbed?.color, settingsUpdateTick) {
                 val color = settings?.settings?.discordOnShortenEmbed?.color?.toColorInt()
 
                 mutableStateOf(if (color != null) Color(color) else Color.Black)
             }
 
-            var thumbnail by remember(settings?.settings?.discordOnShortenEmbed?.thumbnail) {
+            var thumbnail by remember(settings?.settings?.discordOnShortenEmbed?.thumbnail, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnShortenEmbed?.thumbnail ?: false)
             }
 
-            var imageOrVideo by remember(settings?.settings?.discordOnShortenEmbed?.imageOrVideo) {
+            var imageOrVideo by remember(settings?.settings?.discordOnShortenEmbed?.imageOrVideo, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnShortenEmbed?.imageOrVideo ?: false)
             }
 
-            var timestamp by remember(settings?.settings?.discordOnShortenEmbed?.timestamp) {
+            var timestamp by remember(settings?.settings?.discordOnShortenEmbed?.timestamp, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnShortenEmbed?.timestamp ?: false)
             }
 
-            var url by remember(settings?.settings?.discordOnShortenEmbed?.url) {
+            var url by remember(settings?.settings?.discordOnShortenEmbed?.url, settingsUpdateTick) {
                 mutableStateOf(settings?.settings?.discordOnShortenEmbed?.url ?: false)
             }
 

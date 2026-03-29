@@ -43,6 +43,9 @@ object AdminSettingsScreen : AppScreen
 object AdminUsersScreen : AppScreen
 
 @Serializable
+object AdminActionsScreen : AppScreen
+
+@Serializable
 object AdminInvitesScreen : AppScreen
 
 @Serializable

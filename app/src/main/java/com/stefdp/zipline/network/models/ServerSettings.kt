@@ -2,6 +2,7 @@ package com.stefdp.zipline.network.models
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.stefdp.zipline.network.models.requests.UploadCompressionType
 import kotlinx.parcelize.Parcelize
 
 data class ServerSettings(
@@ -38,7 +39,7 @@ data class ServerSettingsSettings(
     val filesRemoveGpsMetadata: Boolean,
     val filesRandomWordsNumAdjectives: Long,
     val filesRandomWordsSeparator: String,
-    val filesDefaultCompressionFormat: String? = null,
+    val filesDefaultCompressionFormat: UploadCompressionType? = null,
     val filesMaxFilesPerUpload: Long,
 
     val urlsRoute: String,
@@ -172,7 +173,7 @@ data class PartialServerSettingsSettings(
     val filesRemoveGpsMetadata: Boolean? = null,
     val filesRandomWordsNumAdjectives: Long? = null,
     val filesRandomWordsSeparator: String? = null,
-    val filesDefaultCompressionFormat: String? = null,
+    val filesDefaultCompressionFormat: UploadCompressionType? = null,
     val filesMaxFilesPerUpload: Long? = null,
 
     val urlsRoute: String? = null,
@@ -212,7 +213,7 @@ data class PartialServerSettingsSettings(
     val websiteThemeLight: String? = null,
 
     val oauthBypassLocalLogin: Boolean? = null,
-    val oauthLoginOnly: Boolean,
+    val oauthLoginOnly: Boolean? = null,
 
     val oauthDiscordClientId: String? = null,
     val oauthDiscordClientSecret: String? = null,

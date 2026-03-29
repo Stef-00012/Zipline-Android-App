@@ -35,6 +35,7 @@ fun Switch(
     description: CharSequence? = null,
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
     ) {
         Row(
@@ -59,10 +60,6 @@ fun Switch(
         }
 
         if (description != null) {
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-
             Text(
                 text = description.toAnnotatedString(),
                 style = MaterialTheme.typography.bodyMedium.copy(

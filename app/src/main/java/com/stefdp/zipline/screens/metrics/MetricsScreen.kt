@@ -61,6 +61,8 @@ import com.stefdp.zipline.network.models.Metric
 import com.stefdp.zipline.network.requests.getServerStats
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.network.models.UserRole
+import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.metrics.components.Stat
 import com.stefdp.zipline.utils.colorHash
 import com.stefdp.zipline.utils.formatBytes
@@ -100,6 +102,20 @@ fun MetricsScreen(
     }
 
     val webSettings = LocalWebSettings.current
+
+    if (webSettings?.config?.features?.metrics?.enabled != true) {
+        navController.navigate(HomeScreen) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+
+    localLoggedUser?.role?.level?.let {
+        if (webSettings?.config?.features?.metrics?.adminOnly == true && it > UserRole.ADMIN.level) {
+            navController.navigate(HomeScreen) {
+                popUpTo(navController.graph.id) { inclusive = true }
+            }
+        }
+    }
 
     val today = Instant.now()
 

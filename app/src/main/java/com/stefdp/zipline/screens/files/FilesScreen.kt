@@ -66,7 +66,7 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.DeletePromptPopup
+import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.HeaderButton
@@ -127,7 +127,24 @@ fun FilesScreen(
     activity: FragmentActivity,
     userId: String? = null
 ) {
-    val currentUser = LocalLoggedUser.current
+    val localLoggedUser = LocalLoggedUser.current
+
+    val validRoles = listOf(
+        UserRole.ADMIN,
+        UserRole.SUPERADMIN
+    )
+
+    if (localLoggedUser == null) {
+        navController.navigate(LoginScreen) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+
+    if (userId != null && localLoggedUser?.role !in validRoles) {
+        navController.navigate(HomeScreen) {
+            popUpTo(HomeScreen) { inclusive = true }
+        }
+    }
 
     var username by remember { mutableStateOf<String?>(null) }
     var files by remember { mutableStateOf<List<File>?>(null) }
@@ -135,23 +152,6 @@ fun FilesScreen(
     var incompleteFiles by remember { mutableStateOf<List<IncompleteFile>?>(null) }
 
     var tags by remember { mutableStateOf<List<Tag>?>(null) }
-
-    val validRoles = listOf(
-        UserRole.ADMIN,
-        UserRole.SUPERADMIN
-    )
-
-    if (currentUser == null) {
-        navController.navigate(LoginScreen) {
-            popUpTo(navController.graph.id) { inclusive = true }
-        }
-    }
-
-    if (userId != null && currentUser?.role !in validRoles) {
-        navController.navigate(HomeScreen) {
-            popUpTo(HomeScreen) { inclusive = true }
-        }
-    }
 
     var serverUrl by remember { mutableStateOf<String?>(null) }
 
@@ -179,7 +179,7 @@ fun FilesScreen(
     suspend fun updateFiles() {
         isLoading = true
 
-        if (userId != null && currentUser?.role in validRoles) {
+        if (userId != null && localLoggedUser?.role in validRoles) {
             val userRes = getUser(
                 context = context,
                 userId = userId,
@@ -188,7 +188,7 @@ fun FilesScreen(
             userRes.onSuccess {
                 username = it.username
 
-                if (!canInteract(currentUser?.role, it.role)) {
+                if (!canInteract(localLoggedUser?.role, it.role)) {
                     navController.navigate(HomeScreen) {
                         popUpTo(HomeScreen) { inclusive = true }
                     }
@@ -854,14 +854,14 @@ fun FilesScreen(
                 var deleteFile by remember { mutableStateOf<File?>(null) }
                 val coroutineScope = rememberCoroutineScope()
 
-                DeletePromptPopup(
+                PromptPopup(
                     showPopup = deleteFile != null,
                     onDismissRequest = { deleteFile = null },
                     onCancel = { deleteFile = null },
                     isLoading = isLoading,
                     title = "Are you sure?",
                     description = "Are you sure you want to delete ${deleteFile?.originalName ?: deleteFile?.name}? This action cannot be undone.",
-                    onDelete = {
+                    onSuccess = {
                         coroutineScope.launch {
                             if (deleteFile == null) return@launch
 
@@ -1226,7 +1226,7 @@ fun FilesScreen(
                     )
             ) {
                 if (files == null || isLoading) {
-                    items(filesPerPage.toInt()) {
+                    items(5) {
                         Box(
                             modifier = Modifier
                                 .padding(5.dp)

@@ -96,7 +96,10 @@ fun TableHeader(
                         Icon(
                             painter = painterResource(R.drawable.filter_alt),
                             contentDescription = "Search by ${header.name}",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (header.searchEnabled)
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         )
                     }
                 }

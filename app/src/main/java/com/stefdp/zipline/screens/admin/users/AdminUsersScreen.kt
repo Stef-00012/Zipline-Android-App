@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,20 +41,19 @@ import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Avatar
 import com.stefdp.zipline.components.DeletePromptButtonLayout
-import com.stefdp.zipline.components.DeletePromptPopup
+import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.components.table.TableScrollbarConfig
-import com.stefdp.zipline.network.models.Url
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.UserRole
-import com.stefdp.zipline.network.requests.deleteUrl
 import com.stefdp.zipline.network.requests.deleteUser
 import com.stefdp.zipline.network.requests.getUsers
 import com.stefdp.zipline.screens.FilesScreen
+import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.users.components.CreateUserPopup
 import com.stefdp.zipline.screens.admin.users.components.EditUserPopup
@@ -76,11 +74,19 @@ fun AdminUsersScreen(
     context: Context,
     activity: FragmentActivity,
 ) {
-    val currentUser = LocalLoggedUser.current
+    val localLoggedUser = LocalLoggedUser.current
 
-    if (currentUser == null || currentUser.role.level > UserRole.ADMIN.level) {
+    if (localLoggedUser == null) {
         navController.navigate(LoginScreen) {
             popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+
+    localLoggedUser?.role?.level?.let {
+        if (it > UserRole.ADMIN.level) {
+            navController.navigate(HomeScreen) {
+                popUpTo(navController.graph.id) { inclusive = true }
+            }
         }
     }
 
@@ -99,10 +105,6 @@ fun AdminUsersScreen(
     var deleteUser by remember { mutableStateOf<User?>(null) }
     var deleteUserLevel by remember { mutableIntStateOf(0) }
     var editUser by remember { mutableStateOf<User?>(null) }
-
-    LaunchedEffect(users) {
-        Log.d("AdminUsersScreen", "Users updated: $users")
-    }
 
     fun sortUsers(users: List<User>): List<User> {
         if (!compactView) return users.sortedBy { Instant.parse(it.createdAt) }.reversed()
@@ -150,14 +152,14 @@ fun AdminUsersScreen(
     val coroutineScope = rememberCoroutineScope()
 
     if (deleteUserLevel == 0) {
-        DeletePromptPopup(
+        PromptPopup(
             showPopup = deleteUser != null,
             onDismissRequest = { deleteUser = null },
             onCancel = { deleteUser = null },
             isLoading = isLoading,
             title = "Delete ${deleteUser?.username}?",
             description = "Are you sure you want to delete ${deleteUser?.username}? This action cannot be undone.",
-            onDelete = {
+            onSuccess = {
                 coroutineScope.launch {
                     if (deleteUser == null) return@launch
 
@@ -166,7 +168,7 @@ fun AdminUsersScreen(
             }
         )
     } else {
-        DeletePromptPopup(
+        PromptPopup(
             showPopup = deleteUser != null,
             isLoading = isLoading,
             title = "Delete ${deleteUser?.username}'s data?",
@@ -176,7 +178,7 @@ fun AdminUsersScreen(
                 deleteUserLevel = 0
                 deleteUser = null
             },
-            onDelete = {
+            onSuccess = {
                 coroutineScope.launch {
                     if (deleteUser == null) return@launch
 
@@ -246,12 +248,12 @@ fun AdminUsersScreen(
                 }
             },
             cancelText = "No, keep everything & only delete user",
-            deleteText = "Yes, delete everything"
+            successText = "Yes, delete everything"
         )
     }
 
     CreateUserPopup(
-        currentUser = currentUser,
+        currentUser = localLoggedUser,
         context = context,
         showPopup = createdNewUserPopupOpen,
         onDismissRequest = { createdNewUserPopupOpen = false },
@@ -259,7 +261,7 @@ fun AdminUsersScreen(
     )
 
     EditUserPopup(
-        currentUser = currentUser,
+        currentUser = localLoggedUser,
         user = editUser,
         context = context,
         showPopup = editUser != null,
@@ -285,9 +287,6 @@ fun AdminUsersScreen(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
             )
 
             Row(
@@ -470,7 +469,7 @@ fun AdminUsersScreen(
                 )
 
                 val rows: List<TableRowData> = users?.map { user ->
-                    val canInteractWithUser = canInteract(currentUser?.role, user.role)
+                    val canInteractWithUser = canInteract(localLoggedUser?.role, user.role)
 
                     TableRowData(
                         clickable = true,
@@ -591,7 +590,7 @@ fun AdminUsersScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (users == null || isLoading) {
-                    items(15) {
+                    items(5) {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
@@ -609,7 +608,7 @@ fun AdminUsersScreen(
                     if (users!!.size > 0L) {
                         items(users!!.size) { index ->
                             val user = users!![index]
-                            val canInteractWithUser = canInteract(currentUser?.role, user.role)
+                            val canInteractWithUser = canInteract(localLoggedUser?.role, user.role)
 
                             LargeUserDisplay(
                                 user = user,

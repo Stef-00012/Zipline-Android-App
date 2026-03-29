@@ -126,6 +126,8 @@ fun UploadTextScreen(
         webSettings?.config?.chunks?.size ?: "25mb"
     )
 
+    val chunksEnabled = webSettings?.config?.chunks?.enabled ?: false
+
     val mimetypes = webSettings?.codeMap ?: listOf(
         CodeMapEntry(
             name = "Plain text",
@@ -915,7 +917,7 @@ fun UploadTextScreen(
                             it == selectedOverrideDomain.firstOrNull()
                         }
 
-                    if (tempFile.length() >= maxChunkSize) {
+                    if (chunksEnabled && tempFile.length() >= maxChunkSize) {
                         val uploadPartialFileResult = uploadPartialFile(
                             context = context,
                             filePath = tempFile.absolutePath,

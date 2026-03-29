@@ -2,6 +2,7 @@ package com.stefdp.zipline.components
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +49,7 @@ import com.stefdp.zipline.utils.toAnnotatedString
 @Composable
 fun TextInput(
     modifier: Modifier = Modifier,
+    containerModifier: Modifier = Modifier,
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -70,103 +72,104 @@ fun TextInput(
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = value,
-        keyboardActions = keyboardActions,
-        onValueChange = onValueChange,
-        textStyle = LocalTextStyle.current.copy(
-            color = if (enabled)
-                MaterialTheme.colorScheme.onBackground
-            else
-                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-        ),
-        modifier = modifier,
-        readOnly = readOnly,
-        singleLine = singleLine,
-        label = if (label != null) {
-            {
-                Text(
-                    text = label.toAnnotatedString(),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    color = if (enabled)
-                        MaterialTheme.colorScheme.onBackground
-                    else
-                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                )
-            }
-        } else null,
-        placeholder = if (placeholder != null) {
-            {
-                Text(
-                    text = placeholder.toAnnotatedString(),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                )
-            }
-        } else null,
-        enabled = enabled,
-        colors = colors,
-        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
-        visualTransformation = if (isPassword && !passwordVisible) {
-            PasswordVisualTransformation()
-        } else VisualTransformation.None,
-        keyboardOptions = keyboardOptions,
-        trailingIcon = if (isPassword || sideButtonIcon != null) {
-            {
-                IconButton(
-                    modifier = Modifier.padding(end = 4.dp),
-                    onClick = if (isPassword) {
-                        {
-                            passwordVisible = !passwordVisible
-                            onPasswordToggle(passwordVisible)
-                        }
-                    } else onSideButtonPress
-                ) {
-                    Icon(
-                        painter = if (isPassword) {
-                            if (passwordVisible) {
-                                painterResource(R.drawable.visibility_off)
-                            } else {
-                                painterResource(R.drawable.visibility)
-                            }
-                        } else {
-                            /*
-                                This is safe because this button only appears if the
-                                (isPassword || sideButtonIcon != null) condition passes,
-                                and this "else" is only reached if "isPassword" is false,
-                                which means "sideButtonIcon" must be non-null
-                            */
-                            sideButtonIcon as Painter
-                        },
-                        tint = sideButtonColor,
-                        contentDescription = if (isPassword) {
-                            if (passwordVisible)
-                                "TMP"
-                            else "TMP"
-                        } else sideButtonContentDescription ?: "TMP",
-                        modifier = Modifier.requiredSize(28.dp)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = containerModifier
+    ) {
+        OutlinedTextField(
+            value = value,
+            keyboardActions = keyboardActions,
+            onValueChange = onValueChange,
+            textStyle = LocalTextStyle.current.copy(
+                color = if (enabled)
+                    MaterialTheme.colorScheme.onBackground
+                else
+                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            ),
+            modifier = modifier,
+            readOnly = readOnly,
+            singleLine = singleLine,
+            label = if (label != null) {
+                {
+                    Text(
+                        text = label.toAnnotatedString(),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = if (enabled)
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                     )
                 }
-            }
-        } else null
-    )
-
-    if (description != null) {
-        Spacer(
-            modifier = Modifier.height(8.dp)
+            } else null,
+            placeholder = if (placeholder != null) {
+                {
+                    Text(
+                        text = placeholder.toAnnotatedString(),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
+                }
+            } else null,
+            enabled = enabled,
+            colors = colors,
+            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
+            visualTransformation = if (isPassword && !passwordVisible) {
+                PasswordVisualTransformation()
+            } else VisualTransformation.None,
+            keyboardOptions = keyboardOptions,
+            trailingIcon = if (isPassword || sideButtonIcon != null) {
+                {
+                    IconButton(
+                        modifier = Modifier.padding(end = 4.dp),
+                        onClick = if (isPassword) {
+                            {
+                                passwordVisible = !passwordVisible
+                                onPasswordToggle(passwordVisible)
+                            }
+                        } else onSideButtonPress
+                    ) {
+                        Icon(
+                            painter = if (isPassword) {
+                                if (passwordVisible) {
+                                    painterResource(R.drawable.visibility_off)
+                                } else {
+                                    painterResource(R.drawable.visibility)
+                                }
+                            } else {
+                                /*
+                                    This is safe because this button only appears if the
+                                    (isPassword || sideButtonIcon != null) condition passes,
+                                    and this "else" is only reached if "isPassword" is false,
+                                    which means "sideButtonIcon" must be non-null
+                                */
+                                sideButtonIcon as Painter
+                            },
+                            tint = sideButtonColor,
+                            contentDescription = if (isPassword) {
+                                if (passwordVisible)
+                                    "TMP"
+                                else "TMP"
+                            } else sideButtonContentDescription ?: "TMP",
+                            modifier = Modifier.requiredSize(28.dp)
+                        )
+                    }
+                }
+            } else null
         )
 
-        Text(
-            text = description.toAnnotatedString(),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-            ),
-            modifier = Modifier.padding(
-                horizontal = 8.dp
+        if (description != null) {
+            Text(
+                text = description.toAnnotatedString(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.padding(
+                    horizontal = 8.dp
+                )
             )
-        )
+        }
     }
 }
 

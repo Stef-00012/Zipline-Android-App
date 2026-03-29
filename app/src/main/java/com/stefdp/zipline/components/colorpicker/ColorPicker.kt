@@ -4,7 +4,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,18 +45,22 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.utils.colorHash
 import com.stefdp.zipline.utils.drawCheckerboard
+import com.stefdp.zipline.utils.toAnnotatedString
 
 val ColorRegex = Regex("^#([A-Fa-f0-9]{6})$")
 val AlphaColorRegex = Regex("^#([A-Fa-f0-9]{8})")
+val GeneralHexRegex = Regex("^#([A-Fa-f0-9])*$")
 
 @Composable
 fun ColorPicker(
     modifier: Modifier = Modifier,
+    containerModifier: Modifier = Modifier,
     color: Color,
     onColorChange: (Color) -> Unit,
     enabled: Boolean = true,
     label: CharSequence? = null,
     placeholder: CharSequence? = null,
+    description: CharSequence? = null,
     colors: TextFieldColors = getOutlinedTextFieldColors(),
     colorSide: ColorSide = ColorSide.RIGHT,
     showAutomaticColorButton: Boolean = false,
@@ -62,6 +69,7 @@ fun ColorPicker(
     alpha: Boolean = false,
 ) {
     val colorRegex = if (alpha) AlphaColorRegex else ColorRegex
+    val maxLength = if (alpha) 9 else 7
 
     var value by remember(color) { mutableStateOf(TextFieldValue(color.toHex(alpha))) }
     val originalValue by remember { mutableStateOf(value) }
@@ -77,6 +85,15 @@ fun ColorPicker(
         )
     }
     var pickerColor by remember { mutableStateOf(currentColor) }
+
+    LaunchedEffect(value.text) {
+        if (colorRegex.matches(value.text)) {
+            val newColor = Color(value.text.toColorInt())
+
+            currentColor = newColor
+            pickerColor = newColor
+        }
+    }
 
     val focusManager = LocalFocusManager.current
 
@@ -132,65 +149,94 @@ fun ColorPicker(
         }
     }
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            value = it
-        },
-        textStyle = LocalTextStyle.current.copy(
-            color = if (enabled)
-                MaterialTheme.colorScheme.onBackground
-            else
-                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-        ),
-        singleLine = true,
-        keyboardActions = KeyboardActions(
-            onDone = { onDone() }
-        ),
-        label = if (label != null) {
-            {
-                Text(
-                    text = label.toString(),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    color = if (enabled)
-                        MaterialTheme.colorScheme.onBackground
-                    else
-                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                )
-            }
-        } else null,
-        placeholder = if (placeholder != null) {
-            {
-                Text(
-                    text = placeholder.toString(),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                )
-            }
-        } else null,
-        colors = colors,
-        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
-        enabled = enabled,
-        leadingIcon = {
-            SideButton(ColorSide.LEFT)
-        },
-        trailingIcon = {
-            SideButton(ColorSide.RIGHT)
-        },
-        modifier = modifier
-            .onPreviewKeyEvent { keyEvent ->
-                if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
-                    onDone()
-                    focusManager.clearFocus()
-
-                    true
-                } else {
-                    false
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = containerModifier
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                if (it.text.isBlank()) {
+                    value = TextFieldValue("#${if (alpha) "00" else ""}000000")
                 }
-            }
-    )
+
+                if (!GeneralHexRegex.matches(it.text)) return@OutlinedTextField
+
+                if (it.text.length <= maxLength && it.text.startsWith("#")) {
+                    value = it
+                }
+            },
+            textStyle = LocalTextStyle.current.copy(
+                color = if (enabled)
+                    MaterialTheme.colorScheme.onBackground
+                else
+                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            ),
+            singleLine = true,
+            keyboardActions = KeyboardActions(
+                onDone = { onDone() }
+            ),
+            label = if (label != null) {
+                {
+                    Text(
+                        text = label.toString(),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = if (enabled)
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
+                }
+            } else null,
+            placeholder = if (placeholder != null) {
+                {
+                    Text(
+                        text = placeholder.toString(),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
+                }
+            } else null,
+            colors = colors,
+            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
+            enabled = enabled,
+            leadingIcon = if (colorSide == ColorSide.RIGHT && !showAutomaticColorButton)
+                null
+            else ({
+                SideButton(ColorSide.LEFT)
+            }),
+            trailingIcon = if (colorSide == ColorSide.LEFT && !showAutomaticColorButton)
+                null
+            else ({
+                SideButton(ColorSide.RIGHT)
+            }),
+            modifier = modifier
+                .onPreviewKeyEvent { keyEvent ->
+                    if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
+                        onDone()
+                        focusManager.clearFocus()
+
+                        true
+                    } else {
+                        false
+                    }
+                }
+        )
+
+        if (description != null) {
+            Text(
+                text = description.toAnnotatedString(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.padding(
+                    horizontal = 8.dp
+                )
+            )
+        }
+    }
 
     Popup(
         showPopup = showPicker,

@@ -37,7 +37,10 @@ import androidx.navigation.toRoute
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.DEBUG_USER_ID
 import com.stefdp.zipline.DebugWrapper
+import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.R
+import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.screens.*
 
 const val DRAWER_CORNER_RADIUS = BASE_CORNER_RADIUS + 5
@@ -50,6 +53,9 @@ fun Sidebar(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    val webSettings = LocalWebSettings.current
+    val currentUser = LocalLoggedUser.current
 
     ModalDrawerSheet(
         drawerContainerColor = MaterialTheme.colorScheme.surface,
@@ -92,32 +98,40 @@ fun Sidebar(
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
 
-            NavigationDrawerItem(
-                label = {
-                    Row {
-                        Icon(
-                            painter = painterResource(R.drawable.bar_chart),
-                            contentDescription = "Metrics Screen"
-                        )
+            if (
+                webSettings?.config?.features?.metrics?.enabled == true
+            ) {
+                currentUser?.role?.level?.let {
+                    if (webSettings.config.features.metrics.adminOnly && it > UserRole.ADMIN.level) return@let
 
-                        Spacer(
-                            modifier = Modifier.width(6.dp)
-                        )
+                    NavigationDrawerItem(
+                        label = {
+                            Row {
+                                Icon(
+                                    painter = painterResource(R.drawable.bar_chart),
+                                    contentDescription = "Metrics Screen"
+                                )
 
-                        Text("Metrics")
-                    }
-                },
-                selected = false,
-                onClick = {
-                    if (currentDestination?.route != MetricsScreen::class.qualifiedName) {
-                        onItemClick(MetricsScreen)
-                    } else {
-                        closeSidebar()
-                    }
-                },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-            )
+                                Spacer(
+                                    modifier = Modifier.width(6.dp)
+                                )
+
+                                Text("Metrics")
+                            }
+                        },
+                        selected = false,
+                        onClick = {
+                            if (currentDestination?.route != MetricsScreen::class.qualifiedName) {
+                                onItemClick(MetricsScreen)
+                            } else {
+                                closeSidebar()
+                            }
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                    )
+                }
+            }
 
             NavigationDrawerItem(
                 label = {
@@ -277,96 +291,131 @@ fun Sidebar(
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
             )
 
-            ExpandableDrawerSection(
-                label = {
-                    Row {
-                        Icon(
-                            painter = painterResource(R.drawable.home),
-                            contentDescription = "Administration Menu"
+            currentUser?.role?.level?.let {
+                if (it <= UserRole.ADMIN.level) {
+                    ExpandableDrawerSection(
+                        label = {
+                            Row {
+                                Icon(
+                                    painter = painterResource(R.drawable.admin_panel_settings),
+                                    contentDescription = "Administration Menu"
+                                )
+
+                                Spacer(
+                                    modifier = Modifier.width(6.dp)
+                                )
+
+                                Text("Administrator")
+                            }
+                        },
+                    ) {
+                        if (it <= UserRole.SUPERADMIN.level) {
+                            NavigationDrawerItem(
+                                label = {
+                                    Row {
+                                        Icon(
+                                            painter = painterResource(R.drawable.settings),
+                                            contentDescription = "Administrator Settings Screen"
+                                        )
+
+                                        Spacer(
+                                            modifier = Modifier.width(6.dp)
+                                        )
+
+                                        Text("Settings")
+                                    }
+                                },
+                                selected = false,
+                                onClick = { onItemClick(AdminSettingsScreen) },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                            )
+                        }
+
+                        NavigationDrawerItem(
+                            label = {
+                                Row {
+                                    Icon(
+                                        painter = painterResource(R.drawable.group),
+                                        contentDescription = "Administrator Users Screen"
+                                    )
+
+                                    Spacer(
+                                        modifier = Modifier.width(6.dp)
+                                    )
+
+                                    Text("Users")
+                                }
+                            },
+                            selected = false,
+                            onClick = {
+                                if (currentDestination?.route != AdminUsersScreen::class.qualifiedName) {
+                                    onItemClick(AdminUsersScreen)
+                                } else {
+                                    closeSidebar()
+                                }
+                            },
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                         )
 
-                        Spacer(
-                            modifier = Modifier.width(6.dp)
+                        NavigationDrawerItem(
+                            label = {
+                                Row {
+                                    Icon(
+                                        painter = painterResource(R.drawable.timer),
+                                        contentDescription = "Administrator Actions Screen"
+                                    )
+
+                                    Spacer(
+                                        modifier = Modifier.width(6.dp)
+                                    )
+
+                                    Text("Actions")
+                                }
+                            },
+                            selected = false,
+                            onClick = {
+                                if (currentDestination?.route != AdminActionsScreen::class.qualifiedName) {
+                                    onItemClick(AdminActionsScreen)
+                                } else {
+                                    closeSidebar()
+                                }
+                            },
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                         )
 
-                        Text("Administrator")
+                        if (webSettings?.config?.invites?.enabled == true) {
+                            NavigationDrawerItem(
+                                label = {
+                                    Row {
+                                        Icon(
+                                            painter = painterResource(R.drawable.mail),
+                                            contentDescription = "Administrator Invites Screen"
+                                        )
+
+                                        Spacer(
+                                            modifier = Modifier.width(6.dp)
+                                        )
+
+                                        Text("Invites")
+                                    }
+                                },
+                                selected = false,
+                                onClick = {
+                                    if (currentDestination?.route != AdminInvitesScreen::class.qualifiedName) {
+                                        onItemClick(AdminInvitesScreen)
+                                    } else {
+                                        closeSidebar()
+                                    }
+                                },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                            )
+                        }
                     }
-                },
-            ) {
-                NavigationDrawerItem(
-                    label = {
-                        Row {
-                            Icon(
-                                painter = painterResource(R.drawable.settings),
-                                contentDescription = "Administrator Settings Screen"
-                            )
-
-                            Spacer(
-                                modifier = Modifier.width(6.dp)
-                            )
-
-                            Text("Settings")
-                        }
-                    },
-                    selected = false,
-                    onClick = { onItemClick(AdminSettingsScreen) },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                )
-
-                NavigationDrawerItem(
-                    label = {
-                        Row {
-                            Icon(
-                                painter = painterResource(R.drawable.group),
-                                contentDescription = "Administrator Users Screen"
-                            )
-
-                            Spacer(
-                                modifier = Modifier.width(6.dp)
-                            )
-
-                            Text("Users")
-                        }
-                    },
-                    selected = false,
-                    onClick = {
-                        if (currentDestination?.route != AdminUsersScreen::class.qualifiedName) {
-                            onItemClick(AdminUsersScreen)
-                        } else {
-                            closeSidebar()
-                        }
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                )
-
-                NavigationDrawerItem(
-                    label = {
-                        Row {
-                            Icon(
-                                painter = painterResource(R.drawable.mail),
-                                contentDescription = "Administrator Invites Screen"
-                            )
-
-                            Spacer(
-                                modifier = Modifier.width(6.dp)
-                            )
-
-                            Text("Invites")
-                        }
-                    },
-                    selected = false,
-                    onClick = {
-                        if (currentDestination?.route != AdminInvitesScreen::class.qualifiedName) {
-                            onItemClick(AdminInvitesScreen)
-                        } else {
-                            closeSidebar()
-                        }
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                )
+                }
             }
 
             DebugWrapper {

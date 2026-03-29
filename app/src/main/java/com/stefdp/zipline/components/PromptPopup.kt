@@ -10,38 +10,45 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.utils.toAnnotatedString
 
 @Composable
-fun DeletePromptPopup(
+fun PromptPopup(
     showPopup: Boolean,
-    isLoading: Boolean,
+    isLoading: Boolean = false,
     onCancel: () -> Unit,
-    onDelete: () -> Unit,
+    onSuccess: () -> Unit,
     onDismissRequest: () -> Unit,
-    title: String,
-    description: String,
-    cancelText: String = "Cancel",
-    deleteText: String = "Delete",
-    buttonLayout: DeletePromptButtonLayout = DeletePromptButtonLayout.HORIZONTAL
+    title: CharSequence,
+    description: CharSequence,
+    cancelText: CharSequence = "Cancel",
+    successText: CharSequence = "Delete",
+    cancelColor: Color = DarkGray,
+    successColor: Color = MaterialTheme.colorScheme.error,
+    buttonLayout: DeletePromptButtonLayout = DeletePromptButtonLayout.HORIZONTAL,
+    content: @Composable () -> Unit = { }
 ) {
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest
     ) {
         Text(
-            text = title,
+            text = title.toAnnotatedString(),
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold
             ),
         )
 
         Text(
-            text = description
+            text = description.toAnnotatedString()
         )
+
+        content()
 
         if (buttonLayout == DeletePromptButtonLayout.HORIZONTAL) {
             Row(
@@ -55,25 +62,25 @@ fun DeletePromptPopup(
                 Button(
                     onClick = onCancel,
                     colors = getButtonColors().copy(
-                        containerColor = DarkGray,
-                        disabledContainerColor = DarkGray.copy(alpha = 0.5f)
+                        containerColor = cancelColor,
+                        disabledContainerColor = cancelColor.copy(alpha = 0.5f)
                     ),
                     enabled = !isLoading
                 ) {
-                    Text(cancelText)
+                    Text(cancelText.toAnnotatedString())
                 }
 
                 Button(
                     onClick = {
-                        onDelete()
+                        onSuccess()
                     },
                     colors = getButtonColors().copy(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                        containerColor = successColor,
+                        disabledContainerColor = successColor.copy(alpha = 0.5f)
                     ),
                     enabled = !isLoading
                 ) {
-                    Text(deleteText)
+                    Text(successText.toAnnotatedString())
                 }
             }
         } else {
@@ -89,30 +96,28 @@ fun DeletePromptPopup(
                 Button(
                     onClick = onCancel,
                     colors = getButtonColors().copy(
-                        containerColor = DarkGray,
-                        disabledContainerColor = DarkGray.copy(alpha = 0.5f)
+                        containerColor = cancelColor,
+                        disabledContainerColor = cancelColor.copy(alpha = 0.5f)
                     ),
                     enabled = !isLoading
                 ) {
-                    Text(cancelText)
+                    Text(cancelText.toAnnotatedString())
                 }
 
                 Button(
                     onClick = {
-                        onDelete()
+                        onSuccess()
                     },
                     colors = getButtonColors().copy(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                        containerColor = successColor,
+                        disabledContainerColor = successColor.copy(alpha = 0.5f)
                     ),
                     enabled = !isLoading
                 ) {
-                    Text(deleteText)
+                    Text(successText.toAnnotatedString())
                 }
             }
         }
-
-
     }
 }
 

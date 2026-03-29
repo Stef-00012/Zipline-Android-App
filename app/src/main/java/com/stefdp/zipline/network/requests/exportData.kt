@@ -16,6 +16,7 @@ suspend fun exportData(
     notificationTitle: String = "Exporting data",
     notificationContent: String = "Export in progress",
     onProgress: (totalBytes: Long, bytesTransferred: Long, speedBytesPerSecond: Double) -> Unit = { _, _, _ -> },
+    excludeMetrics: Boolean? = null
 ): Result<String> {
     val secureStore = SecureStorage.getInstance(context)
 
@@ -38,7 +39,10 @@ suspend fun exportData(
     val transferId = service.registerTransfer(notificationTitle, notificationContent, onProgress)
 
     return try {
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).exportData(token)
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).exportData(
+            token = token,
+            noMetrics = excludeMetrics
+        )
 
         if (!response.isSuccessful) {
             service.failTransfer(transferId, "HTTP ${response.code()}")

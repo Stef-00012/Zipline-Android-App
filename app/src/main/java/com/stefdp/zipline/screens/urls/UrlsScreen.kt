@@ -56,7 +56,7 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.DeletePromptPopup
+import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.table.Table
@@ -91,9 +91,9 @@ fun UrlsScreen(
     context: Context,
     activity: FragmentActivity,
 ) {
-    val currentUser = LocalLoggedUser.current
+    val localLoggedUser = LocalLoggedUser.current
 
-    if (currentUser == null) {
+    if (localLoggedUser == null) {
         navController.navigate(LoginScreen) {
             popUpTo(navController.graph.id) { inclusive = true }
         }
@@ -202,14 +202,14 @@ fun UrlsScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    DeletePromptPopup(
+    PromptPopup(
         showPopup = deleteUrl != null,
         onDismissRequest = { deleteUrl = null },
         onCancel = { deleteUrl = null },
         isLoading = isLoading,
         title = "Are you sure?",
         description = "Are you sure you want to delete ${deleteUrl?.code}? This action cannot be undone.",
-        onDelete = {
+        onSuccess = {
             coroutineScope.launch {
                 if (deleteUrl == null) return@launch
 
@@ -286,9 +286,6 @@ fun UrlsScreen(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
             )
 
             Row(
@@ -830,7 +827,7 @@ fun UrlsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (urls == null || isLoading) {
-                    items(15) {
+                    items(5) {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))

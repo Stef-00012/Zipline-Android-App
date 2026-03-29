@@ -5,30 +5,20 @@ import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
-import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.network.models.WebInvite
 import com.stefdp.zipline.network.models.responses.ErrorResponse
-import com.stefdp.zipline.network.models.responses.UpdateServerSettingsErrorResponse
-import com.stefdp.zipline.network.models.responses.ZeroByteFilesResponse
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[updateServerSettings]"
+private const val TAG = "ZiplineApi[getWebInvite]"
 
-suspend fun updateServerSettings(
+suspend fun getWebInvite(
     context: Context,
-    data: PartialServerSettingsSettings
-): Result<UpdateServerSettingsResult> {
+    code: String
+): Result<WebInvite> {
     try {
         val secureStore = SecureStorage.getInstance(context)
 
         val serverUrl = secureStore.get("serverUrl")
-        val token = secureStore.get("token")
-
-        if (token.isNullOrEmpty()) {
-            return Result.failure(
-                Exception(context.getString(R.string.missing_token))
-            )
-        }
 
         if (serverUrl.isNullOrEmpty()) {
             return Result.failure(
@@ -36,9 +26,8 @@ suspend fun updateServerSettings(
             )
         }
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).updateServerSettings(
-            token = token,
-            data = data
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).getWebInvite(
+            code = code
         )
 
         val body = response.body()
@@ -55,17 +44,23 @@ suspend fun updateServerSettings(
             }
 
             val errorBody = response.errorBody()?.string()
-            val json = Gson().fromJson(errorBody, UpdateServerSettingsErrorResponse::class.java)
+            val json = Gson().fromJson(errorBody, ErrorResponse::class.java)
 
-            return Result.success(
-                UpdateServerSettingsResult.Error(json)
+            if (json.error.isNotEmpty()) {
+                Log.e(TAG, "Error message: ${json.error}")
+
+                return Result.failure(
+                    Exception(json.error)
+                )
+            }
+
+            return Result.failure(
+                Exception(context.getString(R.string.generic_error))
             )
         }
 
-        if (body is ServerSettings) {
-            return Result.success(
-                UpdateServerSettingsResult.Success(body)
-            )
+        if (body is WebInvite) {
+            return Result.success(body)
         }
 
         return Result.failure(
@@ -78,9 +73,4 @@ suspend fun updateServerSettings(
             Exception(context.getString(R.string.generic_error))
         )
     }
-}
-
-sealed interface UpdateServerSettingsResult {
-    data class Success(val settings: ServerSettings) : UpdateServerSettingsResult
-    data class Error(val error: UpdateServerSettingsErrorResponse) : UpdateServerSettingsResult
 }

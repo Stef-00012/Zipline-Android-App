@@ -14,6 +14,7 @@ import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.Url
 import com.stefdp.zipline.network.models.User
+import com.stefdp.zipline.network.models.WebInvite
 import com.stefdp.zipline.network.models.WebSettings
 import com.stefdp.zipline.network.models.requests.BulkDeleteFilesBody
 import com.stefdp.zipline.network.models.requests.BulkUpdateFilesBody
@@ -114,6 +115,23 @@ interface ZiplineApiService {
     suspend fun getInvites(
         @Header("Authorization") token: String,
     ): Response<List<Invite>>
+
+    @GET("auth/invites/web")
+    suspend fun getWebInvite(
+        @Query("code") code: String
+    ): Response<WebInvite>
+
+    @GET("auth/invites/{codeOrId}")
+    suspend fun getInvite(
+        @Header("Authorization") token: String,
+        @Path("codeOrId") codeOrId: String
+    ): Response<Invite>
+
+    @DELETE("auth/invites/{codeOrId}")
+    suspend fun deleteInvite(
+        @Header("Authorization") token: String,
+        @Path("codeOrId") codeOrId: String
+    ): Response<Invite>
 
     @POST("server/thumbnails")
     suspend fun runThumbnailGenerationJob(

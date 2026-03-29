@@ -70,17 +70,17 @@ fun HomeScreen(
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
-    val publicSettings = LocalPublicSettings.current
-    val updatePublicSettings = LocalUpdatePublicSettings.current
-
-    val webSettings = LocalWebSettings.current
-    val updateWebSettings = LocalUpdateWebSettings.current
-
     if (localLoggedUser == null) {
         navController.navigate(LoginScreen) {
             popUpTo(navController.graph.id) { inclusive = true }
         }
     }
+
+    val publicSettings = LocalPublicSettings.current
+    val updatePublicSettings = LocalUpdatePublicSettings.current
+
+    val webSettings = LocalWebSettings.current
+    val updateWebSettings = LocalUpdateWebSettings.current
 
     var userStats by remember { mutableStateOf<GetStatsResponse?>(null) }
     var recentFiles by remember { mutableStateOf<List<File>>(emptyList()) }

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.DeletePromptPopup
+import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.Popup
@@ -127,7 +127,7 @@ fun LargeFileDisplay(
 
         val coroutineScope = rememberCoroutineScope()
 
-        DeletePromptPopup(
+        PromptPopup(
             showPopup = showConfirmDeletePopup,
             isLoading = isLoading,
             onDismissRequest = {
@@ -140,7 +140,7 @@ fun LargeFileDisplay(
             },
             title = "Are you sure?",
             description = "Are you sure you want to delete ${currentFile.originalName ?: currentFile.name}? This action cannot be undone.",
-            onDelete = {
+            onSuccess = {
                 coroutineScope.launch {
                     isLoading = true
 

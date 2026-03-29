@@ -139,6 +139,8 @@ fun UploadFileScreen(
         webSettings?.config?.chunks?.size ?: "25mb"
     )
 
+    val chunksEnabled = webSettings?.config?.chunks?.enabled ?: false
+
     val defaultDeletesAtDate = webSettings?.config?.files?.defaultExpiration ?: "never"
     val defaultNameFormat = webSettings?.config?.files?.defaultFormat ?: FilesFormat.RANDOM
     val defaultCompressionFormat = webSettings?.config?.files?.defaultCompressionFormat ?: UploadCompressionType.PNG
@@ -942,7 +944,7 @@ fun UploadFileScreen(
                                 it == selectedOverrideDomain.firstOrNull()
                             }
 
-                        if (tempFile.length() >= maxChunkSize) {
+                        if (chunksEnabled && tempFile.length() >= maxChunkSize) {
                             val uploadPartialFileResult = uploadPartialFile(
                                 context = context,
                                 filePath = tempFile.absolutePath,

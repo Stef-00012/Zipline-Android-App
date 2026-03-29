@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -62,6 +63,7 @@ data class SelectOption(
 @Composable
 fun Select(
     modifier: Modifier = Modifier,
+    containerModifier: Modifier = Modifier,
     options: List<SelectOption>,
     selectedIds: Set<String>,
     onSelectionChange: (Set<String>) -> Unit,
@@ -85,188 +87,189 @@ fun Select(
 
     var anchorY by remember { mutableFloatStateOf(0f) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
-            if (enabled) {
-                if (expanded) {
-                    handleClose()
-                } else {
-                    tempSelectedIds = selectedIds
-
-                    expanded = true
-                }
-            }
-        },
-        modifier = modifier
-            .onGloballyPositioned { coordinates ->
-                anchorY = coordinates.positionOnScreen().y
-            }
-            .fillMaxWidth()
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = containerModifier
     ) {
-        BasicTextField(
-            value = if (selectedIds.isEmpty()) "" else " ", // that's just to properly place the label
-            onValueChange = {},
-            enabled = false,
-            readOnly = true,
-            interactionSource = interactionSource,
-            modifier = Modifier
-                .menuAnchor(
-                    type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                    enabled = enabled
-                )
-                .fillMaxWidth(),
-            decorationBox = {
-                OutlinedTextFieldDefaults.DecorationBox(
-                    value = if (selectedIds.isEmpty()) "" else " ",
-                    innerTextField = {
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            if (selectedIds.isNotEmpty()) {
-                                if (multiple) {
-                                    FlowRow(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                if (enabled) {
+                    if (expanded) {
+                        handleClose()
+                    } else {
+                        tempSelectedIds = selectedIds
+
+                        expanded = true
+                    }
+                }
+            },
+            modifier = modifier
+                .onGloballyPositioned { coordinates ->
+                    anchorY = coordinates.positionOnScreen().y
+                }
+                .fillMaxWidth()
+        ) {
+            BasicTextField(
+                value = if (selectedIds.isEmpty()) "" else " ", // that's just to properly place the label
+                onValueChange = {},
+                enabled = false,
+                readOnly = true,
+                interactionSource = interactionSource,
+                modifier = Modifier
+                    .menuAnchor(
+                        type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                        enabled = enabled
+                    )
+                    .fillMaxWidth(),
+                decorationBox = {
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        value = if (selectedIds.isEmpty()) "" else " ",
+                        innerTextField = {
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                if (selectedIds.isNotEmpty()) {
+                                    if (multiple) {
+                                        FlowRow(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            options
+                                                .filter { it.id in selectedIds }
+                                                .forEach { it.label(enabled) }
+                                        }
+                                    } else {
                                         options
-                                            .filter { it.id in selectedIds }
-                                            .forEach { it.label(enabled) }
+                                            .firstOrNull { it.id == selectedIds.firstOrNull() }
+                                            ?.label(enabled)
                                     }
-                                } else {
-                                    options
-                                        .firstOrNull { it.id == selectedIds.firstOrNull() }
-                                        ?.label(enabled)
                                 }
                             }
-                        }
-                    },
-                    enabled = enabled,
-                    singleLine = !multiple,
-                    visualTransformation = VisualTransformation.None,
-                    interactionSource = interactionSource,
-                    label = if (label != null) {
-                        {
-                            Text(
-                                text = label.toAnnotatedString(),
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                color = if (enabled)
-                                    MaterialTheme.colorScheme.onBackground
-                                else
-                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        },
+                        enabled = enabled,
+                        singleLine = !multiple,
+                        visualTransformation = VisualTransformation.None,
+                        interactionSource = interactionSource,
+                        label = if (label != null) {
+                            {
+                                Text(
+                                    text = label.toAnnotatedString(),
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    color = if (enabled)
+                                        MaterialTheme.colorScheme.onBackground
+                                    else
+                                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                )
+                            }
+                        } else null,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded
+                            )
+                        },
+                        colors = colors,
+                        container = {
+                            OutlinedTextFieldDefaults.Container(
+                                enabled = enabled,
+                                isError = false,
+                                interactionSource = interactionSource,
+                                colors = colors,
+                                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
+                                focusedBorderThickness = FocusedBorderThickness,
+                                unfocusedBorderThickness = UnfocusedBorderThickness,
                             )
                         }
-                    } else null,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded
-                        )
-                    },
-                    colors = colors,
-                    container = {
-                        OutlinedTextFieldDefaults.Container(
-                            enabled = enabled,
-                            isError = false,
-                            interactionSource = interactionSource,
-                            colors = colors,
-                            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
-                            focusedBorderThickness = FocusedBorderThickness,
-                            unfocusedBorderThickness = UnfocusedBorderThickness,
-                        )
-                    }
-                )
-            }
-        )
-
-        var isDropdownAbove by remember { mutableStateOf(false) }
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { handleClose() },
-            containerColor = Color.Transparent,
-            shadowElevation = 0.dp,
-            shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
-            modifier = Modifier
-                .onGloballyPositioned { coordinates ->
-                    val menuY = coordinates.positionOnScreen().y
-
-                    isDropdownAbove = menuY < anchorY
+                    )
                 }
-                .padding(
-                    top = if (isDropdownAbove) 0.dp else 10.dp,
-                    bottom = if (isDropdownAbove) 10.dp else 0.dp
-                )
-                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
-                )
-        ) {
-            options.forEach { option ->
-                val isSelected = if (multiple)
-                    option.id in tempSelectedIds
-                else
-                    option.id in selectedIds
+            )
 
-                DropdownMenuItem(
-                    text = {
-                        if (multiple) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = isSelected,
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
-                                    onCheckedChange = null
-                                )
+            var isDropdownAbove by remember { mutableStateOf(false) }
 
-                                Spacer(
-                                    modifier = Modifier.width(8.dp)
-                                )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { handleClose() },
+                containerColor = Color.Transparent,
+                shadowElevation = 0.dp,
+                shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
+                modifier = Modifier
+                    .onGloballyPositioned { coordinates ->
+                        val menuY = coordinates.positionOnScreen().y
 
+                        isDropdownAbove = menuY < anchorY
+                    }
+                    .padding(
+                        top = if (isDropdownAbove) 0.dp else 10.dp,
+                        bottom = if (isDropdownAbove) 10.dp else 0.dp
+                    )
+                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
+                    )
+            ) {
+                options.forEach { option ->
+                    val isSelected = if (multiple)
+                        option.id in tempSelectedIds
+                    else
+                        option.id in selectedIds
+
+                    DropdownMenuItem(
+                        text = {
+                            if (multiple) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(
+                                        checked = isSelected,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
+                                        onCheckedChange = null
+                                    )
+
+                                    Spacer(
+                                        modifier = Modifier.width(8.dp)
+                                    )
+
+                                    option.label(enabled && option.enabled)
+                                }
+                            } else {
                                 option.label(enabled && option.enabled)
                             }
-                        } else {
-                            option.label(enabled && option.enabled)
-                        }
-                    },
-                    onClick = {
-                        if (multiple) {
-                            tempSelectedIds = if (isSelected) {
-                                tempSelectedIds - option.id
+                        },
+                        onClick = {
+                            if (multiple) {
+                                tempSelectedIds = if (isSelected) {
+                                    tempSelectedIds - option.id
+                                } else {
+                                    tempSelectedIds + option.id
+                                }
                             } else {
-                                tempSelectedIds + option.id
-                            }
-                        } else {
-                            onSelectionChange(setOf(option.id))
+                                onSelectionChange(setOf(option.id))
 
-                            expanded = false
-                        }
-                    },
-                    modifier = if (isSelected && multiple) {
-                        Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
-                    } else {
-                        Modifier
-                    },
-                    enabled = option.enabled
-                )
+                                expanded = false
+                            }
+                        },
+                        modifier = if (isSelected && multiple) {
+                            Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                        } else {
+                            Modifier
+                        },
+                        enabled = option.enabled
+                    )
+                }
             }
         }
-    }
 
-    if (description != null) {
-        Spacer(
-            modifier = Modifier.height(8.dp)
-        )
-
-        Text(
-            text = description.toAnnotatedString(),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-            ),
-            modifier = Modifier.padding(
-                horizontal = 8.dp
+        if (description != null) {
+            Text(
+                text = description.toAnnotatedString(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.padding(
+                    horizontal = 8.dp
+                )
             )
-        )
+        }
     }
 }

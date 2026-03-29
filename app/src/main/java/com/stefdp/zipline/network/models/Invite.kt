@@ -17,3 +17,14 @@ data class InviteInviter(
     val username: String,
     val role: UserRole
 )
+
+data class WebInvite(
+    val code: String,
+    val maxUses: Long?,
+    val uses: Long,
+    val inviter: WebInviteInviter
+)
+
+data class WebInviteInviter(
+    val username: String,
+)

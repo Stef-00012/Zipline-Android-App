@@ -8,7 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +25,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -39,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.stefdp.zipline.components.header.Header
 import com.stefdp.zipline.components.Sidebar
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings
@@ -50,6 +55,7 @@ import com.stefdp.zipline.ui.theme.ZiplineTheme
 import com.stefdp.zipline.utils.NetworkMonitor
 import kotlinx.coroutines.launch
 import com.stefdp.zipline.screens.*
+import com.stefdp.zipline.screens.admin.actions.AdminActionsScreen
 import com.stefdp.zipline.screens.admin.invites.AdminInvitesScreen
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsScreen
 import com.stefdp.zipline.screens.admin.users.AdminUsersScreen
@@ -103,6 +109,10 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
         )
     }
 }
+
+// TODO: move from Toast to Notification
+// TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
+// TODO: only show dates smaller than "settings.filesMaxExpiration in upload menu
 
 class MainActivity : FragmentActivity() {
     private var isAppReady by mutableStateOf(false)
@@ -333,7 +343,7 @@ class MainActivity : FragmentActivity() {
                                 AppNavigation(
                                     navController = navController,
                                     context = context,
-                                    activity = activity
+                                    activity = activity,
                                 )
                             }
                         }
@@ -348,7 +358,7 @@ class MainActivity : FragmentActivity() {
 fun AppNavigation(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
 ) {
     NavHost(
         navController = navController,
@@ -470,6 +480,14 @@ fun AppNavigation(
                 navController = navController,
                 context = context,
                 activity = activity
+            )
+        }
+
+        composable<AdminActionsScreen> {
+            AdminActionsScreen(
+                navController = navController,
+                context = context,
+                activity = activity,
             )
         }
 

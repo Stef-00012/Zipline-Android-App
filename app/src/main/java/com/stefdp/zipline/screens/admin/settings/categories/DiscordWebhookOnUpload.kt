@@ -100,7 +100,8 @@ internal fun DiscordWebhookOnUploadCategory(
                 label = "Webhook URL",
                 description = "The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used.",
                 enabled = !isLoading,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isPassword = true
             )
 
             var username by remember(settings?.settings?.discordOnUploadUsername, settingsUpdateTick) {

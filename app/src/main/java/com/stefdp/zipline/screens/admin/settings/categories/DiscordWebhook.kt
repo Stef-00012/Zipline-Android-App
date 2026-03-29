@@ -93,7 +93,8 @@ internal fun DiscordWebhookCategory(
                 label = "Webhook URL",
                 description = "The Discord webhook URL to send notifications to.",
                 enabled = !isLoading,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isPassword = true
             )
 
             var username by remember(settings?.settings?.discordUsername, settingsUpdateTick) {

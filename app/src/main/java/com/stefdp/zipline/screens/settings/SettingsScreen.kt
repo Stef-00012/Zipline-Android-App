@@ -175,14 +175,9 @@ fun SettingsScreen(
 //            }
         }
 
-//        var selectedCategory by remember {
-//            mutableStateOf(
-//                setOf(SettingCategory.USER.toString())
-//            )
-//        }
         var selectedCategory by remember {
             mutableStateOf(
-                setOf(SettingCategory.APP_SETTINGS.toString())
+                setOf(SettingCategory.USER.toString())
             )
         }
 

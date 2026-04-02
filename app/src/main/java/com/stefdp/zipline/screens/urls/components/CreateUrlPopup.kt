@@ -87,7 +87,6 @@ fun CreateUrlPopup(
 
         Spacer(
             modifier = Modifier.height(8.dp)
-
         )
 
         Row(
@@ -98,7 +97,7 @@ fun CreateUrlPopup(
             Text(
                 text = "$createdUrl",
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.tertiary,
                     textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.clickable(

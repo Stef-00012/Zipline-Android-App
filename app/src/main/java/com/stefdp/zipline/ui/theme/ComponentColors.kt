@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun getOutlinedTextFieldColors(displayDisabledBorderColor: Boolean = true) = OutlinedTextFieldDefaults.colors(
+fun getOutlinedTextFieldColors(displayDisabledColor: Boolean = true) = OutlinedTextFieldDefaults.colors(
     selectionColors = TextSelectionColors(
         handleColor = MaterialTheme.colorScheme.primary,
         backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
@@ -25,9 +25,12 @@ fun getOutlinedTextFieldColors(displayDisabledBorderColor: Boolean = true) = Out
     focusedTextColor = MaterialTheme.colorScheme.onBackground,
     focusedContainerColor = MaterialTheme.colorScheme.surface,
     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-    disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+    disabledContainerColor = if (displayDisabledColor)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+    else
+        MaterialTheme.colorScheme.surface,
     errorContainerColor = MaterialTheme.colorScheme.surface,
-    disabledBorderColor = if (displayDisabledBorderColor)
+    disabledBorderColor = if (displayDisabledColor)
         MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
     else
         MaterialTheme.colorScheme.outline,

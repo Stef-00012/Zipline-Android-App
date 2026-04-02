@@ -241,7 +241,7 @@ fun UploadFileScreen(
                         Text(
                             text = "${fileState.url}",
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.tertiary,
                                 textDecoration = TextDecoration.Underline
                             ),
                             modifier = Modifier.clickable(
@@ -562,7 +562,7 @@ fun UploadFileScreen(
                                 tag = "settings",
                                 styles = TextLinkStyles(
                                     style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline
                                     ),
                                 )

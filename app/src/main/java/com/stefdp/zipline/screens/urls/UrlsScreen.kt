@@ -640,7 +640,7 @@ fun UrlsScreen(
                                 content = {
                                     Text(
                                         text = url.code,
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
                                             enabled = serverUrl != null,
@@ -661,7 +661,7 @@ fun UrlsScreen(
                                 content = {
                                     Text(
                                         text = url.vanity ?: "",
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
                                             enabled = serverUrl != null && !url.vanity.isNullOrBlank(),
@@ -680,7 +680,7 @@ fun UrlsScreen(
                                 content = {
                                     Text(
                                         text = url.destination,
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
                                             enabled = serverUrl != null,

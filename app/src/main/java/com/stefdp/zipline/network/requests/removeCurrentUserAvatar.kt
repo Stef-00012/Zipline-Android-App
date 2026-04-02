@@ -13,9 +13,8 @@ import com.stefdp.zipline.utils.SecureStorage
 
 private const val TAG = "ZiplineApi[updateCurrentUser]"
 
-suspend fun updateCurrentUser(
+suspend fun removeCurrentUserAvatar(
     context: Context,
-    data: UpdateCurrentUserBody
 ): Result<UpdateCurrentUserResult> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -35,9 +34,14 @@ suspend fun updateCurrentUser(
             )
         }
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).updateCurrentUser(
+        val response = ZiplineApiClient.getZiplineApiService(
+            baseUrl = serverUrl,
+            includeNull = true
+        ).updateCurrentUser(
             token = token,
-            data = data
+            data = UpdateCurrentUserBody(
+                avatar = null
+            )
         )
 
         val body = response.body()
@@ -77,9 +81,4 @@ suspend fun updateCurrentUser(
             Exception(context.getString(R.string.generic_error))
         )
     }
-}
-
-sealed interface UpdateCurrentUserResult {
-    data class Success(val userResponse: GetCurrentUserResponse) : UpdateCurrentUserResult
-    data class Error(val error: UpdateCurrentUserErrorResponse) : UpdateCurrentUserResult
 }

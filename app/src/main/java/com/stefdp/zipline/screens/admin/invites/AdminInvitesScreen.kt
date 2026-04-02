@@ -507,7 +507,7 @@ fun AdminInvitesScreen(
                                 content = {
                                     Text(
                                         text = invite.code,
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
                                             enabled = serverUrl != null,

@@ -58,7 +58,7 @@ internal fun FeaturesCategory(
         val scrollState = rememberScrollState()
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .verticalScrollWithScrollbar(
                     scrollState = scrollState,
@@ -299,7 +299,7 @@ internal fun FeaturesCategory(
                                     url = url,
                                     styles = TextLinkStyles(
                                         style = SpanStyle(
-                                            color = MaterialTheme.colorScheme.primary,
+                                            color = MaterialTheme.colorScheme.tertiary,
                                             textDecoration = TextDecoration.Underline
                                         )
                                     )

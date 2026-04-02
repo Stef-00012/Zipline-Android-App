@@ -39,15 +39,27 @@ data class UserViewSettings(
 ) : Parcelable
 
 @Parcelize
-enum class UserViewSettingsAlign(val value: String) : Parcelable {
+enum class UserViewSettingsAlign(
+    val value: String,
+    val displayName: String,
+) : Parcelable {
     @SerializedName("left")
-    LEFT("left"),
+    LEFT(
+        value = "left",
+        displayName = "Left"
+    ),
 
     @SerializedName("center")
-    CENTER("center"),
+    CENTER(
+        value = "center",
+        displayName = "Center"
+    ),
 
     @SerializedName("right")
-    RIGHT("right");
+    RIGHT(
+        value = "right",
+        displayName = "Right"
+    );
 
     override fun toString(): String = value
 }

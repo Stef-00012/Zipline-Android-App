@@ -1,4 +1,4 @@
-package com.stefdp.zipline.components.header
+package com.stefdp.zipline.components
 
 import androidx.compose.foundation.layout.Box
 import com.stefdp.zipline.R
@@ -64,10 +64,10 @@ fun Header(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(horizontal = 16.dp)
         ) {
             IconButton(
-                onClick = onMenuClick
+                onClick = onMenuClick,
+                modifier = Modifier.padding(start = 8.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.menu),
@@ -87,7 +87,9 @@ fun Header(
 
                 UserAvatar(
                     enabled = !isInSettings,
-                    navController = navController
+                    onClick = {
+                        navController.navigate(SettingsScreen)
+                    },
                 )
             }
         }

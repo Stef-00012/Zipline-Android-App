@@ -77,7 +77,7 @@ fun LargeUrlDisplay(
                     url.code
                 else url.vanity,
                 color = if (url.enabled)
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.colorScheme.tertiary
                 else MaterialTheme.colorScheme.onSurface,
                 textDecoration = if (url.enabled)
                     TextDecoration.Underline
@@ -213,7 +213,7 @@ fun LargeUrlDisplay(
                             url = url.destination,
                             styles = TextLinkStyles(
                                 style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.tertiary,
                                     textDecoration = TextDecoration.Underline
                                 ),
                             )
@@ -256,7 +256,7 @@ fun LargeUrlDisplay(
                                 url = urlUrl,
                                 styles = TextLinkStyles(
                                     style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline
                                     ),
                                 )

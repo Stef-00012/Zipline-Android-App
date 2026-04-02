@@ -1,5 +1,8 @@
 package com.stefdp.zipline.utils
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
@@ -39,3 +42,9 @@ fun Color.toHex(withAlpha: Boolean = false): String {
         String.format("#%02x%02x%02x", red, green, blue)
     }
 }
+
+val Color.Companion.Saver: Saver<MutableState<Color>, Int>
+    get() = Saver(
+        save = { it.value.toArgb() },
+        restore = { mutableStateOf(Color(it)) }
+    )

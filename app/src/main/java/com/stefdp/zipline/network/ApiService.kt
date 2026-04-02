@@ -72,6 +72,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HEAD
 import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -161,6 +162,12 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
         @Query("nometrics") noMetrics: Boolean? = null,
     ): Response<ResponseBody>
+
+    @HEAD("server/export")
+    suspend fun getExportSize(
+        @Header("Authorization") token: String,
+        @Query("nometrics") noMetrics: Boolean? = null,
+    ): Response<Unit>
 
     @GET("server/export")
     suspend fun getServerDataCounts(
@@ -314,6 +321,11 @@ interface ZiplineApiService {
     @GET("user/token")
     suspend fun getToken(
         @Header("Cookie") cookie: String,
+    ): Response<GetTokenResponse>
+
+    @GET("user/token")
+    suspend fun getTokenWithToken(
+        @Header("Authorization") token: String,
     ): Response<GetTokenResponse>
 
     @PATCH("user/token")

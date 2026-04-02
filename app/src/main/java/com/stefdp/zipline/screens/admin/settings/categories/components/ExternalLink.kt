@@ -92,7 +92,7 @@ fun ExternalLink(
                                 url = url.url,
                                 styles = TextLinkStyles(
                                     style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline
                                     ),
                                 )

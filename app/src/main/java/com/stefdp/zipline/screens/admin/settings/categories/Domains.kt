@@ -54,7 +54,7 @@ internal fun DomainsCategory(
         val scrollState = rememberScrollState()
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .verticalScrollWithScrollbar(
                     scrollState = scrollState,

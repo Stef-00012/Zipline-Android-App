@@ -49,7 +49,9 @@ import com.stefdp.zipline.screens.*
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
 import com.stefdp.zipline.utils.SecureStorage
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(
@@ -204,9 +206,11 @@ fun LoginScreen(
 
                                 userStatsRes
                                     .onSuccess {
-                                        updatePublicSettings()
-                                        updateWebSettings()
-                                        updateLoggedUserAvatar()
+                                        withContext(NonCancellable) {
+                                            updatePublicSettings()
+                                            updateWebSettings()
+                                            updateLoggedUserAvatar()
+                                        }
 
                                         if (currentDestination?.route == LoginScreen::class.qualifiedName) {
                                             navController.navigate(HomeScreen) {
@@ -260,9 +264,11 @@ fun LoginScreen(
 
                                                     userStatsRes
                                                         .onSuccess {
-                                                            updatePublicSettings()
-                                                            updateWebSettings()
-                                                            updateLoggedUserAvatar()
+                                                            withContext(NonCancellable) {
+                                                                updatePublicSettings()
+                                                                updateWebSettings()
+                                                                updateLoggedUserAvatar()
+                                                            }
 
                                                             if (currentDestination?.route == LoginScreen::class.qualifiedName) {
                                                                 navController.navigate(HomeScreen) {

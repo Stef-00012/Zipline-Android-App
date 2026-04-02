@@ -50,6 +50,7 @@ import com.stefdp.zipline.ui.theme.Orange
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
 import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.StorageUtil
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.formatDate
 import com.stefdp.zipline.utils.getDisplayPath
@@ -541,6 +542,29 @@ fun LargeFileDisplay(
                     var fileRequiresPassword by remember { mutableStateOf(false) }
 
                     fun performDownload() {
+                        val fileFits = StorageUtil.canFitFile(
+                            context = context,
+                            uri = selectedUri!!,
+                            fileSize = file!!.size
+                        )
+
+                        if (!fileFits) {
+                            showToast("Not enough space in the selected directory to download the file")
+
+                            return
+                        }
+
+                        val fileFitsCache = StorageUtil.canFitInternalCache(
+                            context = context,
+                            fileSize = file.size
+                        )
+
+                        if (!fileFitsCache) {
+                            showToast("Not enough space in the internal cache to download the file")
+
+                            return
+                        }
+
                         if (currentFile.password == true && downloadFilePassword.isNullOrBlank()) {
                             fileRequiresPassword = true
                             return

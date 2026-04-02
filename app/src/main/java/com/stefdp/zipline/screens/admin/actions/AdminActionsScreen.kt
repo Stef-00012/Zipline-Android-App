@@ -45,6 +45,7 @@ import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.requests.deleteZeroByteFiles
 import com.stefdp.zipline.network.requests.exportData
+import com.stefdp.zipline.network.requests.getExportSize
 import com.stefdp.zipline.network.requests.runDeleteTemporaryFilesJob
 import com.stefdp.zipline.network.requests.runRequerySizeJob
 import com.stefdp.zipline.network.requests.runThumbnailGenerationJob
@@ -53,6 +54,7 @@ import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.actions.components.ActionContainer
 import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.StorageUtil
 import com.stefdp.zipline.utils.getDisplayPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -123,6 +125,44 @@ fun AdminActionsScreen(
 
     fun performDownload() {
         coroutineScope.launch(Dispatchers.IO) {
+            val exportSize = getExportSize(
+                context = context,
+                excludeMetrics = excludeMetricsFromExport.takeIf { it }
+            )
+
+            exportSize
+                .onSuccess {
+                    val exportFits = StorageUtil.canFitFile(
+                        context = context,
+                        uri = selectedUri!!,
+                        fileSize = it
+                    )
+
+                    if (!exportFits) {
+                        showToast("Not enough space in the selected directory to download the export")
+
+                        return@launch
+                    }
+
+                    val exportFitsCache = StorageUtil.canFitInternalCache(
+                        context = context,
+                        fileSize = it
+                    )
+
+                    if (!exportFitsCache) {
+                        showToast("Not enough space in the internal cache to download the export")
+
+                        return@launch
+                    }
+                }
+                .onFailure {
+                    Toast.makeText(
+                        context,
+                        "Failed to get export size: ${it.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
             showToast("Starting download...")
 
             val fileName = "zipline_export_${System.currentTimeMillis()}.json"
@@ -203,17 +243,19 @@ fun AdminActionsScreen(
             selectedPath = getDisplayPath(it)
 
             coroutineScope.launch {
-                secureStore.set("exportDownloadFolder", selectedUri.toString())
+                secureStore.set("adminExportDownloadFolder", selectedUri.toString())
             }
 
             performDownload()
+
+            isLoading = false
         }
     }
 
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
-        val exportDownloadFolder = secureStore.get("exportDownloadFolder")
+        val exportDownloadFolder = secureStore.get("adminExportDownloadFolder")
 
         if (exportDownloadFolder != null) {
             selectedUri = exportDownloadFolder.toUri()

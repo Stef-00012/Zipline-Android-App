@@ -56,7 +56,7 @@ internal fun OAuthCategory(
         val scrollState = rememberScrollState()
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .verticalScrollWithScrollbar(
                     scrollState = scrollState,
@@ -146,7 +146,7 @@ internal fun OAuthCategory(
                         text = "Discord",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.tertiary,
                             textDecoration = TextDecoration.Underline
                         ),
                         modifier = Modifier
@@ -239,7 +239,7 @@ internal fun OAuthCategory(
                         text = "Google",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.tertiary,
                             textDecoration = TextDecoration.Underline
                         ),
                         modifier = Modifier
@@ -310,7 +310,7 @@ internal fun OAuthCategory(
                         text = "GitHub",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.tertiary,
                             textDecoration = TextDecoration.Underline
                         ),
                         modifier = Modifier

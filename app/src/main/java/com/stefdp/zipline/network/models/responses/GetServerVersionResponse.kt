@@ -1,6 +1,17 @@
 package com.stefdp.zipline.network.models.responses
 
 data class GetServerVersionResponse(
+    val details: GetServerVersionDetails,
+    val data: GetServerVersionData,
+    val cache: Boolean
+)
+
+data class GetServerVersionDetails(
+    val version: String,
+    var sha: String? = null,
+)
+
+data class GetServerVersionData(
     val isUpstream: Boolean,
     val isRelease: Boolean,
     val isLatest: Boolean,

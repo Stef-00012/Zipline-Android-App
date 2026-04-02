@@ -5,18 +5,16 @@ import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
+import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.responses.ErrorResponse
-import com.stefdp.zipline.network.models.responses.GetCurrentUserResponse
-import com.stefdp.zipline.network.models.responses.UpdateCurrentUserErrorResponse
+import com.stefdp.zipline.network.models.responses.GetTokenResponse
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[updateCurrentUser]"
+private const val TAG = "ZiplineApi[getTokenWithToken]"
 
-suspend fun updateCurrentUser(
+suspend fun getTokenWithToken(
     context: Context,
-    data: UpdateCurrentUserBody
-): Result<UpdateCurrentUserResult> {
+): Result<GetTokenResponse> {
     try {
         val secureStore = SecureStorage.getInstance(context)
 
@@ -35,9 +33,8 @@ suspend fun updateCurrentUser(
             )
         }
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).updateCurrentUser(
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).getTokenWithToken(
             token = token,
-            data = data
         )
 
         val body = response.body()
@@ -54,17 +51,23 @@ suspend fun updateCurrentUser(
             }
 
             val errorBody = response.errorBody()?.string()
-            val json = Gson().fromJson(errorBody, UpdateCurrentUserErrorResponse::class.java)
+            val json = Gson().fromJson(errorBody, ErrorResponse::class.java)
 
-            return Result.success(
-                UpdateCurrentUserResult.Error(json)
+            if (json.error.isNotEmpty()) {
+                Log.e(TAG, "Error message: ${json.error}")
+
+                return Result.failure(
+                    Exception(json.error)
+                )
+            }
+
+            return Result.failure(
+                Exception(context.getString(R.string.generic_error))
             )
         }
 
-        if (body is GetCurrentUserResponse) {
-            return Result.success(
-                UpdateCurrentUserResult.Success(body)
-            )
+        if (body is GetTokenResponse) {
+            return Result.success(body)
         }
 
         return Result.failure(
@@ -77,9 +80,4 @@ suspend fun updateCurrentUser(
             Exception(context.getString(R.string.generic_error))
         )
     }
-}
-
-sealed interface UpdateCurrentUserResult {
-    data class Success(val userResponse: GetCurrentUserResponse) : UpdateCurrentUserResult
-    data class Error(val error: UpdateCurrentUserErrorResponse) : UpdateCurrentUserResult
 }

@@ -39,6 +39,7 @@ fun AvatarInput(
     onAvatarChange: (avatar: String?) -> Unit,
     enabled: Boolean = true,
     label: CharSequence? = null,
+    placeholder: CharSequence? = null,
     colors: TextFieldColors = getOutlinedTextFieldColors(!enabled),
     includeSideButton: Boolean = true,
 ) {
@@ -130,6 +131,16 @@ fun AvatarInput(
                         MaterialTheme.colorScheme.onBackground
                     else
                         MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                )
+            }
+        } else null,
+        placeholder = if (placeholder != null) {
+            {
+                Text(
+                    text = placeholder.toAnnotatedString(),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                 )
             }
         } else null,

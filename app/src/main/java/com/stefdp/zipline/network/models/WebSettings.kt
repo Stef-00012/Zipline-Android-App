@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class WebSettings(
-    val config: WebSettingsConfig,
+    val config: WebSettingsConfig? = null,
     val codeMap: List<CodeMapEntry>,
 ) : Parcelable
 

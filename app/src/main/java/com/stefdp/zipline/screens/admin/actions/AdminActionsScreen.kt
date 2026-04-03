@@ -36,6 +36,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.PromptPopup
@@ -98,11 +99,15 @@ fun AdminActionsScreen(
                 zeroByteFileCount = it.files?.size
             }
              .onFailure {
-                 Toast.makeText(
-                     context,
-                     "Failed to scan for zero byte files: ${it.message}",
-                     Toast.LENGTH_LONG
-                 ).show()
+                 Notification.show(
+                     context = context,
+                     activity = activity,
+                     content = {
+                         Text(
+                             text = "Failed to scan for zero byte files: ${it.message}"
+                         )
+                     }
+                 )
             }
     }
 
@@ -115,11 +120,15 @@ fun AdminActionsScreen(
 
     fun showToast(message: String) {
         coroutineScope.launch(Dispatchers.Main) {
-            Toast.makeText(
-                context,
-                message,
-                Toast.LENGTH_LONG
-            ).show()
+            Notification.show(
+                context = context,
+                activity = activity,
+                content = {
+                    Text(
+                        text = message
+                    )
+                }
+            )
         }
     }
 
@@ -156,11 +165,15 @@ fun AdminActionsScreen(
                     }
                 }
                 .onFailure {
-                    Toast.makeText(
-                        context,
-                        "Failed to get export size: ${it.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        content = {
+                            Text(
+                                text = "Failed to get export size: ${it.message}"
+                            )
+                        }
+                    )
                 }
 
             showToast("Starting download...")
@@ -209,7 +222,7 @@ fun AdminActionsScreen(
                             showToast("Failed to create file in selected directory")
                         }
                     } catch (e: Exception) {
-                        Log.e(
+                        Logger.error(
                             "AdminActionsScreen[ExportData]",
                             "Failed to copy export to selected directory",
                             e
@@ -221,7 +234,7 @@ fun AdminActionsScreen(
                     }
                 }
                 .onFailure {
-                    Log.e("AdminActionsScreen[ExportData]", "Failed to download export", it)
+                    Logger.error("AdminActionsScreen[ExportData]", "Failed to download export", it)
 
                     showToast("Failed to download export: ${it.message}")
                 }
@@ -431,20 +444,28 @@ fun AdminActionsScreen(
 
                 deleteTempFilesRes
                     .onSuccess {
-                        Toast.makeText(
-                            context,
-                            it,
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = it
+                                )
+                            }
+                        )
 
                         popupEnabled = null
                     }
                     .onFailure {
-                        Toast.makeText(
-                            context,
-                            "Failed to delete temporary files: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Failed to delete temporary files: ${it.message}"
+                                )
+                            }
+                        )
 
                         popupEnabled = null
                     }
@@ -472,20 +493,28 @@ fun AdminActionsScreen(
 
                 deleteZeroByteFilesRes
                     .onSuccess {
-                        Toast.makeText(
-                            context,
-                            "Cleared ${it.files?.size ?: 0} files with a size of 0B.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Cleared ${it.files?.size ?: 0} files with a size of 0B."
+                                )
+                            }
+                        )
 
                         popupEnabled = null
                     }
                     .onFailure {
-                        Toast.makeText(
-                            context,
-                            "Failed to delete zero byte files: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Failed to delete zero byte files: ${it.message}"
+                                )
+                            }
+                        )
 
                         popupEnabled = null
                     }
@@ -521,18 +550,24 @@ fun AdminActionsScreen(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            message = it,
+                            content = {
+                                Text(it)
+                            },
                             duration = 8000L
                         )
 
                         popupEnabled = null
                     }
                     .onFailure {
-                        Toast.makeText(
-                            context,
-                            "Failed to delete requery file sizes: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Failed to delete requery file sizes: ${it.message}"
+                                )
+                            }
+                        )
 
                         popupEnabled = null
                     }
@@ -580,18 +615,24 @@ fun AdminActionsScreen(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            message = it,
+                            content = {
+                                Text(it)
+                            },
                             duration = 8000L
                         )
 
                         popupEnabled = null
                     }
                     .onFailure {
-                        Toast.makeText(
-                            context,
-                            "Failed to delete requery file sizes: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Failed to delete requery file sizes: ${it.message}"
+                                )
+                            }
+                        )
 
                         popupEnabled = null
                     }

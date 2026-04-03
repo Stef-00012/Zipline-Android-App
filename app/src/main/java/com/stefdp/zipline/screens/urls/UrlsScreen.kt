@@ -3,8 +3,6 @@ package com.stefdp.zipline.screens.urls
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -55,9 +53,11 @@ import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
@@ -74,7 +74,7 @@ import com.stefdp.zipline.screens.urls.components.CreateUrlPopup
 import com.stefdp.zipline.screens.urls.components.EditUrlPopup
 import com.stefdp.zipline.screens.urls.components.EnabledCheckbox
 import com.stefdp.zipline.screens.urls.components.LargeUrlDisplay
-import com.stefdp.zipline.screens.urls.components.QRCodePopup
+import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
@@ -232,11 +232,15 @@ fun UrlsScreen(
                         }
                     }
                     .onFailure {
-                        Toast.makeText(
-                            context,
-                            "Failed to delete URL: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Failed to delete URL: ${it.message}"
+                                )
+                            }
+                        )
                     }
 
                 isLoading = false
@@ -247,24 +251,27 @@ fun UrlsScreen(
 
     CreateUrlPopup(
         context = context,
+        activity = activity,
         showPopup = createdNewUrlPopupOpen,
         onDismissRequest = { createdNewUrlPopupOpen = false },
         updateUrls = ::updateUrls
     )
 
     EditUrlPopup(
-        url = editUrl,
         context = context,
+        activity = activity,
+        url = editUrl,
         showPopup = editUrl != null,
         onDismissRequest = { editUrl = null },
         updateUrls = ::updateUrls
     )
 
     QRCodePopup(
+        context = context,
+        activity = activity,
         qrCodeText = qrCodeText,
         showPopup = qrCodeUrl != null && serverUrl != null,
         onDismissRequest = { qrCodeUrl = null },
-        context = context,
         downloadFileName = "QR_${qrCodeUrl?.id ?: "code"}.png"
     )
 
@@ -647,7 +654,7 @@ fun UrlsScreen(
                                             onClick = {
                                                 val urlUrl = "${serverUrl}${urlsRoute}/${url.code}"
 
-                                                Log.d("UrlsScreen", "Opening URL: $urlUrl (serverUrl: $serverUrl, urlsRoute: $urlsRoute, url.code: ${url.code})")
+                                                Logger.debug("UrlsScreen", "Opening URL: $urlUrl (serverUrl: $serverUrl, urlsRoute: $urlsRoute, url.code: ${url.code})")
 
                                                 val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
                                                 context.startActivity(intent)
@@ -747,11 +754,15 @@ fun UrlsScreen(
 
                                                 clipboardManager.setClipEntry(clipData)
 
-                                                Toast.makeText(
-                                                    context,
-                                                    "URL copied to clipboard",
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = {
+                                                        Text(
+                                                            text = "URL copied to clipboard"
+                                                        )
+                                                    }
+                                                )
                                             }
                                         },
                                         enabled = !isLoading
@@ -847,10 +858,11 @@ fun UrlsScreen(
                             val url = urls!![index]
 
                             LargeUrlDisplay(
+                                context = context,
+                                activity = activity,
                                 url = url,
                                 serverUrl = serverUrl,
                                 urlsRoute = urlsRoute,
-                                context = context,
                                 onDelete = { deleteUrl = url },
                                 onEdit = { editUrl = url },
                                 onShowQRCode = {

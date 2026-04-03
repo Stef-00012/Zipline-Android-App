@@ -3,7 +3,6 @@ package com.stefdp.zipline.screens.admin.invites
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +45,7 @@ import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
@@ -60,7 +60,7 @@ import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.invites.components.CreateInvitePopup
 import com.stefdp.zipline.screens.admin.invites.components.LargeInviteDisplay
 import com.stefdp.zipline.screens.files.components.IconButton
-import com.stefdp.zipline.screens.urls.components.QRCodePopup
+import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
@@ -211,11 +211,15 @@ fun AdminInvitesScreen(
                             }
                         }
                         .onFailure {
-                            Toast.makeText(
-                                context,
-                                "Failed to delete invite: ${it.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to delete invite: ${it.message}"
+                                    )
+                                },
+                            )
                         }
 
                     isLoading = false
@@ -227,16 +231,18 @@ fun AdminInvitesScreen(
 
     CreateInvitePopup(
         context = context,
+        activity = activity,
         showPopup = createdNewInvitePopupOpen,
         onDismissRequest = { createdNewInvitePopupOpen = false },
         updateInvites = ::updateInvites
     )
 
     QRCodePopup(
+        context = context,
+        activity = activity,
         qrCodeText = qrCodeText,
         showPopup = qrCodeInvite != null && serverUrl != null,
         onDismissRequest = { qrCodeInvite = null },
-        context = context,
         downloadFileName = "QR_${qrCodeInvite?.id ?: "code"}.png"
     )
 
@@ -592,11 +598,15 @@ fun AdminInvitesScreen(
 
                                                 clipboardManager.setClipEntry(clipData)
 
-                                                Toast.makeText(
-                                                    context,
-                                                    "Invite link copied to clipboard",
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = {
+                                                        Text(
+                                                            text = "Invite link copied to clipboard"
+                                                        )
+                                                    },
+                                                )
                                             }
                                         },
                                         enabled = !isLoading
@@ -680,6 +690,7 @@ fun AdminInvitesScreen(
 
                             LargeInviteDisplay(
                                 context = context,
+                                activity = activity,
                                 invite = invite,
                                 serverUrl = serverUrl,
                                 onDelete = { deleteInvite = invite },

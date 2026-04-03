@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.ui.theme.getOutlinedTextFieldColors
@@ -34,8 +35,9 @@ const val MAX_AVATAR_FILE_SIZE = 10L * 1024L * 1024L // 5 MB
 
 @Composable
 fun AvatarInput(
-    modifier: Modifier = Modifier,
     context: Context,
+    activity: FragmentActivity,
+    modifier: Modifier = Modifier,
     onAvatarChange: (avatar: String?) -> Unit,
     enabled: Boolean = true,
     label: CharSequence? = null,
@@ -60,11 +62,15 @@ fun AvatarInput(
                 filename = TextFieldValue(name)
 
                 if (size >= MAX_AVATAR_FILE_SIZE) {
-                    Toast.makeText(
-                        context,
-                        "File is too large: $name",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        content = {
+                            Text(
+                                text = "File is too large: $name"
+                            )
+                        }
+                    )
 
                     return@rememberLauncherForActivityResult
                 }

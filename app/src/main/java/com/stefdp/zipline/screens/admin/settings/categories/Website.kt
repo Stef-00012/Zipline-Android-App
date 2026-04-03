@@ -33,9 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
@@ -58,6 +60,7 @@ internal fun WebsiteCategory(
     title: String,
     settingsUpdateTick: Int,
     context: Context,
+    activity: FragmentActivity
 ) {
     Container(
         scrollable = false,
@@ -248,11 +251,15 @@ internal fun WebsiteCategory(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 if (name.text.isBlank() || url.text.isBlank()) {
-                                    Toast.makeText(
-                                        context,
-                                        "Please fill in all fields",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Notification.show(
+                                        context = context,
+                                        activity = activity,
+                                        content = {
+                                            Text(
+                                                text = "Please fill in all fields"
+                                            )
+                                        }
+                                    )
 
                                     return@Button
                                 }

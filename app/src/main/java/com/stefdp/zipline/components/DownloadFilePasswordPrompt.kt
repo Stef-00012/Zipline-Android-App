@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.network.requests.verifyFilePassword
 import kotlinx.coroutines.launch
 
 @Composable
 fun DownloadFilePasswordPrompt(
     context: Context,
+    activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     onDownload: (password: String) -> Unit,
@@ -70,11 +72,15 @@ fun DownloadFilePasswordPrompt(
                             onDownload(password.text)
                         }
                         .onFailure {
-                            Toast.makeText(
-                                context,
-                                "Incorrect password. Please try again.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Incorrect password. Please try again."
+                                    )
+                                }
+                            )
                         }
                 }
             },

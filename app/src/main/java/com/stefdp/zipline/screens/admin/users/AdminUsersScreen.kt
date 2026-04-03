@@ -43,6 +43,7 @@ import com.stefdp.zipline.components.Avatar
 import com.stefdp.zipline.components.DeletePromptButtonLayout
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
@@ -201,11 +202,15 @@ fun AdminUsersScreen(
                             }
                         }
                         .onFailure {
-                            Toast.makeText(
-                                context,
-                                "Failed to delete user: ${it.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to delete user: ${it.message}"
+                                    )
+                                },
+                            )
                         }
 
                     isLoading = false
@@ -235,11 +240,15 @@ fun AdminUsersScreen(
                             }
                         }
                         .onFailure {
-                            Toast.makeText(
-                                context,
-                                "Failed to delete user: ${it.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to delete user: ${it.message}"
+                                    )
+                                }
+                            )
                         }
 
                     isLoading = false
@@ -253,17 +262,19 @@ fun AdminUsersScreen(
     }
 
     CreateUserPopup(
-        currentUser = localLoggedUser,
         context = context,
+        activity = activity,
+        currentUser = localLoggedUser,
         showPopup = createdNewUserPopupOpen,
         onDismissRequest = { createdNewUserPopupOpen = false },
         updateUsers = ::updateUsers
     )
 
     EditUserPopup(
+        context = context,
+        activity = activity,
         currentUser = localLoggedUser,
         user = editUser,
-        context = context,
         showPopup = editUser != null,
         onDismissRequest = { editUser = null },
         updateUsers = ::updateUsers

@@ -31,9 +31,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.LocalWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
@@ -45,8 +48,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditUrlPopup(
-    url: Url?,
     context: Context,
+    activity: FragmentActivity,
+    url: Url?,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     updateUrls: suspend () -> Unit
@@ -223,25 +227,33 @@ fun EditUrlPopup(
 
                     editUrlRes
                         .onSuccess {
-                            Toast.makeText(
-                                context,
-                                "URL updated successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "URL updated successfully"
+                                    )
+                                }
+                            )
 
                             updateUrls()
                             onDismissRequest()
                         }
                         .onFailure {
-                            Log.e("EditUrlPopup", "Failed to update url", it)
+                            Logger.error("EditUrlPopup", "Failed to update url", it)
 
                             errorMessage = it.message
 
-                            Toast.makeText(
-                                context,
-                                "Failed to update URL",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to update URL"
+                                    )
+                                }
+                            )
                         }
 
                     isLoading = false

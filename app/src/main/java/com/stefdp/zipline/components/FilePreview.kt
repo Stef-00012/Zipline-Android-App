@@ -54,6 +54,8 @@ val zipMimetypes = listOf(
 
 const val APK_MIMETYPE = "application/vnd.android.package-archive"
 
+const val MAX_PREVIEW_FILE_SIZE = 150L * 1024L * 1024L
+
 @Composable
 fun FilePreview(
     file: File,
@@ -63,20 +65,14 @@ fun FilePreview(
     clickEnabled: Boolean = true,
     previewVideos: Boolean = false,
     onImageLoaded: () -> Unit = { },
+    serverUrl: String?
 ) {
     var imageLoading by remember { mutableStateOf(true) }
     var imageFailed by remember { mutableStateOf(false) }
 
     val isVideo = file.type.startsWith("video/")
     val isEmbeddable = file.type in embeddableMimetypes
-
-    var serverUrl by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        serverUrl = secureStore.get("serverUrl")
-    }
+    val isLargeFile = file.size >= MAX_PREVIEW_FILE_SIZE
 
     LaunchedEffect(imageLoading) {
         if (!imageLoading) {
@@ -151,7 +147,7 @@ fun FilePreview(
                     label = "Click to view file ${file.name}"
                 )
             } else {
-                if (imageLoading) {
+                if (imageLoading && !isLargeFile) {
                     DefaultPreview(
                         icon = painterResource(R.drawable.description),
                         iconContentDescription = "${file.type} file",
@@ -159,16 +155,26 @@ fun FilePreview(
                     )
                 }
 
-                AsyncImage(
-                    model = "$serverUrl/raw/${file.name}",
-                    contentDescription = file.originalName ?: file.name,
-                    onSuccess = {
-                        imageLoading = false
-                    },
-                    onError = {
-                        imageFailed = true
-                    }
-                )
+                if (isLargeFile) {
+                    imageLoading = false
+
+                    DefaultPreview(
+                        icon = painterResource(R.drawable.description),
+                        iconContentDescription = "${file.type} file",
+                        label = "Click to view file ${file.name}\nFile too large to preview"
+                    )
+                } else {
+                    AsyncImage(
+                        model = "$serverUrl/raw/${file.name}",
+                        contentDescription = file.originalName ?: file.name,
+                        onSuccess = {
+                            imageLoading = false
+                        },
+                        onError = {
+                            imageFailed = true
+                        }
+                    )
+                }
             }
 
             return@Box
@@ -194,7 +200,7 @@ fun FilePreview(
                     }
                 )
             } else {
-                if (imageLoading) {
+                if (imageLoading && !isLargeFile) {
                     DefaultPreview(
                         icon = painterResource(R.drawable.videocam),
                         iconContentDescription = "Video file",
@@ -214,19 +220,29 @@ fun FilePreview(
                         }
                     )
                 } else {
-                    AsyncImage(
-                        model = "$serverUrl/raw/${file.name}",
-                        contentDescription = file.originalName ?: file.name,
-                        onSuccess = {
-                            imageLoading = false
-                        },
-                        onError = {
-                            imageFailed = true
-                        }
-                    )
+                    if (isLargeFile) {
+                        imageLoading = false
+
+                        DefaultPreview(
+                            icon = painterResource(R.drawable.videocam),
+                            iconContentDescription = "Video file",
+                            label = "Click to play video ${file.name}\nFile too large to preview"
+                        )
+                    } else {
+                        AsyncImage(
+                            model = "$serverUrl/raw/${file.name}",
+                            contentDescription = file.originalName ?: file.name,
+                            onSuccess = {
+                                imageLoading = false
+                            },
+                            onError = {
+                                imageFailed = true
+                            }
+                        )
+                    }
                 }
 
-                if (!imageLoading) {
+                if (!imageLoading && (file.thumbnail?.path != null || !isLargeFile)) {
                     Icon(
                         painter = painterResource(R.drawable.play_arrow),
                         contentDescription = "Play video icon",

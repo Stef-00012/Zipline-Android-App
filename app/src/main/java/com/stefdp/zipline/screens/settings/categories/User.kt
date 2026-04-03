@@ -26,9 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
@@ -38,6 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun UserCategory(
     context: Context,
+    activity: FragmentActivity,
     user: User?,
     token: String?,
     updateUser: suspend (UpdateCurrentUserBody) -> List<String>,
@@ -118,11 +121,15 @@ internal fun UserCategory(
 
                         clipboardManager.setClipEntry(clipData)
 
-                        Toast.makeText(
-                            context,
-                            "Token copied to clipboard",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Token copied to clipboard"
+                                )
+                            }
+                        )
                     }
                 }
             )

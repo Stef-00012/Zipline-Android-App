@@ -1,4 +1,4 @@
-package com.stefdp.zipline.screens.urls.components
+package com.stefdp.zipline.components
 
 import android.content.ClipData
 import android.content.ContentValues
@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,22 +31,18 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.Button
-import com.stefdp.zipline.components.Popup
-import com.stefdp.zipline.utils.getDisplayPath
 import com.stefdp.zipline.utils.rememberQrBitmap
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
 fun QRCodePopup(
     context: Context,
+    activity: FragmentActivity,
     qrCodeText: String,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
@@ -127,11 +122,15 @@ fun QRCodePopup(
 
                         clipboardManager.setClipEntry(clipData)
 
-                        Toast.makeText(
-                            context,
-                            "QR code copied to clipboard",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "QR code copied to clipboard"
+                                )
+                            }
+                        )
                     }
                 },
                 modifier = Modifier.weight(1f)
@@ -163,11 +162,15 @@ fun QRCodePopup(
                             if (out != null) {
                                 qrCode.compress(Bitmap.CompressFormat.PNG, 100, out)
 
-                                Toast.makeText(
-                                    context,
-                                    "QR code saved in Pictures/$downloadFileName",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    content = {
+                                        Text(
+                                            text = "QR code saved in Pictures/$downloadFileName"
+                                        )
+                                    }
+                                )
                             }
                         }
                     }

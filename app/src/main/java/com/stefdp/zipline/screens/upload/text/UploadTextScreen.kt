@@ -52,6 +52,7 @@ import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
@@ -153,11 +154,15 @@ fun UploadTextScreen(
 
             getFileInfo(context, uri)?.let { (name, size, mimeType) ->
                 if (size >= maxFileSize) {
-                    Toast.makeText(
-                        context,
-                        "File is too large: $name",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        content = {
+                            Text(
+                                text = "File is too large: $name"
+                            )
+                        }
+                    )
 
                     return@rememberLauncherForActivityResult
                 }
@@ -273,11 +278,15 @@ fun UploadTextScreen(
 
                                 clipboardManager.setClipEntry(clipData)
 
-                                Toast.makeText(
-                                    context,
-                                    "File link copied to clipboard",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    content = {
+                                        Text(
+                                            text = "File link copied to clipboard"
+                                        )
+                                    }
+                                )
                             }
                         },
                         color = MaterialTheme.colorScheme.primary,

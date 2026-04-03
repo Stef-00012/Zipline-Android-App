@@ -65,11 +65,13 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Pager
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
@@ -274,7 +276,8 @@ fun FilesScreen(
         },
         tags = tags ?: emptyList(),
         updateTags = ::updateTags,
-        context = context
+        context = context,
+        activity = activity
     )
 
     Popup(
@@ -340,6 +343,7 @@ fun FilesScreen(
 
                     PendingFile(
                         context = context,
+                        activity = activity,
                         file = incompleteFile,
                         updateData = ::updateIncompleteFiles,
                         updateIsLoading = { pendingFilesLoading = it },
@@ -393,11 +397,13 @@ fun FilesScreen(
                         enabled = isTitleOverflowing,
                         onClick = {},
                         onLongClick = {
-                            Toast.makeText(
-                                context,
-                                titleText,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(titleText)
+                                }
+                            )
                         }
                     ),
             )
@@ -536,6 +542,7 @@ fun FilesScreen(
 
         LargeFileDisplay(
             context = context,
+            activity = activity,
             file = clickedFile,
             onDismissRequest = { clickedFile = null },
             updateData = ::updateFiles,
@@ -878,11 +885,15 @@ fun FilesScreen(
                                     updateFiles()
                                 }
                                 .onFailure {
-                                    Toast.makeText(
-                                        context,
-                                        "Failed to delete file: ${it.message}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    Notification.show(
+                                        context = context,
+                                        activity = activity,
+                                        content = {
+                                            Text(
+                                                text = "Failed to delete file: ${it.message}"
+                                            )
+                                        },
+                                    )
                                 }
 
                             deleteFile = null
@@ -1011,11 +1022,15 @@ fun FilesScreen(
                                             coroutineScope.launch {
                                                 clipboardManager.setClipEntry(clipData)
 
-                                                Toast.makeText(
-                                                    context,
-                                                    "File link copied to clipboard",
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = {
+                                                        Text(
+                                                            text = "File link copied to clipboard"
+                                                        )
+                                                    }
+                                                )
                                             }
                                         },
                                         enabled = serverUrl != null && !isLoading
@@ -1039,11 +1054,13 @@ fun FilesScreen(
 
                                     fun showToast(message: String) {
                                         coroutineScope.launch(Dispatchers.Main) {
-                                            Toast.makeText(
-                                                context,
-                                                message,
-                                                Toast.LENGTH_LONG
-                                            ).show()
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                                content = {
+                                                    Text(message)
+                                                }
+                                            )
                                         }
                                     }
 
@@ -1129,7 +1146,7 @@ fun FilesScreen(
                                                             showToast("Failed to create file in selected directory")
                                                         }
                                                     } catch (e: Exception) {
-                                                        Log.e(
+                                                        Logger.error(
                                                             "LargeFileDisplay",
                                                             "Failed to copy file to selected directory",
                                                             e
@@ -1141,7 +1158,7 @@ fun FilesScreen(
                                                     }
                                                 }
                                                 .onFailure {
-                                                    Log.e("LargeFileDisplay", "Failed to download file", it)
+                                                    Logger.error("LargeFileDisplay", "Failed to download file", it)
 
                                                     showToast("Failed to download file: ${it.message}")
                                                 }
@@ -1153,6 +1170,7 @@ fun FilesScreen(
 
                                     DownloadFilePasswordPrompt(
                                         context = context,
+                                        activity = activity,
                                         fileId = file.id,
                                         showPopup = fileRequiresPassword && downloadFilePassword == null,
                                         onDismissRequest = {
@@ -1278,7 +1296,8 @@ fun FilesScreen(
                                         .padding(5.dp),
                                     onClick = {
                                         clickedFile = files[index]
-                                    }
+                                    },
+                                    serverUrl = serverUrl,
                                 )
                             }
                         }

@@ -30,9 +30,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.network.models.IncompleteFile
 import com.stefdp.zipline.network.models.IncompleteFileMetadata
 import com.stefdp.zipline.network.models.IncompleteFileMetadataFile
@@ -53,6 +55,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PendingFile(
     context: Context,
+    activity: FragmentActivity,
     file: IncompleteFile,
     isLoading: Boolean,
     updateIsLoading: (Boolean) -> Unit,
@@ -128,20 +131,28 @@ fun PendingFile(
 
                     deleteIncompleteFileRes
                         .onSuccess {
-                            Toast.makeText(
+                            Notification.show(
                                 context,
-                                "Pending File deleted",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Pending File deleted"
+                                    )
+                                },
+                            )
 
                             updateData()
                         }
                         .onFailure {
-                            Toast.makeText(
+                            Notification.show(
                                 context,
-                                "Failed to delete pending file",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to delete pending file"
+                                    )
+                                },
+                            )
                         }
 
                     updateIsLoading(false)

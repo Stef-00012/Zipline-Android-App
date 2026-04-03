@@ -30,6 +30,7 @@ import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
@@ -114,11 +115,15 @@ fun AdminSettingsScreen(
                         updateWebSettings()
                         updatePublicSettings()
 
-                        Toast.makeText(
-                            context,
-                            "Settings updated successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Settings updated successfully"
+                                )
+                            }
+                        )
 
                         settingsUpdateTick += 1
                     }
@@ -317,7 +322,8 @@ fun AdminSettingsScreen(
                     setLoading = ::setLoading,
                     title = SettingCategory.WEBSITE.categoryName,
                     settingsUpdateTick = settingsUpdateTick,
-                    context = context
+                    context = context,
+                    activity = activity
                 )
 
                 SettingCategory.OAUTH.toString() -> OAuthCategory(

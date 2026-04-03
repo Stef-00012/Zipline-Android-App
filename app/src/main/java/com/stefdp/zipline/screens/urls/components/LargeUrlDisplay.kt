@@ -41,10 +41,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.MoreActionsButton
 import com.stefdp.zipline.components.MoreActionsMenuItem
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.network.models.Url
 import com.stefdp.zipline.ui.theme.ZiplineTheme
 import kotlinx.coroutines.launch
@@ -53,10 +55,11 @@ import kotlin.time.Instant
 
 @Composable
 fun LargeUrlDisplay(
+    context: Context,
+    activity: FragmentActivity,
     url: Url,
     serverUrl: String?,
     urlsRoute: String,
-    context: Context,
     onShowQRCode: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
@@ -109,11 +112,15 @@ fun LargeUrlDisplay(
 
                             clipboardManager.setClipEntry(clipData)
 
-                            Toast.makeText(
-                                context,
-                                "URL link copied to clipboard",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "URL link copied to clipboard"
+                                    )
+                                }
+                            )
                         }
                     },
                 ),
@@ -127,11 +134,15 @@ fun LargeUrlDisplay(
 
                             clipboardManager.setClipEntry(clipData)
 
-                            Toast.makeText(
-                                context,
-                                "Destination copied to clipboard",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Destination copied to clipboard"
+                                    )
+                                }
+                            )
                         }
                     },
                 ),

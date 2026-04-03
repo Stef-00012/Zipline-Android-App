@@ -38,8 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.HeaderButton
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.requests.deleteTag
@@ -51,6 +53,7 @@ import com.stefdp.zipline.components.Tag as TagComponent
 @Composable
 fun TagsPopup(
     context: Context,
+    activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     tags: List<Tag>,
@@ -67,12 +70,13 @@ fun TagsPopup(
     var isLoading by remember { mutableStateOf(false) }
 
     CreateTagPopup(
+        context = context,
+        activity = activity,
         showPopup = showCreateTagPopup,
         onDismissRequest = {
             showCreateTagPopup = false
         },
         updateTags = updateTags,
-        context = context
     )
 
     Popup(
@@ -200,19 +204,27 @@ fun TagsPopup(
                                         val deleteStatus = deleteTagRes.getOrNull()
 
                                         if (deleteStatus == true) {
-                                            Toast.makeText(
+                                            Notification.show(
                                                 context,
-                                                "Successfully deleted tag",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                                activity = activity,
+                                                content = {
+                                                    Text(
+                                                        text = "Successfully deleted tag"
+                                                    )
+                                                }
+                                            )
 
                                             updateTags()
                                         } else {
-                                            Toast.makeText(
-                                                context,
-                                                "Failed to delete tag",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                                content = {
+                                                    Text(
+                                                        text = "Failed to delete tag"
+                                                    )
+                                                }
+                                            )
                                         }
 
                                         isLoading = false

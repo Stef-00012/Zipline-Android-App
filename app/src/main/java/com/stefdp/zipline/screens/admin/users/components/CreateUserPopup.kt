@@ -29,10 +29,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.AvatarInput
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
@@ -45,13 +48,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CreateUserPopup(
-    currentUser: User?,
     context: Context,
+    activity: FragmentActivity,
+    currentUser: User?,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     updateUsers: suspend () -> Unit
 ) {
-        var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -145,6 +149,7 @@ fun CreateUserPopup(
 
         AvatarInput(
             context = context,
+            activity = activity,
             onAvatarChange = { avatar = it },
             modifier = Modifier.fillMaxWidth(),
             label = "Avatar",
@@ -203,25 +208,33 @@ fun CreateUserPopup(
 
                     createUserRes
                         .onSuccess {
-                            Toast.makeText(
-                                context,
-                                "User created successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "User created successfully"
+                                    )
+                                }
+                            )
 
                             updateUsers()
                             onDismissRequest()
                         }
                         .onFailure {
-                            Log.e("CreateUrlPopup", "Failed to create user", it)
+                            Logger.error("CreateUrlPopup", "Failed to create user", it)
 
                             errorMessage = it.message ?: "Something went wrong..."
 
-                            Toast.makeText(
-                                context,
-                                "Failed to create user",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to create user"
+                                    )
+                                }
+                            )
                         }
 
                     isLoading = false

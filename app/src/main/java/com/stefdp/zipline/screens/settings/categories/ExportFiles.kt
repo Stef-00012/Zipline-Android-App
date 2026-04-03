@@ -30,9 +30,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
@@ -56,6 +59,7 @@ import kotlin.time.Instant
 @Composable
 internal fun ExportFilesCategory(
     context: Context,
+    activity: FragmentActivity,
     exports: List<Export>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
@@ -229,11 +233,15 @@ internal fun ExportFilesCategory(
                                                 if (it.deleted) {
                                                     updateExports()
                                                 } else {
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Failed to delete export",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                                    Notification.show(
+                                                        context = context,
+                                                        activity = activity,
+                                                        content = {
+                                                            Text(
+                                                                text = "Failed to delete export"
+                                                            )
+                                                        }
+                                                    )
                                                 }
                                             }
 
@@ -261,11 +269,15 @@ internal fun ExportFilesCategory(
 
                                 fun showToast(message: String) {
                                     coroutineScope.launch(Dispatchers.Main) {
-                                        Toast.makeText(
-                                            context,
-                                            message,
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                        Notification.show(
+                                            context = context,
+                                            activity = activity,
+                                            content = {
+                                                Text(
+                                                    text = message
+                                                )
+                                            }
+                                        )
                                     }
                                 }
 
@@ -293,7 +305,7 @@ internal fun ExportFilesCategory(
                                         return
                                     }
 
-                                    Log.d("ExportFiles", "Starting download of export ${export.id} with size ${export.size} bytes to $selectedPath")
+                                    Logger.debug("ExportFiles", "Starting download of export ${export.id} with size ${export.size} bytes to $selectedPath")
 
                                     coroutineScope.launch(Dispatchers.IO) {
                                         showToast("Starting download...")
@@ -344,7 +356,7 @@ internal fun ExportFilesCategory(
                                                         showToast("Failed to create file in selected directory")
                                                     }
                                                 } catch (e: Exception) {
-                                                    Log.e(
+                                                    Logger.error(
                                                         "ExportFiles",
                                                         "Failed to copy file to selected directory",
                                                         e
@@ -356,7 +368,7 @@ internal fun ExportFilesCategory(
                                                 }
                                             }
                                             .onFailure {
-                                                Log.e("ExportFiles", "Failed to download export", it)
+                                                Logger.error("ExportFiles", "Failed to download export", it)
 
                                                 showToast("Failed to download export: ${it.message}")
                                             }

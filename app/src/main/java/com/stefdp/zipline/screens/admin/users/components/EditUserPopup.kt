@@ -31,10 +31,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.AvatarInput
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
@@ -51,9 +54,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditUserPopup(
+    context: Context,
+    activity: FragmentActivity,
     currentUser: User?,
     user: User?,
-    context: Context,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     updateUsers: suspend () -> Unit
@@ -163,6 +167,7 @@ fun EditUserPopup(
 
         AvatarInput(
             context = context,
+            activity = activity,
             onAvatarChange = { avatar = it },
             modifier = Modifier.fillMaxWidth(),
             label = "Avatar",
@@ -399,25 +404,33 @@ fun EditUserPopup(
 
                     editUserRes
                         .onSuccess {
-                            Toast.makeText(
-                                context,
-                                "User edited successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "User edited successfully"
+                                    )
+                                }
+                            )
 
                             updateUsers()
                             onDismissRequest()
                         }
                         .onFailure {
-                            Log.e("EditUrlPopup", "Failed to edit user", it)
+                            Logger.error("EditUrlPopup", "Failed to edit user", it)
 
                             errorMessage = it.message ?: "Something went wrong..."
 
-                            Toast.makeText(
-                                context,
-                                "Failed to edit user",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to edit user"
+                                    )
+                                },
+                            )
                         }
 
                     isLoading = false

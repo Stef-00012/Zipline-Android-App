@@ -35,8 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
@@ -49,6 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CreateTagPopup(
     context: Context,
+    activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     updateTags: suspend () -> Unit
@@ -142,23 +146,31 @@ fun CreateTagPopup(
 
                     createTagRes
                         .onSuccess {
-                            Toast.makeText(
+                            Notification.show(
                                 context,
-                                "Tag created successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Tag created successfully"
+                                    )
+                                }
+                            )
 
                             updateTags()
                             onDismissRequest()
                         }
                         .onFailure {
-                            Log.e("CreateTagPopup", "Failed to create tag", it)
+                            Logger.error("CreateTagPopup", "Failed to create tag", it)
 
-                            Toast.makeText(
+                            Notification.show(
                                 context,
-                                "Failed to create tag",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to create tag"
+                                    )
+                                }
+                            )
                         }
 
                     isLoading = false

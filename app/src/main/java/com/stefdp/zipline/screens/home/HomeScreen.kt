@@ -56,6 +56,7 @@ import com.stefdp.zipline.network.requests.getRecentFiles
 import com.stefdp.zipline.network.requests.getStats
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.home.components.Stat
+import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.horizontalLazyScrollbar
 import com.stefdp.zipline.utils.parseBytes
@@ -81,6 +82,14 @@ fun HomeScreen(
 
     val webSettings = LocalWebSettings.current
     val updateWebSettings = LocalUpdateWebSettings.current
+
+    var serverUrl by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        val secureStore = SecureStorage.getInstance(context)
+
+        serverUrl = secureStore.get("serverUrl")
+    }
 
     var userStats by remember { mutableStateOf<GetStatsResponse?>(null) }
     var recentFiles by remember { mutableStateOf<List<File>>(emptyList()) }
@@ -248,6 +257,7 @@ fun HomeScreen(
 
             LargeFileDisplay(
                 context = context,
+                activity = activity,
                 file = clickedFile,
                 onDismissRequest = { clickedFile = null },
                 updateData = ::updateData,
@@ -290,7 +300,8 @@ fun HomeScreen(
                                 .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
                             onClick = { file ->
                                 clickedFile = file
-                            }
+                            },
+                            serverUrl = serverUrl
                         )
                     }
                 }

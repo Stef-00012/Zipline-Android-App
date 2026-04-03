@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.R
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
@@ -42,11 +43,15 @@ fun BiometricAuthScreen(
                 }
             },
             onError = { _, _ ->
-                Toast.makeText(
-                    context,
-                    "Biometric authentication failed",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                    content = {
+                        Text(
+                            text = "Biometric authentication failed"
+                        )
+                    }
+                )
             },
         )
 

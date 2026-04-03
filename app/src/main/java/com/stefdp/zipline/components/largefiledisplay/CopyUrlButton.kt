@@ -25,8 +25,10 @@ import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.White
 import kotlinx.coroutines.launch
@@ -34,6 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun CopyUrlButton(
     context: Context,
+    activity: FragmentActivity,
     standardUrl: String,
     rawUrl: String,
     enabled: Boolean = true,
@@ -78,11 +81,15 @@ internal fun CopyUrlButton(
 
                         clipboardManager.setClipEntry(clipData)
 
-                        Toast.makeText(
-                            context,
-                            "File link copied to clipboard",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "File link copied to clipboard"
+                                )
+                            }
+                        )
 
                         expanded = false
                     }
@@ -106,11 +113,15 @@ internal fun CopyUrlButton(
 
                         clipboardManager.setClipEntry(clipData)
 
-                        Toast.makeText(
-                            context,
-                            "Raw file link copied to clipboard",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Raw file link copied to clipboard"
+                                )
+                            }
+                        )
 
                         expanded = false
                     }

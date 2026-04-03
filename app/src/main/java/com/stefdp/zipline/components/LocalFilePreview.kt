@@ -43,6 +43,7 @@ fun LocalFilePreview(
 ) {
     var imageLoading by remember { mutableStateOf(true) }
     var imageFailed by remember { mutableStateOf(false) }
+    val isLargeFile = fileState.file.size >= MAX_PREVIEW_FILE_SIZE
 
     val fileName = fileState.file.displayName
     val fileType = fileState.file.type
@@ -113,16 +114,26 @@ fun LocalFilePreview(
                     )
                 }
 
-                AsyncImage(
-                    model = fileUri,
-                    contentDescription = fileName,
-                    onSuccess = {
-                        imageLoading = false
-                    },
-                    onError = {
-                        imageFailed = true
-                    }
-                )
+                if (isLargeFile) {
+                    imageLoading = false
+
+                    DefaultPreview(
+                        icon = painterResource(R.drawable.description),
+                        iconContentDescription = "$fileType file",
+                        label = "${fileName}\nFile too large to preview"
+                    )
+                } else {
+                    AsyncImage(
+                        model = fileUri,
+                        contentDescription = fileName,
+                        onSuccess = {
+                            imageLoading = false
+                        },
+                        onError = {
+                            imageFailed = true
+                        }
+                    )
+                }
             }
 
             return@Box
@@ -144,18 +155,28 @@ fun LocalFilePreview(
                     )
                 }
 
-                AsyncImage(
-                    model = fileUri,
-                    contentDescription = fileName,
-                    onSuccess = {
-                        imageLoading = false
-                    },
-                    onError = {
-                        imageFailed = true
-                    }
-                )
+                if (isLargeFile) {
+                    imageLoading = false
 
-                if (!imageLoading) {
+                    DefaultPreview(
+                        icon = painterResource(R.drawable.videocam),
+                        iconContentDescription = "Video file",
+                        label = "${fileName}\nFile too large to preview"
+                    )
+                } else {
+                    AsyncImage(
+                        model = fileUri,
+                        contentDescription = fileName,
+                        onSuccess = {
+                            imageLoading = false
+                        },
+                        onError = {
+                            imageFailed = true
+                        }
+                    )
+                }
+
+                if (!imageLoading && !isLargeFile) {
                     Icon(
                         painter = painterResource(R.drawable.play_arrow),
                         contentDescription = "Play video icon",

@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -37,15 +38,15 @@ object Notification {
     fun show(
         context: Context,
         activity: FragmentActivity,
-        message: String,
+        content: @Composable () -> Unit,
         duration: Long = 3000L
     ) {
         CoroutineScope(Dispatchers.Main).launch {
-            showInternal(context, activity, message, duration)
+            showInternal(context, activity, content, duration)
         }
     }
 
-    private suspend fun showInternal(context: Context, activity: FragmentActivity, message: String, duration: Long) {
+    private suspend fun showInternal(context: Context, activity: FragmentActivity, content: @Composable () -> Unit, duration: Long) {
         currentDialog?.dismiss()
 
         val dialog = Dialog(context)
@@ -74,7 +75,7 @@ object Notification {
             setViewTreeSavedStateRegistryOwner(activity.window.decorView.findViewTreeSavedStateRegistryOwner())
 
             setContent {
-                NotificationContent(message)
+                NotificationContent(content)
             }
         }
 
@@ -96,7 +97,7 @@ object Notification {
     }
 
     @Composable
-    private fun NotificationContent(message: String) {
+    private fun NotificationContent(content: @Composable () -> Unit) {
         ZiplineTheme {
             Surface(
                 shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp),
@@ -104,19 +105,15 @@ object Notification {
                 tonalElevation = 4.dp,
                 shadowElevation = 6.dp
             ) {
-                Box(
+                Row(
                     modifier = Modifier
                         .padding(
                             horizontal = 20.dp,
                             vertical = 12.dp
                         ),
-                    contentAlignment = Alignment.Center
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    content()
                 }
             }
         }

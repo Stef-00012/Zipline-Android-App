@@ -30,11 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.AvatarInput
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.UserAvatar
 import com.stefdp.zipline.network.models.User
@@ -48,6 +50,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun AvatarCategory(
     context: Context,
+    activity: FragmentActivity,
     updateUser: suspend (UpdateCurrentUserBody?) -> List<String>,
     isLoading: Boolean,
     setLoading: (Boolean) -> Unit,
@@ -89,6 +92,7 @@ internal fun AvatarCategory(
 
             AvatarInput(
                 context = context,
+                activity = activity,
                 onAvatarChange = { newAvatar = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = "Upload new avatar...",
@@ -159,11 +163,15 @@ internal fun AvatarCategory(
                                     } else if (it is UpdateCurrentUserResult.Success) {
                                         localUpdateLoggedUserAvatar()
 
-                                        Toast.makeText(
-                                            context,
-                                            "Avatar removed successfully",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Notification.show(
+                                            context = context,
+                                            activity = activity,
+                                            content = {
+                                                Text(
+                                                    text = "Avatar removed successfully"
+                                                )
+                                            }
+                                        )
 
                                         updateUser(null)
                                     }

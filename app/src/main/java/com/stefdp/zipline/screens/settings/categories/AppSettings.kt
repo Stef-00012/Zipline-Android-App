@@ -51,6 +51,7 @@ import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
@@ -181,11 +182,15 @@ internal fun AppSettingsCategory(
                             }
                         },
                         onError = { _, _ ->
-                            Toast.makeText(
-                                context,
-                                "Biometric authentication failed",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Biometric authentication failed"
+                                    )
+                                }
+                            )
                         },
                     )
 

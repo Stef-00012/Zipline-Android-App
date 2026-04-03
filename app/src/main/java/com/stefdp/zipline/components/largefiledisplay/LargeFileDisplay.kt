@@ -28,10 +28,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
@@ -63,6 +66,7 @@ const val UNKNOWN_FOLDER_NAME = "No Folder"
 @Composable
 fun LargeFileDisplay(
     context: Context,
+    activity: FragmentActivity,
     file: File?,
     onDismissRequest: () -> Unit,
     updateData: suspend () -> Unit,
@@ -157,11 +161,15 @@ fun LargeFileDisplay(
                             onDismissRequest()
                         }
                         .onFailure {
-                            Toast.makeText(
-                                context,
-                                "Failed to delete file: ${it.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to delete file: ${it.message}"
+                                    )
+                                }
+                            )
                         }
 
                     onDelete()
@@ -173,6 +181,7 @@ fun LargeFileDisplay(
 
         EditFilePopup(
             context = context,
+            activity = activity,
             showPopup = showEditFilePopup,
             file = currentFile,
             isLoading = isLoading,
@@ -228,7 +237,8 @@ fun LargeFileDisplay(
 
                         val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
                         context.startActivity(intent)
-                    }
+                    },
+                    serverUrl = serverUrl
                 )
 
                 Stat(
@@ -467,11 +477,15 @@ fun LargeFileDisplay(
                                         updateData()
                                     }
                                     .onFailure {
-                                        Toast.makeText(
-                                            context,
-                                            "Failed to update file: ${it.message}",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                        Notification.show(
+                                            context = context,
+                                            activity = activity,
+                                            content = {
+                                                Text(
+                                                    text = "Failed to update file: ${it.message}"
+                                                )
+                                            }
+                                        )
                                     }
 
                                 isLoading = false
@@ -507,6 +521,7 @@ fun LargeFileDisplay(
 
                     CopyUrlButton(
                         context = context,
+                        activity = activity,
                         enabled = !isLoading || serverUrl == null,
                         standardUrl = "${serverUrl}${currentFile.url}",
                         rawUrl = "$serverUrl/raw/${currentFile.name}"
@@ -530,11 +545,15 @@ fun LargeFileDisplay(
 
                     fun showToast(message: String) {
                         coroutineScope.launch(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                message,
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = message
+                                    )
+                                }
+                            )
                         }
                     }
 
@@ -620,7 +639,7 @@ fun LargeFileDisplay(
                                             showToast("Failed to create file in selected directory")
                                         }
                                     } catch (e: Exception) {
-                                        Log.e(
+                                        Logger.error(
                                             "LargeFileDisplay",
                                             "Failed to copy file to selected directory",
                                             e
@@ -632,7 +651,7 @@ fun LargeFileDisplay(
                                     }
                                 }
                                 .onFailure {
-                                    Log.e("LargeFileDisplay", "Failed to download file", it)
+                                    Logger.error("LargeFileDisplay", "Failed to download file", it)
 
                                     showToast("Failed to download file: ${it.message}")
                                 }
@@ -641,6 +660,7 @@ fun LargeFileDisplay(
 
                     DownloadFilePasswordPrompt(
                         context = context,
+                        activity = activity,
                         fileId = currentFile.id,
                         showPopup = fileRequiresPassword && downloadFilePassword == null,
                         onDismissRequest = {

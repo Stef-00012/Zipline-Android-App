@@ -3,6 +3,7 @@ package com.stefdp.zipline.network.requests
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.responses.ErrorResponse
@@ -41,7 +42,7 @@ suspend fun getCurrentUser(
         if (!response.isSuccessful) {
             val statusCode = response.code()
 
-            Log.e(TAG, "Request failed with code: $statusCode and message: ${response.message()}")
+            Logger.error(TAG, "Request failed with code: $statusCode and message: ${response.message()}")
 
             if (statusCode == 401) {
                 return Result.failure(
@@ -53,7 +54,7 @@ suspend fun getCurrentUser(
             val json = Gson().fromJson(errorBody, ErrorResponse::class.java)
 
             if (json.error.isNotEmpty()) {
-                Log.e(TAG, "Error message: ${json.error}")
+                Logger.error(TAG, "Error message: ${json.error}")
 
                 return Result.failure(
                     Exception(json.error)
@@ -73,7 +74,7 @@ suspend fun getCurrentUser(
             Exception(context.getString(R.string.generic_error))
         )
     } catch(e: Exception) {
-        Log.e(TAG, "Exception occurred: ${e.message}", e)
+        Logger.error(TAG, "Exception occurred: ${e.message}", e)
 
         return Result.failure(
             Exception(context.getString(R.string.generic_error))

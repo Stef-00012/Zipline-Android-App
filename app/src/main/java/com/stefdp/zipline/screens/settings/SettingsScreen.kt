@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.network.models.Export
@@ -115,11 +116,15 @@ fun SettingsScreen(
                     } else if (it is UpdateCurrentUserResult.Success) {
                         localUpdateLoggedUser()
 
-                        Toast.makeText(
-                            context,
-                            "Settings updated successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Settings updated successfully"
+                                )
+                            }
+                        )
 
                         settingsUpdateTick += 1
                     }
@@ -221,18 +226,20 @@ fun SettingsScreen(
         ) {
             when (selectedCategory.first()) {
                 SettingCategory.USER.toString() -> UserCategory(
+                    context = context,
+                    activity = activity,
                     token = token,
                     settingsUpdateTick = settingsUpdateTick,
                     isLoading = isLoading,
                     updateUser = ::updateCurrentUser,
                     setLoading = { isLoading = it },
                     title = SettingCategory.USER.categoryName,
-                    context = context,
                     user = localLoggedUser
                 )
 
                 SettingCategory.AVATAR.toString() -> AvatarCategory(
                     context = context,
+                    activity = activity,
                     updateUser = ::updateCurrentUser,
                     isLoading = isLoading,
                     setLoading = { isLoading = it },
@@ -251,6 +258,7 @@ fun SettingsScreen(
 
                 SettingCategory.EXPORT_FILES.toString() -> ExportFilesCategory(
                     context = context,
+                    activity = activity,
                     settingsUpdateTick = settingsUpdateTick,
                     isLoading = isLoading,
                     setLoading = { isLoading = it },
@@ -270,13 +278,14 @@ fun SettingsScreen(
                 )
 
                 else -> UserCategory(
+                    context = context,
+                    activity = activity,
                     token = token,
                     settingsUpdateTick = settingsUpdateTick,
                     isLoading = isLoading,
                     updateUser = ::updateCurrentUser,
                     setLoading = { isLoading = it },
                     title = SettingCategory.USER.categoryName,
-                    context = context,
                     user = localLoggedUser
                 )
             }

@@ -106,10 +106,9 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
 }
 
 // TODO: move all inputs & loading from remember to rememberSaveable
-// TODO: move from Toast to Notification
 // TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
 // TODO: only show dates smaller than "settings.filesMaxExpiration in upload menu
-// TODO: move from Log.* to Logger.*
+// TODO: disable the admin settings that are in the tampered List
 
 const val APP_VERSION = "2.0.0"
 
@@ -161,7 +160,7 @@ class MainActivity : FragmentActivity() {
                 suspend fun updateLoggedUser(): Result<User> {
                     val tag = "MainActivity[updateLoggedUser]"
 
-                    Log.d(tag, "Checking if user is already logged in...")
+                    Logger.debug(tag, "Checking if user is already logged in...")
 
                     val currentUserRes = getCurrentUser(
                         context = context
@@ -173,15 +172,15 @@ class MainActivity : FragmentActivity() {
                                 Exception("User is not logged in")
                             )
 
-                            Log.d(tag, "User is logged in as ${currentUserData.user.username}")
+                            Logger.debug(tag, "User is logged in as ${currentUserData.user.username}")
 
                             loggedUser = currentUserData.user
 
                             return@updateLoggedUser Result.success(currentUserData.user)
                         }
                         .onFailure { error ->
-                            Log.d(tag, "User is not logged in")
-                            Log.e(tag, "Failed to fetch user stats: ${error.message}")
+                            Logger.debug(tag, "User is not logged in")
+                            Logger.error(tag, "Failed to fetch user stats: ${error.message}")
 
                             loggedUser = null
 
@@ -207,7 +206,7 @@ class MainActivity : FragmentActivity() {
                             return@updateLoggedUserAvatar Result.success(avatarBase64)
                         }
                         .onFailure { error ->
-                            Log.e(tag, "Failed to fetch user avatar: ${error.message}")
+                            Logger.error(tag, "Failed to fetch user avatar: ${error.message}")
 
                             loggedUserAvatar = null
 
@@ -233,7 +232,7 @@ class MainActivity : FragmentActivity() {
                             return@updatePublicSettings Result.success(publicConfigData)
                         }
                         .onFailure { error ->
-                            Log.e(tag, "Failed to fetch public server config: ${error.message}")
+                            Logger.error(tag, "Failed to fetch public server config: ${error.message}")
 
                             publicSettings = null
 
@@ -259,7 +258,7 @@ class MainActivity : FragmentActivity() {
                             return@updateWebSettings Result.success(webSettingsData)
                         }
                         .onFailure { error ->
-                            Log.e(tag, "Failed to fetch web settings: ${error.message}")
+                            Logger.error(tag, "Failed to fetch web settings: ${error.message}")
 
                             webSettings = null
 

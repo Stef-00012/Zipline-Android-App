@@ -32,10 +32,12 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.MoreActionsButton
 import com.stefdp.zipline.components.MoreActionsMenuItem
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.network.models.Invite
 import com.stefdp.zipline.network.models.Url
 import kotlinx.coroutines.launch
@@ -44,9 +46,10 @@ import kotlin.time.Instant
 
 @Composable
 fun LargeInviteDisplay(
+    context: Context,
+    activity: FragmentActivity,
     invite: Invite,
     serverUrl: String?,
-    context: Context,
     onShowQRCode: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -92,11 +95,15 @@ fun LargeInviteDisplay(
 
                             clipboardManager.setClipEntry(clipData)
 
-                            Toast.makeText(
-                                context,
-                                "Invite URL copied to clipboard",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Invite URL copied to clipboard"
+                                    )
+                                }
+                            )
                         }
                     },
                 ),

@@ -39,6 +39,7 @@ import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
@@ -239,7 +240,7 @@ fun LoginScreen(
                                             isTotpRequired = true
                                             isLoading = false
                                         } else if (loginStatus is LoginResult.Success) {
-                                            Log.d("LoginScreen", "Login successful, retrieving token...")
+                                            Logger.debug("LoginScreen", "Login successful, retrieving token...")
                                             val authCookie = loginStatus.authCookie
 
                                             val tokenRes = getToken(
@@ -247,7 +248,7 @@ fun LoginScreen(
                                                 cookie = authCookie,
                                             )
 
-                                            Log.d("LoginScreen", "Token retrieval result: ${tokenRes.isSuccess}")
+                                            Logger.debug("LoginScreen", "Token retrieval result: ${tokenRes.isSuccess}")
 
                                             tokenRes
                                                 .onSuccess { tokenData ->

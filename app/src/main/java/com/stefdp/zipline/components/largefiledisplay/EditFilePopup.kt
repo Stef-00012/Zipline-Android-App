@@ -21,8 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.File
@@ -35,6 +37,7 @@ val intRegex = Regex("^[0-9]*$")
 @Composable
 internal fun EditFilePopup(
     context: Context,
+    activity: FragmentActivity,
     showPopup: Boolean,
     file: File,
     isLoading: Boolean,
@@ -133,11 +136,15 @@ internal fun EditFilePopup(
                             onDismissRequest()
                         }
                         editFileRes.onFailure {
-                            Toast.makeText(
-                                context,
-                                "Failed to remove password: ${it.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to remove password: ${it.message}"
+                                    )
+                                }
+                            )
                         }
 
                         setLoading(false)
@@ -187,11 +194,15 @@ internal fun EditFilePopup(
                         onDismissRequest()
                     }
                     editFileRes.onFailure {
-                        Toast.makeText(
-                            context,
-                            "Failed to update file: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Failed to update file: ${it.message}"
+                                )
+                            }
+                        )
                     }
 
                     setLoading(false)

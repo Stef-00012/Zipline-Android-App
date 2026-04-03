@@ -34,10 +34,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.AvatarInput
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
@@ -51,6 +54,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CreateInvitePopup(
     context: Context,
+    activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     updateInvites: suspend () -> Unit
@@ -178,25 +182,33 @@ fun CreateInvitePopup(
 
                     createInviteRes
                         .onSuccess {
-                            Toast.makeText(
-                                context,
-                                "Invite created successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Invite created successfully"
+                                    )
+                                },
+                            )
 
                             updateInvites()
                             onDismissRequest()
                         }
                         .onFailure {
-                            Log.e("CreateInvitePopup", "Failed to create invite", it)
+                            Logger.error("CreateInvitePopup", "Failed to create invite", it)
 
                             errorMessage = it.message ?: "Something went wrong..."
 
-                            Toast.makeText(
-                                context,
-                                "Failed to create invite",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to create invite"
+                                    )
+                                }
+                            )
                         }
 
                     isLoading = false

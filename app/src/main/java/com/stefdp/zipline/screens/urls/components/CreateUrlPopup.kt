@@ -37,9 +37,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.LocalWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
@@ -55,6 +58,7 @@ val urlRegex = Regex("""^https?://([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:[/?#]\S*)?$""
 @Composable
 fun CreateUrlPopup(
     context: Context,
+    activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
     updateUrls: suspend () -> Unit
@@ -123,11 +127,15 @@ fun CreateUrlPopup(
 
                             clipboardManager.setClipEntry(clipData)
 
-                            Toast.makeText(
-                                context,
-                                "URL copied to clipboard",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "URL copied to clipboard"
+                                    )
+                                }
+                            )
                         }
                     },
                     color = MaterialTheme.colorScheme.primary,
@@ -346,11 +354,15 @@ fun CreateUrlPopup(
 
                     createUrlRes
                         .onSuccess {
-                            Toast.makeText(
-                                context,
-                                "URL created successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "URL created successfully"
+                                    )
+                                }
+                            )
 
                             createdUrl = it.url
 
@@ -358,15 +370,19 @@ fun CreateUrlPopup(
                             onDismissRequest()
                         }
                         .onFailure {
-                            Log.e("CreateUrlPopup", "Failed to create url", it)
+                            Logger.error("CreateUrlPopup", "Failed to create url", it)
 
                             errorMessage = it.message ?: "Something went wrong..."
 
-                            Toast.makeText(
-                                context,
-                                "Failed to create URL",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = {
+                                    Text(
+                                        text = "Failed to create URL"
+                                    )
+                                }
+                            )
                         }
 
                     isLoading = false

@@ -25,7 +25,7 @@ data class WebSettingsConfig(
     val pwa: WebSettingsConfigPwa,
     val oauthEnabled: WebSettingsConfigOauthEnabled,
     val oauth: WebSettingsConfigOauth,
-    val version: String
+    val version: String? = null,
 ) : Parcelable
 
 @Parcelize

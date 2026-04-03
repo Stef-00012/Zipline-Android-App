@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
@@ -161,12 +162,12 @@ internal fun DiscordWebhookOnUploadCategory(
             }
 
             var embedColor by remember(settings?.settings?.discordOnUploadEmbed?.color, settingsUpdateTick) {
-                Log.d("DiscordWebhookOnUploadCategory", "embed: ${settings?.settings?.discordOnUploadEmbed}")
-                Log.d("DiscordWebhookOnUploadCategory", "Initial color: ${settings?.settings?.discordOnUploadEmbed?.color}")
+                Logger.debug("DiscordWebhookOnUploadCategory", "embed: ${settings?.settings?.discordOnUploadEmbed}")
+                Logger.debug("DiscordWebhookOnUploadCategory", "Initial color: ${settings?.settings?.discordOnUploadEmbed?.color}")
 
                 val color = settings?.settings?.discordOnUploadEmbed?.color?.toColorInt()
 
-                Log.d("DiscordWebhookOnUploadCategory", "Parsed color int: $color, Color: ${if (color != null) Color(color) else "none"}")
+                Logger.debug("DiscordWebhookOnUploadCategory", "Parsed color int: $color, Color: ${if (color != null) Color(color) else "none"}")
 
                 mutableStateOf(if (color != null) Color(color) else Color.Black)
             }

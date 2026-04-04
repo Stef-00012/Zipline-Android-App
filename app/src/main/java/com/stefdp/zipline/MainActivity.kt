@@ -106,16 +106,17 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
     }
 }
 
+// TODO: create the folders page
 // TODO: move all inputs & loading from remember to rememberSaveable
 // TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
 // TODO: only show dates smaller than "settings.filesMaxExpiration in upload menu
 // TODO: disable the admin settings that are in the tampered List
+// TODO: create widgets
 
 const val APP_VERSION = "2.0.0"
 
 class MainActivity : FragmentActivity() {
     private var isAppReady by mutableStateOf(false)
-    private var initialIntent: Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()

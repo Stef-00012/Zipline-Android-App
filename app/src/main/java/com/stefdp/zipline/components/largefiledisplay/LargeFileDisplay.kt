@@ -121,6 +121,7 @@ fun LargeFileDisplay(
     LaunchedEffect(file) {
         if (file != null) {
             activeFile = file
+            isPopupVisible = true
         }
     }
 
@@ -157,6 +158,9 @@ fun LargeFileDisplay(
                             onDelete()
                             updateData()
                             onDismissRequest()
+
+                            showConfirmDeletePopup = false
+                            isPopupVisible = true
                         }
                         .onFailure {
                             Notification.show(
@@ -172,7 +176,6 @@ fun LargeFileDisplay(
 
                     onDelete()
 
-                    showConfirmDeletePopup = false
                     isLoading = false
                 }
             }

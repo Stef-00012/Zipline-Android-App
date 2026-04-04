@@ -1,7 +1,6 @@
 package com.stefdp.zipline.components
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,14 +25,13 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -45,6 +43,7 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.ui.theme.ZiplineTheme
 import com.stefdp.zipline.ui.theme.getOutlinedTextFieldColors
 import com.stefdp.zipline.utils.toAnnotatedString
+import kotlinx.coroutines.launch
 
 @Composable
 fun TextInput(
@@ -59,18 +58,34 @@ fun TextInput(
     enabled: Boolean = true,
     isPassword: Boolean = false,
     singleLine: Boolean = true,
-    onPasswordToggle: (
-        visible: Boolean
-    ) -> Unit = { },
-    sideButtonIcon: Painter? = null,
-    sideButtonColor: Color = LocalContentColor.current,
-    onSideButtonPress: () -> Unit = {},
-    sideButtonContentDescription: String? = null,
+    onPasswordToggle: suspend (
+        currentlyVisible: Boolean
+    ) -> Boolean = { true },
+    trailingIcon: Painter? = null,
+    trailingIconColor: Color = LocalContentColor.current,
+    onTrailingIconPress: () -> Unit = {},
+    trailingIconContentDescription: String? = null,
+    leadingIcon: Painter? = null,
+    leadingIconColor: Color = LocalContentColor.current,
+    onLeadingIconPress: () -> Unit = {},
+    leadingIconContentDescription: String? = null,
     colors: TextFieldColors = getOutlinedTextFieldColors(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     readOnly: Boolean = false,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+    fun handlePasswordToggle() {
+        coroutineScope.launch {
+            val proceed = onPasswordToggle(passwordVisible)
+
+            if (proceed) {
+                passwordVisible = !passwordVisible
+            }
+        }
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -119,16 +134,13 @@ fun TextInput(
                 PasswordVisualTransformation()
             } else VisualTransformation.None,
             keyboardOptions = keyboardOptions,
-            trailingIcon = if (isPassword || sideButtonIcon != null) {
+            trailingIcon = if (isPassword || trailingIcon != null) {
                 {
                     IconButton(
                         modifier = Modifier.padding(end = 4.dp),
                         onClick = if (isPassword) {
-                            {
-                                passwordVisible = !passwordVisible
-                                onPasswordToggle(passwordVisible)
-                            }
-                        } else onSideButtonPress
+                            ::handlePasswordToggle
+                        } else onTrailingIconPress
                     ) {
                         Icon(
                             painter = if (isPassword) {
@@ -144,14 +156,29 @@ fun TextInput(
                                     and this "else" is only reached if "isPassword" is false,
                                     which means "sideButtonIcon" must be non-null
                                 */
-                                sideButtonIcon as Painter
+                                trailingIcon as Painter
                             },
-                            tint = sideButtonColor,
+                            tint = trailingIconColor,
                             contentDescription = if (isPassword) {
                                 if (passwordVisible)
-                                    "TMP"
-                                else "TMP"
-                            } else sideButtonContentDescription ?: "TMP",
+                                    "Hide Password"
+                                else "Show Password"
+                            } else trailingIconContentDescription ?: "Unknown",
+                            modifier = Modifier.requiredSize(28.dp)
+                        )
+                    }
+                }
+            } else null,
+            leadingIcon = if (leadingIcon != null) {
+                {
+                    IconButton(
+                        modifier = Modifier.padding(end = 4.dp),
+                        onClick = onLeadingIconPress
+                    ) {
+                        Icon(
+                            painter = leadingIcon,
+                            tint = leadingIconColor,
+                            contentDescription = leadingIconContentDescription ?: "Unknown",
                             modifier = Modifier.requiredSize(28.dp)
                         )
                     }

@@ -4,13 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,14 +24,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
-import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
-import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.screens.files.components.IconButton
-import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
@@ -97,9 +91,9 @@ internal fun DomainsCategory(
                 description = "Enter a domain name.",
                 enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth(),
-                sideButtonIcon = painterResource(R.drawable.add),
-                sideButtonColor = MaterialTheme.colorScheme.primary,
-                onSideButtonPress = {
+                trailingIcon = painterResource(R.drawable.add),
+                trailingIconColor = MaterialTheme.colorScheme.primary,
+                onTrailingIconPress = {
                     coroutineScope.launch {
                         if (newDomain.text.isNotBlank()) {
                             setLoading(true)

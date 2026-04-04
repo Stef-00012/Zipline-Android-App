@@ -66,6 +66,7 @@ import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
 import com.stefdp.zipline.utils.getBiometricStatus
+import com.stefdp.zipline.utils.hasNotificationsPermission
 import com.stefdp.zipline.utils.promptBiometricAuthentication
 import com.stefdp.zipline.utils.shimmerable
 import kotlinx.coroutines.launch
@@ -76,6 +77,8 @@ internal fun AppSettingsCategory(
     activity: FragmentActivity,
     user: User?,
     version: GetServerVersionResponse?,
+    hasNotificationPermission: Boolean,
+    requestNotificationPermission: () -> Unit,
     isLoading: Boolean,
     title: String,
     navController: NavHostController
@@ -258,6 +261,19 @@ internal fun AppSettingsCategory(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                if (!hasNotificationPermission) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            requestNotificationPermission()
+                        }
+                    ) {
+                        Text(
+                            text = "Grant Notifications Permission"
+                        )
+                    }
+                }
+
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     colors = getButtonColors().copy(

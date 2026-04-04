@@ -2,8 +2,6 @@ package com.stefdp.zipline.screens.settings.categories
 
 import android.content.ClipData
 import android.content.Context
-import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,8 +33,14 @@ import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
+import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.createBiometricPrompt
+import com.stefdp.zipline.utils.createPromptInfo
+import com.stefdp.zipline.utils.promptBiometricAuthentication
 import com.stefdp.zipline.utils.shimmerable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 @Composable
 internal fun UserCategory(
@@ -92,8 +97,6 @@ internal fun UserCategory(
                 }
             }
 
-            var isTokenVisible by remember { mutableStateOf(false) }
-
             var tokenInput by remember(token, settingsUpdateTick) {
                 mutableStateOf(TextFieldValue(token ?: ""))
             }
@@ -102,21 +105,72 @@ internal fun UserCategory(
 
             val coroutineScope = rememberCoroutineScope()
 
+            var biometricAuthenticationEnabled by remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                coroutineScope.launch {
+                    val secureStore = SecureStorage.getInstance(context)
+
+                    biometricAuthenticationEnabled = secureStore.get("unlockWithBiometrics").toBoolean()
+                }
+            }
+
+            suspend fun promptBiometrics(): Boolean = suspendCancellableCoroutine { continuation ->
+                val biometricPrompt = createBiometricPrompt(
+                    activity = activity,
+                    onSuccess = {
+                        if (continuation.isActive) continuation.resume(true)
+                    },
+                    onError = { _, _ ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = "Biometric authentication failed"
+                                )
+                            }
+                        )
+
+                        continuation.resume(false)
+                    },
+                )
+
+                val biometricPromptInfo = createPromptInfo(context)
+
+                promptBiometricAuthentication(
+                    activity = activity,
+                    prompt = biometricPrompt,
+                    promptInfo = biometricPromptInfo,
+                )
+            }
+
             TextInput(
-                value = if (isTokenVisible) tokenInput else TextFieldValue("[Click to Reveal]"),
+                value = tokenInput,
                 onValueChange = {},
                 readOnly = true,
                 label = "Token",
                 enabled = !isLoading,
+                isPassword = true,
+                onPasswordToggle = suspend { isCurrentlyVisible ->
+                    return@TextInput if (isCurrentlyVisible || !biometricAuthenticationEnabled)
+                        true
+                    else
+                        promptBiometrics()
+                },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        onClick = { isTokenVisible = true },
-                        enabled = !isLoading && !isTokenVisible && token != null
-                    ),
-                sideButtonIcon = painterResource(R.drawable.content_copy),
-                onSideButtonPress = {
+                    .fillMaxWidth(),
+                leadingIcon = painterResource(R.drawable.content_copy),
+                onLeadingIconPress = {
                     coroutineScope.launch {
+                        val proceed = if (biometricAuthenticationEnabled) {
+                            promptBiometrics()
+                        } else {
+                            true
+                        }
+
+                        if (!proceed) return@launch
+
                         val clipData = ClipData.newPlainText("User Token", tokenInput.text).toClipEntry()
 
                         clipboardManager.setClipEntry(clipData)

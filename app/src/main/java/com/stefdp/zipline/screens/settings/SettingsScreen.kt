@@ -1,7 +1,11 @@
 package com.stefdp.zipline.screens.settings
 
+import android.Manifest
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUser
@@ -43,6 +51,7 @@ import com.stefdp.zipline.screens.settings.categories.AvatarCategory
 import com.stefdp.zipline.screens.settings.categories.ExportFilesCategory
 import com.stefdp.zipline.screens.settings.categories.UserCategory
 import com.stefdp.zipline.screens.settings.categories.ViewingFilesCategory
+import com.stefdp.zipline.utils.hasNotificationsPermission
 
 @Composable
 fun SettingsScreen(
@@ -65,6 +74,57 @@ fun SettingsScreen(
     var token by remember { mutableStateOf(localLoggedUser?.token) }
     var exports by remember { mutableStateOf<List<Export>>(emptyList()) }
     var ziplineVersion by remember { mutableStateOf<GetServerVersionResponse?>(null) }
+
+    var hasNotificationPermission by remember { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasNotificationPermission = hasNotificationsPermission(context)
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasNotificationPermission = isGranted
+
+        val notificationText = if (isGranted)
+            "Notifications Permission Granted"
+        else
+            "Notifications Permission Denied, please go to the app settings and allow it from there"
+
+        Notification.show(
+            context = context,
+            activity = activity,
+            content = {
+                Text(notificationText)
+            }
+        )
+    }
+
+    fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            Notification.show(
+                context = context,
+                activity = activity,
+                content = {
+                    Text("Notifications Permission is automatically granted on this version of Android")
+                }
+            )
+        }
+    }
 
     suspend fun updateToken() {
         val tokenRes = getTokenWithToken(context)
@@ -274,7 +334,9 @@ fun SettingsScreen(
                     title = SettingCategory.APP_SETTINGS.categoryName,
                     version = ziplineVersion,
                     user = localLoggedUser,
-                    navController = navController
+                    navController = navController,
+                    hasNotificationPermission = hasNotificationPermission,
+                    requestNotificationPermission = ::requestNotificationPermission
                 )
 
                 else -> UserCategory(
@@ -286,7 +348,7 @@ fun SettingsScreen(
                     updateUser = ::updateCurrentUser,
                     setLoading = { isLoading = it },
                     title = SettingCategory.USER.categoryName,
-                    user = localLoggedUser
+                    user = localLoggedUser,
                 )
             }
         }

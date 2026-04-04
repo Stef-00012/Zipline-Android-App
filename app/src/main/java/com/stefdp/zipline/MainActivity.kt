@@ -1,8 +1,8 @@
 package com.stefdp.zipline
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -28,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -114,6 +115,7 @@ const val APP_VERSION = "2.0.0"
 
 class MainActivity : FragmentActivity() {
     private var isAppReady by mutableStateOf(false)
+    private var initialIntent: Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -130,6 +132,7 @@ class MainActivity : FragmentActivity() {
         }
 
         enableEdgeToEdge()
+
         setContent {
             ZiplineTheme {
                 val activity = this@MainActivity
@@ -441,27 +444,36 @@ fun AppNavigation(
             )
         }
 
-        composable<UploadFileScreen> {
+        composable<UploadFileScreen> { backStackEntry ->
+            val uploadFileScreen = backStackEntry.toRoute<UploadFileScreen>()
+
             UploadFileScreen(
                 navController = navController,
                 context = context,
-                activity = activity
+                activity = activity,
+                sharedFiles = uploadFileScreen.files
             )
         }
 
-        composable<UploadTextScreen> {
+        composable<UploadTextScreen> { backStackEntry ->
+            val uploadTextScreen = backStackEntry.toRoute<UploadTextScreen>()
+
             UploadTextScreen(
                 navController = navController,
                 context = context,
-                activity = activity
+                activity = activity,
+                sharedText = uploadTextScreen.text
             )
         }
 
-        composable<UrlsScreen> {
+        composable<UrlsScreen> { backStackEntry ->
+            val urlsScreen = backStackEntry.toRoute<UrlsScreen>()
+
             UrlsScreen(
                 navController = navController,
                 context = context,
-                activity = activity
+                activity = activity,
+                sharedUrl = urlsScreen.url
             )
         }
 
@@ -497,4 +509,62 @@ fun AppNavigation(
             )
         }
     }
+}
+
+fun handleSharedIntent(intent: Intent, navController: NavHostController) {
+    val action = intent.action ?: return
+
+    if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE) {
+        val text = intent.getStringExtra(Intent.EXTRA_TEXT)
+
+        if (text != null && (text.startsWith(
+                prefix = "http://",
+                ignoreCase = true
+            ) || text.startsWith(
+                prefix = "https://",
+                ignoreCase = true
+            ))
+        ) {
+            navController.navigate(UrlsScreen(url = text)) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+
+            return
+        }
+
+        val uris = if (action == Intent.ACTION_SEND) {
+            IntentCompat.getParcelableExtra(
+                intent,
+                Intent.EXTRA_STREAM,
+                android.net.Uri::class.java
+            )?.let { listOf(it) }
+        } else {
+            IntentCompat.getParcelableArrayListExtra(
+                intent,
+                Intent.EXTRA_STREAM,
+                android.net.Uri::class.java
+            )
+        }
+
+        if (!uris.isNullOrEmpty()) {
+            val uriStrings = uris.map { it.toString() }
+
+            navController.navigate(UploadFileScreen(files = uriStrings)) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+            return
+        }
+
+        if (text != null) {
+            navController.navigate(UploadTextScreen(text = text)) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        }
+    }
+}
+
+fun isShareIntent(intent: Intent): Boolean {
+    val action = intent.action ?: return false
+
+    return action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE
 }

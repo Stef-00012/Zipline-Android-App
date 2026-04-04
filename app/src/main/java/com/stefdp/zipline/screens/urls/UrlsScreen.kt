@@ -90,6 +90,7 @@ fun UrlsScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
+    sharedUrl: String? = null,
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -98,6 +99,8 @@ fun UrlsScreen(
             popUpTo(navController.graph.id) { inclusive = true }
         }
     }
+
+    var baseUrl by remember { mutableStateOf(sharedUrl) }
 
     val webSettings = LocalWebSettings.current
 
@@ -252,9 +255,13 @@ fun UrlsScreen(
     CreateUrlPopup(
         context = context,
         activity = activity,
-        showPopup = createdNewUrlPopupOpen,
-        onDismissRequest = { createdNewUrlPopupOpen = false },
-        updateUrls = ::updateUrls
+        showPopup = createdNewUrlPopupOpen || baseUrl != null,
+        onDismissRequest = {
+            createdNewUrlPopupOpen = false
+            baseUrl = null
+        },
+        updateUrls = ::updateUrls,
+        baseUrl = baseUrl
     )
 
     EditUrlPopup(

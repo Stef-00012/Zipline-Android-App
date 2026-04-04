@@ -61,7 +61,8 @@ fun CreateUrlPopup(
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    updateUrls: suspend () -> Unit
+    updateUrls: suspend () -> Unit,
+    baseUrl: String? = null,
 ) {
     var isLoading by remember { mutableStateOf(false) }
 
@@ -211,7 +212,7 @@ fun CreateUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var destination by remember { mutableStateOf(TextFieldValue("")) }
+        var destination by remember { mutableStateOf(TextFieldValue(baseUrl ?: "")) }
 
         TextInput(
             value = destination,

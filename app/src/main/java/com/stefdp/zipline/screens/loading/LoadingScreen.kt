@@ -1,6 +1,7 @@
 package com.stefdp.zipline.screens.loading
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.IntentCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalUpdateLoggedUser
@@ -29,9 +31,14 @@ import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
 import com.stefdp.zipline.R
+import com.stefdp.zipline.handleSharedIntent
+import com.stefdp.zipline.isShareIntent
 import com.stefdp.zipline.screens.BiometricAuthScreen
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
+import com.stefdp.zipline.screens.UploadFileScreen
+import com.stefdp.zipline.screens.UploadTextScreen
+import com.stefdp.zipline.screens.UrlsScreen
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.getBiometricStatus
 
@@ -39,12 +46,14 @@ import com.stefdp.zipline.utils.getBiometricStatus
 fun LoadingScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
 ) {
     val updateLoggedUser = LocalUpdateLoggedUser.current
     val updateLoggedUserAvatar = LocalUpdateLoggedUserAvatar.current
     val updatePublicSettings = LocalUpdatePublicSettings.current
     val updateWebSettings = LocalUpdateWebSettings.current
+
+    val intent = activity.intent
 
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
@@ -70,8 +79,14 @@ fun LoadingScreen(
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 } else {
-                    navController.navigate(HomeScreen) {
-                        popUpTo(navController.graph.id) { inclusive = true }
+                    if (isShareIntent(intent)) {
+                        handleSharedIntent(intent, navController)
+
+                        activity.intent = null
+                    } else {
+                        navController.navigate(HomeScreen) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        }
                     }
                 }
             }

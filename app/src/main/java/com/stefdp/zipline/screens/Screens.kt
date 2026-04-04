@@ -28,13 +28,13 @@ data class FilesScreen(val userId: String? = null) : AppScreen
 object FoldersScreen : AppScreen
 
 @Serializable
-object UploadFileScreen : AppScreen
+data class UploadFileScreen(val files: List<String>? = null) : AppScreen
 
 @Serializable
-object UploadTextScreen : AppScreen
+data class UploadTextScreen(val text: String? = null) : AppScreen
 
 @Serializable
-object UrlsScreen : AppScreen
+data class UrlsScreen(val url: String? = null) : AppScreen
 
 @Serializable
 object AdminSettingsScreen : AppScreen

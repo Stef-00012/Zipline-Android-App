@@ -432,7 +432,7 @@ fun FilesScreen(
                         icon = painterResource(R.drawable.upload_file),
                         contentDescription = "Upload file",
                         onClick = {
-                            navController.navigate(UploadFileScreen)
+                            navController.navigate(UploadFileScreen())
                         },
                         enabled = !isLoading,
                     )

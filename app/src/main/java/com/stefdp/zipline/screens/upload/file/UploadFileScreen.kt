@@ -5,8 +5,6 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -105,14 +103,13 @@ import ir.ehsannarmani.compose_charts.extensions.format
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.time.Clock
-import kotlin.time.Duration
 
 @Composable
 fun UploadFileScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    sharedFiles: List<String>? = null
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -146,7 +143,27 @@ fun UploadFileScreen(
     val defaultNameFormat = webSettings?.config?.files?.defaultFormat ?: FilesFormat.RANDOM
     val defaultCompressionFormat = webSettings?.config?.files?.defaultCompressionFormat ?: UploadCompressionType.PNG
 
-    var fileStates by remember { mutableStateOf(listOf<FileUploadState>()) }
+    var fileStates by remember {
+        mutableStateOf<List<FileUploadState>>(
+            sharedFiles?.mapNotNull { uriString ->
+                val uri = uriString.toUri()
+                val fileInfo = getFileInfo(context, uri) ?: return@mapNotNull null
+
+                val fileName = fileInfo.first
+                val fileSize = fileInfo.second
+                val fileType = fileInfo.third
+
+                FileUploadState(
+                    file = SelectedFile(
+                        uri = uri,
+                        displayName = fileName,
+                        size = fileSize,
+                        type = fileType
+                    )
+                )
+            } ?: emptyList()
+        )
+    }
 
     val filePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()

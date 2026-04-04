@@ -23,6 +23,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Notification
+import com.stefdp.zipline.handleSharedIntent
+import com.stefdp.zipline.isShareIntent
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
@@ -34,12 +36,20 @@ fun BiometricAuthScreen(
     context: Context,
     activity: FragmentActivity
 ) {
+    val intent = activity.intent
+
     fun promptBiometrics() {
         val biometricPrompt = createBiometricPrompt(
             activity = activity,
             onSuccess = {
-                navController.navigate(HomeScreen) {
-                    popUpTo(navController.graph.id) { inclusive = true }
+                if (isShareIntent(intent)) {
+                    handleSharedIntent(intent, navController)
+
+                    activity.intent = null
+                } else {
+                    navController.navigate(HomeScreen) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
                 }
             },
             onError = { _, _ ->

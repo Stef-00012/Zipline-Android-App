@@ -227,7 +227,7 @@ fun Sidebar(
                     selected = false,
                     onClick = {
                         if (currentDestination?.route != UploadFileScreen::class.qualifiedName) {
-                            onItemClick(UploadFileScreen)
+                            onItemClick(UploadFileScreen())
                         } else {
                             closeSidebar()
                         }
@@ -254,7 +254,7 @@ fun Sidebar(
                     selected = false,
                     onClick = {
                         if (currentDestination?.route != UploadTextScreen::class.qualifiedName) {
-                            onItemClick(UploadTextScreen)
+                            onItemClick(UploadTextScreen())
                         } else {
                             closeSidebar()
                         }
@@ -282,7 +282,7 @@ fun Sidebar(
                 selected = false,
                 onClick = {
                     if (currentDestination?.route != UrlsScreen::class.qualifiedName) {
-                        onItemClick(UrlsScreen)
+                        onItemClick(UrlsScreen())
                     } else {
                         closeSidebar()
                     }

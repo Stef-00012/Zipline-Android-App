@@ -3,8 +3,6 @@ package com.stefdp.zipline.screens.upload.text
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -90,8 +88,6 @@ import ir.ehsannarmani.compose_charts.extensions.format
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.time.Clock
-import kotlin.time.Duration
 
 const val MAX_TEXT_FILE_SIZE = 10L * 1024L * 1024L // 10MB
 
@@ -99,7 +95,8 @@ const val MAX_TEXT_FILE_SIZE = 10L * 1024L * 1024L // 10MB
 fun UploadTextScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    sharedText: String? = null
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -143,6 +140,45 @@ fun UploadTextScreen(
 
     var fileState by remember { mutableStateOf<FileUploadState?>(null) }
     var uploadText by remember { mutableStateOf(TextFieldValue("")) }
+
+    LaunchedEffect(Unit) {
+        if (sharedText != null) {
+            if (sharedText.length <= maxFileSize) {
+                uploadText = TextFieldValue(sharedText)
+            } else {
+                uploadText = TextFieldValue(sharedText.take(maxFileSize.toInt()))
+
+                val fileType = mimetypes
+                    .firstOrNull {
+                        it.extension == "text/plain"
+                    } ?: mimetypes
+                    .firstOrNull {
+                        it.extension == "txt"
+                    } ?: CodeMapEntry(
+                        name = "Plain text",
+                        mimetype = "text/x-zipline-plain",
+                        extension = "txt"
+                    )
+
+                val tempFile = File.createTempFile(
+                    "upload",
+                    ".${fileType.extension}",
+                    context.cacheDir
+                )
+
+                tempFile.writeText(sharedText)
+
+                fileState = FileUploadState(
+                    file = SelectedFile(
+                        uri = tempFile.toUri(),
+                        displayName = "upload.${fileType.extension}",
+                        size = tempFile.length(),
+                        type = fileType.mimetype
+                    )
+                )
+            }
+        }
+    }
 
     val filePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()

@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -334,8 +332,8 @@ fun FilesScreen(
                         listState = lazyListState,
                     )
             ) {
-                items(incompleteFiles!!.size) {
-                    val incompleteFile = incompleteFiles!![it]
+                items(incompleteFiles!!.size) { incompleteFileIndex ->
+                    val incompleteFile = incompleteFiles!![incompleteFileIndex]
 
                     Spacer(
                         modifier = Modifier.height(8.dp)

@@ -253,6 +253,7 @@ internal fun AppSettingsCategory(
                             UpdateDownloadFolderType.EXPORT -> secureStore.set("exportDownloadFolder", it.toString())
                             UpdateDownloadFolderType.SERVER_EXPORT -> secureStore.set("adminExportDownloadFolder", it.toString())
                             UpdateDownloadFolderType.FILE -> secureStore.set("fileDownloadFolder", it.toString())
+                            UpdateDownloadFolderType.FOLDER_EXPORT -> secureStore.set("folderExportDownloadFolder", it.toString())
                         }
                     }
                 }
@@ -305,6 +306,23 @@ internal fun AppSettingsCategory(
                 ) {
                     Text(
                         text = "Change File Download Folder"
+                    )
+                }
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = getButtonColors().copy(
+                        containerColor = DarkGray,
+                        disabledContainerColor = DarkGray.copy(alpha = 0.5f)
+                    ),
+                    onClick = {
+                        updateDownloadFolderType = UpdateDownloadFolderType.FOLDER_EXPORT
+
+                        directoryPicker.launch(null)
+                    }
+                ) {
+                    Text(
+                        text = "Change Folder Export Download Folder"
                     )
                 }
 
@@ -362,5 +380,6 @@ internal fun AppSettingsCategory(
 private enum class UpdateDownloadFolderType {
     EXPORT,
     SERVER_EXPORT,
-    FILE
+    FILE,
+    FOLDER_EXPORT
 }

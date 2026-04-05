@@ -345,7 +345,7 @@ fun FoldersScreen(
             selectedFileDownloadPath = getDisplayPath(fileDownloadFolder.toUri())
         }
 
-        val folderExportFolder = secureStore.get("folderExportFolder")
+        val folderExportFolder = secureStore.get("folderExportDownloadFolder")
 
         if (folderExportFolder != null) {
             selectedFolderExportUri = folderExportFolder.toUri()
@@ -575,7 +575,7 @@ fun FoldersScreen(
                                     }
                                 }
 
-                            downloadShowToast("Folder export downloaded to ${selectedFolderExportPath}/$fileName")
+                            downloadShowToast("Folder export downloaded to ${selectedFolderExportPath}/$fileName.zip")
                         } else {
                             downloadShowToast("Failed to create folder export in selected directory")
                         }
@@ -620,7 +620,7 @@ fun FoldersScreen(
                 selectedFolderExportPath = getDisplayPath(it)
 
                 coroutineScope.launch {
-                    secureStore.set("folderExportFolder", selectedFolderExportUri.toString())
+                    secureStore.set("folderExportDownloadFolder", selectedFolderExportUri.toString())
                 }
 
                 folderToExport?.let { folder ->

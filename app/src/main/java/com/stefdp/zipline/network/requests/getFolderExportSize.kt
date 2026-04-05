@@ -1,20 +1,16 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
-import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.responses.ErrorResponse
-import com.stefdp.zipline.network.models.responses.LoginResponse
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[getExportSize]"
+private const val TAG = "ZiplineApi[getFolderExportSize]"
 
-suspend fun getExportSize(
+suspend fun getFolderExportSize(
     context: Context,
-    excludeMetrics: Boolean? = null
+    folderId: String,
 ): Result<Long> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -34,9 +30,9 @@ suspend fun getExportSize(
             )
         }
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).getExportSize(
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).getFolderExportSize(
             token = token,
-            noMetrics = excludeMetrics
+            folderId = folderId
         )
 
         return Result.success(response.headers()["Content-Length"]?.toLong() ?: -1L)

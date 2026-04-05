@@ -1,27 +1,23 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.BaseFolder
-import com.stefdp.zipline.network.models.Folder
-import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
-import com.stefdp.zipline.network.models.requests.DeleteFolderBody
-import com.stefdp.zipline.network.models.requests.DeleteFolderChildrenAction
-import com.stefdp.zipline.network.models.requests.RemoveFileFromFolderBody
+import com.stefdp.zipline.network.models.requests.UpdateFolderBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[deleteFolder]"
+private const val TAG = "ZiplineApi[updateFolder]"
 
-suspend fun deleteFolder(
+suspend fun updateFolder(
     context: Context,
     folderId: String,
-    childrenAction: DeleteFolderChildrenAction,
-    targetFolderId: String? = null
+    isPublic: Boolean? = null,
+    allowUploads: Boolean? = null,
+    name: String? = null,
 ): Result<BaseFolder> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -41,16 +37,16 @@ suspend fun deleteFolder(
             )
         }
 
-        val requestBody = DeleteFolderBody(
-            childrenAction = childrenAction,
-            targetFolderId = targetFolderId
+        val requestBody = UpdateFolderBody(
+            name = name,
+            isPublic = isPublic,
+            allowUploads = allowUploads,
         )
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).deleteFolder(
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).updateFolder(
             token = token,
             folderId = folderId,
             data = requestBody
-
         )
 
         val body = response.body()
@@ -82,7 +78,7 @@ suspend fun deleteFolder(
             )
         }
 
-        if (body is Folder) {
+        if (body is BaseFolder) {
             return Result.success(body)
         }
 

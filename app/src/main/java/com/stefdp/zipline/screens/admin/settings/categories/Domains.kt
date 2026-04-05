@@ -28,7 +28,7 @@ import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
-import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 

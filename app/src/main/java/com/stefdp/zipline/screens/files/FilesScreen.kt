@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -65,6 +66,7 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
+import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.DownloadFilePasswordPrompt
 import com.stefdp.zipline.components.FilePreview
@@ -97,7 +99,8 @@ import com.stefdp.zipline.network.requests.getUser
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.UploadFileScreen
-import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.components.OutlinedButton
 import com.stefdp.zipline.screens.files.components.PendingFile
 import com.stefdp.zipline.screens.files.components.tags.TagsPopup
 import com.stefdp.zipline.ui.theme.DarkGray
@@ -516,7 +519,6 @@ fun FilesScreen(
         var clickedFile by remember { mutableStateOf<File?>(null) }
 
         LaunchedEffect(
-            filesPerPage,
             currentPage,
             favoriteFilter,
             sortOrder,
@@ -1297,6 +1299,51 @@ fun FilesScreen(
                                     },
                                     serverUrl = serverUrl,
                                 )
+                            }
+                        } else {
+                            item {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.file_copy_off),
+                                            contentDescription = "User",
+                                            modifier = Modifier.size(32.dp)
+                                        )
+
+                                        Text(
+                                            text = "No files found",
+                                            style = MaterialTheme.typography.titleLarge.copy(
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        )
+                                    }
+
+                                    Button(
+                                        onClick = {
+                                            navController.navigate(UploadFileScreen())
+                                        },
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.upload),
+                                            contentDescription = "Upload file",
+                                        )
+
+                                        Spacer(
+                                            modifier = Modifier.width(8.dp)
+                                        )
+
+                                        Text(
+                                            text = "Upload a file",
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

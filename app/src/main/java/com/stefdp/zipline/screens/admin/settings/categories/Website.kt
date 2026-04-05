@@ -1,7 +1,6 @@
 package com.stefdp.zipline.screens.admin.settings.categories
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,8 +44,7 @@ import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.WebsiteExternalLink
 import com.stefdp.zipline.screens.admin.settings.categories.components.ExternalLink
-import com.stefdp.zipline.screens.files.components.IconButton
-import com.stefdp.zipline.utils.ScrollbarConfig
+import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 import java.util.Collections

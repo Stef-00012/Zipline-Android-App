@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -69,10 +70,10 @@ import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.requests.deleteUrl
 import com.stefdp.zipline.network.requests.getUrls
 import com.stefdp.zipline.screens.LoginScreen
-import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.screens.urls.components.CreateUrlPopup
 import com.stefdp.zipline.screens.urls.components.EditUrlPopup
-import com.stefdp.zipline.screens.urls.components.EnabledCheckbox
+import com.stefdp.zipline.components.EnabledCheckbox
 import com.stefdp.zipline.screens.urls.components.LargeUrlDisplay
 import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
@@ -876,6 +877,37 @@ fun UrlsScreen(
                                     qrCodeUrl = url
                                 },
                             )
+                        }
+                    } else {
+                        item {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.link_2),
+                                        contentDescription = "Link",
+                                        modifier = Modifier.size(32.dp)
+                                    )
+
+                                    Text(
+                                        text = "No URLs found",
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                }
+
+                                Text(
+                                    text = "Shorten a URL to see them here.",
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                )
+                            }
                         }
                     }
                 }

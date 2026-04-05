@@ -1,4 +1,4 @@
-package com.stefdp.zipline.screens.urls.components
+package com.stefdp.zipline.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

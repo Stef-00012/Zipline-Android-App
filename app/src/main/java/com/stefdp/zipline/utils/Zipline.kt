@@ -80,9 +80,28 @@ fun getFolderPath(
     val parent = folders.find { it.id == folder.parentId }
 
     return if (parent != null) {
-        "${getFolderPath(parent, folders)}/${folder.name}"
+        "${getFolderPath(parent, folders)} / ${folder.name}"
     } else {
         folder.name
+    }
+}
+
+fun isChildOf(
+    folder: BaseFolder,
+    folders: List<BaseFolder>,
+    targetParentId: String
+): Boolean {
+    if (folder.id == targetParentId) return true
+
+    val parentId = folder.parentId ?: return false
+
+    val parent = folders.find { it.id == parentId }
+
+    return if (parent != null) {
+        if (parent.id == targetParentId) true
+        else isChildOf(parent, folders, targetParentId)
+    } else {
+        false
     }
 }
 

@@ -54,24 +54,3 @@ fun OutlinedButton(
         content = content
     )
 }
-
-@Preview
-@Composable
-fun Aa() {
-    ZiplineTheme {
-        Column() {
-            OutlinedButton(
-                onClick = { /*TODO*/ }
-            ) {
-                androidx.compose.material3.Text(text = "Button")
-            }
-
-            OutlinedButton(
-                onClick = { /*TODO*/ },
-                enabled = false
-            ) {
-                androidx.compose.material3.Text(text = "Button")
-            }
-        }
-    }
-}

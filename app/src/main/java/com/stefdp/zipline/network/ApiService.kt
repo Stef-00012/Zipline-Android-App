@@ -34,10 +34,12 @@ import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
 import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.models.requests.LoginBody
+import com.stefdp.zipline.network.models.requests.MoveFolderBody
 import com.stefdp.zipline.network.models.requests.RunRequerySizeJobBody
 import com.stefdp.zipline.network.models.requests.RunThumbnailGenerationJobBody
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
 import com.stefdp.zipline.network.models.requests.UpdateFileBody
+import com.stefdp.zipline.network.models.requests.UpdateFolderBody
 import com.stefdp.zipline.network.models.requests.UpdateTagBody
 import com.stefdp.zipline.network.models.requests.UpdateUrlBody
 import com.stefdp.zipline.network.models.requests.UpdateUserBody
@@ -470,7 +472,7 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
         @Query("noincl") excludeFiles: Boolean? = null,
         @Query("user") user: String? = null,
-        @Query("parent") parent: String? = null,
+        @Query("parentId") parent: String? = null,
         @Query("root") root: Boolean? = null,
     ): Response<List<BaseFolder>>
 
@@ -484,6 +486,20 @@ interface ZiplineApiService {
     suspend fun getFolder(
         @Header("Authorization") token: String,
         @Path("folderId") folderId: String,
+    ) : Response<BaseFolder>
+
+    @PATCH("user/folders/{folderId}")
+    suspend fun updateFolder(
+        @Header("Authorization") token: String,
+        @Path("folderId") folderId: String,
+        @Body data: UpdateFolderBody,
+    ) : Response<BaseFolder>
+
+    @PATCH("user/folders/{folderId}")
+    suspend fun moveFolder(
+        @Header("Authorization") token: String,
+        @Path("folderId") folderId: String,
+        @Body data: MoveFolderBody,
     ) : Response<BaseFolder>
 
     @PUT("user/folders/{folderId}")
@@ -514,6 +530,12 @@ interface ZiplineApiService {
         @Path("folderId") folderId: String,
         @Body data: RemoveFileFromFolderBody,
     ): Response<BaseFolder>
+
+    @HEAD("user/folders/{folderId}/export")
+    suspend fun getFolderExportSize(
+        @Header("Authorization") token: String,
+        @Path("folderId") folderId: String,
+    ): Response<Unit>
 
     @Streaming
     @GET("user/folders/{folderId}/export")

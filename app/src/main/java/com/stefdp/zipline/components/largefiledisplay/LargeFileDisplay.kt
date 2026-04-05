@@ -69,7 +69,7 @@ fun LargeFileDisplay(
     onDismissRequest: () -> Unit,
     updateData: suspend () -> Unit,
     tags: List<Tag>? = null,
-    onDelete: () -> Unit
+    onDelete: () -> Unit = {}
 ) {
     var activeFile by remember { mutableStateOf<File?>(null) }
     var isPopupVisible by remember { mutableStateOf(true) }
@@ -173,8 +173,6 @@ fun LargeFileDisplay(
                                 }
                             )
                         }
-
-                    onDelete()
 
                     isLoading = false
                 }
@@ -312,7 +310,7 @@ fun LargeFileDisplay(
                 Select(
                     label = "Tags",
                     multiple = true,
-                    enabled = !isLoading,
+                    enabled = !isLoading && !tags.isNullOrEmpty(),
                     options = allTags.map { tag ->
                         SelectOption(
                             id = tag.id,

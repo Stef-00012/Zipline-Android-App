@@ -106,7 +106,7 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
     }
 }
 
-// TODO: create the folders page
+// TODO: if not already done, disable the save button in popups when not all the required options have been filled
 // TODO: move all inputs & loading from remember to rememberSaveable
 // TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
 // TODO: only show dates smaller than "settings.filesMaxExpiration in upload menu

@@ -33,7 +33,7 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.network.models.WebsiteExternalLink
-import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.ui.theme.getButtonColors
 
 @Composable

@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
@@ -92,7 +93,7 @@ fun HomeScreen(
     }
 
     var userStats by remember { mutableStateOf<GetStatsResponse?>(null) }
-    var recentFiles by remember { mutableStateOf<List<File>>(emptyList()) }
+    var recentFiles by remember { mutableStateOf<List<File>?>(null) }
 
     suspend fun updateData() {
         val recentFilesRes = getRecentFiles(
@@ -247,7 +248,7 @@ fun HomeScreen(
 
             LaunchedEffect(recentFiles) {
                 if (clickedFile != null) {
-                    val updatedFile = recentFiles.find { it.id == clickedFile?.id }
+                    val updatedFile = recentFiles?.find { it.id == clickedFile?.id }
 
                     if (updatedFile != null) {
                         clickedFile = updatedFile
@@ -266,44 +267,59 @@ fun HomeScreen(
 
             val lazyListState = rememberLazyListState()
 
-            LazyRow(
-                state = lazyListState,
-                modifier = Modifier.horizontalLazyScrollbar(
-                    listState = lazyListState
-                )
-            ) {
-                if (recentFiles.isEmpty()) {
-                    items(8) {
-                        Box(
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
-                                .size(200.dp)
-                                .shimmerable(
-                                    enabled = true,
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    keepBackground = true
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {}
-                    }
-                } else {
-                    items(recentFiles.size) { index ->
-                        val file = recentFiles[index]
+            if (recentFiles == null || !recentFiles.isNullOrEmpty()) {
+                LazyRow(
+                    state = lazyListState,
+                    modifier = Modifier.horizontalLazyScrollbar(
+                        listState = lazyListState
+                    )
+                ) {
+                    if (recentFiles == null) {
+                        items(8) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                                    .size(200.dp)
+                                    .shimmerable(
+                                        enabled = true,
+                                        color = MaterialTheme.colorScheme.surfaceVariant,
+                                        keepBackground = true
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {}
+                        }
+                    } else {
+                        items(recentFiles!!.size) { index ->
+                            val file = recentFiles!![index]
 
-                        FilePreview(
-                            file = file,
-                            context = context,
-                            modifier = Modifier
-                                .size(200.dp)
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
-                            onClick = { file ->
-                                clickedFile = file
-                            },
-                            serverUrl = serverUrl
-                        )
+                            FilePreview(
+                                file = file,
+                                context = context,
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .padding(10.dp)
+                                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
+                                onClick = { file ->
+                                    clickedFile = file
+                                },
+                                serverUrl = serverUrl
+                            )
+                        }
                     }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "You have no recent files. The last eight files you uploaded will appear here.",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

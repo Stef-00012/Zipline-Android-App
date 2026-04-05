@@ -79,7 +79,7 @@ import com.stefdp.zipline.network.requests.uploadPartialFile
 import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.SettingsScreen
-import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.utils.DecimalRegex
 import com.stefdp.zipline.utils.FileUploadState
 import com.stefdp.zipline.utils.NumberRegex

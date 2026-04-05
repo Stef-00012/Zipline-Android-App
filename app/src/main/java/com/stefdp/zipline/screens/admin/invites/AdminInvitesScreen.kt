@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +61,7 @@ import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.invites.components.CreateInvitePopup
 import com.stefdp.zipline.screens.admin.invites.components.LargeInviteDisplay
-import com.stefdp.zipline.screens.files.components.IconButton
+import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
@@ -696,6 +698,37 @@ fun AdminInvitesScreen(
                                 onDelete = { deleteInvite = invite },
                                 onShowQRCode = { qrCodeInvite = invite }
                             )
+                        }
+                    } else {
+                        item {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.link_2),
+                                        contentDescription = "Invite",
+                                        modifier = Modifier.size(32.dp)
+                                    )
+
+                                    Text(
+                                        text = "No invites found",
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                }
+
+                                Text(
+                                    text = "Create an invite to see them here.",
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                )
+                            }
                         }
                     }
                 }

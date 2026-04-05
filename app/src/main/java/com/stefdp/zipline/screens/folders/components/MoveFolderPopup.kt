@@ -41,6 +41,7 @@ import com.stefdp.zipline.network.requests.moveFolder
 import com.stefdp.zipline.network.requests.updateFolder
 import com.stefdp.zipline.ui.theme.getButtonColors
 import com.stefdp.zipline.utils.getFolderPath
+import com.stefdp.zipline.utils.isChildOf
 import kotlinx.coroutines.launch
 
 @Composable
@@ -112,20 +113,26 @@ fun MoveFolderPopup(
                         Text("/ (Root)")
                     }
                 )
-            ) + allFolders.map { folder ->
-                SelectOption(
-                    id = folder.id,
-                    label = { enabled ->
-                        Text(
-                            text = getFolderPath(folder, allFolders),
-                            color = if (enabled)
-                                MaterialTheme.colorScheme.onBackground
-                            else
-                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                        )
-                    }
-                )
-            },
+            ) + allFolders
+                .filter { !isChildOf(
+                    folder = it,
+                    folders = allFolders,
+                    targetParentId = folder?.id ?: ""
+                ) }
+                .map { folder ->
+                    SelectOption(
+                        id = folder.id,
+                        label = { enabled ->
+                            Text(
+                                text = getFolderPath(folder, allFolders),
+                                color = if (enabled)
+                                    MaterialTheme.colorScheme.onBackground
+                                else
+                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                            )
+                        }
+                    )
+                },
             onSelectionChange = { destination = it },
             selectedIds = destination,
             enabled = !isLoading

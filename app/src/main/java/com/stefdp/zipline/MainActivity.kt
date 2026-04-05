@@ -106,6 +106,7 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
     }
 }
 
+// TODO: on login check if the instance is V4
 // TODO: if not already done, disable the save button in popups when not all the required options have been filled
 // TODO: move all inputs & loading from remember to rememberSaveable
 // TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line

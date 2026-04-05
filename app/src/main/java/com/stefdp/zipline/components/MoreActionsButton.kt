@@ -50,7 +50,7 @@ fun MoreActionsButton(
                     text = {
                         Text(
                             text = item.label,
-                            color = if (enabled)
+                            color = if (enabled && item.enabled)
                                 textColor
                             else
                                 textColor.copy(alpha = 0.5f)
@@ -60,11 +60,12 @@ fun MoreActionsButton(
                         item.onClick()
                         expanded = false
                     },
+                    enabled = item.enabled,
                     leadingIcon = {
                         Icon(
                             painter = item.icon,
                             contentDescription = item.iconDescription,
-                            tint = if (enabled)
+                            tint = if (enabled && item.enabled)
                                 iconColor
                             else
                                 iconColor.copy(alpha = 0.5f)

@@ -128,4 +128,7 @@ dependencies {
 
     // QR Code
     implementation(libs.zxing.core)
+
+    // SemVer
+    implementation(libs.semver)
 }

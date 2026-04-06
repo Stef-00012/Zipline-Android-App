@@ -38,6 +38,8 @@ import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalScreenViewState
+import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Avatar
 import com.stefdp.zipline.components.DeletePromptButtonLayout
@@ -62,12 +64,15 @@ import com.stefdp.zipline.screens.admin.users.components.LargeUserDisplay
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SortOrder
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.canInteract
 import com.stefdp.zipline.utils.shimmerable
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 import kotlinx.coroutines.launch
 import nl.jacobras.humanreadable.HumanReadable
 import kotlin.time.Instant
+
+const val VIEW_STATE_KEY = "adminUsersViewState"
 
 @Composable
 fun AdminUsersScreen(
@@ -95,7 +100,10 @@ fun AdminUsersScreen(
 
     var isLoading by remember { mutableStateOf(true) }
 
-    var compactView by remember { mutableStateOf(false) }
+    val screenViewState = LocalScreenViewState.current
+    val updateScreenViewState = LocalUpdateScreenViewState.current
+
+    val viewState = screenViewState.adminUsers
 
     var sortKey by remember { mutableStateOf(GetUsersQuerySortBy.CREATED_AT) }
     var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
@@ -108,7 +116,7 @@ fun AdminUsersScreen(
     var editUser by remember { mutableStateOf<User?>(null) }
 
     fun sortUsers(users: List<User>): List<User> {
-        if (!compactView) return users.sortedBy { Instant.parse(it.createdAt) }.reversed()
+        if (viewState == ZiplineViewStateType.LARGE) return users.sortedBy { Instant.parse(it.createdAt) }.reversed()
 
         val ascending = when (sortKey) {
             GetUsersQuerySortBy.USERNAME ->
@@ -193,7 +201,7 @@ fun AdminUsersScreen(
 
                     deleteRes
                         .onSuccess {
-                            if (compactView) {
+                            if (viewState == ZiplineViewStateType.COMPACT) {
                                 updateUsers()
                             } else {
                                 updateUsers(
@@ -231,7 +239,7 @@ fun AdminUsersScreen(
 
                     deleteRes
                         .onSuccess {
-                            if (compactView) {
+                            if (viewState == ZiplineViewStateType.COMPACT) {
                                 updateUsers()
                             } else {
                                 updateUsers(
@@ -317,12 +325,18 @@ fun AdminUsersScreen(
                 )
 
                 HeaderButton(
-                    icon = if (compactView)
+                    icon = if (viewState == ZiplineViewStateType.COMPACT)
                         painterResource(R.drawable.view_agenda)
                     else  painterResource(R.drawable.view_module),
-                    contentDescription = if (compactView) "Switch to detailed view" else "Switch to compact view",
+                    contentDescription = if (viewState == ZiplineViewStateType.COMPACT) "Switch to detailed view" else "Switch to compact view",
                     onClick = {
-                        compactView = !compactView
+                        val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
+
+                        updateScreenViewState(
+                            screenViewState.copy(
+                                adminUsers = newState
+                            )
+                        )
                     },
                     enabled = !isLoading,
                 )
@@ -334,13 +348,13 @@ fun AdminUsersScreen(
         LaunchedEffect(
             sortOrder,
             sortKey,
-            compactView,
+            viewState,
         ) {
             users = users?.let { sortUsers(it) }
         }
 
-        LaunchedEffect(compactView) {
-            if (compactView) return@LaunchedEffect
+        LaunchedEffect(viewState) {
+            if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
 
             if (sortKey != GetUsersQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC) {
                 updateUsers(
@@ -349,7 +363,7 @@ fun AdminUsersScreen(
             }
         }
 
-        if (compactView) {
+        if (viewState == ZiplineViewStateType.COMPACT) {
             Column(
                 modifier = Modifier
                     .padding(vertical = 8.dp)

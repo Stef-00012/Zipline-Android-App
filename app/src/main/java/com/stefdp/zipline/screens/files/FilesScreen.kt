@@ -64,6 +64,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalScreenViewState
+import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
@@ -110,6 +112,7 @@ import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
 import com.stefdp.zipline.utils.StorageUtil
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.camelCaseToHumanReadable
 import com.stefdp.zipline.utils.canInteract
 import com.stefdp.zipline.utils.formatBytes
@@ -123,6 +126,8 @@ import kotlin.time.Instant
 
 const val COMPACT_VIEW_FILE_COUNT = 20L
 const val DETAILED_VIEW_FILE_COUNT = 15L
+
+const val VIEW_STATE_KEY = "filesViewState"
 
 @Composable
 fun FilesScreen(
@@ -166,12 +171,16 @@ fun FilesScreen(
     var pendingFilesPopupOpen by remember { mutableStateOf(false) }
 
     var favoriteFilter by remember { mutableStateOf(false) }
-    var compactView by remember { mutableStateOf(false) }
+
+    val screenViewState = LocalScreenViewState.current
+    val updateScreenViewState = LocalUpdateScreenViewState.current
+
+    val viewState = screenViewState.files
 
     var currentPage by remember { mutableLongStateOf(1L) }
     var totalPages by remember { mutableLongStateOf(1L) }
 
-    val filesPerPage = if (compactView) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
+    val filesPerPage = if (viewState == ZiplineViewStateType.COMPACT) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
 
     var sortKey by remember { mutableStateOf(GetFilesQuerySortBy.CREATED_AT) }
     var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
@@ -444,12 +453,18 @@ fun FilesScreen(
                 )
 
                 HeaderButton(
-                    icon = if (compactView)
+                    icon = if (viewState == ZiplineViewStateType.COMPACT)
                         painterResource(R.drawable.view_agenda)
                     else  painterResource(R.drawable.view_module),
-                    contentDescription = if (compactView) "Switch to detailed view" else "Switch to compact view",
+                    contentDescription = if (viewState == ZiplineViewStateType.COMPACT) "Switch to detailed view" else "Switch to compact view",
                     onClick = {
-                        compactView = !compactView
+                        val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
+
+                        updateScreenViewState(
+                            screenViewState.copy(
+                                files = newState
+                            )
+                        )
                     },
                     enabled = !isLoading,
                 )
@@ -550,7 +565,7 @@ fun FilesScreen(
             onDelete = { clickedFile = null }
         )
 
-        if (compactView) {
+        if (viewState == ZiplineViewStateType.COMPACT) {
             var _searchValue by remember { mutableStateOf(searchValue) }
 
             LaunchedEffect(searchKey) {

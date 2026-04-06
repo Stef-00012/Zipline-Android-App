@@ -44,6 +44,8 @@ import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalScreenViewState
+import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
@@ -66,11 +68,14 @@ import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.shimmerable
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 import kotlinx.coroutines.launch
 import nl.jacobras.humanreadable.HumanReadable
 import kotlin.time.Instant
+
+const val VIEW_STATE_KEY = "adminInvitesViewState"
 
 @Composable
 fun AdminInvitesScreen(
@@ -100,7 +105,10 @@ fun AdminInvitesScreen(
 
     var isLoading by remember { mutableStateOf(true) }
 
-    var compactView by remember { mutableStateOf(false) }
+    val screenViewState = LocalScreenViewState.current
+    val updateScreenViewState = LocalUpdateScreenViewState.current
+
+    val viewState = screenViewState.adminInvites
 
     var sortKey by remember { mutableStateOf(GetInvitesQuerySortBy.CREATED_AT) }
     var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
@@ -123,7 +131,7 @@ fun AdminInvitesScreen(
     }
 
     fun sortInvites(invites: List<Invite>): List<Invite> {
-        if (!compactView) return invites.sortedBy { Instant.parse(it.createdAt) }.reversed()
+        if (viewState == ZiplineViewStateType.LARGE) return invites.sortedBy { Instant.parse(it.createdAt) }.reversed()
 
         val ascending = when (sortKey) {
             GetInvitesQuerySortBy.CODE ->
@@ -204,7 +212,7 @@ fun AdminInvitesScreen(
 
                     deleteRes
                         .onSuccess {
-                            if (compactView) {
+                            if (viewState == ZiplineViewStateType.COMPACT) {
                                 updateInvites()
                             } else {
                                 updateInvites(
@@ -285,12 +293,18 @@ fun AdminInvitesScreen(
                 )
 
                 HeaderButton(
-                    icon = if (compactView)
+                    icon = if (viewState == ZiplineViewStateType.COMPACT)
                         painterResource(R.drawable.view_agenda)
                     else  painterResource(R.drawable.view_module),
-                    contentDescription = if (compactView) "Switch to detailed view" else "Switch to compact view",
+                    contentDescription = if (viewState == ZiplineViewStateType.COMPACT) "Switch to detailed view" else "Switch to compact view",
                     onClick = {
-                        compactView = !compactView
+                        val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
+
+                        updateScreenViewState(
+                            screenViewState.copy(
+                                adminInvites = newState
+                            )
+                        )
                     },
                     enabled = !isLoading,
                 )
@@ -304,13 +318,13 @@ fun AdminInvitesScreen(
         LaunchedEffect(
             sortOrder,
             sortKey,
-            compactView,
+            viewState,
         ) {
             invites = invites?.let { sortInvites(it) }
         }
 
-        LaunchedEffect(compactView) {
-            if (compactView) return@LaunchedEffect
+        LaunchedEffect(viewState) {
+            if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
 
             if (sortKey != GetInvitesQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC) {
                 updateInvites(
@@ -319,7 +333,7 @@ fun AdminInvitesScreen(
             }
         }
 
-        if (compactView) {
+        if (viewState == ZiplineViewStateType.COMPACT) {
             Column(
                 modifier = Modifier
                     .padding(vertical = 8.dp)

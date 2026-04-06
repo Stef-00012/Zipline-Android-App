@@ -1,9 +1,35 @@
 package com.stefdp.zipline.utils
 
+import android.os.Parcelable
 import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.FilesFormat
 import com.stefdp.zipline.network.models.ThumbnailFormat
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
+import io.github.z4kn4fein.semver.toVersion
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class ZiplineViewState(
+    val adminUsers: ZiplineViewStateType,
+    val adminInvites: ZiplineViewStateType,
+    val files: ZiplineViewStateType,
+    val folders: ZiplineViewStateType,
+    val urls: ZiplineViewStateType,
+) : Parcelable
+
+@Parcelize
+enum class ZiplineViewStateType : Parcelable {
+    COMPACT,
+    LARGE;
+
+    companion object {
+        private val names = entries.map { it.name }.toSet()
+
+        operator fun contains(value: String): Boolean = names.contains(value)
+    }
+}
+
+val minimumZiplineVersion = "4.5.0".toVersion()
 
 val inviteExpiresAtDates = listOf(
     "never" to "Never",

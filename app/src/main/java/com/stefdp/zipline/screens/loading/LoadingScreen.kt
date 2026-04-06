@@ -21,7 +21,9 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.LocalUpdatePublicSettings
+import com.stefdp.zipline.LocalUpdateServerVersion
 import com.stefdp.zipline.LocalUpdateWebSettings
+import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.handleSharedIntent
 import com.stefdp.zipline.isShareIntent
 import com.stefdp.zipline.screens.BiometricAuthScreen
@@ -29,6 +31,8 @@ import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.getBiometricStatus
+import com.stefdp.zipline.utils.minimumZiplineVersion
+import io.github.z4kn4fein.semver.toVersionOrNull
 
 @Composable
 fun LoadingScreen(
@@ -36,6 +40,7 @@ fun LoadingScreen(
     context: Context,
     activity: FragmentActivity,
 ) {
+    val updateServerVersion = LocalUpdateServerVersion.current
     val updateLoggedUser = LocalUpdateLoggedUser.current
     val updateLoggedUserAvatar = LocalUpdateLoggedUserAvatar.current
     val updatePublicSettings = LocalUpdatePublicSettings.current
@@ -49,6 +54,64 @@ fun LoadingScreen(
         val unlockWithBiometrics = secureStore.get("unlockWithBiometrics")?.toBoolean() ?: false
         val biometricAuthenticationStatus = getBiometricStatus(context)
 
+        val serverVersionRes = updateServerVersion()
+
+        serverVersionRes
+            .onSuccess {
+                val version = it.details.version.toVersionOrNull(strict = false)
+
+                if (version == null) {
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        content = {
+                            Text(
+                                text = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater."
+                            )
+                        }
+                    )
+
+                    navController.navigate(LoginScreen) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+
+                    return@LaunchedEffect
+                } else if (version < minimumZiplineVersion) {
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        content = {
+                            Text(
+                                text = "You are currently running Zipline v$version. Please update to at least Zipline v${minimumZiplineVersion}."
+                            )
+                        }
+                    )
+
+                    navController.navigate(LoginScreen) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+
+                    return@LaunchedEffect
+                }
+            }
+            .onFailure {
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                    content = {
+                        Text(
+                            text = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater and have the \"Version Checking\" feature enabled (${it.message})"
+                        )
+                    }
+                )
+
+                navController.navigate(LoginScreen) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+
+                return@LaunchedEffect
+            }
+
         val newUserStatsRes = updateLoggedUser()
 
         newUserStatsRes
@@ -56,6 +119,8 @@ fun LoadingScreen(
                 navController.navigate(LoginScreen) {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
+
+                return@LaunchedEffect
             }
             .onSuccess {
                 updatePublicSettings()

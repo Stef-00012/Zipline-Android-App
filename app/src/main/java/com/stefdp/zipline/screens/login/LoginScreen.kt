@@ -41,11 +41,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalServerVersion
 import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.LocalUpdatePublicSettings
+import com.stefdp.zipline.LocalUpdateServerVersion
 import com.stefdp.zipline.LocalUpdateWebSettings
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.PromptPopup
@@ -57,8 +58,11 @@ import com.stefdp.zipline.network.requests.login
 import com.stefdp.zipline.screens.*
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.utils.DomainRegex
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.hasNotificationsPermission
+import com.stefdp.zipline.utils.minimumZiplineVersion
+import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,7 +76,19 @@ fun LoginScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    if (LocalLoggedUser.current is User && currentDestination?.route == LoginScreen::class.qualifiedName) {
+    val localLoggedUser = LocalLoggedUser.current
+    val localServerVersion = LocalServerVersion.current
+
+    val serverVersion = localServerVersion?.details?.version?.toVersionOrNull(
+        strict = false
+    )
+
+    if (
+        localLoggedUser is User &&
+        serverVersion != null &&
+        serverVersion >= minimumZiplineVersion &&
+        currentDestination?.route == LoginScreen::class.qualifiedName
+        ) {
         navController.navigate(HomeScreen) {
             popUpTo(navController.graph.id) { inclusive = true }
         }
@@ -266,6 +282,7 @@ fun LoginScreen(
 
                 val coroutineScope = rememberCoroutineScope()
 
+                val updateServerVersion = LocalUpdateServerVersion.current
                 val updateLoggedUser = LocalUpdateLoggedUser.current
                 val updateLoggedUserAvatar = LocalUpdateLoggedUserAvatar.current
                 val updatePublicSettings = LocalUpdatePublicSettings.current
@@ -273,6 +290,14 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
+                        val isValidDomain = DomainRegex.matches(serverUrl.text.lowercase())
+
+                        if (!isValidDomain) {
+                            errorMessage = "Please enter a valid server URL"
+
+                            return@Button
+                        }
+
                         coroutineScope.launch {
                             isLoading = true
 
@@ -282,30 +307,6 @@ fun LoginScreen(
 
                             if (isTokenLogin) {
                                 secureStore.set("token", token.text)
-
-                                val userStatsRes = updateLoggedUser()
-
-                                userStatsRes
-                                    .onSuccess {
-                                        withContext(NonCancellable) {
-                                            updatePublicSettings()
-                                            updateWebSettings()
-                                            updateLoggedUserAvatar()
-                                        }
-
-                                        if (currentDestination?.route == LoginScreen::class.qualifiedName) {
-                                            navController.navigate(HomeScreen) {
-                                                popUpTo(navController.graph.id) { inclusive = true }
-                                            }
-                                        }
-
-                                        isLoading = false
-                                    }
-                                    .onFailure { error ->
-                                        errorMessage = error.message
-
-                                        isLoading = false
-                                    }
                             } else {
                                 val loginRes = login(
                                     context = context,
@@ -320,15 +321,12 @@ fun LoginScreen(
                                             isTotpRequired = true
                                             isLoading = false
                                         } else if (loginStatus is LoginResult.Success) {
-                                            Logger.debug("LoginScreen", "Login successful, retrieving token...")
                                             val authCookie = loginStatus.authCookie
 
                                             val tokenRes = getToken(
                                                 context = context,
                                                 cookie = authCookie,
                                             )
-
-                                            Logger.debug("LoginScreen", "Token retrieval result: ${tokenRes.isSuccess}")
 
                                             tokenRes
                                                 .onSuccess { tokenData ->
@@ -340,44 +338,76 @@ fun LoginScreen(
                                                     }
 
                                                     secureStore.set("token", tokenData.token)
-
-                                                    val userStatsRes = updateLoggedUser()
-
-                                                    userStatsRes
-                                                        .onSuccess {
-                                                            withContext(NonCancellable) {
-                                                                updatePublicSettings()
-                                                                updateWebSettings()
-                                                                updateLoggedUserAvatar()
-                                                            }
-
-                                                            if (currentDestination?.route == LoginScreen::class.qualifiedName) {
-                                                                navController.navigate(HomeScreen) {
-                                                                    popUpTo(navController.graph.id) { inclusive = true }
-                                                                }
-                                                            }
-
-                                                            isLoading = false
-                                                        }
-                                                        .onFailure { error ->
-                                                            errorMessage = error.message
-
-                                                            isLoading = false
-                                                        }
                                                 }
                                                 .onFailure { error ->
-                                                    errorMessage = error.message
+                                                    errorMessage = "Failed to fetch user token, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"
                                                     isLoading = false
+
+                                                    return@launch
                                                 }
 
                                         }
                                     }
                                     .onFailure { error ->
-                                        errorMessage = error.message
+                                        errorMessage = "Failed to login, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"
 
                                         isLoading = false
+
+                                        return@launch
                                     }
                             }
+
+                            val serverVersionRes = updateServerVersion()
+
+                            serverVersionRes
+                                .onSuccess {
+                                    val version = it.details.version.toVersionOrNull(strict = false)
+
+                                    if (version == null) {
+                                        errorMessage = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater."
+
+                                        isLoading = false
+
+                                        return@launch
+                                    } else if (version < minimumZiplineVersion) {
+                                        errorMessage = "You are currently running Zipline v$version. Please update to at least Zipline v${minimumZiplineVersion}."
+
+                                        isLoading = false
+
+                                        return@launch
+                                    }
+                                }
+                                .onFailure {
+                                    errorMessage = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater and have the \"Version Checking\" feature enabled (${it.message})"
+
+                                    isLoading = false
+
+                                    return@launch
+                                }
+
+                            val userStatsRes = updateLoggedUser()
+
+                            userStatsRes
+                                .onSuccess {
+                                    withContext(NonCancellable) {
+                                        updatePublicSettings()
+                                        updateWebSettings()
+                                        updateLoggedUserAvatar()
+                                    }
+
+                                    if (currentDestination?.route == LoginScreen::class.qualifiedName) {
+                                        navController.navigate(HomeScreen) {
+                                            popUpTo(navController.graph.id) { inclusive = true }
+                                        }
+                                    }
+
+                                    isLoading = false
+                                }
+                                .onFailure { error ->
+                                    errorMessage = "Failed to fetch user, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"
+
+                                    isLoading = false
+                                }
                         }
                     },
                     enabled = !isLoading,

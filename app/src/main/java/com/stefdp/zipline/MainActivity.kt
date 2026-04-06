@@ -43,9 +43,11 @@ import com.stefdp.zipline.components.Sidebar
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings
+import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
 import com.stefdp.zipline.network.requests.getAvatar
 import com.stefdp.zipline.network.requests.getCurrentUser
 import com.stefdp.zipline.network.requests.getPublicConfig
+import com.stefdp.zipline.network.requests.getServerVersion
 import com.stefdp.zipline.network.requests.getWebServerSettings
 import com.stefdp.zipline.ui.theme.ZiplineTheme
 import com.stefdp.zipline.utils.NetworkMonitor
@@ -66,7 +68,15 @@ import com.stefdp.zipline.screens.settings.SettingsScreen
 import com.stefdp.zipline.screens.urls.UrlsScreen
 import com.stefdp.zipline.screens.upload.file.UploadFileScreen
 import com.stefdp.zipline.screens.upload.text.UploadTextScreen
+import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.ZiplineViewState
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import kotlinx.coroutines.delay
+import com.stefdp.zipline.screens.admin.invites.VIEW_STATE_KEY as ADMIN_INVITES_VIEW_STATE_KEY
+import com.stefdp.zipline.screens.admin.users.VIEW_STATE_KEY as ADMIN_USERS_VIEW_STATE_KEY
+import com.stefdp.zipline.screens.files.VIEW_STATE_KEY as FILES_VIEW_STATE_KEY
+import com.stefdp.zipline.screens.folders.VIEW_STATE_KEY as FOLDERS_VIEW_STATE_KEY
+import com.stefdp.zipline.screens.urls.VIEW_STATE_KEY as URLS_VIEW_STATE_KEY
 
 const val BASE_CORNER_RADIUS = 10
 
@@ -106,7 +116,30 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
     }
 }
 
-// TODO: on login check if the instance is V4
+val LocalServerVersion = compositionLocalOf<GetServerVersionResponse?> { null }
+
+val LocalUpdateServerVersion = compositionLocalOf<suspend () -> Result<GetServerVersionResponse>> {
+    {
+        Result.failure(
+            Exception("Placeholder")
+        )
+    }
+}
+
+val LocalScreenViewState = compositionLocalOf {
+    ZiplineViewState(
+        adminUsers = ZiplineViewStateType.LARGE,
+        adminInvites = ZiplineViewStateType.LARGE,
+        files = ZiplineViewStateType.LARGE,
+        folders = ZiplineViewStateType.LARGE,
+        urls = ZiplineViewStateType.LARGE,
+    )
+}
+
+val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState) -> Unit> {
+    {}
+}
+
 // TODO: if not already done, disable the save button in popups when not all the required options have been filled
 // TODO: move all inputs & loading from remember to rememberSaveable
 // TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
@@ -156,6 +189,22 @@ class MainActivity : FragmentActivity() {
 
                 var webSettings by rememberSaveable {
                     mutableStateOf<WebSettings?>(null)
+                }
+
+                var serverVersion by rememberSaveable {
+                    mutableStateOf<GetServerVersionResponse?>(null)
+                }
+
+                var screenViewState by rememberSaveable {
+                    mutableStateOf(
+                        ZiplineViewState(
+                            adminUsers = ZiplineViewStateType.LARGE,
+                            adminInvites = ZiplineViewStateType.LARGE,
+                            files = ZiplineViewStateType.LARGE,
+                            folders = ZiplineViewStateType.LARGE,
+                            urls = ZiplineViewStateType.LARGE,
+                        )
+                    )
                 }
 
                 val networkMonitor = NetworkMonitor(context)
@@ -275,6 +324,38 @@ class MainActivity : FragmentActivity() {
                     )
                 }
 
+                suspend fun updateServerVersion(): Result<GetServerVersionResponse> {
+                    val tag = "MainActivity[updateServerVersion]"
+
+                    val serverVersionRes = getServerVersion(
+                        context = context
+                    )
+
+                    serverVersionRes
+                        .onSuccess { serverVersionData ->
+                            serverVersion = serverVersionData
+
+                            return@updateServerVersion Result.success(serverVersionData)
+                        }
+                        .onFailure { error ->
+                            Logger.error(tag, "Failed to fetch web settings: ${error.message}")
+
+                            webSettings = null
+
+                            return@updateServerVersion Result.failure(error)
+                        }
+
+                    return Result.failure(
+                        Exception("Something went wrong...")
+                    )
+                }
+
+                fun updateScreenViewState(viewState: ZiplineViewState) {
+                    screenViewState = viewState
+                }
+
+                val coroutineScope = rememberCoroutineScope()
+
                 LaunchedEffect(isConnected) {
                     if (isConnected) {
                         updateLoggedUser()
@@ -282,10 +363,27 @@ class MainActivity : FragmentActivity() {
                         updateWebSettings()
                         updatePublicSettings()
                     }
+
+                    coroutineScope.launch {
+                        val secureStore = SecureStorage.getInstance(context)
+
+                        val adminInvitesViewState = secureStore.get(ADMIN_INVITES_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
+                        val adminUsersViewState = secureStore.get(ADMIN_USERS_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
+                        val filesViewState = secureStore.get(FILES_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
+                        val foldersViewState = secureStore.get(FOLDERS_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
+                        val urlsViewState = secureStore.get(URLS_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
+
+                        screenViewState = ZiplineViewState(
+                            adminInvites = if (adminInvitesViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(adminInvitesViewState) else ZiplineViewStateType.LARGE,
+                            adminUsers = if (adminUsersViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(adminUsersViewState) else ZiplineViewStateType.LARGE,
+                            files = if (filesViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(filesViewState) else ZiplineViewStateType.LARGE,
+                            folders = if (foldersViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(foldersViewState) else ZiplineViewStateType.LARGE,
+                            urls = if (urlsViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(urlsViewState) else ZiplineViewStateType.LARGE,
+                        )
+                    }
                 }
 
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
 
                 CompositionLocalProvider(
                     LocalLoggedUser provides loggedUser,
@@ -296,6 +394,10 @@ class MainActivity : FragmentActivity() {
                     LocalUpdatePublicSettings provides ::updatePublicSettings,
                     LocalWebSettings provides webSettings,
                     LocalUpdateWebSettings provides ::updateWebSettings,
+                    LocalServerVersion provides serverVersion,
+                    LocalUpdateServerVersion provides ::updateServerVersion,
+                    LocalScreenViewState provides screenViewState,
+                    LocalUpdateScreenViewState provides ::updateScreenViewState
                 ) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
@@ -316,7 +418,7 @@ class MainActivity : FragmentActivity() {
                                         return@Header
                                     }
 
-                                    scope.launch {
+                                    coroutineScope.launch {
                                         if (drawerState.isClosed) drawerState.open() else drawerState.close()
                                     }
                                 }
@@ -332,12 +434,12 @@ class MainActivity : FragmentActivity() {
                                 drawerContent = {
                                     Sidebar(
                                         onItemClick = { screen ->
-                                            scope.launch { drawerState.close() }
+                                            coroutineScope.launch { drawerState.close() }
                                             navController.navigate(screen)
                                         },
                                         navController = navController,
                                         closeSidebar = {
-                                            scope.launch { drawerState.close() }
+                                            coroutineScope.launch { drawerState.close() }
                                         }
                                     )
                                 },

@@ -60,6 +60,8 @@ import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalScreenViewState
+import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
@@ -76,11 +78,9 @@ import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Pager
-import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
-import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.Tag
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.largefiledisplay.LargeFileDisplay
@@ -88,7 +88,6 @@ import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableScrollbarConfig
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
-import com.stefdp.zipline.network.requests.createFolder
 import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.network.requests.downloadFile
 import com.stefdp.zipline.network.requests.exportFolder
@@ -97,6 +96,7 @@ import com.stefdp.zipline.network.requests.getFolderExportSize
 import com.stefdp.zipline.network.requests.getFolders
 import com.stefdp.zipline.network.requests.getTags
 import com.stefdp.zipline.network.requests.updateFolder
+import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.UploadFileScreen
 import com.stefdp.zipline.screens.folders.components.CreateFolderPopup
 import com.stefdp.zipline.screens.folders.components.DeleteFolderPopup
@@ -110,6 +110,7 @@ import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
 import com.stefdp.zipline.utils.StorageUtil
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.camelCaseToHumanReadable
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.getDisplayPath
@@ -123,6 +124,8 @@ import kotlin.time.Instant
 const val COMPACT_VIEW_FILE_COUNT = 20L
 const val DETAILED_VIEW_FILE_COUNT = 15L
 
+const val VIEW_STATE_KEY = "foldersViewState"
+
 @Composable
 fun FoldersScreen(
     navController: NavHostController,
@@ -131,11 +134,11 @@ fun FoldersScreen(
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
-//    if (localLoggedUser == null) {
-//        navController.navigate(LoginScreen) {
-//            popUpTo(navController.graph.id) { inclusive = true }
-//        }
-//    }
+    if (localLoggedUser == null) {
+        navController.navigate(LoginScreen) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
 
     var mainFolder by remember { mutableStateOf<BaseFolder?>(null) }
     var folders by remember { mutableStateOf<List<BaseFolder>?>(null) }
@@ -152,12 +155,15 @@ fun FoldersScreen(
     var isLoading by remember { mutableStateOf(false) }
     var tagsLoading by remember { mutableStateOf(true) }
 
-    var compactView by remember { mutableStateOf(false) }
+    val screenViewState = LocalScreenViewState.current
+    val updateScreenViewState = LocalUpdateScreenViewState.current
+
+    val viewState = screenViewState.folders
 
     var currentPage by remember { mutableLongStateOf(1L) }
     var totalPages by remember { mutableLongStateOf(1L) }
 
-    val filesPerPage = if (compactView) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
+    val filesPerPage = if (viewState == ZiplineViewStateType.COMPACT) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
 
     var folderSortKey by remember { mutableStateOf(GetFoldersQuerySortBy.CREATED_AT) }
     var folderSortOrder by remember { mutableStateOf(SortOrder.DESC) }
@@ -179,7 +185,7 @@ fun FoldersScreen(
     var selectedFileDownloadPath by remember { mutableStateOf<String?>(null) }
 
     fun sortFolders(folders: List<BaseFolder>): List<BaseFolder> {
-        if (!compactView) return folders.sortedBy { Instant.parse(it.createdAt) }.reversed()
+        if (viewState == ZiplineViewStateType.LARGE) return folders.sortedBy { Instant.parse(it.createdAt) }.reversed()
 
         val ascending = when (folderSortKey) {
             GetFoldersQuerySortBy.NAME ->
@@ -208,9 +214,9 @@ fun FoldersScreen(
     LaunchedEffect(
         folderSortKey,
         folderSortOrder,
-        compactView
+        viewState
     ) {
-        if (compactView) {
+        if (viewState == ZiplineViewStateType.COMPACT) {
             folders?.let {
                 folders = sortFolders(it)
             }
@@ -229,7 +235,7 @@ fun FoldersScreen(
 
         foldersRes
             .onSuccess {
-                folders = if (compactView) sortFolders(it) else it
+                folders = if (viewState == ZiplineViewStateType.COMPACT) sortFolders(it) else it
             }
 
         isLoading = false
@@ -678,12 +684,18 @@ fun FoldersScreen(
                 )
 
                 HeaderButton(
-                    icon = if (compactView)
+                    icon = if (viewState == ZiplineViewStateType.COMPACT)
                         painterResource(R.drawable.view_agenda)
                     else  painterResource(R.drawable.view_module),
-                    contentDescription = if (compactView) "Switch to detailed view" else "Switch to compact view",
+                    contentDescription = if (viewState == ZiplineViewStateType.COMPACT) "Switch to detailed view" else "Switch to compact view",
                     onClick = {
-                        compactView = !compactView
+                        val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
+
+                        updateScreenViewState(
+                            screenViewState.copy(
+                                folders = newState
+                            )
+                        )
                     },
                     enabled = !isLoading,
                 )
@@ -782,7 +794,7 @@ fun FoldersScreen(
 
         val foldersLazyColumnListState = rememberLazyListState()
 
-        if (compactView) {
+        if (viewState == ZiplineViewStateType.COMPACT) {
             Column(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -1443,7 +1455,7 @@ fun FoldersScreen(
                 tags = tags,
             )
 
-            if (compactView) {
+            if (viewState == ZiplineViewStateType.COMPACT) {
                 var _searchValue by remember { mutableStateOf(fileSearchValue) }
 
                 LaunchedEffect(fileSearchKey) {

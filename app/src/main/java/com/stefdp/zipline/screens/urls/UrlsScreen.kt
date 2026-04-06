@@ -53,6 +53,8 @@ import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
+import com.stefdp.zipline.LocalScreenViewState
+import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
@@ -79,12 +81,15 @@ import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.camelCaseToHumanReadable
 import com.stefdp.zipline.utils.shimmerable
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 import kotlinx.coroutines.launch
 import nl.jacobras.humanreadable.HumanReadable
 import kotlin.time.Instant
+
+const val VIEW_STATE_KEY = "urlsViewState"
 
 @Composable
 fun UrlsScreen(
@@ -113,7 +118,10 @@ fun UrlsScreen(
 
     var isLoading by remember { mutableStateOf(true) }
 
-    var compactView by remember { mutableStateOf(false) }
+    val screenViewState = LocalScreenViewState.current
+    val updateScreenViewState = LocalUpdateScreenViewState.current
+
+    val viewState = screenViewState.urls
 
     var sortKey by remember { mutableStateOf(GetUrlsQuerySortBy.CREATED_AT) }
     var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
@@ -140,7 +148,7 @@ fun UrlsScreen(
     }
 
     fun sortUrls(urls: List<Url>): List<Url> {
-        if (!compactView) return urls.sortedBy { Instant.parse(it.createdAt) }.reversed()
+        if (viewState == ZiplineViewStateType.LARGE) return urls.sortedBy { Instant.parse(it.createdAt) }.reversed()
 
         val ascending = when (sortKey) {
             GetUrlsQuerySortBy.CODE ->
@@ -226,7 +234,7 @@ fun UrlsScreen(
 
                 deleteRes
                     .onSuccess {
-                        if (compactView) {
+                        if (viewState == ZiplineViewStateType.COMPACT) {
                             updateUrls()
                         } else {
                             updateUrls(
@@ -320,12 +328,18 @@ fun UrlsScreen(
                 )
 
                 HeaderButton(
-                    icon = if (compactView)
+                    icon = if (viewState == ZiplineViewStateType.COMPACT)
                         painterResource(R.drawable.view_agenda)
                     else  painterResource(R.drawable.view_module),
-                    contentDescription = if (compactView) "Switch to detailed view" else "Switch to compact view",
+                    contentDescription = if (viewState == ZiplineViewStateType.COMPACT) "Switch to detailed view" else "Switch to compact view",
                     onClick = {
-                        compactView = !compactView
+                        val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
+
+                        updateScreenViewState(
+                            screenViewState.copy(
+                                urls = newState
+                            )
+                        )
                     },
                     enabled = !isLoading,
                 )
@@ -342,13 +356,13 @@ fun UrlsScreen(
         LaunchedEffect(
             sortOrder,
             sortKey,
-            compactView,
+            viewState,
         ) {
             urls = urls?.let { sortUrls(it) }
         }
 
-        LaunchedEffect(compactView) {
-            if (compactView) return@LaunchedEffect
+        LaunchedEffect(viewState) {
+            if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
 
             if (
                 (searchKey != null && searchValue.text.isNotBlank()) ||
@@ -361,7 +375,7 @@ fun UrlsScreen(
             }
         }
 
-        if (compactView) {
+        if (viewState == ZiplineViewStateType.COMPACT) {
             var _searchValue by remember { mutableStateOf(searchValue) }
 
             LaunchedEffect(searchKey) {

@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.stefdp.zipline.BASE_CORNER_RADIUS
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Popup
@@ -228,14 +227,10 @@ fun VersionDisplay(
             modifier = Modifier.height(8.dp)
         )
 
-        Logger.debug("VersionDisplay","isLatest: ${versionData?.isLatest}, isUpstream: ${versionData?.isUpstream}, latest commit: ${versionData?.latest?.commit}, if: ${versionData?.isLatest != true &&
-                versionData?.isUpstream != true &&
-                versionData?.latest?.commit != null}")
-
         if (
             versionData?.isLatest != true &&
             versionData?.isUpstream == true &&
-            versionData?.latest?.commit != null
+            versionData.latest.commit != null
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)

@@ -13,6 +13,8 @@ import com.stefdp.zipline.network.models.requests.CreateUrlBody
 import com.stefdp.zipline.network.models.requests.UpdateTagBody
 import com.stefdp.zipline.network.models.responses.CreateUrlResponse
 import com.stefdp.zipline.network.models.responses.ErrorResponse
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
+import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
 
 private const val TAG = "ZiplineApi[updateTag]"
@@ -26,8 +28,8 @@ suspend fun updateTag(
     try {
         val secureStore = SecureStorage.getInstance(context)
 
-        val serverUrl = secureStore.get("serverUrl")
-        val token = secureStore.get("token")
+        val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+        val token = secureStore.get(STORAGE_TOKEN_KEY)
 
         if (token.isNullOrEmpty()) {
             return Result.failure(

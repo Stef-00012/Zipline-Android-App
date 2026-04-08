@@ -54,6 +54,7 @@ import com.stefdp.zipline.network.requests.scanForZeroByteFiles
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.actions.components.ActionContainer
+import com.stefdp.zipline.utils.STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.StorageUtil
 import com.stefdp.zipline.utils.getDisplayPath
@@ -256,7 +257,7 @@ fun AdminActionsScreen(
             selectedPath = getDisplayPath(it)
 
             coroutineScope.launch {
-                secureStore.set("adminExportDownloadFolder", selectedUri.toString())
+                secureStore.set(STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY, selectedUri.toString())
             }
 
             performDownload()
@@ -268,7 +269,7 @@ fun AdminActionsScreen(
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
-        val exportDownloadFolder = secureStore.get("adminExportDownloadFolder")
+        val exportDownloadFolder = secureStore.get(STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY)
 
         if (exportDownloadFolder != null) {
             selectedUri = exportDownloadFolder.toUri()

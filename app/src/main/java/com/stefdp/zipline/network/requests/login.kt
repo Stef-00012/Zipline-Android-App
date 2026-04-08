@@ -9,6 +9,7 @@ import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.LoginResponse
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 
 private const val TAG = "ZiplineApi[login]"
@@ -22,7 +23,7 @@ suspend fun login(
     try {
         val secureStore = SecureStorage.getInstance(context)
 
-        val serverUrl = secureStore.get("serverUrl")
+        val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
 
         if (serverUrl.isNullOrEmpty()) {
             return Result.failure(

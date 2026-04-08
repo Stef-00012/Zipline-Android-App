@@ -10,6 +10,8 @@ import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.UploadFileResponse
 import com.stefdp.zipline.transferservice.ProgressTracker
 import com.stefdp.zipline.transferservice.TransferServiceConnection
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
+import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -41,8 +43,8 @@ suspend fun uploadFile(
 ): Result<UploadFileResponse> {
     val secureStore = SecureStorage.getInstance(context)
 
-    val serverUrl = secureStore.get("serverUrl")
-    val token = secureStore.get("token")
+    val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+    val token = secureStore.get(STORAGE_TOKEN_KEY)
 
     if (token.isNullOrEmpty()) {
         return Result.failure(

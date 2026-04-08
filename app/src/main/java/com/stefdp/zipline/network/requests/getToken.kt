@@ -8,6 +8,7 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.GetTokenResponse
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 
 private const val TAG = "ZiplineApi[getToken]"
@@ -19,7 +20,7 @@ suspend fun getToken(
     try {
         val secureStore = SecureStorage.getInstance(context)
 
-        val serverUrl = secureStore.get("serverUrl")
+        val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
 
         if (serverUrl.isNullOrEmpty()) {
             return Result.failure(

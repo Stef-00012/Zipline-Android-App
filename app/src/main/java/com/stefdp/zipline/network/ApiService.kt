@@ -35,6 +35,7 @@ import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
 import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.requests.MoveFolderBody
+import com.stefdp.zipline.network.models.requests.RemoveCurrentUserAvatarBody
 import com.stefdp.zipline.network.models.requests.RunRequerySizeJobBody
 import com.stefdp.zipline.network.models.requests.RunThumbnailGenerationJobBody
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
@@ -318,6 +319,12 @@ interface ZiplineApiService {
     suspend fun updateCurrentUser(
         @Header("Authorization") token: String,
         @Body data: UpdateCurrentUserBody,
+    ): Response<GetCurrentUserResponse>
+
+    @PATCH("user")
+    suspend fun removeCurrentUserAvatar(
+        @Header("Authorization") token: String,
+        @Body data: RemoveCurrentUserAvatarBody,
     ): Response<GetCurrentUserResponse>
 
     @GET("user/token")

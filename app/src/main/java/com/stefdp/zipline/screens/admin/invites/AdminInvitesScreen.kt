@@ -65,6 +65,7 @@ import com.stefdp.zipline.screens.admin.invites.components.CreateInvitePopup
 import com.stefdp.zipline.screens.admin.invites.components.LargeInviteDisplay
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.components.QRCodePopup
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
@@ -180,7 +181,7 @@ fun AdminInvitesScreen(
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
-        serverUrl = secureStore.get("serverUrl")
+        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
     }
 
     LaunchedEffect(Unit) {

@@ -5,6 +5,8 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.transferservice.TransferServiceConnection
 import com.stefdp.zipline.transferservice.util.copyStreamWithProgress
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
+import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import java.io.File
 import java.io.FileOutputStream
@@ -20,8 +22,8 @@ suspend fun exportFolder(
 ): Result<String> {
     val secureStore = SecureStorage.getInstance(context)
 
-    val serverUrl = secureStore.get("serverUrl")
-    val token = secureStore.get("token")
+    val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+    val token = secureStore.get(STORAGE_TOKEN_KEY)
 
     if (token.isNullOrEmpty()) {
         return Result.failure(

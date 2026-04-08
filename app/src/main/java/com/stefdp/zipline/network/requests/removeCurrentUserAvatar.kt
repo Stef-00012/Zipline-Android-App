@@ -1,15 +1,15 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
-import com.stefdp.zipline.network.models.responses.ErrorResponse
+import com.stefdp.zipline.network.models.requests.RemoveCurrentUserAvatarBody
 import com.stefdp.zipline.network.models.responses.GetCurrentUserResponse
 import com.stefdp.zipline.network.models.responses.UpdateCurrentUserErrorResponse
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
+import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
 
 private const val TAG = "ZiplineApi[updateCurrentUser]"
@@ -20,8 +20,8 @@ suspend fun removeCurrentUserAvatar(
     try {
         val secureStore = SecureStorage.getInstance(context)
 
-        val serverUrl = secureStore.get("serverUrl")
-        val token = secureStore.get("token")
+        val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+        val token = secureStore.get(STORAGE_TOKEN_KEY)
 
         if (token.isNullOrEmpty()) {
             return Result.failure(
@@ -38,11 +38,9 @@ suspend fun removeCurrentUserAvatar(
         val response = ZiplineApiClient.getZiplineApiService(
             baseUrl = serverUrl,
             includeNull = true
-        ).updateCurrentUser(
+        ).removeCurrentUserAvatar(
             token = token,
-            data = UpdateCurrentUserBody(
-                avatar = null
-            )
+            data = RemoveCurrentUserAvatarBody()
         )
 
         val body = response.body()

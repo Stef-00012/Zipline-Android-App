@@ -42,19 +42,18 @@ import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.UserViewSettings
 import com.stefdp.zipline.network.models.UserViewSettingsAlign
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
+import com.stefdp.zipline.screens.settings.SettingsUiState
+import com.stefdp.zipline.screens.settings.SettingsViewModel
 import com.stefdp.zipline.utils.toHex
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun ViewingFilesCategory(
-    context: Context,
-    user: User?,
-    updateUser: suspend (UpdateCurrentUserBody?) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateUser: (UpdateCurrentUserBody?) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: SettingsViewModel,
+    state: SettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -122,72 +121,51 @@ internal fun ViewingFilesCategory(
                 )
             }
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var enableViewRoutes by remember(user?.view?.enabled, settingsUpdateTick) {
-                mutableStateOf(user?.view?.enabled ?: false)
-            }
-
             Switch(
-                checked = enableViewRoutes,
-                onCheckedChange = { enableViewRoutes = it },
+                checked = state.enableViewRoutes,
+                onCheckedChange = {
+                    viewModel.setEnableViewRoutes(it)
+                },
+                enabled = !state.isLoading,
                 label = "Enable View Routes",
                 description = "Enable viewing files through customizable view-routes."
             )
 
-            var showMimetype by remember(user?.view?.showMimetype, settingsUpdateTick) {
-                mutableStateOf(user?.view?.showMimetype ?: false)
-            }
-
             Switch(
-                checked = showMimetype,
-                onCheckedChange = { showMimetype = it },
+                checked = state.showMimetype,
+                onCheckedChange = {
+                    viewModel.setShowMimetype(it)
+                },
+                enabled = !state.isLoading,
                 label = "Show Mimetype",
                 description = "Show the mimetype of the file in the view-route."
             )
 
-            var showTags by remember(user?.view?.showTags, settingsUpdateTick) {
-                mutableStateOf(user?.view?.showTags ?: false)
-            }
-
             Switch(
-                checked = showTags,
-                onCheckedChange = { showTags = it },
+                checked = state.showTags,
+                onCheckedChange = {
+                    viewModel.setShowTags(it)
+                },
+                enabled = !state.isLoading,
                 label = "Show Tags",
                 description = "Show the file's tags in the view-route."
             )
 
-            var showFolder by remember(user?.view?.showFolder, settingsUpdateTick) {
-                mutableStateOf(user?.view?.showFolder ?: false)
-            }
-
             Switch(
-                checked = showFolder,
-                onCheckedChange = { showFolder = it },
+                checked = state.showFolder,
+                onCheckedChange = {
+                    viewModel.setShowFolder(it)
+                },
+                enabled = !state.isLoading,
                 label = "Show Folder",
                 description = "Show the name/link of the folder if possible in the view-route."
             )
 
-            var viewContent by remember(user?.view?.content, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(user?.view?.content ?: ""))
-            }
-
             TextInput(
-                value = viewContent,
-                onValueChange = { viewContent = it },
+                value = state.viewContent,
+                onValueChange = {
+                    viewModel.setViewContent(it)
+                },
                 label = "View Content",
                 description = "Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable.",
                 modifier = Modifier
@@ -195,13 +173,9 @@ internal fun ViewingFilesCategory(
                     .heightIn(
                         max = 200.dp
                     ),
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 singleLine = false,
             )
-
-            var selectedViewContentAlignment by remember(user?.view?.align, settingsUpdateTick) {
-                mutableStateOf(setOf((user?.view?.align ?: UserViewSettingsAlign.LEFT).toString()))
-            }
 
             Select(
                 options = viewContentAlignmentOptions.map { option ->
@@ -218,71 +192,63 @@ internal fun ViewingFilesCategory(
                         },
                     )
                 },
-                selectedIds = selectedViewContentAlignment,
-                onSelectionChange = { selectedViewContentAlignment = it },
+                selectedIds = state.selectedViewContentAlignment,
+                onSelectionChange = {
+                    viewModel.setSelectedViewContentAlignment(it)
+                },
+                enabled = !state.isLoading,
                 label = "View Content Alignment",
                 description = "Change the alignment of the content within view-routes.",
             )
 
-            var enableEmbed by remember(user?.view?.embed, settingsUpdateTick) {
-                mutableStateOf(user?.view?.embed ?: false)
-            }
-
             Switch(
-                checked = enableEmbed,
-                onCheckedChange = { enableEmbed = it },
+                checked = state.enableEmbed,
+                onCheckedChange = {
+                    viewModel.setEnableEmbed(it)
+                },
+                enabled = !state.isLoading,
                 label = "Enable Embed",
                 description = "Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
             )
 
-            var embedTitle by remember(user?.view?.embedTitle, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(user?.view?.embedTitle ?: ""))
-            }
-
             TextInput(
-                value = embedTitle,
-                onValueChange = { embedTitle = it },
+                value = state.embedTitle,
+                onValueChange = {
+                    viewModel.setEmbedTitle(it)
+                },
                 label = "Embed Title",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading && enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed,
             )
 
-            var embedDescription by remember(user?.view?.embedDescription, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(user?.view?.embedDescription ?: ""))
-            }
-
             TextInput(
-                value = embedDescription,
-                onValueChange = { embedDescription = it },
+                value = state.embedDescription,
+                onValueChange = {
+                    viewModel.setEmbedDescription(it)
+                },
                 label = "Embed Description",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading && enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed,
                 singleLine = false,
             )
 
-            var embedSiteName by remember(user?.view?.embedSiteName, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(user?.view?.embedSiteName ?: ""))
-            }
-
             TextInput(
-                value = embedSiteName,
-                onValueChange = { embedSiteName = it },
+                value = state.embedSiteName,
+                onValueChange = {
+                    viewModel.setEmbedSiteName(it)
+                },
                 label = "Embed Site Name",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading && enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed,
             )
-
-            var embedColor by remember(user?.view?.embedColor, settingsUpdateTick) {
-                val color = user?.view?.embedColor?.toColorInt()
-
-                mutableStateOf(if (color != null) Color(color) else Color.Black)
-            }
 
             ColorPicker(
                 label = "Embed Color",
-                color = embedColor,
-                onColorChange = { embedColor = it },
-                enabled = !isLoading && enableEmbed,
+                color = state.embedColor,
+                onColorChange = {
+                    viewModel.setEmbedColor(it)
+                },
+                enabled = !state.isLoading && state.enableEmbed,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -292,30 +258,26 @@ internal fun ViewingFilesCategory(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     coroutineScope.launch {
-                        setLoading(true)
-
                         val data = UpdateCurrentUserBody(
                             view = UserViewSettings(
-                                enabled = enableViewRoutes,
-                                showMimetype = showMimetype,
-                                showTags = showTags,
-                                showFolder = showFolder,
-                                content = viewContent.text,
-                                align = UserViewSettingsAlign.valueOf(selectedViewContentAlignment.first()),
-                                embed = enableEmbed,
-                                embedTitle = embedTitle.text,
-                                embedDescription = embedDescription.text,
-                                embedSiteName = embedSiteName.text,
-                                embedColor = embedColor.toHex()
+                                enabled = state.enableViewRoutes,
+                                showMimetype = state.showMimetype,
+                                showTags = state.showTags,
+                                showFolder = state.showFolder,
+                                content = state.viewContent.text,
+                                align = UserViewSettingsAlign.valueOf(state.selectedViewContentAlignment.first()),
+                                embed = state.enableEmbed,
+                                embedTitle = state.embedTitle.text,
+                                embedDescription = state.embedDescription.text,
+                                embedSiteName = state.embedSiteName.text,
+                                embedColor = state.embedColor.toHex()
                             )
                         )
 
-                        errors = updateUser(data)
-
-                        setLoading(false)
+                        updateUser(data)
                     }
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

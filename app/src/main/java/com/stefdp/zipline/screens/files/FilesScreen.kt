@@ -108,6 +108,8 @@ import com.stefdp.zipline.screens.files.components.tags.TagsPopup
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
+import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
@@ -273,7 +275,7 @@ fun FilesScreen(
 
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
-        serverUrl = secureStore.get("serverUrl")
+        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
 
         updateIncompleteFiles()
         updateTags()
@@ -1059,7 +1061,7 @@ fun FilesScreen(
                                     LaunchedEffect(Unit) {
                                         val secureStore = SecureStorage.getInstance(context)
 
-                                        val fileDownloadFolder = secureStore.get("fileDownloadFolder")
+                                        val fileDownloadFolder = secureStore.get(STORAGE_FILE_DOWNLOAD_FOLDER_KEY)
 
                                         if (fileDownloadFolder != null) {
                                             selectedUri = fileDownloadFolder.toUri()
@@ -1214,7 +1216,7 @@ fun FilesScreen(
                                             selectedPath = getDisplayPath(it)
 
                                             coroutineScope.launch {
-                                                secureStore.set("fileDownloadFolder", selectedUri.toString())
+                                                secureStore.set(STORAGE_FILE_DOWNLOAD_FOLDER_KEY, selectedUri.toString())
                                             }
 
                                             performDownload()

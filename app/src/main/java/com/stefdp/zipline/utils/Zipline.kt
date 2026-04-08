@@ -8,6 +8,14 @@ import com.stefdp.zipline.network.models.requests.UploadCompressionType
 import io.github.z4kn4fein.semver.toVersion
 import kotlinx.parcelize.Parcelize
 
+const val STORAGE_SERVER_URL_KEY = "serverUrl"
+const val STORAGE_TOKEN_KEY = "token"
+const val STORAGE_FILE_DOWNLOAD_FOLDER_KEY = "fileDownloadFolder"
+const val STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY = "folderExportDownloadFolder"
+const val STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY = "adminExportDownloadFolder"
+const val STORAGE_EXPORT_DOWNLOAD_FOLDER_KEY = "exportDownloadFolder"
+const val STORAGE_UNLOCK_WITH_BIOMETRICS_KEY = "unlockWithBiometrics"
+
 @Parcelize
 data class ZiplineViewState(
     val adminUsers: ZiplineViewStateType,
@@ -29,7 +37,7 @@ enum class ZiplineViewStateType : Parcelable {
     }
 }
 
-val minimumZiplineVersion = "4.5.0".toVersion()
+val minimumZiplineVersion = "4.5.3".toVersion()
 
 val inviteExpiresAtDates = listOf(
     "never" to "Never",

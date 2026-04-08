@@ -229,6 +229,8 @@ internal fun FeaturesCategory(
             }
 
             Select(
+                label = "Thumbnails Format",
+                description = "The output format for thumbnails. Requires a server restart.",
                 options = thumbnailFormats.map { (id, label) ->
                     SelectOption(
                         id = id.toString(),
@@ -245,6 +247,7 @@ internal fun FeaturesCategory(
                 },
                 selectedIds = selectedThumbnailsFormat,
                 onSelectionChange = { selectedThumbnailsFormat = it },
+                enabled = !isLoading,
             )
 
             var versionChecking by remember(settings?.settings?.featuresVersionChecking, settingsUpdateTick) {

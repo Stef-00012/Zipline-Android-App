@@ -58,27 +58,29 @@ fun CreateUrlPopup(
     context: Context,
     activity: FragmentActivity,
     showPopup: Boolean,
+    isLoading: Boolean,
     onDismissRequest: () -> Unit,
-    updateUrls: suspend () -> Unit,
+    onDismissCreatedUrlRequest: () -> Unit,
     baseUrl: String? = null,
+    onCreate: (
+        destination: String,
+        vanity: String?,
+        enabled: Boolean,
+        maxViews: Long?,
+        password: String?,
+        domain: String?
+    ) -> Unit,
+    createdUrl: String?,
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-
     val webSettings = LocalWebSettings.current
 
     val domains = webSettings?.config?.domains ?: emptyList()
-
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    var createdUrl by remember { mutableStateOf<String?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
 
     Popup(
         showPopup = createdUrl != null,
-        onDismissRequest = {
-            createdUrl = null
-        },
+        onDismissRequest = onDismissCreatedUrlRequest,
         scrollable = false,
     ) {
         Text(
@@ -189,21 +191,6 @@ fun CreateUrlPopup(
                     contentDescription = "Close shorten menu",
                 )
             }
-        }
-
-        if (errorMessage != null) {
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error
-            )
-
-             Spacer(
-                modifier = Modifier.height(4.dp)
-            )
         }
 
         Spacer(
@@ -333,59 +320,77 @@ fun CreateUrlPopup(
             enabled = !isLoading,
             onClick = {
                 if (!urlRegex.matches(destination.text)) {
-                    errorMessage = "Invalid URL"
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "Invalid Destination URL"
+                        )
+                    }
 
                     return@Button
                 }
 
-                coroutineScope.launch {
-                    isLoading = true
 
-                    val createUrlRes = createUrl(
-                        context = context,
-                        destination = destination.text,
-                        vanity = vanity.text.ifBlank { null },
-                        maxViews = maxViews.text.toLongOrNull(),
-                        enabled = enabled,
-                        domain = selectedOverrideDomain.firstOrNull { it != "default" },
-                        password = password.text.ifBlank { null }
-                    )
 
-                    createUrlRes
-                        .onSuccess {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "URL created successfully"
-                                    )
-                                }
-                            )
+                onCreate(
+                    destination.text,
+                    vanity.text.ifBlank { null },
+                    enabled,
+                    maxViews.text.toLongOrNull(),
+                    password.text.ifBlank { null },
+                    selectedOverrideDomain.firstOrNull { it != "default" },
+                )
 
-                            createdUrl = it.url
-
-                            updateUrls()
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Logger.error("CreateUrlPopup", "Failed to create url", it)
-
-                            errorMessage = it.message ?: "Something went wrong..."
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to create URL"
-                                    )
-                                }
-                            )
-                        }
-
-                    isLoading = false
-                }
+//                coroutineScope.launch {
+//                    isLoading = true
+//
+//                    val createUrlRes = createUrl(
+//                        context = context,
+//                        destination = destination.text,
+//                        vanity = vanity.text.ifBlank { null },
+//                        maxViews = maxViews.text.toLongOrNull(),
+//                        enabled = enabled,
+//                        domain = selectedOverrideDomain.firstOrNull { it != "default" },
+//                        password = password.text.ifBlank { null }
+//                    )
+//
+//                    createUrlRes
+//                        .onSuccess {
+//                            Notification.show(
+//                                context = context,
+//                                activity = activity,
+//                                content = {
+//                                    Text(
+//                                        text = "URL created successfully"
+//                                    )
+//                                }
+//                            )
+//
+//                            createdUrl = it.url
+//
+//                            updateUrls()
+//                            onDismissRequest()
+//                        }
+//                        .onFailure {
+//                            Logger.error("CreateUrlPopup", "Failed to create url", it)
+//
+//                            errorMessage = it.message ?: "Something went wrong..."
+//
+//                            Notification.show(
+//                                context = context,
+//                                activity = activity,
+//                                content = {
+//                                    Text(
+//                                        text = "Failed to create URL"
+//                                    )
+//                                }
+//                            )
+//                        }
+//
+//                    isLoading = false
+//                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

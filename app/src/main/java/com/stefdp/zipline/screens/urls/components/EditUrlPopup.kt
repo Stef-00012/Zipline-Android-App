@@ -53,14 +53,16 @@ fun EditUrlPopup(
     url: Url?,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    updateUrls: suspend () -> Unit
+    isLoading: Boolean,
+    onEdit: (
+        urlId: String,
+        destination: String,
+        vanity: String?,
+        enabled: Boolean,
+        maxViews: Long?,
+        password: String?,
+    ) -> Unit
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest,
@@ -93,21 +95,6 @@ fun EditUrlPopup(
                     contentDescription = "Close shorten menu",
                 )
             }
-        }
-
-        if (errorMessage != null) {
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error
-            )
-
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
         }
 
         Spacer(
@@ -205,59 +192,77 @@ fun EditUrlPopup(
             enabled = !isLoading,
             onClick = {
                 if (!urlRegex.matches(destination.text)) {
-                    errorMessage = "Invalid Destination"
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "Invalid Destination URL"
+                        )
+                    }
 
                     return@Button
                 }
 
-                coroutineScope.launch {
-                    if (url == null) return@launch
+                if (url == null) return@Button
 
-                    isLoading = true
+                onEdit(
+                    url.id,
+                    destination.text,
+                    vanity.text.takeIf { it.isNotBlank() },
+                    enabled,
+                    maxViews.text.toLongOrNull(),
+                    password.text.takeIf { it.isNotBlank() }
+                )
 
-                    val editUrlRes = updateUrl(
-                        urlId = url.id,
-                        context = context,
-                        destination = destination.text,
-                        vanity = vanity.text.takeIf { it.isNotBlank() },
-                        maxViews = maxViews.text.toLongOrNull(),
-                        enabled = enabled,
-                        password = password.text.takeIf { it.isNotBlank() }
-                    )
-
-                    editUrlRes
-                        .onSuccess {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "URL updated successfully"
-                                    )
-                                }
-                            )
-
-                            updateUrls()
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Logger.error("EditUrlPopup", "Failed to update url", it)
-
-                            errorMessage = it.message
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to update URL"
-                                    )
-                                }
-                            )
-                        }
-
-                    isLoading = false
-                }
+//                coroutineScope.launch {
+//                    if (url == null) return@launch
+//
+//                    isLoading = true
+//
+//                    val editUrlRes = updateUrl(
+//                        urlId = url.id,
+//                        context = context,
+//                        destination = destination.text,
+//                        vanity = vanity.text.takeIf { it.isNotBlank() },
+//                        maxViews = maxViews.text.toLongOrNull(),
+//                        enabled = enabled,
+//                        password = password.text.takeIf { it.isNotBlank() }
+//                    )
+//
+//                    editUrlRes
+//                        .onSuccess {
+//                            Notification.show(
+//                                context = context,
+//                                activity = activity,
+//                                content = {
+//                                    Text(
+//                                        text = "URL updated successfully"
+//                                    )
+//                                }
+//                            )
+//
+//                            updateUrls()
+//                            onDismissRequest()
+//                        }
+//                        .onFailure {
+//                            Logger.error("EditUrlPopup", "Failed to update url", it)
+//
+//                            errorMessage = it.message
+//
+//                            Notification.show(
+//                                context = context,
+//                                activity = activity,
+//                                content = {
+//                                    Text(
+//                                        text = "Failed to update URL"
+//                                    )
+//                                }
+//                            )
+//                        }
+//
+//                    isLoading = false
+//                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -42,6 +42,8 @@ import com.stefdp.zipline.network.requests.deleteExport
 import com.stefdp.zipline.network.requests.downloadExport
 import com.stefdp.zipline.network.requests.startExport
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.screens.settings.SettingsUiState
+import com.stefdp.zipline.screens.settings.SettingsViewModel
 import com.stefdp.zipline.ui.theme.DarkGreen
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.StorageUtil
@@ -56,12 +58,9 @@ import kotlin.time.Instant
 internal fun ExportFilesCategory(
     context: Context,
     activity: FragmentActivity,
-    exports: List<Export>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
     title: String,
-    updateExports: suspend () -> Unit,
-    settingsUpdateTick: Int
+    viewModel: SettingsViewModel,
+    state: SettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -78,21 +77,35 @@ internal fun ExportFilesCategory(
                 ),
             )
 
-            val coroutineScope = rememberCoroutineScope()
-
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
-
-                        startExport(context)
-                        updateExports()
-
-                        setLoading(false)
-                    }
+                    viewModel.startExport(
+                        context = context,
+                        onError = { error ->
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                            ) {
+                                Text(
+                                    text = "Failed to start export: $error",
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        },
+                        onSuccess = {
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                            ) {
+                                Text(
+                                    text = "Export started successfully",
+                                )
+                            }
+                        }
+                    )
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.add),
@@ -165,7 +178,7 @@ internal fun ExportFilesCategory(
                 )
             )
 
-            val tableRows = exports.map { export ->
+            val tableRows = state.exports?.map { export ->
                 TableRowData(
                     cells = listOf(
                         TableCellData(
@@ -217,181 +230,64 @@ internal fun ExportFilesCategory(
                                     color = MaterialTheme.colorScheme.error,
                                     iconColor = MaterialTheme.colorScheme.onError,
                                     onClick = {
-                                        coroutineScope.launch {
-                                            setLoading(true)
-
-                                            val deleteExportRes = deleteExport(
-                                                context = context,
-                                                exportId = export.id
-                                            )
-
-                                            deleteExportRes.onSuccess {
-                                                if (it.deleted) {
-                                                    updateExports()
-                                                } else {
-                                                    Notification.show(
-                                                        context = context,
-                                                        activity = activity,
-                                                        content = {
-                                                            Text(
-                                                                text = "Failed to delete export"
-                                                            )
-                                                        }
+                                        viewModel.deleteExport(
+                                            context = context,
+                                            exportId = export.id,
+                                            onError = { error ->
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                ) {
+                                                    Text(
+                                                        text = "Failed to delete export: $error",
+                                                        color = MaterialTheme.colorScheme.error,
+                                                    )
+                                                }
+                                            },
+                                            onSuccess = {
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                ) {
+                                                    Text(
+                                                        text = "Export deleted successfully",
                                                     )
                                                 }
                                             }
-
-                                            setLoading(false)
-                                        }
+                                        )
                                     },
-                                    enabled = !isLoading
+                                    enabled = !state.isLoading
                                 )
 
                                 ActionButtonSpacer()
-
-                                var selectedUri by remember { mutableStateOf<Uri?>(null) }
-                                var selectedPath by remember { mutableStateOf<String?>(null) }
-
-                                LaunchedEffect(Unit) {
-                                    val secureStore = SecureStorage.getInstance(context)
-
-                                    val exportDownloadFolder = secureStore.get("exportDownloadFolder")
-
-                                    if (exportDownloadFolder != null) {
-                                        selectedUri = exportDownloadFolder.toUri()
-                                        selectedPath = getDisplayPath(exportDownloadFolder.toUri())
-                                    }
-                                }
-
-                                fun showToast(message: String) {
-                                    coroutineScope.launch(Dispatchers.Main) {
-                                        Notification.show(
-                                            context = context,
-                                            activity = activity,
-                                            content = {
-                                                Text(
-                                                    text = message
-                                                )
-                                            }
-                                        )
-                                    }
-                                }
-
-                                fun performDownload() {
-                                    val exportFits = StorageUtil.canFitFile(
-                                        context = context,
-                                        uri = selectedUri!!,
-                                        fileSize = export.size.toLong()
-                                    )
-
-                                    if (!exportFits) {
-                                        showToast("Not enough space in the selected directory to download the export")
-
-                                        return
-                                    }
-
-                                    val exportFitsCache = StorageUtil.canFitInternalCache(
-                                        context = context,
-                                        fileSize = export.size.toLong()
-                                    )
-
-                                    if (!exportFitsCache) {
-                                        showToast("Not enough space in the internal cache to download the export")
-
-                                        return
-                                    }
-
-                                    Logger.debug("ExportFiles", "Starting download of export ${export.id} with size ${export.size} bytes to $selectedPath")
-
-                                    coroutineScope.launch(Dispatchers.IO) {
-                                        showToast("Starting download...")
-
-                                        val fileName = "export_${export.id}_${System.currentTimeMillis()}.zip"
-
-                                        val tempFile = java.io.File(context.cacheDir, fileName)
-                                        val tempDestinationPath = tempFile.absolutePath
-
-                                        if (tempFile.exists()) tempFile.delete()
-
-                                        val downloadRes = downloadExport(
-                                            context = context,
-                                            exportId = export.id,
-                                            destinationPath = tempDestinationPath,
-                                            notificationTitle = "Downloading export",
-                                            notificationContent = "Downloading export ${export.id}",
-                                        )
-
-                                        downloadRes
-                                            .onSuccess {
-                                                try {
-                                                    val docUri =
-                                                        DocumentsContract.buildDocumentUriUsingTree(
-                                                            selectedUri,
-                                                            DocumentsContract.getTreeDocumentId(
-                                                                selectedUri
-                                                            )
-                                                        )
-
-                                                    val fileUri = DocumentsContract.createDocument(
-                                                        context.contentResolver,
-                                                        docUri,
-                                                        "application/zip",
-                                                        fileName
-                                                    )
-
-                                                    if (fileUri != null) {
-                                                        context.contentResolver.openOutputStream(fileUri)
-                                                            ?.use { out ->
-                                                                tempFile.inputStream().use { inp ->
-                                                                    inp.copyTo(out)
-                                                                }
-                                                            }
-
-                                                        showToast("Export downloaded to ${selectedPath}/$fileName")
-                                                    } else {
-                                                        showToast("Failed to create file in selected directory")
-                                                    }
-                                                } catch (e: Exception) {
-                                                    Logger.error(
-                                                        "ExportFiles",
-                                                        "Failed to copy file to selected directory",
-                                                        e
-                                                    )
-
-                                                    showToast("Failed to copy file to selected directory: ${e.message}")
-                                                } finally {
-                                                    tempFile.delete()
-                                                }
-                                            }
-                                            .onFailure {
-                                                Logger.error("ExportFiles", "Failed to download export", it)
-
-                                                showToast("Failed to download export: ${it.message}")
-                                            }
-                                    }
-                                }
 
                                 val directoryPicker = rememberLauncherForActivityResult(
                                     contract = ActivityResultContracts.OpenDocumentTree()
                                 ) { uri: Uri? ->
                                     uri?.let {
-                                        val secureStore = SecureStorage.getInstance(context)
-
                                         context.contentResolver.takePersistableUriPermission(
                                             it,
                                             Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                                         )
-                                        selectedUri = it
-                                        selectedPath = getDisplayPath(it)
 
-                                        coroutineScope.launch {
-                                            secureStore.set("exportDownloadFolder", selectedUri.toString())
-                                        }
+                                        viewModel.setSelectedExportUri(
+                                            context = context,
+                                            exportUri = it
+                                        )
 
-                                        performDownload()
-
-                                        setLoading(false)
+                                        viewModel.performExportDownload(
+                                            context = context,
+                                            export = export,
+                                            exportUri = it,
+                                            sendNotification = { content ->
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = content
+                                                )
+                                            }
+                                        )
                                     }
                                 }
 
@@ -401,31 +297,39 @@ internal fun ExportFilesCategory(
                                     color = MaterialTheme.colorScheme.primary,
                                     iconColor = MaterialTheme.colorScheme.onPrimary,
                                     onClick = {
-                                        setLoading(true)
-
-                                        if (selectedUri == null) {
+                                        if (state.selectedExportUri == null) {
                                             directoryPicker.launch(null)
 
                                             return@IconButton
                                         }
 
-                                        performDownload()
-
-                                        setLoading(false)
+                                        viewModel.performExportDownload(
+                                            context = context,
+                                            export = export,
+                                            exportUri = state.selectedExportUri,
+                                            sendNotification = { content ->
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = content,
+                                                    duration = 5000L
+                                                )
+                                            }
+                                        )
                                     },
-                                    enabled = !isLoading && export.completed
+                                    enabled = !state.isLoading && export.completed
                                 )
                             },
                             width = tableActionsWidth
                         ),
                     )
                 )
-            }
+            } ?: emptyList()
 
             Table(
                 headers = tableHeaders,
                 rows = tableRows,
-                loading = isLoading
+                loading = state.exports == null
             )
         }
     }

@@ -295,9 +295,9 @@ internal fun DiscordWebhookOnShortenCategory(
                         setLoading(true)
 
                         val data = PartialServerSettingsSettings(
-                            discordOnShortenWebhookUrl = webhookUrl.text,
+                            discordOnShortenWebhookUrl = webhookUrl.text.takeIf { it.isNotBlank() },
                             discordOnShortenUsername = username.text,
-                            discordOnShortenAvatarUrl = avatarUrl.text,
+                            discordOnShortenAvatarUrl = avatarUrl.text.takeIf { it.isNotBlank() },
                             discordOnShortenContent = content.text,
                             discordOnShortenEmbed = embed?.copy(
                                 title = embedTitle.text,

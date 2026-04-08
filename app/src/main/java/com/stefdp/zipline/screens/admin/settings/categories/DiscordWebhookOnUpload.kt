@@ -301,9 +301,9 @@ internal fun DiscordWebhookOnUploadCategory(
                         setLoading(true)
 
                         val data = PartialServerSettingsSettings(
-                            discordOnUploadWebhookUrl = webhookUrl.text,
+                            discordOnUploadWebhookUrl = webhookUrl.text.takeIf { it.isNotBlank() },
                             discordOnUploadUsername = username.text,
-                            discordOnUploadAvatarUrl = avatarUrl.text,
+                            discordOnUploadAvatarUrl = avatarUrl.text.takeIf { it.isNotBlank() },
                             discordOnUploadContent = content.text,
                             discordOnUploadEmbed = embed?.copy(
                                 title = embedTitle.text,

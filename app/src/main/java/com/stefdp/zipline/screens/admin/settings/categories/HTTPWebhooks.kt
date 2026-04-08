@@ -102,8 +102,8 @@ internal fun HTTPWebhooksCategory(
                         setLoading(true)
 
                         val data = PartialServerSettingsSettings(
-                            httpWebhookOnUpload = onUpload.text,
-                            httpWebhookOnShorten = onShorten.text
+                            httpWebhookOnUpload = onUpload.text.takeIf { it.isNotBlank() },
+                            httpWebhookOnShorten = onShorten.text.takeIf { it.isNotBlank() }
                         )
 
                         val updateSettingsErrors = updateSettings(data)

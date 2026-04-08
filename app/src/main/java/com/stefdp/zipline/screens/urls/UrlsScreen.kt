@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,8 +50,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
@@ -67,10 +68,8 @@ import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.components.table.TableScrollbarConfig
-import com.stefdp.zipline.network.models.Url
 import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.requests.deleteUrl
-import com.stefdp.zipline.network.requests.getUrls
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.screens.urls.components.CreateUrlPopup
@@ -79,7 +78,6 @@ import com.stefdp.zipline.components.EnabledCheckbox
 import com.stefdp.zipline.screens.urls.components.LargeUrlDisplay
 import com.stefdp.zipline.components.QRCodePopup
 import com.stefdp.zipline.utils.ScrollbarConfig
-import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
 import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.camelCaseToHumanReadable
@@ -97,6 +95,7 @@ fun UrlsScreen(
     context: Context,
     activity: FragmentActivity,
     sharedUrl: String? = null,
+    viewModel: UrlsViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -106,157 +105,69 @@ fun UrlsScreen(
         }
     }
 
-    var baseUrl by remember { mutableStateOf(sharedUrl) }
+    val state by viewModel.state.collectAsState()
 
     val webSettings = LocalWebSettings.current
 
     val urlsRoute = webSettings?.config?.urls?.route.takeIf { it != "/" } ?: ""
-
-    var urls by remember { mutableStateOf<List<Url>?>(null) }
-
-    var serverUrl by remember { mutableStateOf<String?>(null) }
-
-    var isLoading by remember { mutableStateOf(true) }
 
     val screenViewState = LocalScreenViewState.current
     val updateScreenViewState = LocalUpdateScreenViewState.current
 
     val viewState = screenViewState.urls
 
-    var sortKey by remember { mutableStateOf(GetUrlsQuerySortBy.CREATED_AT) }
-    var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
     val defaultSortOrder = SortOrder.UNSPECIFIED
-
-    var searchKey by remember { mutableStateOf<GetUrlsQuerySearchField?>(null) }
-    var searchValue by remember { mutableStateOf(TextFieldValue("")) }
-
-    var createdNewUrlPopupOpen by remember { mutableStateOf(false) }
-
-    var deleteUrl by remember { mutableStateOf<Url?>(null) }
-    var editUrl by remember { mutableStateOf<Url?>(null) }
-
-    var qrCodeUrl by remember { mutableStateOf<Url?>(null) }
-    var qrCodeText by remember { mutableStateOf("") }
-
-    LaunchedEffect(qrCodeUrl) {
-        if (qrCodeUrl == null) {
-            qrCodeText = ""
-            return@LaunchedEffect
-        }
-
-        qrCodeText = "${serverUrl}${urlsRoute}/${if (qrCodeUrl!!.vanity.isNullOrBlank()) qrCodeUrl!!.code else qrCodeUrl!!.vanity}"
-    }
-
-    fun sortUrls(urls: List<Url>): List<Url> {
-        if (viewState == ZiplineViewStateType.LARGE) return urls.sortedBy { Instant.parse(it.createdAt) }.reversed()
-
-        val ascending = when (sortKey) {
-            GetUrlsQuerySortBy.CODE ->
-                urls.sortedBy { it.code }
-
-            GetUrlsQuerySortBy.VANITY ->
-                urls.sortedBy { it.vanity.orEmpty() }
-
-            GetUrlsQuerySortBy.DESTINATION ->
-                urls.sortedBy { it.destination }
-
-            GetUrlsQuerySortBy.VIEWS ->
-                urls.sortedBy { it.views }
-
-            GetUrlsQuerySortBy.MAX_VIEWS ->
-                urls.sortedBy { it.maxViews ?: Long.MIN_VALUE }
-
-            GetUrlsQuerySortBy.CREATED_AT ->
-                urls.sortedBy { Instant.parse(it.createdAt) }
-
-            GetUrlsQuerySortBy.ENABLED ->
-                urls.sortedBy { it.enabled }
-        }
-
-        return when (sortOrder) {
-            SortOrder.ASC -> ascending
-            SortOrder.DESC -> ascending.reversed()
-            SortOrder.UNSPECIFIED -> urls
-        }
-    }
-
-    suspend fun updateUrls(search: Boolean = true, sort: Boolean = true) {
-        isLoading = true
-
-        if (search) {
-            val userUrlsRes = getUrls(
-                context = context,
-                searchField = searchKey,
-                searchQuery = searchValue.text.ifEmpty { null }
-            )
-
-            userUrlsRes.onSuccess {
-                urls = if (sort) sortUrls(it) else it
-            }
-        } else {
-            val userUrlsRes = getUrls(
-                context = context,
-            )
-
-            userUrlsRes.onSuccess {
-                urls = if (sort) sortUrls(it) else it
-            }
-        }
-
-        isLoading = false
-    }
-
-    LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        serverUrl = secureStore.get("serverUrl")
-    }
 
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        viewModel.initData(context, urlsRoute, sharedUrl)
+    }
+
+    LaunchedEffect(state.searchValue) {
+        viewModel.refreshUrls(context, viewState)
+    }
+
+    LaunchedEffect(state.sortOrder, state.sortKey, viewState) {
+        viewModel.triggerSort(viewState)
+    }
+
     PromptPopup(
-        showPopup = deleteUrl != null,
-        onDismissRequest = { deleteUrl = null },
-        onCancel = { deleteUrl = null },
-        isLoading = isLoading,
+        showPopup = state.deleteUrl != null,
+        onDismissRequest = { viewModel.setDeleteUrl(null) },
+        onCancel = { viewModel.setDeleteUrl(null) },
+        isLoading = state.isLoading,
         title = "Are you sure?",
-        description = "Are you sure you want to delete ${deleteUrl?.code}? This action cannot be undone.",
+        description = "Are you sure you want to delete ${state.deleteUrl?.code}? This action cannot be undone.",
         onSuccess = {
             coroutineScope.launch {
-                if (deleteUrl == null) return@launch
+                if (state.deleteUrl == null) return@launch
 
-                isLoading = true
-
-                val deleteRes = deleteUrl(
+                viewModel.deleteUrl(
                     context = context,
-                    urlId = deleteUrl!!.id
-                )
-
-                deleteRes
-                    .onSuccess {
-                        if (viewState == ZiplineViewStateType.COMPACT) {
-                            updateUrls()
-                        } else {
-                            updateUrls(
-                                search = false,
-                                sort = false
-                            )
-                        }
-                    }
-                    .onFailure {
+                    urlId = state.deleteUrl!!.id,
+                    viewState = viewState,
+                    onSuccess = {
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "Failed to delete URL: ${it.message}"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "URL deleted successfully"
+                            )
+                        }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "Failed to delete URL: ${error}"
+                            )
+                        }
                     }
-
-                isLoading = false
-                deleteUrl = null
+                )
             }
         }
     )
@@ -264,31 +175,102 @@ fun UrlsScreen(
     CreateUrlPopup(
         context = context,
         activity = activity,
-        showPopup = createdNewUrlPopupOpen || baseUrl != null,
+        showPopup = state.isCreatePopupOpen,
+        isLoading = state.popupIsLoading,
         onDismissRequest = {
-            createdNewUrlPopupOpen = false
-            baseUrl = null
+            Notification.show(
+                context = context,
+                activity = activity,
+            ) {
+                Text(
+                    text = "URL created successfully"
+                )
+            }
+
+            viewModel.closeCreatePopup()
         },
-        updateUrls = ::updateUrls,
-        baseUrl = baseUrl
+        createdUrl = state.createdUrlResult,
+        onDismissCreatedUrlRequest = {
+            viewModel.clearCreatedUrlResult()
+        },
+        baseUrl = state.createPopupBaseUrl,
+        onCreate = { destination, vanity, enabled, maxViews, password, domain ->
+            viewModel.createUrl(
+                context = context,
+                destination = destination,
+                vanity = vanity,
+                maxViews = maxViews,
+                password = password,
+                enabled = enabled,
+                domain = domain,
+                viewState = viewState,
+                onSuccess = {
+                    viewModel.closeCreatePopup()
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "Failed to create URL: $error"
+                        )
+                    }
+                }
+            )
+        }
     )
 
     EditUrlPopup(
         context = context,
         activity = activity,
-        url = editUrl,
-        showPopup = editUrl != null,
-        onDismissRequest = { editUrl = null },
-        updateUrls = ::updateUrls
+        url = state.editUrl,
+        showPopup = state.editUrl != null,
+        isLoading = state.popupIsLoading,
+        onDismissRequest = { viewModel.setEditUrl(null) },
+        onEdit = { urlId, destination, vanity, enabled, maxViews, password ->
+            viewModel.editUrl(
+                context = context,
+                urlId = urlId,
+                destination = destination,
+                vanity = vanity,
+                maxViews = maxViews,
+                password = password,
+                enabled = enabled,
+                viewState = viewState,
+                onSuccess = {
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "URL updated successfully"
+                        )
+                    }
+
+                    viewModel.setEditUrl(null)
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "Failed to edit URL: $error"
+                        )
+                    }
+                }
+            )
+        }
     )
 
     QRCodePopup(
         context = context,
         activity = activity,
-        qrCodeText = qrCodeText,
-        showPopup = qrCodeUrl != null && serverUrl != null,
-        onDismissRequest = { qrCodeUrl = null },
-        downloadFileName = "QR_${qrCodeUrl?.id ?: "code"}.png"
+        qrCodeText = state.qrCodeText,
+        showPopup = state.qrCodeUrl != null && state.serverUrl != null,
+        onDismissRequest = { viewModel.setQrCodeUrl(null) },
+        downloadFileName = "QR_${state.qrCodeUrl?.id ?: "code"}.png"
     )
 
     Column(
@@ -318,9 +300,9 @@ fun UrlsScreen(
                     icon = painterResource(R.drawable.add_link),
                     contentDescription = "Create URL",
                     onClick = {
-                        createdNewUrlPopupOpen = true
+                        viewModel.openCreatePopup()
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
 
                 Spacer(
@@ -341,48 +323,33 @@ fun UrlsScreen(
                             )
                         )
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
             }
         }
 
         val lazyColumnListState = rememberLazyListState()
 
-        LaunchedEffect(searchValue) {
-            updateUrls()
-            lazyColumnListState.animateScrollToItem(0)
-        }
-
-        LaunchedEffect(
-            sortOrder,
-            sortKey,
-            viewState,
-        ) {
-            urls = urls?.let { sortUrls(it) }
-        }
-
-        LaunchedEffect(viewState) {
-            if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
-
-            if (
-                (searchKey != null && searchValue.text.isNotBlank()) ||
-                (sortKey != GetUrlsQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC)
-            ) {
-                updateUrls(
-                    search = false,
-                    sort = false
-                )
-            }
-        }
+//        LaunchedEffect(viewState) {
+//            if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
+//
+//            if (
+//                (searchKey != null && searchValue.text.isNotBlank()) ||
+//                (sortKey != GetUrlsQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC)
+//            ) {
+//                updateUrls(
+//                    search = false,
+//                    sort = false
+//                )
+//            }
+//        }
 
         if (viewState == ZiplineViewStateType.COMPACT) {
-            var _searchValue by remember { mutableStateOf(searchValue) }
+            var uiSearchValue by remember { mutableStateOf(state.searchValue) }
 
-            LaunchedEffect(searchKey) {
-                _searchValue = TextFieldValue("")
-            }
+            LaunchedEffect(state.searchKey) { uiSearchValue = TextFieldValue("") }
 
-            if (searchKey != null) {
+            if (state.searchKey != null) {
                 Column(
                     modifier = Modifier
                         .padding(top = 8.dp)
@@ -401,7 +368,7 @@ fun UrlsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Search by ${camelCaseToHumanReadable(searchKey.toString())}",
+                            text = "Search by ${camelCaseToHumanReadable(state.searchKey.toString())}",
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold
                             ),
@@ -414,8 +381,8 @@ fun UrlsScreen(
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                                 .clickable(
                                     onClick = {
-                                        searchKey = null
-                                        searchValue = TextFieldValue("")
+                                        viewModel.updateSearchValue(TextFieldValue(""))
+                                        viewModel.updateSearchKey(null)
                                     }
                                 )
                         ) {
@@ -431,14 +398,14 @@ fun UrlsScreen(
                     )
 
                     fun onEnter() {
-                        searchValue = _searchValue
+                        viewModel.updateSearchValue(uiSearchValue)
                     }
 
                     val focusManager = LocalFocusManager.current
 
                     TextInput(
-                        value = _searchValue,
-                        onValueChange = { _searchValue = it },
+                        value = uiSearchValue,
+                        onValueChange = { uiSearchValue = it },
                         label = "Search",
                         keyboardActions = KeyboardActions(
                             onDone = {
@@ -482,6 +449,14 @@ fun UrlsScreen(
                 val tableEnabledWidth = 120.dp
                 val tableActionsWidth = 170.dp
 
+                fun onSortChanged(sortKey: GetUrlsQuerySortBy) {
+                    if (state.sortKey != sortKey || state.sortOrder == SortOrder.UNSPECIFIED || state.sortOrder == SortOrder.DESC) {
+                        viewModel.updateSort(sortKey, SortOrder.ASC)
+                    } else {
+                        viewModel.updateSort(sortKey, SortOrder.DESC)
+                    }
+                }
+
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
                         content = {
@@ -494,19 +469,12 @@ fun UrlsScreen(
                         name = "code",
                         searchable = true,
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.CODE) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.CODE) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.CODE) {
-                                sortKey = GetUrlsQuerySortBy.CODE
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.CODE)
                         },
                         onSearchClick = {
-                            searchKey = GetUrlsQuerySearchField.CODE
+                            viewModel.updateSearchKey(GetUrlsQuerySearchField.CODE)
                         }
                     ),
                     TableHeaderData(
@@ -520,19 +488,12 @@ fun UrlsScreen(
                         name = "vanity",
                         searchable = true,
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.VANITY) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.VANITY) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.VANITY) {
-                                sortKey = GetUrlsQuerySortBy.VANITY
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.VANITY)
                         },
                         onSearchClick = {
-                            searchKey = GetUrlsQuerySearchField.VANITY
+                            viewModel.updateSearchKey(GetUrlsQuerySearchField.VANITY)
                         }
                     ),
                     TableHeaderData(
@@ -546,19 +507,12 @@ fun UrlsScreen(
                         name = "destination",
                         searchable = true,
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.DESTINATION) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.DESTINATION) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.DESTINATION) {
-                                sortKey = GetUrlsQuerySortBy.DESTINATION
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.DESTINATION)
                         },
                         onSearchClick = {
-                            searchKey = GetUrlsQuerySearchField.DESTINATION
+                            viewModel.updateSearchKey(GetUrlsQuerySearchField.DESTINATION)
                         }
                     ),
                     TableHeaderData(
@@ -571,16 +525,9 @@ fun UrlsScreen(
                         width = tableViewsWidth,
                         name = "views",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.VIEWS) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.VIEWS) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.VIEWS) {
-                                sortKey = GetUrlsQuerySortBy.VIEWS
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.VIEWS)
                         }
                     ),
                     TableHeaderData(
@@ -593,16 +540,9 @@ fun UrlsScreen(
                         width = tableMaxViewsWidth,
                         name = "max views",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.MAX_VIEWS) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.MAX_VIEWS) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.MAX_VIEWS) {
-                                sortKey = GetUrlsQuerySortBy.MAX_VIEWS
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.MAX_VIEWS)
                         }
                     ),
                     TableHeaderData(
@@ -615,16 +555,9 @@ fun UrlsScreen(
                         width = tableCreatedWidth,
                         name = "created",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.CREATED_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.CREATED_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.CREATED_AT) {
-                                sortKey = GetUrlsQuerySortBy.CREATED_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.CREATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -637,16 +570,9 @@ fun UrlsScreen(
                         width = tableEnabledWidth,
                         name = "enabled",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUrlsQuerySortBy.ENABLED) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUrlsQuerySortBy.ENABLED) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUrlsQuerySortBy.ENABLED) {
-                                sortKey = GetUrlsQuerySortBy.ENABLED
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUrlsQuerySortBy.ENABLED)
                         },
                     ),
                     TableHeaderData(
@@ -661,7 +587,7 @@ fun UrlsScreen(
                     ),
                 )
 
-                val rows: List<TableRowData> = urls?.map { url ->
+                val rows: List<TableRowData> = state.urls?.map { url ->
                     TableRowData(
                         clickable = true,
                         cells = listOf(
@@ -672,11 +598,9 @@ fun UrlsScreen(
                                         color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
-                                            enabled = serverUrl != null,
+                                            enabled = state.serverUrl != null,
                                             onClick = {
-                                                val urlUrl = "${serverUrl}${urlsRoute}/${url.code}"
-
-                                                Logger.debug("UrlsScreen", "Opening URL: $urlUrl (serverUrl: $serverUrl, urlsRoute: $urlsRoute, url.code: ${url.code})")
+                                                val urlUrl = "${state.serverUrl}${urlsRoute}/${url.code}"
 
                                                 val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
                                                 context.startActivity(intent)
@@ -693,9 +617,9 @@ fun UrlsScreen(
                                         color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
-                                            enabled = serverUrl != null && !url.vanity.isNullOrBlank(),
+                                            enabled = state.serverUrl != null && !url.vanity.isNullOrBlank(),
                                             onClick = {
-                                                val urlUrl = "${serverUrl}${urlsRoute}/${url.vanity}"
+                                                val urlUrl = "${state.serverUrl}${urlsRoute}/${url.vanity}"
 
                                                 val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
                                                 context.startActivity(intent)
@@ -712,7 +636,7 @@ fun UrlsScreen(
                                         color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
-                                            enabled = serverUrl != null,
+                                            enabled = state.serverUrl != null,
                                             onClick = {
                                                 val intent = Intent(Intent.ACTION_VIEW, url.destination.toUri())
                                                 context.startActivity(intent)
@@ -770,7 +694,7 @@ fun UrlsScreen(
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
                                             coroutineScope.launch {
-                                                val urlUrl = "${serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
+                                                val urlUrl = "${state.serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
 
                                                 val clipData = ClipData.newRawUri("URL", urlUrl.toUri()).toClipEntry()
 
@@ -787,7 +711,7 @@ fun UrlsScreen(
                                                 )
                                             }
                                         },
-                                        enabled = !isLoading
+                                        enabled = !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -798,9 +722,9 @@ fun UrlsScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
-                                            qrCodeUrl = url
+                                            viewModel.setQrCodeUrl(url)
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = state.serverUrl != null && !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -810,8 +734,8 @@ fun UrlsScreen(
                                         iconContentDescription = "Edit URL",
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { editUrl = url },
-                                        enabled = serverUrl != null && !isLoading
+                                        onClick = { viewModel.setEditUrl(url) },
+                                        enabled = state.serverUrl != null && !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -822,9 +746,9 @@ fun UrlsScreen(
                                         color = MaterialTheme.colorScheme.error,
                                         iconColor = MaterialTheme.colorScheme.onError,
                                         onClick = {
-                                            deleteUrl = url
+                                            viewModel.setDeleteUrl(url)
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = state.serverUrl != null && !state.isLoading
                                     )
                                 },
                                 width = tableActionsWidth,
@@ -837,7 +761,7 @@ fun UrlsScreen(
                     modifier = Modifier.fillMaxSize(),
                     headers = headers,
                     rows = rows,
-                    loading = isLoading,
+                    loading = state.isLoading,
                     scrollbarConfig = TableScrollbarConfig(
                         vertical = ScrollbarConfig(
                             alwaysKeepScrollbar = true
@@ -859,7 +783,7 @@ fun UrlsScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (urls == null || isLoading) {
+                if (state.urls == null || state.isLoading) {
                     items(5) {
                         Box(
                             modifier = Modifier
@@ -875,21 +799,19 @@ fun UrlsScreen(
                         ) {}
                     }
                 } else {
-                    if (urls!!.size > 0L) {
-                        items(urls!!.size) { index ->
-                            val url = urls!![index]
+                    if (state.urls!!.size > 0L) {
+                        items(state.urls!!.size) { index ->
+                            val url = state.urls!![index]
 
                             LargeUrlDisplay(
                                 context = context,
                                 activity = activity,
                                 url = url,
-                                serverUrl = serverUrl,
+                                serverUrl = state.serverUrl,
                                 urlsRoute = urlsRoute,
-                                onDelete = { deleteUrl = url },
-                                onEdit = { editUrl = url },
-                                onShowQRCode = {
-                                    qrCodeUrl = url
-                                },
+                                onDelete = { viewModel.setDeleteUrl(url) },
+                                onEdit = { viewModel.setEditUrl(url) },
+                                onShowQRCode = { viewModel.setQrCodeUrl(url) },
                             )
                         }
                     } else {
@@ -928,29 +850,4 @@ fun UrlsScreen(
             }
         }
     }
-}
-
-private enum class GetUrlsQuerySortBy(val value: String) {
-    @SerializedName("code")
-    CODE("code"),
-
-    @SerializedName("vanity")
-    VANITY("vanity"),
-
-    @SerializedName("destination")
-    DESTINATION("destination"),
-
-    @SerializedName("views")
-    VIEWS("views"),
-
-    @SerializedName("maxViews")
-    MAX_VIEWS("maxViews"),
-
-    @SerializedName("createdAt")
-    CREATED_AT("createdAt"),
-
-    @SerializedName("enabled")
-    ENABLED("enabled");
-
-    override fun toString(): String = value
 }

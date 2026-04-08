@@ -106,6 +106,9 @@ import com.stefdp.zipline.screens.folders.components.MoveFolderPopup
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
+import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
@@ -342,16 +345,16 @@ fun FoldersScreen(
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
-        serverUrl = secureStore.get("serverUrl")
+        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
 
-        val fileDownloadFolder = secureStore.get("fileDownloadFolder")
+        val fileDownloadFolder = secureStore.get(STORAGE_FILE_DOWNLOAD_FOLDER_KEY)
 
         if (fileDownloadFolder != null) {
             selectedFileDownloadUri = fileDownloadFolder.toUri()
             selectedFileDownloadPath = getDisplayPath(fileDownloadFolder.toUri())
         }
 
-        val folderExportFolder = secureStore.get("folderExportDownloadFolder")
+        val folderExportFolder = secureStore.get(STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY)
 
         if (folderExportFolder != null) {
             selectedFolderExportUri = folderExportFolder.toUri()
@@ -626,7 +629,7 @@ fun FoldersScreen(
                 selectedFolderExportPath = getDisplayPath(it)
 
                 coroutineScope.launch {
-                    secureStore.set("folderExportDownloadFolder", selectedFolderExportUri.toString())
+                    secureStore.set(STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY, selectedFolderExportUri.toString())
                 }
 
                 folderToExport?.let { folder ->
@@ -637,7 +640,7 @@ fun FoldersScreen(
                 selectedFileDownloadPath = getDisplayPath(it)
 
                 coroutineScope.launch {
-                    secureStore.set("fileDownloadFolder", selectedFileDownloadUri.toString())
+                    secureStore.set(STORAGE_FILE_DOWNLOAD_FOLDER_KEY, selectedFileDownloadUri.toString())
                 }
 
                 fileToDownload?.let { file ->

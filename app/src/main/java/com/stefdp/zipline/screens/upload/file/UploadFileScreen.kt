@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -30,11 +29,9 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,13 +45,13 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
@@ -70,16 +67,12 @@ import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.FilesFormat
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
-import com.stefdp.zipline.network.requests.getFolders
-import com.stefdp.zipline.network.requests.uploadFile
-import com.stefdp.zipline.network.requests.uploadPartialFile
-import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.SettingsScreen
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.utils.DecimalRegex
 import com.stefdp.zipline.utils.FileUploadState
 import com.stefdp.zipline.utils.NumberRegex
@@ -90,7 +83,6 @@ import com.stefdp.zipline.utils.compressionFormats
 import com.stefdp.zipline.utils.copyUriToTempFile
 import com.stefdp.zipline.utils.deletesAtDates
 import com.stefdp.zipline.utils.formatBytes
-import com.stefdp.zipline.utils.formatSpeed
 import com.stefdp.zipline.utils.getFileInfo
 import com.stefdp.zipline.utils.getFolderPath
 import com.stefdp.zipline.utils.hasCameraPermission
@@ -100,7 +92,6 @@ import com.stefdp.zipline.utils.parseBytes
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import ir.ehsannarmani.compose_charts.extensions.format
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -109,7 +100,8 @@ fun UploadFileScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
-    sharedFiles: List<String>? = null
+    sharedFiles: List<String>? = null,
+    viewModel: UploadFileViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -119,9 +111,7 @@ fun UploadFileScreen(
         }
     }
 
-    var isUploading by remember { mutableStateOf(false) }
-
-    var folders by remember { mutableStateOf(emptyList<BaseFolder>()) }
+    val state by viewModel.state.collectAsState()
 
     val webSettings = LocalWebSettings.current
 
@@ -143,25 +133,10 @@ fun UploadFileScreen(
     val defaultNameFormat = webSettings?.config?.files?.defaultFormat ?: FilesFormat.RANDOM
     val defaultCompressionFormat = webSettings?.config?.files?.defaultCompressionFormat ?: UploadCompressionType.PNG
 
-    var fileStates by remember {
-        mutableStateOf<List<FileUploadState>>(
-            sharedFiles?.mapNotNull { uriString ->
-                val uri = uriString.toUri()
-                val fileInfo = getFileInfo(context, uri) ?: return@mapNotNull null
-
-                val fileName = fileInfo.first
-                val fileSize = fileInfo.second
-                val fileType = fileInfo.third
-
-                FileUploadState(
-                    file = SelectedFile(
-                        uri = uri,
-                        displayName = fileName,
-                        size = fileSize,
-                        type = fileType
-                    )
-                )
-            } ?: emptyList()
+    LaunchedEffect(Unit) {
+        viewModel.initData(
+            context = context,
+            sharedFiles = sharedFiles,
         )
     }
 
@@ -170,7 +145,7 @@ fun UploadFileScreen(
     ) { uris ->
         if (uris.isNotEmpty()) {
             val newFiles = uris.mapNotNull { uri ->
-                val fileExists = fileStates.find { it.file.uri == uri } != null
+                val fileExists = state.fileStates.find { it.file.uri == uri } != null
 
                 if (fileExists) return@mapNotNull null
 
@@ -200,19 +175,24 @@ fun UploadFileScreen(
                 }
             }
 
-            fileStates = fileStates + newFiles
+            viewModel.addFileStates(newFiles)
         }
     }
 
     LaunchedEffect(Unit) {
-        val foldersRes = getFolders(
+        viewModel.refreshFolders(
             context = context,
-            excludeFiles = true
+            onError = {
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                ) {
+                    Text(
+                        text = it
+                    )
+                }
+            }
         )
-
-        foldersRes.onSuccess {
-            folders = it
-        }
     }
 
     val clipboardManager = LocalClipboard.current
@@ -220,15 +200,12 @@ fun UploadFileScreen(
     val coroutineScope = rememberCoroutineScope()
 
     Popup(
-        showPopup = !isUploading && fileStates.any { it.status == UploadStatus.FAILED || it.status == UploadStatus.COMPLETE },
+        showPopup = !state.isUploading && state.fileStates.any { it.status == UploadStatus.FAILED || it.status == UploadStatus.COMPLETE },
         onDismissRequest = {
-            fileStates = fileStates.filter { it.status == UploadStatus.UPLOADING || it.status == UploadStatus.PENDING }
+            viewModel.clearFinishedFileStates()
         },
         scrollable = false,
     ) {
-        val successfulFiles by remember(fileStates) { mutableStateOf(fileStates.filter { it.status == UploadStatus.COMPLETE }) }
-        val failedFiles by remember(fileStates) { mutableStateOf(fileStates.filter { it.status == UploadStatus.FAILED }) }
-
         val lazyListState = rememberLazyListState()
 
         Text(
@@ -251,9 +228,9 @@ fun UploadFileScreen(
                 ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (successfulFiles.isNotEmpty()) {
-                items(successfulFiles.size) { index ->
-                    val fileState = successfulFiles[index]
+            if (state.successfulFiles.isNotEmpty()) {
+                items(state.successfulFiles.size) { index ->
+                    val fileState = state.successfulFiles[index]
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -319,9 +296,9 @@ fun UploadFileScreen(
                 }
             }
 
-            if (failedFiles.isNotEmpty()) {
-                items(failedFiles.size) { index ->
-                    val fileState = failedFiles[index]
+            if (state.failedFiles.isNotEmpty()) {
+                items(state.failedFiles.size) { index ->
+                    val fileState =state. failedFiles[index]
 
                     Text(
                         text = "${fileState.file.displayName} - ${fileState.errorMessage ?: "Unknown error"}",
@@ -369,22 +346,22 @@ fun UploadFileScreen(
                 return result
             }
 
-            var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
-
             val takePictureLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.TakePicture()
             ) { success ->
                 if (success) {
-                    tempCameraUri?.let { uri ->
+                    state.tempCameraUri?.let { uri ->
                         val cachedFile = copyUriToTempFile(context, uri, "camera_capture.jpg")
 
                         if (cachedFile != null) {
-                            fileStates += FileUploadState(
-                                file = SelectedFile(
-                                    uri = uri,
-                                    displayName = cachedFile.name,
-                                    size = cachedFile.length(),
-                                    type = context.contentResolver.getType(uri) ?: "application/octet-stream"
+                            viewModel.addFileStates(
+                                FileUploadState(
+                                    file = SelectedFile(
+                                        uri = uri,
+                                        displayName = cachedFile.name,
+                                        size = cachedFile.length(),
+                                        type = context.contentResolver.getType(uri) ?: "application/octet-stream"
+                                    )
                                 )
                             )
                         }
@@ -402,7 +379,7 @@ fun UploadFileScreen(
                     file
                 )
 
-                tempCameraUri = uri
+                viewModel.setTempCameraUri(uri)
                 takePictureLauncher.launch(uri)
             }
 
@@ -440,7 +417,7 @@ fun UploadFileScreen(
                 HeaderButton(
                     icon = painterResource(R.drawable.photo_camera),
                     contentDescription = "Take a picture",
-                    enabled = !isUploading,
+                    enabled = !state.isUploading,
                     onClick = { handleCameraButton() },
                     iconColor = MaterialTheme.colorScheme.primary
                 )
@@ -455,7 +432,7 @@ fun UploadFileScreen(
                     onClick = {
                         navController.navigate(FilesScreen())
                     },
-                    enabled = !isUploading,
+                    enabled = !state.isUploading,
                 )
             }
         }
@@ -478,7 +455,7 @@ fun UploadFileScreen(
                 modifier = Modifier
                     .horizontalLazyScrollbar(lazyListState)
             ) {
-                val validFilesStates = fileStates.filter { it.status == UploadStatus.UPLOADING || it.status == UploadStatus.PENDING || it.status == UploadStatus.FAILED }
+                val validFilesStates = state.fileStates.filter { it.status == UploadStatus.UPLOADING || it.status == UploadStatus.PENDING || it.status == UploadStatus.FAILED }
 
                 items(validFilesStates.size) { index ->
                     val fileState = validFilesStates[index]
@@ -490,9 +467,9 @@ fun UploadFileScreen(
                             .padding(10.dp)
                             .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
                         onClick = {
-                            fileStates = fileStates.filter { it != fileState }
+                            viewModel.removeFileState(fileState)
                         },
-                        clickEnabled = !isUploading
+                        clickEnabled = !state.isUploading
                     )
                 }
             }
@@ -518,7 +495,7 @@ fun UploadFileScreen(
 
         Button(
             onClick = { filePicker.launch(arrayOf("*/*")) },
-            enabled = !isUploading,
+            enabled = !state.isUploading,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
@@ -531,17 +508,6 @@ fun UploadFileScreen(
         )
 
         val scrollState = rememberScrollState()
-
-        var selectedDeletesAt by remember { mutableStateOf(setOf("default")) }
-        var selectedNameFormat by remember { mutableStateOf(setOf("default")) }
-        var selectedCompressionFormat by remember { mutableStateOf(setOf("default")) }
-        var compressionPercentage by remember { mutableStateOf(TextFieldValue("")) }
-        var maxViews by remember { mutableStateOf(TextFieldValue("")) }
-        var selectedFolder by remember { mutableStateOf(setOf("default")) }
-        var selectedOverrideDomain by remember { mutableStateOf(setOf("default")) }
-        var overrideFileName by remember { mutableStateOf(TextFieldValue("")) }
-        var password by remember { mutableStateOf(TextFieldValue("")) }
-        var addOriginalName by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -633,10 +599,10 @@ fun UploadFileScreen(
                     )
                 },
                 onSelectionChange = {
-                    selectedDeletesAt = it
+                    viewModel.setSelectedDeletesAt(it)
                 },
-                selectedIds = selectedDeletesAt,
-                enabled = !isUploading
+                selectedIds = state.selectedDeletesAt,
+                enabled = !state.isUploading
             )
 
             SelectSpacer()
@@ -672,9 +638,11 @@ fun UploadFileScreen(
                         }
                     )
                 },
-                onSelectionChange = { selectedNameFormat = it },
-                selectedIds = selectedNameFormat,
-                enabled = !isUploading
+                onSelectionChange = {
+                    viewModel.setSelectedNameFormat(it)
+                },
+                selectedIds = state.selectedNameFormat,
+                enabled = !state.isUploading
             )
 
             SelectSpacer()
@@ -733,19 +701,21 @@ fun UploadFileScreen(
                         }
                     )
                 },
-                onSelectionChange = { selectedCompressionFormat = it },
-                selectedIds = selectedCompressionFormat,
-                enabled = !isUploading
+                onSelectionChange = {
+                    viewModel.setSelectedCompressionFormat(it)
+                },
+                selectedIds = state.selectedCompressionFormat,
+                enabled = !state.isUploading
             )
 
             TextSpacer()
 
             TextInput(
-                value = compressionPercentage,
+                value = state.compressionPercentage,
                 description = "The compression level to use on images (only). The above format will be used to compress images. Leave blank to disable compression.",
                 onValueChange = {
                     if (DecimalRegex.matches(it.text) || it.text.isEmpty()) {
-                        compressionPercentage = it
+                        viewModel.setCompressionPercentage(it)
                     }
                 },
                 label = "Compression Percent",
@@ -753,17 +723,17 @@ fun UploadFileScreen(
                     keyboardType = KeyboardType.Decimal
                 ),
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isUploading
+                enabled = !state.isUploading
             )
 
             TextSpacer()
 
             TextInput(
-                value = maxViews,
+                value = state.maxViews,
                 description = "The maximum number of views the files can have before they are deleted. Leave blank to allow as many views as you want.",
                 onValueChange = {
                     if (NumberRegex.matches(it.text) || it.text.isEmpty()) {
-                        maxViews = it
+                        viewModel.setMaxViews(it)
                     }
                 },
                 label = "Max Views",
@@ -771,7 +741,7 @@ fun UploadFileScreen(
                     keyboardType = KeyboardType.Number
                 ),
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isUploading
+                enabled = !state.isUploading
             )
 
             SelectSpacer()
@@ -786,12 +756,12 @@ fun UploadFileScreen(
                             Text("/ (Root)")
                         }
                     )
-                ) + folders.map { folder ->
+                ) + state.folders.map { folder ->
                     SelectOption(
                         id = folder.id,
                         label = { enabled ->
                             Text(
-                                text = getFolderPath(folder, folders),
+                                text = getFolderPath(folder, state.folders),
                                 color = if (enabled)
                                     MaterialTheme.colorScheme.onBackground
                                 else
@@ -800,9 +770,11 @@ fun UploadFileScreen(
                         }
                     )
                 },
-                onSelectionChange = { selectedFolder = it },
-                selectedIds = selectedFolder,
-                enabled = !isUploading
+                onSelectionChange = {
+                    viewModel.setSelectedFolder(it)
+                },
+                selectedIds = state.selectedFolder,
+                enabled = !state.isUploading
             )
 
             SelectSpacer()
@@ -832,46 +804,50 @@ fun UploadFileScreen(
                         }
                     )
                 },
-                onSelectionChange = { selectedOverrideDomain = it },
-                selectedIds = selectedOverrideDomain,
-                enabled = !isUploading
+                onSelectionChange = {
+                    viewModel.setSelectedOverrideDomain(it)
+                },
+                selectedIds = state.selectedOverrideDomain,
+                enabled = !state.isUploading
             )
 
             TextSpacer()
 
             TextInput(
-                value = overrideFileName,
+                value = state.overrideFileName,
                 description = "Override the file name with this value. Leave blank to use the \"Name Format\" option. This value is ignored if you are uploading more than one file. This value is not saved to your browser, and is cleared after uploading.",
                 onValueChange = {
-                    overrideFileName = it
+                    viewModel.setOverrideFileName(it)
                 },
                 label = "Override File Name",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isUploading
+                enabled = !state.isUploading
             )
 
             TextSpacer()
 
             TextInput(
-                value = password,
+                value = state.password,
                 description = "Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading.",
                 onValueChange = {
-                    password = it
+                    viewModel.setPassword(it)
                 },
                 label = "Password",
                 isPassword = true,
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isUploading
+                enabled = !state.isUploading
             )
 
             TextSpacer()
 
             Switch(
-                checked = addOriginalName,
-                onCheckedChange = { addOriginalName = it },
+                checked = state.addOriginalName,
+                onCheckedChange = {
+                    viewModel.setAddOriginalName(it)
+                },
                 label = "Add Original Name",
                 description = "Add the original file name, so that the file can be downloaded with the original name. This will still use the \"Name Format\" option for its file name.",
-                enabled = !isUploading
+                enabled = !state.isUploading
             )
         }
 
@@ -879,7 +855,7 @@ fun UploadFileScreen(
             modifier = Modifier.height(8.dp)
         )
 
-        val uploadingFile = fileStates.find { it.status == UploadStatus.UPLOADING }
+        val uploadingFile = state.fileStates.find { it.status == UploadStatus.UPLOADING }
 
         if (uploadingFile != null) {
             Text(
@@ -903,196 +879,25 @@ fun UploadFileScreen(
 
         Button(
             onClick = {
-                coroutineScope.launch(Dispatchers.IO) {
-                    isUploading = true
-
-                    val totalFiles = fileStates.size
-
-                    for (index in fileStates.indices) {
-                        val state = fileStates[index]
-
-                        if (state.status == UploadStatus.COMPLETE) {
-                            continue
-                        }
-
-                        fileStates = fileStates.toMutableList().also {
-                            it[index] = state.copy(
-                                status = UploadStatus.UPLOADING,
-                                progressPercent = 0f,
-                                speedText = "",
-                                bytesTransferred = 0,
-                                errorMessage = null,
-                            )
-                        }
-
-                        val tempFile = copyUriToTempFile(
-                            context = context,
-                            uri = state.file.uri,
-                            displayName = state.file.displayName
-                        )
-
-                        if (tempFile == null) {
-                            fileStates = fileStates.toMutableList().also {
-                                it[index] = state.copy(
-                                    status = UploadStatus.FAILED,
-                                    errorMessage = "Failed to read file",
-                                )
-                            }
-
-                            continue
-                        }
-
-                        val fileExtension = state.file.displayName.substringAfterLast('.', "")
-
-                        val deletesAt = selectedDeletesAt.firstOrNull().takeIf { it != "default" } ?: defaultDeletesAtDate
-
-                        val nameFormat = if (selectedNameFormat.firstOrNull() == "default")
-                            defaultNameFormat
-                        else
-                            nameFormats.firstOrNull {
-                                it.first.toString() == selectedNameFormat.firstOrNull()
-                            }?.first ?: defaultNameFormat
-
-                        val compressionType = if (selectedCompressionFormat.firstOrNull() == "default")
-                            defaultCompressionFormat
-                        else
-                            compressionFormats.firstOrNull {
-                                it.first.toString() == selectedCompressionFormat.firstOrNull()
-                            }?.first ?: defaultCompressionFormat
-
-                        val folder = if (selectedFolder.firstOrNull() == "default")
-                            null
-                        else
-                            folders.firstOrNull {
-                                it.id == selectedFolder.firstOrNull()
-                            }?.id
-
-                        val overrideDomain = if (selectedOverrideDomain.firstOrNull() == "default")
-                            null
-                        else
-                            domains.firstOrNull {
-                                it == selectedOverrideDomain.firstOrNull()
-                            }
-
-                        if (chunksEnabled && tempFile.length() >= maxChunkSize) {
-                            val uploadPartialFileResult = uploadPartialFile(
-                                context = context,
-                                filePath = tempFile.absolutePath,
-                                filename = overrideFileName.text.takeIf { it.isNotBlank() },
-                                fileExtension = fileExtension,
-                                chunkSize = chunkSize,
-                                originalName = if (addOriginalName) state.file.displayName else null,
-                                deletesAt = deletesAt,
-                                format = nameFormat,
-                                maxViews = maxViews.text.toLongOrNull(),
-                                folder = folder,
-                                domain = overrideDomain,
-                                password = password.text.takeIf { it.isNotBlank() },
-                                imageCompressionType = compressionType,
-                                imageCompressionPercent = compressionPercentage.text.toFloatOrNull()?.coerceIn(0f, 100f),
-                                notificationTitle = "Uploading (${index + 1}/$totalFiles)",
-                                notificationContent = state.file.displayName,
-                                onProgress = { total, transferred, speed ->
-                                    val totalFloat = total.toFloat()
-                                    val transferredFloat = transferred.toFloat()
-
-                                    val percent = if (totalFloat > 0f) ((transferredFloat * 100f) / total) else 0f
-
-                                    fileStates = fileStates.toMutableList().also {
-                                        it[index] = it[index].copy(
-                                            progressPercent = percent,
-                                            speedText = formatSpeed(speed),
-                                            bytesTransferred = transferred
-                                        )
-                                    }
-                                },
-                            )
-
-                            uploadPartialFileResult
-                                .onSuccess { response ->
-                                    fileStates = fileStates.toMutableList().also {
-                                        it[index] = it[index].copy(
-                                            status = UploadStatus.COMPLETE,
-                                            progressPercent = 100f,
-                                            url = response.files.first().url
-                                        )
-                                    }
-                                }
-                                .onFailure { error ->
-                                    fileStates = fileStates.toMutableList().also {
-                                        it[index] = it[index].copy(
-                                            status = UploadStatus.FAILED,
-                                            errorMessage = error.message,
-                                        )
-                                    }
-                                }
-                        } else {
-                            val uploadFileResult = uploadFile(
-                                context = context,
-                                filePath = tempFile.absolutePath,
-                                filename = overrideFileName.text.takeIf { it.isNotBlank() },
-                                fileExtension = fileExtension,
-                                originalName = if (addOriginalName) state.file.displayName else null,
-                                deletesAt = deletesAt,
-                                format = nameFormat,
-                                maxViews = maxViews.text.toLongOrNull(),
-                                folder = folder,
-                                domain = overrideDomain,
-                                password = password.text.takeIf { it.isNotBlank() },
-                                imageCompressionType = compressionType,
-                                imageCompressionPercent = compressionPercentage.text.toFloatOrNull()?.coerceIn(0f, 100f),
-                                notificationTitle = "Uploading (${index + 1}/$totalFiles)",
-                                notificationContent = state.file.displayName,
-                                onProgress = { total, transferred, speed ->
-                                    val totalFloat = total.toFloat()
-                                    val transferredFloat = transferred.toFloat()
-
-                                    val percent = if (totalFloat > 0f) ((transferredFloat * 100f) / total) else 0f
-
-                                    fileStates = fileStates.toMutableList().also {
-                                        it[index] = it[index].copy(
-                                            progressPercent = percent,
-                                            speedText = formatSpeed(speed),
-                                            bytesTransferred = transferred,
-                                        )
-                                    }
-                                },
-                            )
-
-                            uploadFileResult
-                                .onSuccess { response ->
-                                    fileStates = fileStates.toMutableList().also {
-                                        it[index] = it[index].copy(
-                                            status = UploadStatus.COMPLETE,
-                                            progressPercent = 100f,
-                                            url = response.files.first().url
-                                        )
-                                    }
-                                }
-                                .onFailure { error ->
-                                    fileStates = fileStates.toMutableList().also {
-                                        it[index] = it[index].copy(
-                                            status = UploadStatus.FAILED,
-                                            errorMessage = error.message,
-                                        )
-                                    }
-                                }
-                        }
-
-                        tempFile.delete()
-                    }
-
-                    isUploading = false
-                }
+                viewModel.upload(
+                    context = context,
+                    defaultNameFormat = defaultNameFormat,
+                    defaultCompressionFormat = defaultCompressionFormat,
+                    domains = domains,
+                    defaultDeletesAtDate = defaultDeletesAtDate,
+                    chunksEnabled = chunksEnabled,
+                    maxChunkSize = maxChunkSize,
+                    chunkSize = chunkSize,
+                )
             },
-            enabled = !isUploading && fileStates.any { it.status == UploadStatus.PENDING || it.status == UploadStatus.FAILED },
+            enabled = !state.isUploading && state.fileStates.any { it.status == UploadStatus.PENDING || it.status == UploadStatus.FAILED },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = if (uploadingFile != null && isUploading)
+                text = if (uploadingFile != null && state.isUploading)
                     "Uploading... ${uploadingFile.progressPercent.toDouble().format(1)}%"
                 else
-                    "Upload ${if (fileStates.size > 1) "${fileStates.size} files" else "file"}",
+                    "Upload ${if (state.fileStates.size > 1) "${state.fileStates.size} files" else "file"}",
             )
         }
     }

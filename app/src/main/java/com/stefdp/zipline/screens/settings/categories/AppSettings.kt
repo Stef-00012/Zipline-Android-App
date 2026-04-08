@@ -59,9 +59,16 @@ import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
 import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
 import com.stefdp.zipline.screens.LoginScreen
+import com.stefdp.zipline.screens.settings.SettingsUiState
+import com.stefdp.zipline.screens.settings.SettingsViewModel
+import com.stefdp.zipline.screens.settings.UpdateDownloadFolderType
 import com.stefdp.zipline.screens.settings.categories.components.VersionDisplay
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.utils.STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_EXPORT_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
@@ -81,7 +88,9 @@ internal fun AppSettingsCategory(
     requestNotificationPermission: () -> Unit,
     isLoading: Boolean,
     title: String,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: SettingsViewModel,
+    state: SettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -152,20 +161,8 @@ internal fun AppSettingsCategory(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) {}
 
-            var unlockWithBiometrics by remember { mutableStateOf(false) }
-
-            val coroutineScope = rememberCoroutineScope()
-
-            LaunchedEffect(Unit) {
-                coroutineScope.launch {
-                    val secureStore = SecureStorage.getInstance(context)
-
-                    unlockWithBiometrics = secureStore.get("unlockWithBiometrics")?.toBoolean() ?: false
-                }
-            }
-
             Switch(
-                checked = unlockWithBiometrics,
+                checked = state.biometricAuthenticationEnabled,
                 enabled = !isLoading && (
                         biometricAuthenticationStatus == BiometricManager.BIOMETRIC_SUCCESS || (
                                 biometricAuthenticationStatus == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED &&
@@ -176,13 +173,10 @@ internal fun AppSettingsCategory(
                     val biometricPrompt = createBiometricPrompt(
                         activity = activity,
                         onSuccess = {
-                            coroutineScope.launch {
-                                val secureStore = SecureStorage.getInstance(context)
-
-                                unlockWithBiometrics = checked
-
-                                secureStore.set("unlockWithBiometrics", unlockWithBiometrics.toString())
-                            }
+                            viewModel.setBiometricAuthenticationEnabled(
+                                context = context,
+                                enabled = checked
+                            )
                         },
                         onError = { _, _ ->
                             Notification.show(
@@ -234,28 +228,20 @@ internal fun AppSettingsCategory(
 //                )
             )
 
-            var updateDownloadFolderType by remember { mutableStateOf(UpdateDownloadFolderType.FILE) }
-
             val directoryPicker = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocumentTree()
             ) { uri: Uri? ->
                 uri?.let {
-                    val secureStore = SecureStorage.getInstance(context)
-
                     context.contentResolver.takePersistableUriPermission(
                         it,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
 
-                    coroutineScope.launch {
-                        when (updateDownloadFolderType) {
-                            UpdateDownloadFolderType.EXPORT -> secureStore.set("exportDownloadFolder", it.toString())
-                            UpdateDownloadFolderType.SERVER_EXPORT -> secureStore.set("adminExportDownloadFolder", it.toString())
-                            UpdateDownloadFolderType.FILE -> secureStore.set("fileDownloadFolder", it.toString())
-                            UpdateDownloadFolderType.FOLDER_EXPORT -> secureStore.set("folderExportDownloadFolder", it.toString())
-                        }
-                    }
+                    viewModel.updateDownloadFolder(
+                        context = context,
+                        uri = it
+                    )
                 }
             }
 
@@ -282,7 +268,7 @@ internal fun AppSettingsCategory(
                         disabledContainerColor = DarkGray.copy(alpha = 0.5f)
                     ),
                     onClick = {
-                        updateDownloadFolderType = UpdateDownloadFolderType.EXPORT
+                        viewModel.setUpdateDownloadFolderType(UpdateDownloadFolderType.EXPORT)
 
                         directoryPicker.launch(null)
                     },
@@ -299,7 +285,7 @@ internal fun AppSettingsCategory(
                         disabledContainerColor = DarkGray.copy(alpha = 0.5f)
                     ),
                     onClick = {
-                        updateDownloadFolderType = UpdateDownloadFolderType.FILE
+                        viewModel.setUpdateDownloadFolderType(UpdateDownloadFolderType.FILE)
 
                         directoryPicker.launch(null)
                     }
@@ -316,7 +302,7 @@ internal fun AppSettingsCategory(
                         disabledContainerColor = DarkGray.copy(alpha = 0.5f)
                     ),
                     onClick = {
-                        updateDownloadFolderType = UpdateDownloadFolderType.FOLDER_EXPORT
+                        viewModel.setUpdateDownloadFolderType(UpdateDownloadFolderType.FOLDER_EXPORT)
 
                         directoryPicker.launch(null)
                     }
@@ -334,7 +320,7 @@ internal fun AppSettingsCategory(
                             disabledContainerColor = DarkGray.copy(alpha = 0.5f)
                         ),
                         onClick = {
-                            updateDownloadFolderType = UpdateDownloadFolderType.SERVER_EXPORT
+                            viewModel.setUpdateDownloadFolderType(UpdateDownloadFolderType.SERVER_EXPORT)
 
                             directoryPicker.launch(null)
                         }
@@ -354,18 +340,11 @@ internal fun AppSettingsCategory(
                         disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
                     ),
                     onClick = {
-                        coroutineScope.launch {
-                            val secureStore = SecureStorage.getInstance(context)
-
-                            secureStore.del("token")
-                            secureStore.del("serverUrl")
-
-                            localUpdateLoggedUser()
-
-                            navController.navigate(LoginScreen) {
-                                popUpTo(navController.graph.id) { inclusive = true }
-                            }
-                        }
+                        viewModel.logout(
+                            context = context,
+                            navController = navController,
+                            localUpdateLoggedUser = localUpdateLoggedUser
+                        )
                     }
                 ) {
                     Text(
@@ -375,11 +354,4 @@ internal fun AppSettingsCategory(
             }
         }
     }
-}
-
-private enum class UpdateDownloadFolderType {
-    EXPORT,
-    SERVER_EXPORT,
-    FILE,
-    FOLDER_EXPORT
 }

@@ -7,7 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import android.util.Base64
 
-val Context.dataStore by preferencesDataStore(name = "hackatime_settings")
+val Context.dataStore by preferencesDataStore(name = "zipline_settings")
 
 class SecureStorage private constructor(context: Context) {
      private val dataStore = context.applicationContext.dataStore

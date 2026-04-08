@@ -29,6 +29,7 @@ import com.stefdp.zipline.isShareIntent
 import com.stefdp.zipline.screens.BiometricAuthScreen
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
+import com.stefdp.zipline.utils.STORAGE_UNLOCK_WITH_BIOMETRICS_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.getBiometricStatus
 import com.stefdp.zipline.utils.minimumZiplineVersion
@@ -51,7 +52,7 @@ fun LoadingScreen(
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
-        val unlockWithBiometrics = secureStore.get("unlockWithBiometrics")?.toBoolean() ?: false
+        val unlockWithBiometrics = secureStore.get(STORAGE_UNLOCK_WITH_BIOMETRICS_KEY)?.toBoolean() ?: false
         val biometricAuthenticationStatus = getBiometricStatus(context)
 
         val serverVersionRes = updateServerVersion()

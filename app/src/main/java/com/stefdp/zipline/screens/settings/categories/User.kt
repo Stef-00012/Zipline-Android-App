@@ -33,11 +33,14 @@ import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
+import com.stefdp.zipline.screens.settings.SettingsUiState
+import com.stefdp.zipline.screens.settings.SettingsViewModel
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
 import com.stefdp.zipline.utils.promptBiometricAuthentication
 import com.stefdp.zipline.utils.shimmerable
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -47,12 +50,10 @@ internal fun UserCategory(
     context: Context,
     activity: FragmentActivity,
     user: User?,
-    token: String?,
-    updateUser: suspend (UpdateCurrentUserBody) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateUser: (UpdateCurrentUserBody) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: SettingsViewModel,
+    state: SettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -82,38 +83,9 @@ internal fun UserCategory(
                 )
             }
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var tokenInput by remember(token, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(token ?: ""))
-            }
-
             val clipboardManager = LocalClipboard.current
 
             val coroutineScope = rememberCoroutineScope()
-
-            var biometricAuthenticationEnabled by remember { mutableStateOf(false) }
-
-            LaunchedEffect(Unit) {
-                coroutineScope.launch {
-                    val secureStore = SecureStorage.getInstance(context)
-
-                    biometricAuthenticationEnabled = secureStore.get("unlockWithBiometrics").toBoolean()
-                }
-            }
 
             suspend fun promptBiometrics(): Boolean = suspendCancellableCoroutine { continuation ->
                 val biometricPrompt = createBiometricPrompt(
@@ -146,14 +118,14 @@ internal fun UserCategory(
             }
 
             TextInput(
-                value = tokenInput,
+                value = state.tokenInput,
                 onValueChange = {},
                 readOnly = true,
                 label = "Token",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 isPassword = true,
                 onPasswordToggle = suspend { isCurrentlyVisible ->
-                    return@TextInput if (isCurrentlyVisible || !biometricAuthenticationEnabled)
+                    return@TextInput if (isCurrentlyVisible || !state.biometricAuthenticationEnabled)
                         true
                     else
                         promptBiometrics()
@@ -163,7 +135,7 @@ internal fun UserCategory(
                 leadingIcon = painterResource(R.drawable.content_copy),
                 onLeadingIconPress = {
                     coroutineScope.launch {
-                        val proceed = if (biometricAuthenticationEnabled) {
+                        val proceed = if (state.biometricAuthenticationEnabled) {
                             promptBiometrics()
                         } else {
                             true
@@ -171,7 +143,7 @@ internal fun UserCategory(
 
                         if (!proceed) return@launch
 
-                        val clipData = ClipData.newPlainText("User Token", tokenInput.text).toClipEntry()
+                        val clipData = ClipData.newPlainText("User Token", state.tokenInput.text).toClipEntry()
 
                         clipboardManager.setClipEntry(clipData)
 
@@ -188,29 +160,25 @@ internal fun UserCategory(
                 }
             )
 
-            var username by remember(user?.username, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(user?.username ?: ""))
-            }
-
             TextInput(
-                value = username,
-                onValueChange = { username = it },
+                value = state.usernameInput,
+                onValueChange = {
+                    viewModel.setUsernameInput(it)
+                },
                 label = "Username",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var password by remember {
-                mutableStateOf(TextFieldValue(""))
-            }
-
             TextInput(
-                value = password,
-                onValueChange = { password = it },
+                value = state.passwordInput,
+                onValueChange = {
+                    viewModel.setPasswordInput(it)
+                },
                 label = "Password",
                 description = "Leave blank to keep the same password.",
                 isPassword = true,
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -218,23 +186,15 @@ internal fun UserCategory(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     coroutineScope.launch {
-                        setLoading(true)
-
                         val data = UpdateCurrentUserBody(
-                            password = password.text.takeIf { it.isNotEmpty() },
-                            username = username.text.takeIf { it.isNotEmpty() },
+                            password = state.passwordInput.text.takeIf { it.isNotEmpty() },
+                            username = state.usernameInput.text.takeIf { it.isNotEmpty() && it != user?.username },
                         )
 
-
-
-                        val updateUserErrors = updateUser(data)
-
-                        errors = updateUserErrors
-
-                        setLoading(false)
+                        updateUser(data)
                     }
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

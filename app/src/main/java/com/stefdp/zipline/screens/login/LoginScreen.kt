@@ -59,6 +59,8 @@ import com.stefdp.zipline.screens.*
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
 import com.stefdp.zipline.utils.DomainRegex
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
+import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.hasNotificationsPermission
 import com.stefdp.zipline.utils.minimumZiplineVersion
@@ -303,10 +305,10 @@ fun LoginScreen(
 
                             val secureStore = SecureStorage.getInstance(context)
 
-                            secureStore.set("serverUrl", serverUrl.text.lowercase())
+                            secureStore.set(STORAGE_SERVER_URL_KEY, serverUrl.text.lowercase())
 
                             if (isTokenLogin) {
-                                secureStore.set("token", token.text)
+                                secureStore.set(STORAGE_TOKEN_KEY, token.text)
                             } else {
                                 val loginRes = login(
                                     context = context,
@@ -337,7 +339,7 @@ fun LoginScreen(
                                                         return@launch
                                                     }
 
-                                                    secureStore.set("token", tokenData.token)
+                                                    secureStore.set(STORAGE_TOKEN_KEY, tokenData.token)
                                                 }
                                                 .onFailure { error ->
                                                     errorMessage = "Failed to fetch user token, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"

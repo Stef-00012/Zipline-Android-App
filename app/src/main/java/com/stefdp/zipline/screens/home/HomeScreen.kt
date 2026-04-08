@@ -57,6 +57,7 @@ import com.stefdp.zipline.network.requests.getRecentFiles
 import com.stefdp.zipline.network.requests.getStats
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.home.components.Stat
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.horizontalLazyScrollbar
@@ -89,7 +90,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
-        serverUrl = secureStore.get("serverUrl")
+        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
     }
 
     var userStats by remember { mutableStateOf<GetStatsResponse?>(null) }

@@ -38,8 +38,8 @@ object Notification {
     fun show(
         context: Context,
         activity: FragmentActivity,
+        duration: Long = 3000L,
         content: @Composable () -> Unit,
-        duration: Long = 3000L
     ) {
         CoroutineScope(Dispatchers.Main).launch {
             showInternal(context, activity, content, duration)

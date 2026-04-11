@@ -94,7 +94,7 @@ private fun StatDifference(
     infinite: Boolean = false,
     loading: Boolean = false
 ) {
-    val diff = if (infinite) "∞" else "${difference.format(2)}%"
+    val diff = if (infinite) "∞" else difference.format(2)
 
     val color = when {
         difference > 0 -> Color.Green

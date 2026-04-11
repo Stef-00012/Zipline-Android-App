@@ -191,7 +191,7 @@ fun VersionDisplay(
                     )
 
                     Text(
-                        text = versionData?.version?.sha ?: "0000000",
+                        text = versionData?.version?.sha?.take(7) ?: "0000000",
                         color = MaterialTheme.colorScheme.tertiary,
                         textDecoration = TextDecoration.Underline,
                         modifier = Modifier.clickable(
@@ -271,7 +271,7 @@ fun VersionDisplay(
                         )
 
                         Text(
-                            text = versionData.latest.commit.sha.slice(0..7),
+                            text = "test" + versionData.latest.commit.sha.take(7),
                             color = MaterialTheme.colorScheme.tertiary,
                             textDecoration = TextDecoration.Underline,
                             modifier = Modifier.clickable(

@@ -138,6 +138,7 @@ fun ColorPicker(
                         onClick = {
                             pickerColor = colorHash(automaticColorText ?: "")
                             value = TextFieldValue(pickerColor.toHex(alpha))
+                            onColorChange(pickerColor)
                         }
                     )
             ) {

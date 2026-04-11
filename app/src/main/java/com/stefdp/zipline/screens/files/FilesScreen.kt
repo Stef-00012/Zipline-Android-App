@@ -35,11 +35,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
@@ -87,8 +89,6 @@ import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.components.table.TableScrollbarConfig
 import com.stefdp.zipline.network.models.File
-import com.stefdp.zipline.network.models.IncompleteFile
-import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
@@ -102,7 +102,6 @@ import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.UploadFileScreen
 import com.stefdp.zipline.components.IconButton
-import com.stefdp.zipline.components.OutlinedButton
 import com.stefdp.zipline.screens.files.components.PendingFile
 import com.stefdp.zipline.screens.files.components.tags.TagsPopup
 import com.stefdp.zipline.ui.theme.DarkGray
@@ -131,19 +130,20 @@ const val DETAILED_VIEW_FILE_COUNT = 15L
 
 const val VIEW_STATE_KEY = "filesViewState"
 
+internal val validRoles = listOf(
+    UserRole.ADMIN,
+    UserRole.SUPERADMIN
+)
+
 @Composable
 fun FilesScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
-    userId: String? = null
+    userId: String? = null,
+    viewModel: FilesViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
-
-    val validRoles = listOf(
-        UserRole.ADMIN,
-        UserRole.SUPERADMIN
-    )
 
     if (localLoggedUser == null) {
         navController.navigate(LoginScreen) {
@@ -157,145 +157,61 @@ fun FilesScreen(
         }
     }
 
-    var username by remember { mutableStateOf<String?>(null) }
-    var files by remember { mutableStateOf<List<File>?>(null) }
-
-    var incompleteFiles by remember { mutableStateOf<List<IncompleteFile>?>(null) }
-
-    var tags by remember { mutableStateOf<List<Tag>?>(null) }
-
-    var serverUrl by remember { mutableStateOf<String?>(null) }
-
-    var isLoading by remember { mutableStateOf(true) }
-    var tagsLoading by remember { mutableStateOf(true) }
-
-    var manageTagsPopupOpen by remember { mutableStateOf(false) }
-    var pendingFilesPopupOpen by remember { mutableStateOf(false) }
-
-    var favoriteFilter by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsState()
 
     val screenViewState = LocalScreenViewState.current
     val updateScreenViewState = LocalUpdateScreenViewState.current
 
     val viewState = screenViewState.files
 
-    var currentPage by remember { mutableLongStateOf(1L) }
-    var totalPages by remember { mutableLongStateOf(1L) }
-
     val filesPerPage = if (viewState == ZiplineViewStateType.COMPACT) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
 
-    var sortKey by remember { mutableStateOf(GetFilesQuerySortBy.CREATED_AT) }
-    var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
     val defaultSortOrder = SortOrder.UNSPECIFIED
-    
-    var searchKey by remember { mutableStateOf<GetFilesQuerySearchField?>(null) }
-    var searchValue by remember { mutableStateOf(TextFieldValue("")) }
 
     suspend fun updateFiles() {
-        isLoading = true
-
-        if (userId != null && localLoggedUser?.role in validRoles) {
-            val userRes = getUser(
-                context = context,
-                userId = userId,
-            )
-
-            userRes.onSuccess {
-                username = it.username
-
-                if (!canInteract(localLoggedUser?.role, it.role)) {
-                    navController.navigate(HomeScreen) {
-                        popUpTo(HomeScreen) { inclusive = true }
-                    }
-
-                    return@updateFiles
+        viewModel.refreshFiles(
+            context = context,
+            filesPerPage = filesPerPage,
+            userId = userId,
+            currentUserRole = localLoggedUser?.role,
+            onUnauthorized = {
+                navController.navigate(HomeScreen) {
+                    popUpTo(HomeScreen) { inclusive = true }
                 }
             }
-
-            val userFilesRes = getFiles(
-                context = context,
-                userId = userId,
-                perPage = filesPerPage,
-                page = currentPage,
-                filterFavorite = favoriteFilter,
-                sortOrder = sortOrder,
-                sortBy = sortKey,
-                searchField = searchKey,
-                searchQuery = searchValue.text.ifEmpty { null }
-            )
-
-            userFilesRes.onSuccess {
-                files = it.page
-                totalPages = it.pages ?: 1L
-            }
-        } else {
-            val userFilesRes = getFiles(
-                context = context,
-                perPage = filesPerPage,
-                page = currentPage,
-                filterFavorite = favoriteFilter,
-                sortOrder = sortOrder,
-                sortBy = sortKey,
-                searchField = searchKey,
-                searchQuery = searchValue.text.ifEmpty { null }
-            )
-
-            userFilesRes.onSuccess {
-                files = it.page
-                totalPages = it.pages ?: 1L
-            }
-        }
-
-        isLoading = false
+        )
     }
 
     suspend fun updateIncompleteFiles() {
-        val incompleteFilesRes = getIncompleteFiles(
-            context = context,
-        )
-
-        incompleteFilesRes.onSuccess {
-            incompleteFiles = it
-        }
+        viewModel.refreshIncompleteFiles(context)
     }
 
     suspend fun updateTags() {
-        tagsLoading = true
-
-        val tagsRes = getTags(
-            context = context,
-        )
-
-        tagsRes.onSuccess {
-            tags = it
-        }
-
-        tagsLoading = false
+        viewModel.refreshTags(context)
     }
 
     LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+        viewModel.initData(context)
 
         updateIncompleteFiles()
         updateTags()
     }
 
     TagsPopup(
-        showPopup = manageTagsPopupOpen,
+        showPopup = state.manageTagsPopupOpen,
         onDismissRequest = {
-            manageTagsPopupOpen = false
+            viewModel.closeManageTagsPopup()
         },
-        tags = tags ?: emptyList(),
-        updateTags = ::updateTags,
         context = context,
-        activity = activity
+        activity = activity,
+        viewModel = viewModel,
+        state = state
     )
 
     Popup(
-        showPopup = pendingFilesPopupOpen,
+        showPopup = state.pendingFilesPopupOpen,
         onDismissRequest = {
-            pendingFilesPopupOpen = false
+            viewModel.closePendingFilesPopup()
         },
         scrollable = false
     ) {
@@ -318,7 +234,7 @@ fun FilesScreen(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable(
                         onClick = {
-                            pendingFilesPopupOpen = false
+                            viewModel.closePendingFilesPopup()
                         }
                     )
             ) {
@@ -333,9 +249,7 @@ fun FilesScreen(
             modifier = Modifier.height(8.dp)
         )
 
-        if (incompleteFiles != null && incompleteFiles!!.isNotEmpty()) {
-            var pendingFilesLoading by remember { mutableStateOf(false) }
-
+        if (state.incompleteFiles != null && state.incompleteFiles!!.isNotEmpty()) {
             val lazyListState = rememberLazyListState()
 
             LazyColumn(
@@ -346,8 +260,8 @@ fun FilesScreen(
                         listState = lazyListState,
                     )
             ) {
-                items(incompleteFiles!!.size) { incompleteFileIndex ->
-                    val incompleteFile = incompleteFiles!![incompleteFileIndex]
+                items(state.incompleteFiles!!.size) { incompleteFileIndex ->
+                    val incompleteFile = state.incompleteFiles!![incompleteFileIndex]
 
                     Spacer(
                         modifier = Modifier.height(8.dp)
@@ -357,9 +271,8 @@ fun FilesScreen(
                         context = context,
                         activity = activity,
                         file = incompleteFile,
-                        updateData = ::updateIncompleteFiles,
-                        updateIsLoading = { pendingFilesLoading = it },
-                        isLoading = pendingFilesLoading,
+                        viewModel = viewModel,
+                        state = state
                     )
                 }
             }
@@ -388,8 +301,8 @@ fun FilesScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            val titleText = if (username != null) "$username's Files" else "Files"
-            var isTitleOverflowing by remember { mutableStateOf(false) }
+            val titleText = if (state.username != null) "${state.username}'s Files" else "Files"
+            var isTitleOverflowing by rememberSaveable { mutableStateOf(false) }
 
             Text(
                 text = titleText,
@@ -424,15 +337,15 @@ fun FilesScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 HeaderButton(
-                    icon = if (favoriteFilter)
+                    icon = if (state.favoriteFilter)
                         painterResource(R.drawable.star_filled)
                     else   painterResource(R.drawable.star),
                     contentDescription = "Favorites filter",
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                     onClick = {
-                        favoriteFilter = !favoriteFilter
+                        viewModel.toggleFavoriteFilter()
                     },
-                    iconColor = if (favoriteFilter) Yellow else MaterialTheme.colorScheme.primary
+                    iconColor = if (state.favoriteFilter) Yellow else MaterialTheme.colorScheme.primary
                 )
 
                 if (userId == null) {
@@ -446,7 +359,7 @@ fun FilesScreen(
                         onClick = {
                             navController.navigate(UploadFileScreen())
                         },
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                     )
                 }
 
@@ -468,7 +381,7 @@ fun FilesScreen(
                             )
                         )
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
 
                 if (userId == null) {
@@ -476,7 +389,7 @@ fun FilesScreen(
                         modifier = Modifier.width(5.dp)
                     )
 
-                    var dropdownExpanded by remember { mutableStateOf(false) }
+                    var dropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
                     Box(
                         modifier = Modifier.wrapContentSize(Alignment.TopStart)
@@ -485,7 +398,7 @@ fun FilesScreen(
                             icon = painterResource(R.drawable.more_horiz),
                             contentDescription = "More actions",
                             onClick = { dropdownExpanded = true },
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
 
                         DropdownMenu(
@@ -499,7 +412,7 @@ fun FilesScreen(
                                     Text("Manage Tags")
                                 },
                                 onClick = {
-                                    manageTagsPopupOpen = true
+                                    viewModel.openManageTagsPopup()
                                     dropdownExpanded = false
                                 },
                                 leadingIcon = {
@@ -515,7 +428,7 @@ fun FilesScreen(
                                     Text("View Pending Files")
                                 },
                                 onClick = {
-                                    pendingFilesPopupOpen = true
+                                    viewModel.openPendingFilesPopup()
                                     dropdownExpanded = false
                                 },
                                 leadingIcon = {
@@ -533,26 +446,24 @@ fun FilesScreen(
 
         val lazyColumnListState = rememberLazyListState()
 
-        var clickedFile by remember { mutableStateOf<File?>(null) }
-
         LaunchedEffect(
-            currentPage,
-            favoriteFilter,
-            sortOrder,
-            sortKey,
-            searchValue,
+            state.currentPage,
+            state.favoriteFilter,
+            state.sortOrder,
+            state.sortKey,
+            state.searchValue,
         ) {
             updateFiles()
             lazyColumnListState.animateScrollToItem(0)
-            clickedFile = null
+            viewModel.setClickedFile(null)
         }
 
-        LaunchedEffect(files) {
-            if (clickedFile != null) {
-                val updatedFile = files?.find { it.id == clickedFile?.id }
+        LaunchedEffect(state.files) {
+            if (state.clickedFile != null) {
+                val updatedFile = state.files?.find { it.id == state.clickedFile?.id }
 
                 if (updatedFile != null) {
-                    clickedFile = updatedFile
+                    viewModel.setClickedFile(updatedFile)
                 }
             }
         }
@@ -560,21 +471,27 @@ fun FilesScreen(
         LargeFileDisplay(
             context = context,
             activity = activity,
-            file = clickedFile,
-            onDismissRequest = { clickedFile = null },
+            file = state.clickedFile,
+            onDismissRequest = {
+                viewModel.setClickedFile(null)
+            },
             updateData = ::updateFiles,
-            tags = tags,
-            onDelete = { clickedFile = null }
+            tags = state.tags,
+            onDelete = {
+                viewModel.setClickedFile(null)
+            }
         )
 
         if (viewState == ZiplineViewStateType.COMPACT) {
-            var _searchValue by remember { mutableStateOf(searchValue) }
+            var uiSearchValue by rememberSaveable(
+                stateSaver = TextFieldValue.Saver
+            ) { mutableStateOf(state.searchValue) }
 
-            LaunchedEffect(searchKey) {
-                _searchValue = TextFieldValue("")
+            LaunchedEffect(state.searchKey) {
+                uiSearchValue = TextFieldValue("")
             }
 
-            if (searchKey != null) {
+            if (state.searchKey != null) {
                 Column(
                     modifier = Modifier
                         .padding(top = 8.dp)
@@ -593,7 +510,7 @@ fun FilesScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Search by ${camelCaseToHumanReadable(searchKey.toString())}",
+                            text = "Search by ${camelCaseToHumanReadable(state.searchKey.toString())}",
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold
                             ),
@@ -606,8 +523,7 @@ fun FilesScreen(
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                                 .clickable(
                                     onClick = {
-                                        searchKey = null
-                                        searchValue = TextFieldValue("")
+                                        viewModel.updateSearchKey(null)
                                     }
                                 )
                         ) {
@@ -622,14 +538,12 @@ fun FilesScreen(
                         modifier = Modifier.height(8.dp)
                     )
 
-                    if (searchKey == GetFilesQuerySearchField.TAGS) {
-                        var selectedTagIds by remember { mutableStateOf(emptySet<String>()) }
-
+                    if (state.searchKey == GetFilesQuerySearchField.TAGS) {
                         Select(
                             label = "Tags",
                             multiple = true,
-                            enabled = !tagsLoading && tags?.isNotEmpty() ?: false,
-                            options = tags?.map { tag ->
+                            enabled = !state.tagsLoading && state.tags?.isNotEmpty() ?: false,
+                            options = state.tags?.map { tag ->
                                 SelectOption(
                                     id = tag.id,
                                     label = { enabled ->
@@ -640,26 +554,23 @@ fun FilesScreen(
                                     },
                                 )
                             } ?: emptyList(),
-                            selectedIds = selectedTagIds,
+                            selectedIds = state.selectedTagIds,
                             onSelectionChange = { newSelectedIds ->
-                                if (newSelectedIds == selectedTagIds) return@Select
+                                if (newSelectedIds == state.selectedTagIds) return@Select
 
-                                selectedTagIds = newSelectedIds
-                                searchValue = TextFieldValue(
-                                    "," + newSelectedIds.joinToString(",")
-                                )
+                                viewModel.setSelectedTagIds(newSelectedIds)
                             }
                         )
                     } else {
                         fun onEnter() {
-                            searchValue = _searchValue
+                            viewModel.updateSearchValue(uiSearchValue)
                         }
 
                         val focusManager = LocalFocusManager.current
 
                         TextInput(
-                            value = _searchValue,
-                            onValueChange = { _searchValue = it },
+                            value = uiSearchValue,
+                            onValueChange = { uiSearchValue = it },
                             label = "Search",
                             keyboardActions = KeyboardActions(
                                 onDone = {
@@ -704,6 +615,14 @@ fun FilesScreen(
                 val tableIdWidth = 300.dp
                 val tableActionsWidth = 220.dp
 
+                fun onSortChanged(sortKey: GetFilesQuerySortBy) {
+                    if (state.sortKey != sortKey || state.sortOrder == SortOrder.UNSPECIFIED || state.sortOrder == SortOrder.DESC) {
+                        viewModel.updateSort(sortKey, SortOrder.ASC)
+                    } else {
+                        viewModel.updateSort(sortKey, SortOrder.DESC)
+                    }
+                }
+
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
                         content = {
@@ -716,19 +635,12 @@ fun FilesScreen(
                         name = "name",
                         searchable = true,
                         sortable = true,
-                        sortOrder = if (sortKey == GetFilesQuerySortBy.NAME) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetFilesQuerySortBy.NAME) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetFilesQuerySortBy.NAME) {
-                                sortKey = GetFilesQuerySortBy.NAME
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFilesQuerySortBy.NAME)
                         },
                         onSearchClick = {
-                            searchKey = GetFilesQuerySearchField.NAME
+                            viewModel.updateSearchKey(GetFilesQuerySearchField.NAME)
                         }
                     ),
                     TableHeaderData(
@@ -742,9 +654,9 @@ fun FilesScreen(
                         name = "tags",
                         searchable = true,
                         onSearchClick = {
-                            searchKey = GetFilesQuerySearchField.TAGS
+                            viewModel.updateSearchKey(GetFilesQuerySearchField.TAGS)
                         },
-                        searchEnabled = !tagsLoading && tags?.isNotEmpty() ?: false
+                        searchEnabled = !state.tagsLoading && state.tags?.isNotEmpty() ?: false
                     ),
                     TableHeaderData(
                         content = {
@@ -757,19 +669,12 @@ fun FilesScreen(
                         name = "type",
                         searchable = true,
                         sortable = true,
-                        sortOrder = if (sortKey == GetFilesQuerySortBy.TYPE) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetFilesQuerySortBy.TYPE) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetFilesQuerySortBy.TYPE) {
-                                sortKey = GetFilesQuerySortBy.TYPE
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFilesQuerySortBy.TYPE)
                         },
                         onSearchClick = {
-                            searchKey = GetFilesQuerySearchField.TYPE
+                            viewModel.updateSearchKey(GetFilesQuerySearchField.TYPE)
                         }
                     ),
                     TableHeaderData(
@@ -782,16 +687,9 @@ fun FilesScreen(
                         width = tableSizeWidth,
                         name = "size",
                         sortable = true,
-                        sortOrder = if (sortKey == GetFilesQuerySortBy.SIZE) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetFilesQuerySortBy.SIZE) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetFilesQuerySortBy.SIZE) {
-                                sortKey = GetFilesQuerySortBy.SIZE
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFilesQuerySortBy.SIZE)
                         }
                     ),
                     TableHeaderData(
@@ -804,16 +702,9 @@ fun FilesScreen(
                         width = tableCreatedAtWidth,
                         name = "created at",
                         sortable = true,
-                        sortOrder = if (sortKey == GetFilesQuerySortBy.CREATED_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetFilesQuerySortBy.CREATED_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetFilesQuerySortBy.CREATED_AT) {
-                                sortKey = GetFilesQuerySortBy.CREATED_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFilesQuerySortBy.CREATED_AT)
                         }
                     ),
                     TableHeaderData(
@@ -826,16 +717,9 @@ fun FilesScreen(
                         width = tableFavoriteWidth,
                         name = "favorite",
                         sortable = true,
-                        sortOrder = if (sortKey == GetFilesQuerySortBy.FAVORITE) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetFilesQuerySortBy.FAVORITE) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetFilesQuerySortBy.FAVORITE) {
-                                sortKey = GetFilesQuerySortBy.FAVORITE
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFilesQuerySortBy.FAVORITE)
                         }
                     ),
                     TableHeaderData(
@@ -849,19 +733,12 @@ fun FilesScreen(
                         name = "ID",
                         searchable = true,
                         sortable = true,
-                        sortOrder = if (sortKey == GetFilesQuerySortBy.ID) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetFilesQuerySortBy.ID) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetFilesQuerySortBy.ID) {
-                                sortKey = GetFilesQuerySortBy.ID
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFilesQuerySortBy.ID)
                         },
                         onSearchClick = {
-                            searchKey = GetFilesQuerySearchField.ID
+                            viewModel.updateSearchKey(GetFilesQuerySearchField.ID)
                         }
                     ),
                     TableHeaderData(
@@ -876,54 +753,54 @@ fun FilesScreen(
                     ),
                 )
 
-                var deleteFile by remember { mutableStateOf<File?>(null) }
                 val coroutineScope = rememberCoroutineScope()
 
                 PromptPopup(
-                    showPopup = deleteFile != null,
-                    onDismissRequest = { deleteFile = null },
-                    onCancel = { deleteFile = null },
-                    isLoading = isLoading,
+                    showPopup = state.deleteFile != null,
+                    onDismissRequest = {
+                        viewModel.setDeleteFile(null)
+                    },
+                    onCancel = {
+                        viewModel.setDeleteFile(null)
+                    },
+                    isLoading = state.isLoading,
                     title = "Are you sure?",
-                    description = "Are you sure you want to delete ${deleteFile?.originalName ?: deleteFile?.name}? This action cannot be undone.",
+                    description = "Are you sure you want to delete ${state.deleteFile?.originalName ?: state.deleteFile?.name}? This action cannot be undone.",
                     onSuccess = {
-                        coroutineScope.launch {
-                            if (deleteFile == null) return@launch
-
-                            isLoading = true
-
-                            val deleteRes = deleteFile(
-                                context = context,
-                                fileId = deleteFile!!.id
-                            )
-
-                            deleteRes
-                                .onSuccess {
-                                    updateFiles()
-                                }
-                                .onFailure {
-                                    Notification.show(
-                                        context = context,
-                                        activity = activity,
-                                        content = {
-                                            Text(
-                                                text = "Failed to delete file: ${it.message}"
-                                            )
-                                        },
+                        viewModel.deleteFile(
+                            context = context,
+                            filesPerPage = filesPerPage,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "File deleted successfully"
                                     )
                                 }
-
-                            deleteFile = null
-
-                            isLoading = false
-                        }
+                            },
+                            onError = { error ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = error,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
+                        )
                     }
                 )
 
-                val rows: List<TableRowData> = files?.map { file ->
+                val rows: List<TableRowData> = state.files?.map { file ->
                     TableRowData(
                         clickable = true,
-                        onClick = { clickedFile = file },
+                        onClick = {
+                            viewModel.setClickedFile(file)
+                        },
                         cells = listOf(
                             TableCellData(
                                 content = {
@@ -1002,8 +879,10 @@ fun FilesScreen(
                                         iconContentDescription = "More details",
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { clickedFile = file },
-                                        enabled = !isLoading
+                                        onClick = {
+                                            viewModel.setClickedFile(file)
+                                        },
+                                        enabled = !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -1014,12 +893,12 @@ fun FilesScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
-                                            val fileUrl = "${serverUrl}${file.url}"
+                                            val fileUrl = "${state.serverUrl}${file.url}"
 
                                             val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
                                             context.startActivity(intent)
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = state.serverUrl != null && !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -1032,7 +911,7 @@ fun FilesScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
-                                            val fileUrl = "${serverUrl}${file.url}"
+                                            val fileUrl = "${state.serverUrl}${file.url}"
 
                                             val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
 
@@ -1050,154 +929,35 @@ fun FilesScreen(
                                                 )
                                             }
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = state.serverUrl != null && !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
-
-                                    var selectedUri by remember { mutableStateOf<Uri?>(null) }
-                                    var selectedPath by remember { mutableStateOf<String?>(null) }
-
-                                    LaunchedEffect(Unit) {
-                                        val secureStore = SecureStorage.getInstance(context)
-
-                                        val fileDownloadFolder = secureStore.get(STORAGE_FILE_DOWNLOAD_FOLDER_KEY)
-
-                                        if (fileDownloadFolder != null) {
-                                            selectedUri = fileDownloadFolder.toUri()
-                                            selectedPath = getDisplayPath(fileDownloadFolder.toUri())
-                                        }
-                                    }
-
-                                    fun showToast(message: String) {
-                                        coroutineScope.launch(Dispatchers.Main) {
-                                            Notification.show(
-                                                context = context,
-                                                activity = activity,
-                                                content = {
-                                                    Text(message)
-                                                }
-                                            )
-                                        }
-                                    }
-
-                                    var downloadFilePassword by remember { mutableStateOf<String?>(null) }
-                                    var fileRequiresPassword by remember { mutableStateOf(false) }
-
-                                    fun performDownload() {
-                                        val fileFits = StorageUtil.canFitFile(
-                                            context = context,
-                                            uri = selectedUri!!,
-                                            fileSize = file.size
-                                        )
-
-                                        if (!fileFits) {
-                                            showToast("Not enough space in the selected directory to download the file")
-
-                                            return
-                                        }
-
-                                        val fileFitsCache = StorageUtil.canFitInternalCache(
-                                            context = context,
-                                            fileSize = file.size
-                                        )
-
-                                        if (!fileFitsCache) {
-                                            showToast("Not enough space in the internal cache to download the file")
-
-                                            return
-                                        }
-
-                                        if (file.password == true && downloadFilePassword.isNullOrBlank()) {
-                                            fileRequiresPassword = true
-                                            return
-                                        }
-
-                                        coroutineScope.launch(Dispatchers.IO) {
-                                            showToast("Starting download...")
-
-                                            val fileName = file.originalName ?: file.name
-
-                                            val tempFile = java.io.File(context.cacheDir, fileName)
-                                            val tempDestinationPath = tempFile.absolutePath
-
-                                            if (tempFile.exists()) tempFile.delete()
-
-                                            val downloadRes = downloadFile(
-                                                context = context,
-                                                fileId = file.id,
-                                                destinationPath = tempDestinationPath,
-                                                notificationTitle = "Downloading file",
-                                                notificationContent = "Downloading ${file.name}",
-                                                password = downloadFilePassword
-                                            )
-
-                                            downloadRes
-                                                .onSuccess {
-                                                    try {
-                                                        val docUri =
-                                                            DocumentsContract.buildDocumentUriUsingTree(
-                                                                selectedUri,
-                                                                DocumentsContract.getTreeDocumentId(
-                                                                    selectedUri
-                                                                )
-                                                            )
-
-                                                        val fileUri = DocumentsContract.createDocument(
-                                                            context.contentResolver,
-                                                            docUri,
-                                                            file.type,
-                                                            fileName
-                                                        )
-
-                                                        if (fileUri != null) {
-                                                            context.contentResolver.openOutputStream(fileUri)
-                                                                ?.use { out ->
-                                                                    tempFile.inputStream().use { inp ->
-                                                                        inp.copyTo(out)
-                                                                    }
-                                                                }
-
-                                                            showToast("File downloaded to ${selectedPath}/$fileName")
-                                                        } else {
-                                                            showToast("Failed to create file in selected directory")
-                                                        }
-                                                    } catch (e: Exception) {
-                                                        Logger.error(
-                                                            "LargeFileDisplay",
-                                                            "Failed to copy file to selected directory",
-                                                            e
-                                                        )
-
-                                                        showToast("Failed to copy file to selected directory: ${e.message}")
-                                                    } finally {
-                                                        tempFile.delete()
-                                                    }
-                                                }
-                                                .onFailure {
-                                                    Logger.error("LargeFileDisplay", "Failed to download file", it)
-
-                                                    showToast("Failed to download file: ${it.message}")
-                                                }
-
-                                            fileRequiresPassword = false
-                                            downloadFilePassword = null
-                                        }
-                                    }
 
                                     DownloadFilePasswordPrompt(
                                         context = context,
                                         activity = activity,
                                         fileId = file.id,
-                                        showPopup = fileRequiresPassword && downloadFilePassword == null,
+                                        showPopup = state.fileRequiresPassword && state.downloadFilePassword == null,
                                         onDismissRequest = {
-                                            fileRequiresPassword = false
-                                            downloadFilePassword = null
+                                            viewModel.setFileRequiresPassword(false)
                                         },
                                         onDownload = {
-                                            downloadFilePassword = it
+                                            viewModel.setDownloadFilePassword(it)
 
-                                            performDownload()
+                                            viewModel.performDownload(
+                                                context = context,
+                                                file = file,
+                                                uri = state.selectedUri!!,
+                                                password = it,
+                                                sendNotification = { content ->
+                                                    Notification.show(
+                                                        context = context,
+                                                        activity = activity,
+                                                        content = content
+                                                    )
+                                                }
+                                            )
                                         }
                                     )
 
@@ -1205,21 +965,27 @@ fun FilesScreen(
                                         contract = ActivityResultContracts.OpenDocumentTree()
                                     ) { uri: Uri? ->
                                         uri?.let {
-                                            val secureStore = SecureStorage.getInstance(context)
-
                                             context.contentResolver.takePersistableUriPermission(
                                                 it,
                                                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                                         Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                                             )
-                                            selectedUri = it
-                                            selectedPath = getDisplayPath(it)
 
-                                            coroutineScope.launch {
-                                                secureStore.set(STORAGE_FILE_DOWNLOAD_FOLDER_KEY, selectedUri.toString())
-                                            }
+                                            viewModel.setSelectedUri(context, it)
 
-                                            performDownload()
+                                            viewModel.performDownload(
+                                                context = context,
+                                                file = file,
+                                                uri = uri,
+                                                password = state.downloadFilePassword,
+                                                sendNotification = { content ->
+                                                    Notification.show(
+                                                        context = context,
+                                                        activity = activity,
+                                                        content = content
+                                                    )
+                                                }
+                                            )
                                         }
                                     }
 
@@ -1229,28 +995,40 @@ fun FilesScreen(
                                         color = DarkGray,
                                         iconColor = White,
                                         onClick = {
-                                            if (selectedUri == null) {
+                                            if (state.selectedUri == null) {
                                                 directoryPicker.launch(null)
 
                                                 return@IconButton
                                             }
 
-                                            performDownload()
+                                            viewModel.performDownload(
+                                                context = context,
+                                                file = file,
+                                                uri = state.selectedUri!!,
+                                                password = state.downloadFilePassword,
+                                                sendNotification = { content ->
+                                                    Notification.show(
+                                                        context = context,
+                                                        activity = activity,
+                                                        content = content
+                                                    )
+                                                }
+                                            )
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
 
                                     IconButton(
                                         icon = painterResource(R.drawable.delete),
-                                        iconContentDescription = "Open file in browser",
+                                        iconContentDescription = "Delete File",
                                         color = MaterialTheme.colorScheme.error,
                                         iconColor = MaterialTheme.colorScheme.onError,
                                         onClick = {
-                                            deleteFile = file
+                                            viewModel.setDeleteFile(file)
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = !state.isLoading
                                     )
                                 },
                                 width = tableActionsWidth,
@@ -1263,7 +1041,7 @@ fun FilesScreen(
                     modifier = Modifier.fillMaxSize(),
                     headers = headers,
                     rows = rows,
-                    loading = isLoading,
+                    loading = state.isLoading,
                     scrollbarConfig = TableScrollbarConfig(
                         vertical = ScrollbarConfig(
                             alwaysKeepScrollbar = true
@@ -1284,7 +1062,7 @@ fun FilesScreen(
                         listState = lazyColumnListState,
                     )
             ) {
-                if (files == null || isLoading) {
+                if (state.files == null || state.isLoading) {
                     items(5) {
                         Box(
                             modifier = Modifier
@@ -1301,20 +1079,22 @@ fun FilesScreen(
                         ) {}
                     }
                 } else {
-                    files?.let { files ->
+                    state.files?.let { files ->
                         if (files.size > 0L) {
                             items(files.size) { index ->
+                                val file = files[index]
+
                                 FilePreview(
-                                    file = files[index],
+                                    file = file,
                                     context = context,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(250.dp)
                                         .padding(5.dp),
                                     onClick = {
-                                        clickedFile = files[index]
+                                        viewModel.setClickedFile(file)
                                     },
-                                    serverUrl = serverUrl,
+                                    serverUrl = state.serverUrl,
                                 )
                             }
                         } else {
@@ -1370,23 +1150,23 @@ fun FilesScreen(
 
         Pager(
             onFirstPageClick = {
-                currentPage = 1L
+                viewModel.setCurrentPage(1L)
             },
             onPreviousPageClick = {
-                if (currentPage > 1) currentPage--
+                if (state.currentPage > 1) viewModel.setCurrentPage(state.currentPage - 1)
             },
-            onCustomPageInput = {
-                page -> currentPage = page.coerceIn(1, totalPages)
+            onCustomPageInput = { newPage ->
+                viewModel.setCurrentPage(newPage.coerceIn(1, state.totalPages))
             },
             onNextPageClick = {
-                if (currentPage < totalPages) currentPage++
+                if (state.currentPage < state.totalPages) viewModel.setCurrentPage(state.currentPage + 1)
             },
             onLastPageClick = {
-                currentPage = totalPages
+                viewModel.setCurrentPage(state.totalPages)
             },
-            currentPage = currentPage,
-            totalPages = totalPages,
-            enabled = !isLoading
+            currentPage = state.currentPage,
+            totalPages = state.totalPages,
+            enabled = !state.isLoading
         )
     }
 }

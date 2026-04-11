@@ -38,6 +38,8 @@ import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.requests.deleteTag
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.screens.files.FilesUiState
+import com.stefdp.zipline.screens.files.FilesViewModel
 import kotlinx.coroutines.launch
 import com.stefdp.zipline.components.Tag as TagComponent
 
@@ -47,27 +49,31 @@ fun TagsPopup(
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    tags: List<Tag>,
-    updateTags: suspend () -> Unit
+    viewModel: FilesViewModel,
+    state: FilesUiState
 ) {
-    var showCreateTagPopup by remember { mutableStateOf(false) }
-
-    var tagToEdit by remember { mutableStateOf<Tag?>(null) }
-
-    val showMainPopup = showPopup && !showCreateTagPopup && tagToEdit == null
-
-    val coroutineScope = rememberCoroutineScope()
-
-    var isLoading by remember { mutableStateOf(false) }
+    val showMainPopup = showPopup && !state.showCreateTagPopup && state.tagToEdit == null
 
     CreateTagPopup(
         context = context,
         activity = activity,
-        showPopup = showCreateTagPopup,
+        showPopup = state.showCreateTagPopup,
         onDismissRequest = {
-            showCreateTagPopup = false
+            viewModel.closeCreateTagPopup()
         },
-        updateTags = updateTags,
+        viewModel = viewModel,
+        state = state
+    )
+
+    EditTagPopup(
+        context = context,
+        activity = activity,
+        showPopup = state.tagToEdit != null,
+        onDismissRequest = {
+            viewModel.setTagToEdit(null)
+        },
+        viewModel = viewModel,
+        state = state
     )
 
     Popup(
@@ -94,11 +100,11 @@ fun TagsPopup(
 
                 HeaderButton(
                     onClick = {
-                        showCreateTagPopup = true
+                        viewModel.openCreateTagPopup()
                     },
                     icon = painterResource(id = R.drawable.add),
                     contentDescription = "Create tag",
-                    enabled = !isLoading
+                    enabled = !state.tagsLoading
                 )
             }
 
@@ -124,10 +130,10 @@ fun TagsPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        if (tags.isNotEmpty()) {
+        if (!state.tags.isNullOrEmpty()) {
             LazyColumn {
-                items(tags.size) {
-                    val tag = tags[it]
+                items(state.tags.size) {
+                    val tag = state.tags[it]
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -169,11 +175,11 @@ fun TagsPopup(
                                 icon = painterResource(R.drawable.edit),
                                 iconContentDescription = "Edit tag",
                                 onClick = {
-                                    tagToEdit = tag
+                                    viewModel.setTagToEdit(tag)
                                 },
                                 color = MaterialTheme.colorScheme.primary,
                                 iconColor = MaterialTheme.colorScheme.onPrimary,
-                                enabled = !isLoading
+                                enabled = !state.tagsLoading
                             )
 
                             Spacer(
@@ -184,46 +190,35 @@ fun TagsPopup(
                                 icon = painterResource(R.drawable.delete),
                                 iconContentDescription = "Delete tag",
                                 onClick = {
-                                    coroutineScope.launch {
-                                        isLoading = true
-
-                                        val deleteTagRes = deleteTag(
-                                            context = context,
-                                            tagId = tag.id
-                                        )
-
-                                        val deleteStatus = deleteTagRes.getOrNull()
-
-                                        if (deleteStatus == true) {
-                                            Notification.show(
-                                                context,
-                                                activity = activity,
-                                                content = {
-                                                    Text(
-                                                        text = "Successfully deleted tag"
-                                                    )
-                                                }
-                                            )
-
-                                            updateTags()
-                                        } else {
+                                    viewModel.deleteTag(
+                                        context = context,
+                                        tagId = tag.id,
+                                        onSuccess = {
                                             Notification.show(
                                                 context = context,
                                                 activity = activity,
-                                                content = {
-                                                    Text(
-                                                        text = "Failed to delete tag"
-                                                    )
-                                                }
-                                            )
+                                            ) {
+                                                Text(
+                                                    text = "Successfully deleted tag"
+                                                )
+                                            }
+                                        },
+                                        onError = { error ->
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                            ) {
+                                                Text(
+                                                    text = error,
+                                                    color = MaterialTheme.colorScheme.onError
+                                                )
+                                            }
                                         }
-
-                                        isLoading = false
-                                    }
+                                    )
                                 },
                                 color = MaterialTheme.colorScheme.error,
                                 iconColor = MaterialTheme.colorScheme.onError,
-                                enabled = !isLoading
+                                enabled = !state.tagsLoading
                             )
                         }
                     }

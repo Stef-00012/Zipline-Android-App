@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
@@ -69,7 +71,8 @@ import java.util.Locale
 fun HomeScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    viewModel: HomeViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -85,34 +88,14 @@ fun HomeScreen(
     val webSettings = LocalWebSettings.current
     val updateWebSettings = LocalUpdateWebSettings.current
 
-    var serverUrl by remember { mutableStateOf<String?>(null) }
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+        viewModel.initData(context)
     }
 
-    var userStats by remember { mutableStateOf<GetStatsResponse?>(null) }
-    var recentFiles by remember { mutableStateOf<List<File>?>(null) }
-
-    suspend fun updateData() {
-        val recentFilesRes = getRecentFiles(
-            context = context,
-            count = 8
-        )
-
-        val userStatsRes = getStats(
-            context = context,
-        )
-
-        recentFilesRes.onSuccess {
-            recentFiles = it
-        }
-
-        userStatsRes.onSuccess {
-            userStats = it
-        }
+    fun updateData() {
+        viewModel.updateData(context)
     }
 
     LaunchedEffect(Unit) {
@@ -151,7 +134,7 @@ fun HomeScreen(
             )
         )
 
-        val filesUploaded = userStats?.filesUploaded
+        val filesUploaded = state.userStats?.filesUploaded
 
         Text(
             text = "You have $filesUploaded files uploaded.",
@@ -160,7 +143,7 @@ fun HomeScreen(
             ),
             modifier = Modifier
                 .shimmerable(
-                    enabled = userStats == null,
+                    enabled = state.userStats == null,
                 )
                 .padding(
                     start = 4.dp
@@ -177,7 +160,7 @@ fun HomeScreen(
                 ),
                 modifier = Modifier
                     .shimmerable(
-                        enabled = userStats == null,
+                        enabled = state.userStats == null,
                     )
                     .padding(
                         start = 4.dp
@@ -186,7 +169,7 @@ fun HomeScreen(
         }
 
         if (localLoggedUser?.quota?.filesQuota == UserQuotaFilesQuota.BY_BYTES) {
-            val storageUsed = formatBytes(userStats?.storageUsed ?: 0L)
+            val storageUsed = formatBytes(state.userStats?.storageUsed ?: 0L)
             val maxAllowedStorage = formatBytes(
                 parseBytes(localLoggedUser.quota.maxBytes)
             )
@@ -198,7 +181,7 @@ fun HomeScreen(
                 ),
                 modifier = Modifier
                     .shimmerable(
-                        enabled = userStats == null,
+                        enabled = state.userStats == null,
                     )
                     .padding(
                         start = 4.dp
@@ -207,7 +190,7 @@ fun HomeScreen(
         }
 
         if (localLoggedUser?.quota?.maxUrls != null) {
-            val urlsCreated = userStats?.urlsCreated
+            val urlsCreated = state.userStats?.urlsCreated
             val maxUrlsAllowed = localLoggedUser.quota.maxUrls
 
             Text(
@@ -217,7 +200,7 @@ fun HomeScreen(
                 ),
                 modifier = Modifier
                     .shimmerable(
-                        enabled = userStats == null,
+                        enabled = state.userStats == null,
                     )
                     .padding(
                         start = 4.dp
@@ -245,14 +228,12 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.surface),
             scrollable = false
         ) {
-            var clickedFile by remember { mutableStateOf<File?>(null) }
-
-            LaunchedEffect(recentFiles) {
-                if (clickedFile != null) {
-                    val updatedFile = recentFiles?.find { it.id == clickedFile?.id }
+            LaunchedEffect(state.recentFiles) {
+                if (state.clickedRecentFile != null) {
+                    val updatedFile = state.recentFiles?.find { it.id == state.clickedRecentFile?.id }
 
                     if (updatedFile != null) {
-                        clickedFile = updatedFile
+                        viewModel.setClickedRecentFile(updatedFile)
                     }
                 }
             }
@@ -260,22 +241,26 @@ fun HomeScreen(
             LargeFileDisplay(
                 context = context,
                 activity = activity,
-                file = clickedFile,
-                onDismissRequest = { clickedFile = null },
+                file = state.clickedRecentFile,
+                onDismissRequest = {
+                    viewModel.setClickedRecentFile(null)
+                },
                 updateData = ::updateData,
-                onDelete = { clickedFile = null }
+                onDelete = {
+                    viewModel.setClickedRecentFile(null)
+                }
             )
 
             val lazyListState = rememberLazyListState()
 
-            if (recentFiles == null || !recentFiles.isNullOrEmpty()) {
+            if (state.recentFiles == null || !state.recentFiles.isNullOrEmpty()) {
                 LazyRow(
                     state = lazyListState,
                     modifier = Modifier.horizontalLazyScrollbar(
                         listState = lazyListState
                     )
                 ) {
-                    if (recentFiles == null) {
+                    if (state.recentFiles == null) {
                         items(8) {
                             Box(
                                 modifier = Modifier
@@ -291,8 +276,8 @@ fun HomeScreen(
                             ) {}
                         }
                     } else {
-                        items(recentFiles!!.size) { index ->
-                            val file = recentFiles!![index]
+                        items(state.recentFiles!!.size) { index ->
+                            val file = state.recentFiles!![index]
 
                             FilePreview(
                                 file = file,
@@ -302,9 +287,9 @@ fun HomeScreen(
                                     .padding(10.dp)
                                     .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp)),
                                 onClick = { file ->
-                                    clickedFile = file
+                                    viewModel.setClickedRecentFile(file)
                                 },
-                                serverUrl = serverUrl
+                                serverUrl = state.serverUrl
                             )
                         }
                     }
@@ -357,59 +342,59 @@ fun HomeScreen(
 
             Stat(
                 title = "Files Uploaded",
-                value = userStats?.filesUploaded,
+                value = state.userStats?.filesUploaded,
             )
 
             StatDivider()
 
             Stat(
                 title = "Favorite Files",
-                value = userStats?.favoriteFiles,
+                value = state.userStats?.favoriteFiles,
             )
 
             StatDivider()
 
             Stat(
                 title = "Storage Used",
-                value = formatBytes(userStats?.storageUsed ?: 0L),
-                loading = userStats == null
+                value = formatBytes(state.userStats?.storageUsed ?: 0L),
+                loading = state.userStats == null
             )
 
             StatDivider()
 
             Stat(
                 title = "Average Storage Used",
-                value = formatBytes(userStats?.averageStorageUsed?.toLong() ?: 0L),
-                loading = userStats == null
+                value = formatBytes(state.userStats?.averageStorageUsed?.toLong() ?: 0L),
+                loading = state.userStats == null
             )
 
             StatDivider()
 
             Stat(
                 title = "Files Views",
-                value = userStats?.views,
+                value = state.userStats?.views,
             )
 
             StatDivider()
 
             Stat(
                 title = "Average Files Views",
-                value = String.format(Locale.getDefault(), "%.2f", userStats?.averageViews ?: 0.0),
-                loading = userStats == null
+                value = String.format(Locale.getDefault(), "%.2f", state.userStats?.averageViews ?: 0.0),
+                loading = state.userStats == null
             )
 
             StatDivider()
 
             Stat(
                 title = "Links Created",
-                value = userStats?.urlsCreated,
+                value = state.userStats?.urlsCreated,
             )
 
             StatDivider()
 
             Stat(
                 title = "Links Views",
-                value = userStats?.urlViews,
+                value = state.userStats?.urlViews,
             )
         }
 
@@ -463,7 +448,7 @@ fun HomeScreen(
                 ),
             )
 
-            val rows: List<TableRowData>? = userStats?.sortTypeCount?.map { (type, count) ->
+            val rows: List<TableRowData>? = state.userStats?.sortTypeCount?.map { (type, count) ->
                 TableRowData(
                     cells = listOf(
                         TableCellData(
@@ -490,7 +475,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize(),
                 headers = headers,
                 rows = rows ?: emptyList(),
-                loading = userStats == null
+                loading = state.userStats == null
             )
         }
     }

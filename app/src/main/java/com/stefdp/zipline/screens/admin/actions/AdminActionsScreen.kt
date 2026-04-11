@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
@@ -66,6 +68,7 @@ fun AdminActionsScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
+    viewModel: AdminActionsViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -83,203 +86,65 @@ fun AdminActionsScreen(
         }
     }
 
-    var isLoading by remember { mutableStateOf(false) }
-
-    var popupEnabled by remember { mutableStateOf<AdminActionType?>(null) }
-    var exportConfirmationPopup by remember { mutableStateOf(false) }
-
-    var zeroByteFileCount by remember { mutableStateOf<Int?>(null) }
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        val zeroByteFilesRes = scanForZeroByteFiles(
-            context = context
+        viewModel.refreshZeroByteFiles(
+            context = context,
+            onError = { error ->
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                ) {
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         )
-
-        zeroByteFilesRes
-            .onSuccess {
-                zeroByteFileCount = it.files?.size
-            }
-             .onFailure {
-                 Notification.show(
-                     context = context,
-                     activity = activity,
-                     content = {
-                         Text(
-                             text = "Failed to scan for zero byte files: ${it.message}"
-                         )
-                     }
-                 )
-            }
     }
 
     val coroutineScope = rememberCoroutineScope()
-
-    var selectedUri by remember { mutableStateOf<Uri?>(null) }
-    var selectedPath by remember { mutableStateOf<String?>(null) }
-
-    var excludeMetricsFromExport by remember { mutableStateOf(false) }
-
-    fun showToast(message: String) {
-        coroutineScope.launch(Dispatchers.Main) {
-            Notification.show(
-                context = context,
-                activity = activity,
-                content = {
-                    Text(
-                        text = message
-                    )
-                }
-            )
-        }
-    }
-
-    fun performDownload() {
-        coroutineScope.launch(Dispatchers.IO) {
-            val exportSize = getExportSize(
-                context = context,
-                excludeMetrics = excludeMetricsFromExport.takeIf { it }
-            )
-
-            exportSize
-                .onSuccess {
-                    val exportFits = StorageUtil.canFitFile(
-                        context = context,
-                        uri = selectedUri!!,
-                        fileSize = it
-                    )
-
-                    if (!exportFits) {
-                        showToast("Not enough space in the selected directory to download the export")
-
-                        return@launch
-                    }
-
-                    val exportFitsCache = StorageUtil.canFitInternalCache(
-                        context = context,
-                        fileSize = it
-                    )
-
-                    if (!exportFitsCache) {
-                        showToast("Not enough space in the internal cache to download the export")
-
-                        return@launch
-                    }
-                }
-                .onFailure {
-                    Notification.show(
-                        context = context,
-                        activity = activity,
-                        content = {
-                            Text(
-                                text = "Failed to get export size: ${it.message}"
-                            )
-                        }
-                    )
-                }
-
-            showToast("Starting download...")
-
-            val fileName = "zipline_export_${System.currentTimeMillis()}.json"
-
-            val tempFile = java.io.File(context.cacheDir, fileName)
-            val tempDestinationPath = tempFile.absolutePath
-
-            if (tempFile.exists()) tempFile.delete()
-
-            val downloadRes = exportData(
-                context = context,
-                destinationPath = tempDestinationPath,
-                excludeMetrics = excludeMetricsFromExport.takeIf { it }
-            )
-
-            downloadRes
-                .onSuccess {
-                    try {
-                        val docUri =
-                            DocumentsContract.buildDocumentUriUsingTree(
-                                selectedUri,
-                                DocumentsContract.getTreeDocumentId(
-                                    selectedUri
-                                )
-                            )
-
-                        val fileUri = DocumentsContract.createDocument(
-                            context.contentResolver,
-                            docUri,
-                            "application/json",
-                            fileName
-                        )
-
-                        if (fileUri != null) {
-                            context.contentResolver.openOutputStream(fileUri)
-                                ?.use { out ->
-                                    tempFile.inputStream().use { inp ->
-                                        inp.copyTo(out)
-                                    }
-                                }
-
-                            showToast("Export downloaded to ${selectedPath}/$fileName")
-                        } else {
-                            showToast("Failed to create file in selected directory")
-                        }
-                    } catch (e: Exception) {
-                        Logger.error(
-                            "AdminActionsScreen[ExportData]",
-                            "Failed to copy export to selected directory",
-                            e
-                        )
-
-                        showToast("Failed to copy export to selected directory: ${e.message}")
-                    } finally {
-                        tempFile.delete()
-                    }
-                }
-                .onFailure {
-                    Logger.error("AdminActionsScreen[ExportData]", "Failed to download export", it)
-
-                    showToast("Failed to download export: ${it.message}")
-                }
-        }
-    }
 
     val directoryPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
         uri?.let {
-            val secureStore = SecureStorage.getInstance(context)
-
             context.contentResolver.takePersistableUriPermission(
                 it,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
                         Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-            selectedUri = it
-            selectedPath = getDisplayPath(it)
 
-            coroutineScope.launch {
-                secureStore.set(STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY, selectedUri.toString())
-            }
+            viewModel.setSelectedUri(
+                context = context,
+                uri = it
+            )
 
-            performDownload()
-
-            isLoading = false
+            viewModel.performDownload(
+                context = context,
+                uri = it,
+                sendNotification = { content ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        content = content
+                    )
+                }
+            )
         }
     }
 
     LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        val exportDownloadFolder = secureStore.get(STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY)
-
-        if (exportDownloadFolder != null) {
-            selectedUri = exportDownloadFolder.toUri()
-            selectedPath = getDisplayPath(exportDownloadFolder.toUri())
-        }
+        viewModel.initData(context)
     }
 
     Popup(
-        showPopup = popupEnabled == AdminActionType.IMPORT_EXPORT && !exportConfirmationPopup,
-        onDismissRequest = { popupEnabled = null },
+        showPopup = state.popupEnabled == AdminActionType.IMPORT_EXPORT && !state.exportConfirmationPopup,
+        onDismissRequest = {
+            viewModel.setPopupEnabled(null)
+        },
     ) {
         Text(
             text = "Import / Export Data",
@@ -317,7 +182,7 @@ fun AdminActionsScreen(
 
         Button(
             onClick = {
-                exportConfirmationPopup = true
+                viewModel.setExportConfirmationPopup(true)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -326,10 +191,10 @@ fun AdminActionsScreen(
     }
 
     PromptPopup(
-        showPopup = popupEnabled == AdminActionType.IMPORT_EXPORT && exportConfirmationPopup,
+        showPopup = state.popupEnabled == AdminActionType.IMPORT_EXPORT && state.exportConfirmationPopup,
         onDismissRequest = {
-            popupEnabled = null
-            exportConfirmationPopup = false
+            viewModel.setPopupEnabled(null)
+            viewModel.setExportConfirmationPopup(false)
         },
         title = "Are you sure?",
         description = AnnotatedString.fromHtml("""
@@ -361,28 +226,37 @@ fun AdminActionsScreen(
                 <li><b>Versions:</b> The Zipline version, Node version, and export format version.</li>
             </ul>
         """.trimIndent()),
-        onCancel = { exportConfirmationPopup = false },
+        onCancel = {
+            viewModel.setExportConfirmationPopup(false)
+        },
         onSuccess = {
             coroutineScope.launch {
-                isLoading = true
-
-                if (selectedUri == null) {
+                if (state.selectedUri == null) {
                     directoryPicker.launch(null)
 
                     return@launch
                 }
 
-                performDownload()
+                viewModel.performDownload(
+                    context = context,
+                    uri = state.selectedUri!!,
+                    sendNotification = { content ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = content
+                        )
+                    }
+                )
 
-                isLoading = false
-                popupEnabled = null
-                exportConfirmationPopup = false
+                viewModel.setPopupEnabled(null)
+                viewModel.setExportConfirmationPopup(false)
             }
         },
         successText = "Download Export",
         cancelColor = MaterialTheme.colorScheme.error,
         successColor = MaterialTheme.colorScheme.primary,
-        isLoading = isLoading
+        isLoading = state.isLoading
     ) {
         HorizontalDivider(
             modifier = Modifier.padding(
@@ -392,8 +266,10 @@ fun AdminActionsScreen(
         )
 
         Switch(
-            checked = excludeMetricsFromExport,
-            onCheckedChange = { excludeMetricsFromExport = it },
+            checked = state.excludeMetricsFromExport,
+            onCheckedChange = {
+                viewModel.setExcludeMetricsFromExport(it)
+            },
             label = "Exclude Metrics Data",
             description = "Exclude system and usage metrics from the export. This can reduce the export file size."
         )
@@ -429,223 +305,181 @@ fun AdminActionsScreen(
     }
 
     PromptPopup(
-        showPopup = popupEnabled == AdminActionType.CLEAR_TEMP_FILES,
+        showPopup = state.popupEnabled == AdminActionType.CLEAR_TEMP_FILES,
         title = "Are you sure?",
         description = "This will delete temporary files stored within the temporary directory (defined in the configuration). This should not cause harm unless there are files that are being processed still.",
-        onDismissRequest = { popupEnabled = null },
-        onCancel = { popupEnabled = null },
+        onDismissRequest = {
+            viewModel.setPopupEnabled(null)
+        },
+        onCancel = {
+            viewModel.setPopupEnabled(null)
+        },
         successText = "Yes, Delete",
         onSuccess = {
-            coroutineScope.launch {
-                isLoading = true
-
-                val deleteTempFilesRes = runDeleteTemporaryFilesJob(
-                    context = context
-                )
-
-                deleteTempFilesRes
-                    .onSuccess {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = it
-                                )
-                            }
-                        )
-
-                        popupEnabled = null
+            viewModel.deleteTemporaryFiles(
+                context = context,
+                onSuccess = { response ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(response)
                     }
-                    .onFailure {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = "Failed to delete temporary files: ${it.message}"
-                                )
-                            }
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error
                         )
-
-                        popupEnabled = null
                     }
-
-                isLoading = false
-            }
+                }
+            )
         },
-        isLoading = isLoading
+        isLoading = state.isLoading
     )
 
     PromptPopup(
-        showPopup = popupEnabled == AdminActionType.CLEAR_ZERO_BYTE_FILES,
+        showPopup = state.popupEnabled == AdminActionType.CLEAR_ZERO_BYTE_FILES,
         title = "Are you sure?",
-        description = "This will delete ${zeroByteFileCount ?: 0} files from the database and datasource.",
-        onDismissRequest = { popupEnabled = null },
-        onCancel = { popupEnabled = null },
+        description = "This will delete ${state.zeroByteFileCount ?: 0} files from the database and datasource.",
+        onDismissRequest = {
+            viewModel.setPopupEnabled(null)
+        },
+        onCancel = {
+            viewModel.setPopupEnabled(null)
+        },
         successText = "Yes, Delete",
         onSuccess = {
-            coroutineScope.launch {
-                isLoading = true
-
-                val deleteZeroByteFilesRes = deleteZeroByteFiles(
-                    context = context
-                )
-
-                deleteZeroByteFilesRes
-                    .onSuccess {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = "Cleared ${it.files?.size ?: 0} files with a size of 0B."
-                                )
-                            }
-                        )
-
-                        popupEnabled = null
+            viewModel.deleteZeroBytesFiles(
+                context = context,
+                onSuccess = { response ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(response)
                     }
-                    .onFailure {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = "Failed to delete zero byte files: ${it.message}"
-                                )
-                            }
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error
                         )
-
-                        popupEnabled = null
                     }
-
-                isLoading = false
-            }
+                }
+            )
         },
-        isLoading = isLoading
+        isLoading = state.isLoading
     )
 
-    var requeryFileSizeForceUpdate by remember { mutableStateOf(false) }
-    var requeryFileSizeForceDelete by remember { mutableStateOf(false) }
-
     PromptPopup(
-        showPopup = popupEnabled == AdminActionType.REQUERY_FILE_SIZES,
+        showPopup = state.popupEnabled == AdminActionType.REQUERY_FILE_SIZES,
         title = "Are you sure?",
         description = "This will requery the size of every file stored within the database. Additionally you can use the options below.",
-        onDismissRequest = { popupEnabled = null },
-        onCancel = { popupEnabled = null },
+        onDismissRequest = {
+            viewModel.setPopupEnabled(null)
+        },
+        onCancel = {
+            viewModel.setPopupEnabled(null)
+        },
         successText = "Requery",
         onSuccess = {
-            coroutineScope.launch {
-                isLoading = true
-
-                val requeryFileSizesRes = runRequerySizeJob(
-                    context = context,
-                    forceUpdate = requeryFileSizeForceUpdate,
-                    forceDelete = requeryFileSizeForceDelete
-                )
-
-                requeryFileSizesRes
-                    .onSuccess {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(it)
-                            },
-                            duration = 8000L
-                        )
-
-                        popupEnabled = null
+            viewModel.requeryFileSize(
+                context = context,
+                onSuccess = { response ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        duration = 8000L,
+                    ) {
+                        Text(response)
                     }
-                    .onFailure {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = "Failed to delete requery file sizes: ${it.message}"
-                                )
-                            }
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error
                         )
-
-                        popupEnabled = null
                     }
-
-                isLoading = false
-            }
+                }
+            )
         },
-        isLoading = isLoading
+        isLoading = state.isLoading
     ) {
         Switch(
-            checked = requeryFileSizeForceUpdate,
-            onCheckedChange = { requeryFileSizeForceUpdate = it },
+            checked = state.requeryFileSizeForceUpdate,
+            onCheckedChange = {
+                viewModel.setRequeryFileSizeForceUpdate(it)
+            },
             label = "Force Update",
             description = "Force update the size of every file, even if it already has a size set."
         )
 
         Switch(
-            checked = requeryFileSizeForceDelete,
-            onCheckedChange = { requeryFileSizeForceDelete = it },
+            checked = state.requeryFileSizeForceDelete,
+            onCheckedChange = {
+                viewModel.setRequeryFileSizeForceDelete(it)
+            },
             label = "Force Delete",
             description = "Delete files that are not found in the database, or have a size of 0."
         )
     }
 
-    var rerunThumbnailsGeneration by remember { mutableStateOf(false) }
-
     PromptPopup(
-        showPopup = popupEnabled == AdminActionType.GENERATE_THUMBNAILS,
+        showPopup = state.popupEnabled == AdminActionType.GENERATE_THUMBNAILS,
         title = "Are you sure?",
         description = "This will generate thumbnails for all files that do not have a thumbnail set. Additionally you can use the options below.",
-        onDismissRequest = { popupEnabled = null },
-        onCancel = { popupEnabled = null },
+        onDismissRequest = {
+            viewModel.setPopupEnabled(null)
+        },
+        onCancel = {
+            viewModel.setPopupEnabled(null)
+        },
         successText = "Generate",
         onSuccess = {
-            coroutineScope.launch {
-                isLoading = true
-
-                val generateThumbnailsRes = runThumbnailGenerationJob(
-                    context = context,
-                    rerun = rerunThumbnailsGeneration
-                )
-
-                generateThumbnailsRes
-                    .onSuccess {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(it)
-                            },
-                            duration = 8000L
-                        )
-
-                        popupEnabled = null
+            viewModel.generateThumbnails(
+                context = context,
+                onSuccess = { response ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                        duration = 8000L,
+                    ) {
+                        Text(response)
                     }
-                    .onFailure {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = "Failed to delete requery file sizes: ${it.message}"
-                                )
-                            }
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error
                         )
-
-                        popupEnabled = null
                     }
-
-                isLoading = false
-            }
+                }
+            )
         },
-        isLoading = isLoading
+        isLoading = state.isLoading
     ) {
         Switch(
-            checked = rerunThumbnailsGeneration,
-            onCheckedChange = { rerunThumbnailsGeneration = it },
+            checked = state.rerunThumbnailsGeneration,
+            onCheckedChange = {
+                viewModel.setRerunThumbnailsGeneration(it)
+            },
             label = "Re-run",
             description = "Re-run the thumbnail generation for all files regardless of whether they have a thumbnail set."
         )
@@ -680,8 +514,10 @@ fun AdminActionsScreen(
             description = "Allows you to import or export server data and configurations.",
             icon = painterResource(R.drawable.database_upload),
             iconContentDescription = "Import/Export Data",
-            onClick = { popupEnabled = AdminActionType.IMPORT_EXPORT },
-            enabled = !isLoading
+            onClick = {
+                viewModel.setPopupEnabled(AdminActionType.IMPORT_EXPORT)
+            },
+            enabled = !state.isLoading
         )
 
         ActionContainer(
@@ -689,8 +525,10 @@ fun AdminActionsScreen(
             description = "Removes all temporary files from the temporary directory.",
             icon = painterResource(R.drawable.delete),
             iconContentDescription = "Clear Temporary Files",
-            onClick = { popupEnabled = AdminActionType.CLEAR_TEMP_FILES },
-            enabled = !isLoading
+            onClick = {
+                viewModel.setPopupEnabled(AdminActionType.CLEAR_TEMP_FILES)
+            },
+            enabled = !state.isLoading
         )
 
         ActionContainer(
@@ -698,8 +536,10 @@ fun AdminActionsScreen(
             description = "Deletes all files with zero bytes from the database and/or storage.",
             icon = painterResource(R.drawable.delete),
             iconContentDescription = "Clear Zero Byte Files",
-            onClick = { popupEnabled = AdminActionType.CLEAR_ZERO_BYTE_FILES },
-            enabled = !isLoading
+            onClick = {
+                viewModel.setPopupEnabled(AdminActionType.CLEAR_ZERO_BYTE_FILES)
+            },
+            enabled = !state.isLoading
         )
 
         ActionContainer(
@@ -707,8 +547,10 @@ fun AdminActionsScreen(
             description = "Recalculates and updates the sizes of all files in the database.",
             icon = painterResource(R.drawable.play_arrow),
             iconContentDescription = "Requery File Sizes",
-            onClick = { popupEnabled = AdminActionType.REQUERY_FILE_SIZES },
-            enabled = !isLoading
+            onClick = {
+                viewModel.setPopupEnabled(AdminActionType.REQUERY_FILE_SIZES)
+            },
+            enabled = !state.isLoading
         )
 
         ActionContainer(
@@ -716,16 +558,10 @@ fun AdminActionsScreen(
             description = "Creates thumbnails for all image and video files that lack them.",
             icon = painterResource(R.drawable.flare),
             iconContentDescription = "Generate Thumbnails",
-            onClick = { popupEnabled = AdminActionType.GENERATE_THUMBNAILS },
-            enabled = !isLoading
+            onClick = {
+                viewModel.setPopupEnabled(AdminActionType.GENERATE_THUMBNAILS)
+            },
+            enabled = !state.isLoading
         )
     }
-}
-
-private enum class AdminActionType {
-    IMPORT_EXPORT,
-    CLEAR_TEMP_FILES,
-    CLEAR_ZERO_BYTE_FILES,
-    REQUERY_FILE_SIZES,
-    GENERATE_THUMBNAILS
 }

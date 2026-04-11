@@ -16,11 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,20 +23,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
-import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.requests.DeleteFolderChildrenAction
-import com.stefdp.zipline.network.requests.deleteFolder
+import com.stefdp.zipline.screens.folders.FoldersUiState
+import com.stefdp.zipline.screens.folders.FoldersViewModel
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.getFolderPath
 import com.stefdp.zipline.utils.isChildOf
-import kotlinx.coroutines.launch
 
 private val deleteFolderTypeSelectOptions = listOf(
     DeleteFolderChildrenAction.MOVE_TO_ROOT,
@@ -54,22 +48,17 @@ fun DeleteFolderPopup(
     context: Context,
     activity: FragmentActivity,
     showPopup: Boolean,
+    filesPerPage: Long,
     onDismissRequest: () -> Unit,
-    folder: BaseFolder?,
-    isLoading: Boolean,
-    setIsLoading: (Boolean) -> Unit,
-    allFolders: List<BaseFolder>,
-    updateFolders: suspend () -> Unit,
-    updateAllFolders: suspend () -> Unit,
+    viewState: ZiplineViewStateType,
+    viewModel: FoldersViewModel,
+    state: FoldersUiState,
 ) {
-    var selectedDeleteFolderType by remember { mutableStateOf(setOf(DeleteFolderChildrenAction.MOVE_TO_ROOT.toString())) }
-    var selectedNewFolder by remember { mutableStateOf(setOf("none")) }
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest,
     ) {
-        val deleteFolderName = folder?.name ?: ""
+        val deleteFolderName = state.deleteFolder?.name ?: ""
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -112,8 +101,8 @@ fun DeleteFolderPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        val folderChildrenCount = folder?.count?.children ?: 0
-        val folderFileCount = folder?.count?.files ?: 0
+        val folderChildrenCount = state.deleteFolder?.count?.children ?: 0
+        val folderFileCount = state.deleteFolder?.count?.files ?: 0
 
         if (folderChildrenCount > 0 || folderFileCount > 0) {
             Text(
@@ -139,53 +128,57 @@ fun DeleteFolderPopup(
                         }
                     )
                 },
-                selectedIds = selectedDeleteFolderType,
+                selectedIds = state.selectedDeleteFolderType,
                 onSelectionChange = { selectedIds ->
-                    selectedDeleteFolderType = selectedIds
+                    viewModel.setSelectedDeleteFolderType(selectedIds)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            val deleteFolderType = DeleteFolderChildrenAction.valueOf(selectedDeleteFolderType.first())
+            when (DeleteFolderChildrenAction.valueOf(state.selectedDeleteFolderType.first())) {
+                DeleteFolderChildrenAction.MOVE_TO_FOLDER -> {
+                    Spacer(
+                        modifier = Modifier.height(12.dp)
+                    )
 
-            if (deleteFolderType == DeleteFolderChildrenAction.MOVE_TO_FOLDER) {
-                Spacer(
-                    modifier = Modifier.height(12.dp)
-                )
-
-                Select(
-                    label = "Target Folder",
-                    selectedIds = selectedNewFolder,
-                    options = allFolders
-                        .filter { !isChildOf(
-                            folder = it,
-                            folders = allFolders,
-                            targetParentId = folder?.id ?: ""
-                        ) }
-                        .map { folder ->
-                            SelectOption(
-                                id = folder.id,
-                                label = {
-                                    Text(
-                                        text = getFolderPath(folder, allFolders)
-                                    )
-                                }
-                            )
+                    Select(
+                        label = "Target Folder",
+                        selectedIds = state.selectedDeleteNewFolder,
+                        options = state.allFolders
+                            .filter { !isChildOf(
+                                folder = it,
+                                folders = state.allFolders,
+                                targetParentId = state.deleteFolder?.id ?: ""
+                            ) }
+                            .map { folder ->
+                                SelectOption(
+                                    id = folder.id,
+                                    label = {
+                                        Text(
+                                            text = getFolderPath(folder, state.allFolders)
+                                        )
+                                    }
+                                )
+                            },
+                        onSelectionChange = { selectedIds ->
+                            viewModel.setSelectedDeleteNewFolder(selectedIds)
                         },
-                    onSelectionChange = { selectedIds ->
-                        selectedNewFolder = selectedIds
-                    },
-                    enabled = !isLoading
-                )
-            } else if (deleteFolderType == DeleteFolderChildrenAction.CASCADE_DELETE) {
-                Spacer(
-                    modifier = Modifier.height(8.dp)
-                )
+                        enabled = !state.isLoading
+                    )
+                }
 
-                Text(
-                    text = "Warning: This will permanently delete all contents within this folder (subfolders will be deleted, and files will be unlinked from their folders).",
-                    color = MaterialTheme.colorScheme.error
-                )
+                DeleteFolderChildrenAction.CASCADE_DELETE -> {
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Text(
+                        text = "Warning: This will permanently delete all contents within this folder (subfolders will be deleted, and files will be unlinked from their folders).",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                else -> {}
             }
         }
 
@@ -193,60 +186,41 @@ fun DeleteFolderPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        val coroutineScope = rememberCoroutineScope()
-
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && (DeleteFolderChildrenAction.valueOf(selectedDeleteFolderType.first()) != DeleteFolderChildrenAction.MOVE_TO_FOLDER ||
-                    (DeleteFolderChildrenAction.valueOf(selectedDeleteFolderType.first()) == DeleteFolderChildrenAction.MOVE_TO_FOLDER && selectedNewFolder.first() != "none")),
+            enabled = !state.isLoading && (DeleteFolderChildrenAction.valueOf(state.selectedDeleteFolderType.first()) != DeleteFolderChildrenAction.MOVE_TO_FOLDER ||
+                    (DeleteFolderChildrenAction.valueOf(state.selectedDeleteFolderType.first()) == DeleteFolderChildrenAction.MOVE_TO_FOLDER && state.selectedDeleteNewFolder.first() != "none")),
             colors = getButtonColors().copy(
                 containerColor = MaterialTheme.colorScheme.error,
                 disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
             ),
             onClick = {
-                coroutineScope.launch {
-                    if (folder == null) return@launch
-
-                    setIsLoading(true)
-
-                    val deleteRes = deleteFolder(
-                        context = context,
-                        folderId = folder.id,
-                        childrenAction = DeleteFolderChildrenAction.valueOf(selectedDeleteFolderType.first()),
-                        targetFolderId = selectedNewFolder.firstOrNull()
-                    )
-
-                    deleteRes
-                        .onSuccess {
-                            updateFolders()
-                            updateAllFolders()
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "$deleteFolderName has been deleted"
-                                    )
-                                },
-                            )
-
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to delete folder: ${it.message}"
-                                    )
-                                },
+                viewModel.deleteFolder(
+                    context = context,
+                    filesPerPage = filesPerPage,
+                    viewState = viewState,
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
                             )
                         }
-
-                    setIsLoading(false)
-                }
+                    },
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "$deleteFolderName has been deleted"
+                            )
+                        }
+                    }
+                )
             }
         ) {
             Icon(

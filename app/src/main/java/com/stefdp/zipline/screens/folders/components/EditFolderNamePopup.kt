@@ -16,17 +16,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
@@ -34,10 +29,9 @@ import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.BaseFolder
-import com.stefdp.zipline.network.requests.updateFolder
-import com.stefdp.zipline.ui.theme.getButtonColors
-import kotlinx.coroutines.launch
+import com.stefdp.zipline.screens.folders.FoldersUiState
+import com.stefdp.zipline.screens.folders.FoldersViewModel
+import com.stefdp.zipline.utils.ZiplineViewStateType
 
 @Composable
 fun EditFolderNamePopup(
@@ -45,10 +39,9 @@ fun EditFolderNamePopup(
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    folder: BaseFolder?,
-    isLoading: Boolean,
-    setIsLoading: (Boolean) -> Unit,
-    updateFolders: suspend () -> Unit,
+    viewModel: FoldersViewModel,
+    state: FoldersUiState,
+    viewState: ZiplineViewStateType
 ) {
     Popup(
         showPopup = showPopup,
@@ -86,68 +79,50 @@ fun EditFolderNamePopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var newFolderName by remember { mutableStateOf(TextFieldValue(folder?.name ?: "")) }
-
         TextInput(
             label = "New Folder Name",
             placeholder = "Enter new folder name...",
-            value = newFolderName,
-            onValueChange = { newFolderName = it },
+            value = state.editNameFolderNewName,
+            onValueChange = {
+                viewModel.setEditNameFolderNewName(it)
+            },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        val coroutineScope = rememberCoroutineScope()
-
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && newFolderName.text.isNotBlank(),
+            enabled = !state.isLoading && state.editNameFolderNewName.text.isNotBlank(),
             onClick = {
-                coroutineScope.launch {
-                    if (folder == null) return@launch
-
-                    setIsLoading(true)
-
-                    val updateFolderRes = updateFolder(
-                        context = context,
-                        folderId = folder.id,
-                        name = newFolderName.text
-                    )
-
-                    updateFolderRes
-                        .onSuccess {
-                            updateFolders()
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "${folder.name} has been updated successfully to ${it.name}"
-                                    )
-                                },
-                            )
-
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to rename folder: ${it.message}"
-                                    )
-                                },
+                viewModel.editFolderName(
+                    context = context,
+                    viewState = viewState,
+                    onSuccess = { oldFolderName, newFolderName ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "$oldFolderName has been updated successfully to $newFolderName"
                             )
                         }
-
-                    setIsLoading(false)
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             }
         ) {
             Icon(

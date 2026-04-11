@@ -33,11 +33,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,8 +57,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
@@ -86,7 +87,6 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.largefiledisplay.LargeFileDisplay
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableScrollbarConfig
-import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
 import com.stefdp.zipline.network.requests.deleteFile
 import com.stefdp.zipline.network.requests.downloadFile
@@ -133,7 +133,8 @@ const val VIEW_STATE_KEY = "foldersViewState"
 fun FoldersScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    viewModel: FoldersViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -143,508 +144,365 @@ fun FoldersScreen(
         }
     }
 
-    var mainFolder by remember { mutableStateOf<BaseFolder?>(null) }
-    var folders by remember { mutableStateOf<List<BaseFolder>?>(null) }
-    var allFolders by remember { mutableStateOf<List<BaseFolder>>(emptyList()) }
-
-    var foldersPath by remember { mutableStateOf<List<BaseFolder>>(emptyList()) }
-
-    var folderFiles by remember { mutableStateOf<List<File>?>(null) }
-
-    var tags by remember { mutableStateOf<List<Tag>?>(null) }
-
-    var serverUrl by remember { mutableStateOf<String?>(null) }
-
-    var isLoading by remember { mutableStateOf(false) }
-    var tagsLoading by remember { mutableStateOf(true) }
+    val state by viewModel.state.collectAsState()
 
     val screenViewState = LocalScreenViewState.current
     val updateScreenViewState = LocalUpdateScreenViewState.current
 
     val viewState = screenViewState.folders
 
-    var currentPage by remember { mutableLongStateOf(1L) }
-    var totalPages by remember { mutableLongStateOf(1L) }
-
     val filesPerPage = if (viewState == ZiplineViewStateType.COMPACT) COMPACT_VIEW_FILE_COUNT else DETAILED_VIEW_FILE_COUNT
-
-    var folderSortKey by remember { mutableStateOf(GetFoldersQuerySortBy.CREATED_AT) }
-    var folderSortOrder by remember { mutableStateOf(SortOrder.DESC) }
-
-    var fileSortKey by remember { mutableStateOf(GetFilesQuerySortBy.CREATED_AT) }
-    var fileSortOrder by remember { mutableStateOf(SortOrder.DESC) }
 
     val defaultSortOrder = SortOrder.UNSPECIFIED
 
-    var fileSearchKey by remember { mutableStateOf<GetFilesQuerySearchField?>(null) }
-    var fileSearchValue by remember { mutableStateOf(TextFieldValue("")) }
+    LaunchedEffect(Unit) {
+        viewModel.initData(context)
 
-    var createNewFolderPopupOpen by remember { mutableStateOf(false) }
-
-    var selectedFolderExportUri by remember { mutableStateOf<Uri?>(null) }
-    var selectedFolderExportPath by remember { mutableStateOf<String?>(null) }
-
-    var selectedFileDownloadUri by remember { mutableStateOf<Uri?>(null) }
-    var selectedFileDownloadPath by remember { mutableStateOf<String?>(null) }
-
-    fun sortFolders(folders: List<BaseFolder>): List<BaseFolder> {
-        if (viewState == ZiplineViewStateType.LARGE) return folders.sortedBy { Instant.parse(it.createdAt) }.reversed()
-
-        val ascending = when (folderSortKey) {
-            GetFoldersQuerySortBy.NAME ->
-                folders.sortedBy { it.name }
-
-            GetFoldersQuerySortBy.PUBLIC ->
-                folders.sortedBy { it.public }
-
-            GetFoldersQuerySortBy.UPLOADS ->
-                folders.sortedBy { it.allowUploads }
-
-            GetFoldersQuerySortBy.CREATED_AT ->
-                folders.sortedBy { Instant.parse(it.createdAt) }
-
-            GetFoldersQuerySortBy.UPDATED_AT ->
-                folders.sortedBy { Instant.parse(it.updatedAt) }
-        }
-
-        return when (folderSortOrder) {
-            SortOrder.ASC -> ascending
-            SortOrder.DESC -> ascending.reversed()
-            SortOrder.UNSPECIFIED -> folders
-        }
+        viewModel.refreshFolders(context, viewState)
+        viewModel.refreshFiles(context, filesPerPage)
+        viewModel.refreshAllFolders(context)
+        viewModel.refreshTags(context)
     }
 
     LaunchedEffect(
-        folderSortKey,
-        folderSortOrder,
+        state.folderSortKey,
+        state.folderSortOrder,
         viewState
     ) {
         if (viewState == ZiplineViewStateType.COMPACT) {
-            folders?.let {
-                folders = sortFolders(it)
-            }
+            viewModel.triggerFolderSort(viewState)
         }
     }
 
-    suspend fun updateFolders() {
-        isLoading = true
-
-        val foldersRes = getFolders(
-            context = context,
-            parent = mainFolder?.id,
-            root = mainFolder == null,
-            excludeFiles = true,
-        )
-
-        foldersRes
-            .onSuccess {
-                folders = if (viewState == ZiplineViewStateType.COMPACT) sortFolders(it) else it
-            }
-
-        isLoading = false
+    LaunchedEffect(state.mainFolder) {
+        viewModel.refreshFolders(context, viewState)
+        viewModel.refreshFiles(context, filesPerPage)
     }
 
-    suspend fun updateAllFolders() {
-        val allFoldersRes = getFolders(
+    fun toggleAnonymousUploads(folder: BaseFolder) {
+        viewModel.toggleFolderAnonymousUploads(
             context = context,
-            excludeFiles = true,
-        )
-
-        allFoldersRes
-            .onSuccess {
-                allFolders = it
-            }
-    }
-
-    suspend fun updateFiles() {
-        if (mainFolder == null) {
-            folderFiles = null
-        } else {
-            val filesRes = getFiles(
-                context = context,
-                folderId = mainFolder!!.id,
-                perPage = filesPerPage,
-                page = currentPage,
-                sortOrder = fileSortOrder,
-                sortBy = fileSortKey,
-                searchField = fileSearchKey,
-                searchQuery = fileSearchValue.text.ifEmpty { null }
-            )
-
-            filesRes
-                .onSuccess {
-                    folderFiles = it.page
-                    totalPages = it.pages ?: 1L
+            folder = folder,
+            viewState = viewState,
+            onError = { error ->
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                ) {
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
-        }
-    }
-
-    suspend fun toggleAnonymousUploads(
-        folder: BaseFolder,
-    ) {
-        isLoading = true
-
-        val updateRes = updateFolder(
-            context = context,
-            folderId = folder.id,
-            allowUploads = !folder.allowUploads
-        )
-
-        updateRes
-            .onSuccess {
-                updateFolders()
-
+            },
+            onSuccess = { folder ->
                 Notification.show(
                     context = context,
                     activity = activity,
                     content = {
                         Text(
-                            text = "${it.name} will ${if (it.allowUploads) "now allow" else "no longer allow"} anonymous uploads"
+                            text = "${folder.name} will ${if (folder.allowUploads) "now allow" else "no longer allow"} anonymous uploads"
                         )
                     }
                 )
             }
-
-        isLoading = false
+        )
     }
 
-    suspend fun togglePublic(
-        folder: BaseFolder,
-    ) {
-        isLoading = true
-
-        val updateRes = updateFolder(
+    fun togglePublic(folder: BaseFolder) {
+        viewModel.toggleFolderPublic(
             context = context,
-            folderId = folder.id,
-            isPublic = !folder.public
-        )
-
-        updateRes
-            .onSuccess {
-                updateFolders()
-
+            folder = folder,
+            viewState = viewState,
+            onError = { error ->
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                ) {
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            onSuccess = { folder ->
                 Notification.show(
                     context = context,
                     activity = activity,
                     content = {
                         Text(
-                            text = "${it.name} is now ${if (it.public) "public" else "private"}"
+                            text = "${folder.name} is now ${if (folder.public) "public" else "private"}"
                         )
                     }
                 )
             }
-
-        isLoading = false
-    }
-
-    LaunchedEffect(mainFolder) {
-        updateFolders()
-        updateFiles()
-    }
-
-    LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
-
-        val fileDownloadFolder = secureStore.get(STORAGE_FILE_DOWNLOAD_FOLDER_KEY)
-
-        if (fileDownloadFolder != null) {
-            selectedFileDownloadUri = fileDownloadFolder.toUri()
-            selectedFileDownloadPath = getDisplayPath(fileDownloadFolder.toUri())
-        }
-
-        val folderExportFolder = secureStore.get(STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY)
-
-        if (folderExportFolder != null) {
-            selectedFolderExportUri = folderExportFolder.toUri()
-            selectedFolderExportPath = getDisplayPath(folderExportFolder.toUri())
-        }
-
-        updateFolders()
-        updateFiles()
-        updateAllFolders()
-
-        val tagsRes = getTags(context)
-
-        tagsRes
-            .onSuccess {
-                tags = it
-            }
+        )
     }
 
     val coroutineScope = rememberCoroutineScope()
 
-    fun downloadShowToast(message: String) {
-        coroutineScope.launch(Dispatchers.Main) {
-            Notification.show(
-                context = context,
-                activity = activity,
-                content = {
-                    Text(message)
-                }
-            )
-        }
-    }
+    // TODO: move to ViewModel
+//    fun performFileDownload(file: File) {
+//        val fileFits = StorageUtil.canFitFile(
+//            context = context,
+//            uri = selectedFileDownloadUri!!,
+//            fileSize = file.size
+//        )
+//
+//        if (!fileFits) {
+//            downloadShowToast("Not enough space in the selected directory to download the file")
+//
+//            return
+//        }
+//
+//        val fileFitsCache = StorageUtil.canFitInternalCache(
+//            context = context,
+//            fileSize = file.size
+//        )
+//
+//        if (!fileFitsCache) {
+//            downloadShowToast("Not enough space in the internal cache to download the file")
+//
+//            return
+//        }
+//
+//        if (file.password == true && downloadFilePassword.isNullOrBlank()) {
+//            fileRequiresPassword = true
+//            return
+//        }
+//
+//        coroutineScope.launch(Dispatchers.IO) {
+//            downloadShowToast("Starting download...")
+//
+//            val fileName = file.originalName ?: file.name
+//
+//            val tempFile = java.io.File(context.cacheDir, fileName)
+//            val tempDestinationPath = tempFile.absolutePath
+//
+//            if (tempFile.exists()) tempFile.delete()
+//
+//            val downloadRes = downloadFile(
+//                context = context,
+//                fileId = file.id,
+//                destinationPath = tempDestinationPath,
+//                notificationTitle = "Downloading file",
+//                notificationContent = "Downloading ${file.name}",
+//                password = downloadFilePassword
+//            )
+//
+//            downloadRes
+//                .onSuccess {
+//                    try {
+//                        val docUri =
+//                            DocumentsContract.buildDocumentUriUsingTree(
+//                                selectedFileDownloadUri,
+//                                DocumentsContract.getTreeDocumentId(
+//                                    selectedFileDownloadUri
+//                                )
+//                            )
+//
+//                        val fileUri = DocumentsContract.createDocument(
+//                            context.contentResolver,
+//                            docUri,
+//                            file.type,
+//                            fileName
+//                        )
+//
+//                        if (fileUri != null) {
+//                            context.contentResolver.openOutputStream(fileUri)
+//                                ?.use { out ->
+//                                    tempFile.inputStream().use { inp ->
+//                                        inp.copyTo(out)
+//                                    }
+//                                }
+//
+//                            downloadShowToast("File downloaded to ${selectedFileDownloadPath}/$fileName")
+//                        } else {
+//                            downloadShowToast("Failed to create file in selected directory")
+//                        }
+//                    } catch (e: Exception) {
+//                        Logger.error(
+//                            "FoldersScreen",
+//                            "Failed to copy file to selected directory",
+//                            e
+//                        )
+//
+//                        downloadShowToast("Failed to copy file to selected directory: ${e.message}")
+//                    } finally {
+//                        tempFile.delete()
+//                    }
+//                }
+//                .onFailure {
+//                    Logger.error("FoldersScreen", "Failed to download file", it)
+//
+//                    downloadShowToast("Failed to download file: ${it.message}")
+//                }
+//
+//            fileRequiresPassword = false
+//            downloadFilePassword = null
+//            fileToDownload = null
+//        }
+//    }
 
-    var downloadFolderType by remember { mutableStateOf(DownloadFolderType.FOLDER) }
-
-    var downloadFilePassword by remember { mutableStateOf<String?>(null) }
-    var fileRequiresPassword by remember { mutableStateOf(false) }
-
-    var fileToDownload by remember { mutableStateOf<File?>(null) }
-    var folderToExport by remember { mutableStateOf<BaseFolder?>(null) }
-
-    fun performFileDownload(file: File) {
-        val fileFits = StorageUtil.canFitFile(
-            context = context,
-            uri = selectedFileDownloadUri!!,
-            fileSize = file.size
-        )
-
-        if (!fileFits) {
-            downloadShowToast("Not enough space in the selected directory to download the file")
-
-            return
-        }
-
-        val fileFitsCache = StorageUtil.canFitInternalCache(
-            context = context,
-            fileSize = file.size
-        )
-
-        if (!fileFitsCache) {
-            downloadShowToast("Not enough space in the internal cache to download the file")
-
-            return
-        }
-
-        if (file.password == true && downloadFilePassword.isNullOrBlank()) {
-            fileRequiresPassword = true
-            return
-        }
-
-        coroutineScope.launch(Dispatchers.IO) {
-            downloadShowToast("Starting download...")
-
-            val fileName = file.originalName ?: file.name
-
-            val tempFile = java.io.File(context.cacheDir, fileName)
-            val tempDestinationPath = tempFile.absolutePath
-
-            if (tempFile.exists()) tempFile.delete()
-
-            val downloadRes = downloadFile(
-                context = context,
-                fileId = file.id,
-                destinationPath = tempDestinationPath,
-                notificationTitle = "Downloading file",
-                notificationContent = "Downloading ${file.name}",
-                password = downloadFilePassword
-            )
-
-            downloadRes
-                .onSuccess {
-                    try {
-                        val docUri =
-                            DocumentsContract.buildDocumentUriUsingTree(
-                                selectedFileDownloadUri,
-                                DocumentsContract.getTreeDocumentId(
-                                    selectedFileDownloadUri
-                                )
-                            )
-
-                        val fileUri = DocumentsContract.createDocument(
-                            context.contentResolver,
-                            docUri,
-                            file.type,
-                            fileName
-                        )
-
-                        if (fileUri != null) {
-                            context.contentResolver.openOutputStream(fileUri)
-                                ?.use { out ->
-                                    tempFile.inputStream().use { inp ->
-                                        inp.copyTo(out)
-                                    }
-                                }
-
-                            downloadShowToast("File downloaded to ${selectedFileDownloadPath}/$fileName")
-                        } else {
-                            downloadShowToast("Failed to create file in selected directory")
-                        }
-                    } catch (e: Exception) {
-                        Logger.error(
-                            "FoldersScreen",
-                            "Failed to copy file to selected directory",
-                            e
-                        )
-
-                        downloadShowToast("Failed to copy file to selected directory: ${e.message}")
-                    } finally {
-                        tempFile.delete()
-                    }
-                }
-                .onFailure {
-                    Logger.error("FoldersScreen", "Failed to download file", it)
-
-                    downloadShowToast("Failed to download file: ${it.message}")
-                }
-
-            fileRequiresPassword = false
-            downloadFilePassword = null
-            fileToDownload = null
-        }
-    }
-
-    fun performFolderExport(folder: BaseFolder) {
-        coroutineScope.launch(Dispatchers.IO) {
-            val folderExportSize = getFolderExportSize(
-                context = context,
-                folderId = folder.id
-            )
-
-            folderExportSize
-                .onSuccess {
-                    val fileFits = StorageUtil.canFitFile(
-                        context = context,
-                        uri = selectedFolderExportUri!!,
-                        fileSize = it
-                    )
-
-                    if (!fileFits) {
-                        downloadShowToast("Not enough space in the selected directory to download the folder")
-
-                        return@launch
-                    }
-
-                    val fileFitsCache = StorageUtil.canFitInternalCache(
-                        context = context,
-                        fileSize = it
-                    )
-
-                    if (!fileFitsCache) {
-                        downloadShowToast("Not enough space in the internal cache to download the folder")
-
-                        return@launch
-                    }
-                }
-                .onFailure {
-                    Notification.show(
-                        context = context,
-                        activity = activity,
-                        content = {
-                            Text(
-                                text = "Failed to get folder export size: ${it.message}"
-                            )
-                        }
-                    )
-                }
-
-            downloadShowToast("Starting download...")
-
-            val fileName = folder.name
-
-            val tempFile = java.io.File(context.cacheDir, fileName)
-            val tempDestinationPath = tempFile.absolutePath
-
-            if (tempFile.exists()) tempFile.delete()
-
-            val exportRes = exportFolder(
-                context = context,
-                folderId = folder.id,
-                destinationPath = tempDestinationPath,
-                notificationTitle = "Downloading folder export",
-                notificationContent = "Downloading ${folder.name}",
-            )
-
-            exportRes
-                .onSuccess {
-                    try {
-                        val docUri =
-                            DocumentsContract.buildDocumentUriUsingTree(
-                                selectedFolderExportUri,
-                                DocumentsContract.getTreeDocumentId(
-                                    selectedFolderExportUri
-                                )
-                            )
-
-                        val fileUri = DocumentsContract.createDocument(
-                            context.contentResolver,
-                            docUri,
-                            "application/zip",
-                            fileName
-                        )
-
-                        if (fileUri != null) {
-                            context.contentResolver.openOutputStream(fileUri)
-                                ?.use { out ->
-                                    tempFile.inputStream().use { inp ->
-                                        inp.copyTo(out)
-                                    }
-                                }
-
-                            downloadShowToast("Folder export downloaded to ${selectedFolderExportPath}/$fileName.zip")
-                        } else {
-                            downloadShowToast("Failed to create folder export in selected directory")
-                        }
-                    } catch (e: Exception) {
-                        Logger.error(
-                            "FoldersScreen",
-                            "Failed to copy folder export to selected directory",
-                            e
-                        )
-
-                        downloadShowToast("Failed to copy folder export to selected directory: ${e.message}")
-                    } finally {
-                        tempFile.delete()
-                    }
-                }
-                .onFailure {
-                    Logger.error("FoldersScreen", "Failed to download folder export", it)
-
-                    downloadShowToast("Failed to download folder export: ${it.message}")
-                }
-
-            fileRequiresPassword = false
-            downloadFilePassword = null
-            folderToExport = null
-        }
-    }
+    // TODO: move to ViewModel
+//    fun performFolderExport(folder: BaseFolder) {
+//        coroutineScope.launch(Dispatchers.IO) {
+//            val folderExportSize = getFolderExportSize(
+//                context = context,
+//                folderId = folder.id
+//            )
+//
+//            folderExportSize
+//                .onSuccess {
+//                    val fileFits = StorageUtil.canFitFile(
+//                        context = context,
+//                        uri = selectedFolderExportUri!!,
+//                        fileSize = it
+//                    )
+//
+//                    if (!fileFits) {
+//                        downloadShowToast("Not enough space in the selected directory to download the folder")
+//
+//                        return@launch
+//                    }
+//
+//                    val fileFitsCache = StorageUtil.canFitInternalCache(
+//                        context = context,
+//                        fileSize = it
+//                    )
+//
+//                    if (!fileFitsCache) {
+//                        downloadShowToast("Not enough space in the internal cache to download the folder")
+//
+//                        return@launch
+//                    }
+//                }
+//                .onFailure {
+//                    Notification.show(
+//                        context = context,
+//                        activity = activity,
+//                        content = {
+//                            Text(
+//                                text = "Failed to get folder export size: ${it.message}"
+//                            )
+//                        }
+//                    )
+//                }
+//
+//            downloadShowToast("Starting download...")
+//
+//            val fileName = folder.name
+//
+//            val tempFile = java.io.File(context.cacheDir, fileName)
+//            val tempDestinationPath = tempFile.absolutePath
+//
+//            if (tempFile.exists()) tempFile.delete()
+//
+//            val exportRes = exportFolder(
+//                context = context,
+//                folderId = folder.id,
+//                destinationPath = tempDestinationPath,
+//                notificationTitle = "Downloading folder export",
+//                notificationContent = "Downloading ${folder.name}",
+//            )
+//
+//            exportRes
+//                .onSuccess {
+//                    try {
+//                        val docUri =
+//                            DocumentsContract.buildDocumentUriUsingTree(
+//                                selectedFolderExportUri,
+//                                DocumentsContract.getTreeDocumentId(
+//                                    selectedFolderExportUri
+//                                )
+//                            )
+//
+//                        val fileUri = DocumentsContract.createDocument(
+//                            context.contentResolver,
+//                            docUri,
+//                            "application/zip",
+//                            fileName
+//                        )
+//
+//                        if (fileUri != null) {
+//                            context.contentResolver.openOutputStream(fileUri)
+//                                ?.use { out ->
+//                                    tempFile.inputStream().use { inp ->
+//                                        inp.copyTo(out)
+//                                    }
+//                                }
+//
+//                            downloadShowToast("Folder export downloaded to ${selectedFolderExportPath}/$fileName.zip")
+//                        } else {
+//                            downloadShowToast("Failed to create folder export in selected directory")
+//                        }
+//                    } catch (e: Exception) {
+//                        Logger.error(
+//                            "FoldersScreen",
+//                            "Failed to copy folder export to selected directory",
+//                            e
+//                        )
+//
+//                        downloadShowToast("Failed to copy folder export to selected directory: ${e.message}")
+//                    } finally {
+//                        tempFile.delete()
+//                    }
+//                }
+//                .onFailure {
+//                    Logger.error("FoldersScreen", "Failed to download folder export", it)
+//
+//                    downloadShowToast("Failed to download folder export: ${it.message}")
+//                }
+//
+//            fileRequiresPassword = false
+//            downloadFilePassword = null
+//            folderToExport = null
+//        }
+//    }
 
     val directoryPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
         uri?.let {
-            val secureStore = SecureStorage.getInstance(context)
-
             context.contentResolver.takePersistableUriPermission(
                 it,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
                         Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
 
-            if (downloadFolderType == DownloadFolderType.FOLDER) {
-                selectedFolderExportUri = it
-                selectedFolderExportPath = getDisplayPath(it)
+            if (state.downloadFolderType == DownloadFolderType.FOLDER) {
+                viewModel.setDownloadFolderExportUri(context, it)
 
-                coroutineScope.launch {
-                    secureStore.set(STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY, selectedFolderExportUri.toString())
-                }
-
-                folderToExport?.let { folder ->
-                    performFolderExport(folder)
+                state.folderToExport?.let { folder ->
+                    viewModel.performFolderExport(
+                        context = context,
+                        folder = folder,
+                        folderExportUri = it,
+                        sendNotification = { content ->
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = content
+                            )
+                        }
+                    )
                 }
             } else {
-                selectedFileDownloadUri = it
-                selectedFileDownloadPath = getDisplayPath(it)
+                viewModel.setDownloadFileUri(context, it)
 
-                coroutineScope.launch {
-                    secureStore.set(STORAGE_FILE_DOWNLOAD_FOLDER_KEY, selectedFileDownloadUri.toString())
-                }
-
-                fileToDownload?.let { file ->
-                    performFileDownload(file)
+                state.fileToDownload?.let { file ->
+                    viewModel.performFileDownload(
+                        context = context,
+                        file = file,
+                        fileDownloadUri = it,
+                        sendNotification = { content ->
+                            Notification.show(
+                                context = context,
+                                activity = activity,
+                                content = content
+                            )
+                         }
+                    )
                 }
             }
         }
@@ -677,9 +535,9 @@ fun FoldersScreen(
                     icon = painterResource(R.drawable.create_new_folder),
                     contentDescription = "Create Folder",
                     onClick = {
-                        createNewFolderPopupOpen = true
+                        viewModel.openCreateNewFolderPopup()
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
 
                 Spacer(
@@ -700,12 +558,12 @@ fun FoldersScreen(
                             )
                         )
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
             }
         }
 
-        if (foldersPath.isNotEmpty()) {
+        if (state.foldersPath.isNotEmpty()) {
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalArrangement = Arrangement.Center,
@@ -718,13 +576,13 @@ fun FoldersScreen(
                         .size(24.dp)
                         .clickable(
                             onClick = {
-                                mainFolder = null
-                                foldersPath = emptyList()
+                                viewModel.setMainFolder(null)
+                                viewModel.setFolderPath(emptyList())
                             }
                         )
                 )
 
-                foldersPath.forEachIndexed { index, folder ->
+                state.foldersPath.forEachIndexed { index, folder ->
                     Text("/")
 
                     Text(
@@ -732,8 +590,8 @@ fun FoldersScreen(
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.clickable(
                             onClick = {
-                                mainFolder = folder
-                                foldersPath = foldersPath.subList(0, index + 1)
+                                viewModel.setMainFolder(folder)
+                                viewModel.setFolderPath(state.foldersPath.subList(0, index + 1))
                             }
                         )
                     )
@@ -741,58 +599,53 @@ fun FoldersScreen(
             }
         }
 
-        var deleteFolder by remember { mutableStateOf<BaseFolder?>(null) }
-
         DeleteFolderPopup(
             context = context,
             activity = activity,
-            folder = deleteFolder,
-            isLoading = isLoading,
-            setIsLoading = { isLoading = it },
-            allFolders = allFolders,
-            updateFolders = ::updateFolders,
-            updateAllFolders = ::updateAllFolders,
-            showPopup = deleteFolder != null,
-            onDismissRequest = { deleteFolder = null },
+            filesPerPage = filesPerPage,
+            showPopup = state.deleteFolder != null,
+            onDismissRequest = {
+                viewModel.setDeleteFolder(null)
+            },
+            viewModel = viewModel,
+            state = state,
+            viewState = viewState
         )
 
         CreateFolderPopup(
             context = context,
             activity = activity,
-            mainFolder = mainFolder,
-            isLoading = isLoading,
-            setIsLoading = { isLoading = it },
-            updateFolders = ::updateFolders,
-            updateAllFolders = ::updateAllFolders,
-            showPopup = createNewFolderPopupOpen,
-            onDismissRequest = { createNewFolderPopupOpen = false },
+            showPopup = state.createNewFolderPopupOpen,
+            onDismissRequest = {
+                viewModel.closeCreateNewFolderPopup()
+            },
+            viewModel = viewModel,
+            state = state,
+            viewState = viewState
         )
-
-        var editNameFolder by remember { mutableStateOf<BaseFolder?>(null) }
 
         EditFolderNamePopup(
             context = context,
             activity = activity,
-            folder = editNameFolder,
-            isLoading = isLoading,
-            setIsLoading = { isLoading = it },
-            updateFolders = ::updateFolders,
-            showPopup = editNameFolder != null,
-            onDismissRequest = { editNameFolder = null },
+            showPopup = state.editNameFolder != null,
+            onDismissRequest = {
+                viewModel.setEditNameFolder(null)
+            },
+            viewModel = viewModel,
+            state = state,
+            viewState = viewState
         )
-
-        var moveFolder by remember { mutableStateOf<BaseFolder?>(null) }
 
         MoveFolderPopup(
             context = context,
             activity = activity,
-            folder = moveFolder,
-            allFolders = allFolders,
-            isLoading = isLoading,
-            setIsLoading = { isLoading = it },
-            updateFolders = ::updateFolders,
-            showPopup = moveFolder != null,
-            onDismissRequest = { moveFolder = null },
+            showPopup = state.moveFolder != null,
+            onDismissRequest = {
+                viewModel.setMoveFolder(null)
+            },
+            viewModel = viewModel,
+            state = state,
+            viewState = viewState
         )
 
         val foldersLazyColumnListState = rememberLazyListState()
@@ -816,6 +669,14 @@ fun FoldersScreen(
                 val tableLastUpdatedAtWidth = 170.dp
                 val tableActionsWidth = 130.dp
 
+                fun onSortChanged(sortKey: GetFoldersQuerySortBy) {
+                    if (state.folderSortKey != sortKey || state.folderSortOrder == SortOrder.UNSPECIFIED || state.folderSortOrder == SortOrder.DESC) {
+                        viewModel.updateFoldersSort(sortKey, SortOrder.ASC)
+                    } else {
+                        viewModel.updateFoldersSort(sortKey, SortOrder.DESC)
+                    }
+                }
+
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
                         content = {
@@ -827,16 +688,9 @@ fun FoldersScreen(
                         width = tableNameWidth,
                         name = "name",
                         sortable = true,
-                        sortOrder = if (folderSortKey == GetFoldersQuerySortBy.NAME) folderSortOrder else defaultSortOrder,
+                        sortOrder = if (state.folderSortKey == GetFoldersQuerySortBy.NAME) state.folderSortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (folderSortKey != GetFoldersQuerySortBy.NAME) {
-                                folderSortKey = GetFoldersQuerySortBy.NAME
-                                folderSortOrder = SortOrder.ASC
-                            } else if (folderSortOrder == SortOrder.UNSPECIFIED || folderSortOrder == SortOrder.DESC) {
-                                folderSortOrder = SortOrder.ASC
-                            } else {
-                                folderSortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFoldersQuerySortBy.NAME)
                         },
                     ),
                     TableHeaderData(
@@ -849,16 +703,9 @@ fun FoldersScreen(
                         width = tablePublicWidth,
                         name = "public",
                         sortable = true,
-                        sortOrder = if (folderSortKey == GetFoldersQuerySortBy.PUBLIC) folderSortOrder else defaultSortOrder,
+                        sortOrder = if (state.folderSortKey == GetFoldersQuerySortBy.PUBLIC) state.folderSortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (folderSortKey != GetFoldersQuerySortBy.PUBLIC) {
-                                folderSortKey = GetFoldersQuerySortBy.PUBLIC
-                                folderSortOrder = SortOrder.ASC
-                            } else if (folderSortOrder == SortOrder.UNSPECIFIED || folderSortOrder == SortOrder.DESC) {
-                                folderSortOrder = SortOrder.ASC
-                            } else {
-                                folderSortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFoldersQuerySortBy.PUBLIC)
                         },
                     ),
                     TableHeaderData(
@@ -871,16 +718,9 @@ fun FoldersScreen(
                         width = tableUploadsWidth,
                         name = "uploads",
                         sortable = true,
-                        sortOrder = if (folderSortKey == GetFoldersQuerySortBy.UPLOADS) folderSortOrder else defaultSortOrder,
+                        sortOrder = if (state.folderSortKey == GetFoldersQuerySortBy.UPLOADS) state.folderSortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (folderSortKey != GetFoldersQuerySortBy.UPLOADS) {
-                                folderSortKey = GetFoldersQuerySortBy.UPLOADS
-                                folderSortOrder = SortOrder.ASC
-                            } else if (folderSortOrder == SortOrder.UNSPECIFIED || folderSortOrder == SortOrder.DESC) {
-                                folderSortOrder = SortOrder.ASC
-                            } else {
-                                folderSortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFoldersQuerySortBy.UPLOADS)
                         },
                     ),
                     TableHeaderData(
@@ -893,16 +733,9 @@ fun FoldersScreen(
                         width = tableCreatedWidth,
                         name = "created at",
                         sortable = true,
-                        sortOrder = if (folderSortKey == GetFoldersQuerySortBy.CREATED_AT) folderSortOrder else defaultSortOrder,
+                        sortOrder = if (state.folderSortKey == GetFoldersQuerySortBy.CREATED_AT) state.folderSortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (folderSortKey != GetFoldersQuerySortBy.CREATED_AT) {
-                                folderSortKey = GetFoldersQuerySortBy.CREATED_AT
-                                folderSortOrder = SortOrder.ASC
-                            } else if (folderSortOrder == SortOrder.UNSPECIFIED || folderSortOrder == SortOrder.DESC) {
-                                folderSortOrder = SortOrder.ASC
-                            } else {
-                                folderSortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFoldersQuerySortBy.CREATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -915,16 +748,9 @@ fun FoldersScreen(
                         width = tableLastUpdatedAtWidth,
                         name = "lastUpdatedAt",
                         sortable = true,
-                        sortOrder = if (folderSortKey == GetFoldersQuerySortBy.UPDATED_AT) folderSortOrder else defaultSortOrder,
+                        sortOrder = if (state.folderSortKey == GetFoldersQuerySortBy.UPDATED_AT) state.folderSortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (folderSortKey != GetFoldersQuerySortBy.UPDATED_AT) {
-                                folderSortKey = GetFoldersQuerySortBy.UPDATED_AT
-                                folderSortOrder = SortOrder.ASC
-                            } else if (folderSortOrder == SortOrder.UNSPECIFIED || folderSortOrder == SortOrder.DESC) {
-                                folderSortOrder = SortOrder.ASC
-                            } else {
-                                folderSortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetFoldersQuerySortBy.UPDATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -939,12 +765,12 @@ fun FoldersScreen(
                     ),
                 )
 
-                val rows: List<TableRowData> = folders?.map { folder ->
+                val rows: List<TableRowData> = state.folders?.map { folder ->
                     TableRowData(
                         clickable = true,
                         onClick = {
-                            mainFolder = folder
-                            foldersPath = foldersPath + folder
+                            viewModel.setMainFolder(folder)
+                            viewModel.setFolderPath(state.foldersPath + folder)
                         },
                         cells = listOf(
                             TableCellData(
@@ -1015,7 +841,7 @@ fun FoldersScreen(
                                         Spacer(modifier = Modifier.width(8.dp))
                                     }
 
-                                    var expanded by remember { mutableStateOf(false) }
+                                    var expanded by rememberSaveable { mutableStateOf(false) }
 
                                     DropdownMenu(
                                         expanded = expanded,
@@ -1027,16 +853,16 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = "Open Folder",
-                                                    color = if (isLoading)
+                                                    color = if (state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                mainFolder = folder
-                                                foldersPath = foldersPath + folder
+                                                viewModel.setMainFolder(folder)
+                                                viewModel.setFolderPath(state.foldersPath + folder)
 
                                                 expanded = false
                                             },
@@ -1044,7 +870,7 @@ fun FoldersScreen(
                                                 Icon(
                                                     painter = painterResource(R.drawable.folder_open),
                                                     contentDescription = "Open folder",
-                                                    tint = if (isLoading)
+                                                    tint = if (state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant
@@ -1056,22 +882,22 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = "Move Folder",
-                                                    color = if (!isLoading)
+                                                    color = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                moveFolder = folder
+                                                viewModel.setMoveFolder(folder)
                                                 expanded = false
                                             },
                                             leadingIcon = {
                                                 Icon(
                                                     painter = painterResource(R.drawable.folder_copy),
                                                     contentDescription = "Move folder",
-                                                    tint = if (!isLoading)
+                                                    tint = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -1083,25 +909,36 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = "Export as ZIP",
-                                                    color = if (!isLoading)
+                                                    color = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                folderToExport = folder
+                                                viewModel.setFolderToExport(folder)
 
-                                                if (selectedFolderExportUri == null) {
-                                                    downloadFolderType = DownloadFolderType.FOLDER
+                                                if (state.selectedFolderExportUri == null) {
+                                                    viewModel.setDownloadFolderType(DownloadFolderType.FOLDER)
 
                                                     directoryPicker.launch(null)
 
                                                     return@DropdownMenuItem
                                                 }
 
-                                                performFolderExport(folder)
+                                                viewModel.performFolderExport(
+                                                    context = context,
+                                                    folder = folder,
+                                                    folderExportUri = state.selectedFolderExportUri!!,
+                                                    sendNotification = { content ->
+                                                        Notification.show(
+                                                            context = context,
+                                                            activity = activity,
+                                                            content = content
+                                                        )
+                                                    }
+                                                )
 
                                                 expanded = false
                                             },
@@ -1109,7 +946,7 @@ fun FoldersScreen(
                                                 Icon(
                                                     painter = painterResource(R.drawable.folder_zip),
                                                     contentDescription = "Export as ZIP",
-                                                    tint = if (!isLoading)
+                                                    tint = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -1121,18 +958,17 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = if (folder.public) "Make Private" else "Make Public",
-                                                    color = if (!isLoading)
+                                                    color = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                coroutineScope.launch {
-                                                    togglePublic(folder)
-                                                    expanded = false
-                                                }
+                                                togglePublic(folder)
+
+                                                expanded = false
                                             },
                                             leadingIcon = {
                                                 Icon(
@@ -1143,7 +979,7 @@ fun FoldersScreen(
                                                             R.drawable.lock_open
                                                     ),
                                                     contentDescription = if (folder.public) "Make private" else "Make public",
-                                                    tint = if (!isLoading)
+                                                    tint = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -1155,18 +991,17 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = if (folder.allowUploads) "Disallow Anonymous Uploads" else "Allow Anonymous Uploads",
-                                                    color = if (!isLoading)
+                                                    color = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                coroutineScope.launch {
-                                                    toggleAnonymousUploads(folder)
-                                                    expanded = false
-                                                }
+                                                toggleAnonymousUploads(folder)
+
+                                                expanded = false
                                             },
                                             leadingIcon = {
                                                 Icon(
@@ -1177,7 +1012,7 @@ fun FoldersScreen(
                                                             R.drawable.share
                                                     ),
                                                     contentDescription = if (folder.allowUploads) "Disallow anonymous uploads" else "Allow anonymous uploads",
-                                                    tint = if (!isLoading)
+                                                    tint = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -1189,22 +1024,22 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = "Edit Name",
-                                                    color = if (!isLoading)
+                                                    color = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                editNameFolder = folder
+                                                viewModel.setEditNameFolder(folder)
                                                 expanded = false
                                             },
                                             leadingIcon = {
                                                 Icon(
                                                     painter = painterResource(R.drawable.edit),
                                                     contentDescription = "Edit name",
-                                                    tint = if (!isLoading)
+                                                    tint = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.onSurfaceVariant
                                                     else
                                                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -1216,22 +1051,22 @@ fun FoldersScreen(
                                             text = {
                                                 Text(
                                                     text = "Delete",
-                                                    color = if (!isLoading)
+                                                    color = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.error
                                                     else
                                                         MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
                                                 )
                                             },
-                                            enabled = !isLoading,
+                                            enabled = !state.isLoading,
                                             onClick = {
-                                                deleteFolder = folder
+                                                viewModel.setDeleteFolder(folder)
                                                 expanded = false
                                             },
                                             leadingIcon = {
                                                 Icon(
                                                     painter = painterResource(R.drawable.delete),
                                                     contentDescription = "Delete",
-                                                    tint = if (!isLoading)
+                                                    tint = if (!state.isLoading)
                                                         MaterialTheme.colorScheme.error
                                                     else
                                                         MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
@@ -1246,7 +1081,7 @@ fun FoldersScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = { expanded = true },
-                                        enabled = !isLoading
+                                        enabled = !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -1259,7 +1094,7 @@ fun FoldersScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
-                                            val fileUrl = "${serverUrl}/folder/${folder.id}"
+                                            val fileUrl = "${state.serverUrl}/folder/${folder.id}"
 
                                             val clipData = ClipData.newRawUri("Folder URL", fileUrl.toUri()).toClipEntry()
 
@@ -1277,7 +1112,7 @@ fun FoldersScreen(
                                                 )
                                             }
                                         },
-                                        enabled = serverUrl != null && !isLoading && folder.public
+                                        enabled = state.serverUrl != null && !state.isLoading && folder.public
                                     )
 
                                     ActionButtonSpacer()
@@ -1288,9 +1123,9 @@ fun FoldersScreen(
                                         color = MaterialTheme.colorScheme.error,
                                         iconColor = MaterialTheme.colorScheme.onError,
                                         onClick = {
-                                            deleteFolder = folder
+                                            viewModel.setDeleteFolder(folder)
                                         },
-                                        enabled = serverUrl != null && !isLoading
+                                        enabled = state.serverUrl != null && !state.isLoading
                                     )
                                 },
                                 width = tableActionsWidth,
@@ -1305,7 +1140,7 @@ fun FoldersScreen(
                         .weight(0.35f),
                     headers = headers,
                     rows = rows,
-                    loading = isLoading,
+                    loading = state.folders == null,
                     scrollbarConfig = TableScrollbarConfig(
                         vertical = ScrollbarConfig(
                             alwaysKeepScrollbar = true
@@ -1318,7 +1153,7 @@ fun FoldersScreen(
             }
         } else {
             val foldersModifier = Modifier.fillMaxWidth()
-            val foldersHeightModifier = if (folders?.isEmpty() == true && mainFolder != null)
+            val foldersHeightModifier = if (state.folders?.isEmpty() == true && state.mainFolder != null)
                 foldersModifier.height(0.dp)
             else
                 foldersModifier.weight(0.35f)
@@ -1332,7 +1167,7 @@ fun FoldersScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (folders == null || isLoading) {
+                if (state.folders == null || state.isLoading) {
                     items(5) {
                         Box(
                             modifier = Modifier
@@ -1348,7 +1183,7 @@ fun FoldersScreen(
                         ) {}
                     }
                 } else {
-                    folders?.let { folders ->
+                    state.folders?.let { folders ->
                         if (folders.size > 0L) {
                             items(folders.size) { index ->
                                 val folder = folders[index]
@@ -1357,33 +1192,50 @@ fun FoldersScreen(
                                     context = context,
                                     activity = activity,
                                     folder = folder,
-                                    serverUrl = serverUrl,
+                                    serverUrl = state.serverUrl,
                                     onOpen = {
-                                        mainFolder = folder
-                                        foldersPath = foldersPath + folder
+                                        viewModel.setMainFolder(folder)
+                                        viewModel.setFolderPath(state.foldersPath + folder)
                                     },
-                                    onMove = { moveFolder = folder },
+                                    onMove = {
+                                        viewModel.setMoveFolder(folder)
+                                    },
                                     onExportZip = {
-                                        folderToExport = folder
+                                        viewModel.setFolderToExport(folder)
 
-                                        if (selectedFolderExportUri == null) {
-                                            downloadFolderType = DownloadFolderType.FOLDER
+                                        if (state.selectedFolderExportUri == null) {
+                                            viewModel.setDownloadFolderType(DownloadFolderType.FOLDER)
 
                                             directoryPicker.launch(null)
 
                                             return@LargeFolderDisplay
                                         }
 
-                                        performFolderExport(folder)
+                                        viewModel.performFolderExport(
+                                            context = context,
+                                            folder = folder,
+                                            folderExportUri = state.selectedFolderExportUri!!,
+                                            sendNotification = { content ->
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = content
+                                                )
+                                            }
+                                        )
                                     },
                                     onTogglePublic = {
-                                        coroutineScope.launch { togglePublic(folder) }
+                                        togglePublic(folder)
                                     },
                                     onToggleAnonymousUploads = {
-                                        coroutineScope.launch { toggleAnonymousUploads(folder) }
+                                        toggleAnonymousUploads(folder)
                                     },
-                                    onEditName = { editNameFolder = folder },
-                                    onDelete = { deleteFolder = folder },
+                                    onEditName = {
+                                        viewModel.setEditNameFolder(folder)
+                                    },
+                                    onDelete = {
+                                        viewModel.setDeleteFolder(folder)
+                                    },
                                 )
                             }
                         } else {
@@ -1423,49 +1275,55 @@ fun FoldersScreen(
             }
         }
 
-        if (mainFolder != null) {
+        if (state.mainFolder != null) {
             val filesLazyColumnListState = rememberLazyListState()
 
-            var clickedFile by remember { mutableStateOf<File?>(null) }
-
             LaunchedEffect(
-                currentPage,
-                fileSortOrder,
-                fileSortKey,
-                fileSearchValue,
+                state.currentPage,
+                state.fileSortOrder,
+                state.fileSortKey,
+                state.fileSearchValue,
             ) {
-                updateFiles()
+                viewModel.refreshFiles(context, filesPerPage)
                 filesLazyColumnListState.animateScrollToItem(0)
-                clickedFile = null
+                viewModel.setClickedFile(null)
             }
 
-            LaunchedEffect(folderFiles) {
-                if (clickedFile != null) {
-                    val updatedFile = folderFiles?.find { it.id == clickedFile?.id }
+            LaunchedEffect(state.folderFiles) {
+                if (state.clickedFile != null) {
+                    val updatedFile = state.folderFiles?.find { it.id == state.clickedFile?.id }
 
                     if (updatedFile != null) {
-                        clickedFile = updatedFile
+                        viewModel.setClickedFile(updatedFile)
                     }
                 }
+            }
+
+            fun updateData() {
+                viewModel.refreshFolders(context, viewState)
             }
 
             LargeFileDisplay(
                 context = context,
                 activity = activity,
-                file = clickedFile,
-                updateData = ::updateFolders,
-                onDismissRequest = { clickedFile = null },
-                tags = tags,
+                file = state.clickedFile,
+                updateData = ::updateData,
+                onDismissRequest = {
+                    viewModel.setClickedFile(null)
+                },
+                tags = state.tags,
             )
 
             if (viewState == ZiplineViewStateType.COMPACT) {
-                var _searchValue by remember { mutableStateOf(fileSearchValue) }
+                var uiSearchValue by rememberSaveable(
+                    stateSaver = TextFieldValue.Saver
+                ) { mutableStateOf(state.fileSearchValue) }
 
-                LaunchedEffect(fileSearchKey) {
-                    _searchValue = TextFieldValue("")
+                LaunchedEffect(state.fileSearchKey) {
+                    uiSearchValue = TextFieldValue("")
                 }
 
-                if (fileSearchKey != null) {
+                if (state.fileSearchKey != null) {
                     Column(
                         modifier = Modifier
                             .padding(top = 8.dp)
@@ -1484,7 +1342,7 @@ fun FoldersScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Search by ${camelCaseToHumanReadable(fileSearchKey.toString())}",
+                                text = "Search by ${camelCaseToHumanReadable(state.fileSearchKey.toString())}",
                                 style = MaterialTheme.typography.headlineSmall.copy(
                                     fontWeight = FontWeight.Bold
                                 ),
@@ -1497,8 +1355,7 @@ fun FoldersScreen(
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable(
                                         onClick = {
-                                            fileSearchKey = null
-                                            fileSearchValue = TextFieldValue("")
+                                            viewModel.updateFileSearchKey(null)
                                         }
                                     )
                             ) {
@@ -1513,14 +1370,12 @@ fun FoldersScreen(
                             modifier = Modifier.height(8.dp)
                         )
 
-                        if (fileSearchKey == GetFilesQuerySearchField.TAGS) {
-                            var selectedTagIds by remember { mutableStateOf(emptySet<String>()) }
-
+                        if (state.fileSearchKey == GetFilesQuerySearchField.TAGS) {
                             Select(
                                 label = "Tags",
                                 multiple = true,
-                                enabled = !tagsLoading && tags?.isNotEmpty() ?: false,
-                                options = tags?.map { tag ->
+                                enabled = !state.tagsLoading && state.tags?.isNotEmpty() ?: false,
+                                options = state.tags?.map { tag ->
                                     SelectOption(
                                         id = tag.id,
                                         label = { enabled ->
@@ -1531,26 +1386,23 @@ fun FoldersScreen(
                                         },
                                     )
                                 } ?: emptyList(),
-                                selectedIds = selectedTagIds,
+                                selectedIds = state.selectedTagIds,
                                 onSelectionChange = { newSelectedIds ->
-                                    if (newSelectedIds == selectedTagIds) return@Select
+                                    if (newSelectedIds == state.selectedTagIds) return@Select
 
-                                    selectedTagIds = newSelectedIds
-                                    fileSearchValue = TextFieldValue(
-                                        "," + newSelectedIds.joinToString(",")
-                                    )
+                                    viewModel.setSelectedTagIds(newSelectedIds)
                                 }
                             )
                         } else {
                             fun onEnter() {
-                                fileSearchValue = _searchValue
+                                viewModel.updateFileSearchValue(uiSearchValue)
                             }
 
                             val focusManager = LocalFocusManager.current
 
                             TextInput(
-                                value = _searchValue,
-                                onValueChange = { _searchValue = it },
+                                value = uiSearchValue,
+                                onValueChange = { uiSearchValue = it },
                                 label = "Search",
                                 keyboardActions = KeyboardActions(
                                     onDone = {
@@ -1596,6 +1448,14 @@ fun FoldersScreen(
                     val tableIdWidth = 300.dp
                     val tableActionsWidth = 220.dp
 
+                    fun onSortChanged(sortKey: GetFilesQuerySortBy) {
+                        if (state.fileSortKey != sortKey || state.fileSortOrder == SortOrder.UNSPECIFIED || state.fileSortOrder == SortOrder.DESC) {
+                            viewModel.updateFilesSort(sortKey, SortOrder.ASC)
+                        } else {
+                            viewModel.updateFilesSort(sortKey, SortOrder.DESC)
+                        }
+                    }
+
                     val headers: List<TableHeaderData> = listOf(
                         TableHeaderData(
                             content = {
@@ -1608,19 +1468,12 @@ fun FoldersScreen(
                             name = "name",
                             searchable = true,
                             sortable = true,
-                            sortOrder = if (fileSortKey == GetFilesQuerySortBy.NAME) fileSortOrder else defaultSortOrder,
+                            sortOrder = if (state.fileSortKey == GetFilesQuerySortBy.NAME) state.fileSortOrder else defaultSortOrder,
                             onSortChanged = {
-                                if (fileSortKey != GetFilesQuerySortBy.NAME) {
-                                    fileSortKey = GetFilesQuerySortBy.NAME
-                                    fileSortOrder = SortOrder.ASC
-                                } else if (fileSortOrder == SortOrder.UNSPECIFIED || fileSortOrder == SortOrder.DESC) {
-                                    fileSortOrder = SortOrder.ASC
-                                } else {
-                                    fileSortOrder = SortOrder.DESC
-                                }
+                                onSortChanged(GetFilesQuerySortBy.NAME)
                             },
                             onSearchClick = {
-                                fileSearchKey = GetFilesQuerySearchField.NAME
+                                viewModel.updateFileSearchKey(GetFilesQuerySearchField.NAME)
                             }
                         ),
                         TableHeaderData(
@@ -1634,9 +1487,9 @@ fun FoldersScreen(
                             name = "tags",
                             searchable = true,
                             onSearchClick = {
-                                fileSearchKey = GetFilesQuerySearchField.TAGS
+                                viewModel.updateFileSearchKey(GetFilesQuerySearchField.TAGS)
                             },
-                            searchEnabled = !tagsLoading && tags?.isNotEmpty() ?: false
+                            searchEnabled = !state.tagsLoading && state.tags?.isNotEmpty() ?: false
                         ),
                         TableHeaderData(
                             content = {
@@ -1649,19 +1502,12 @@ fun FoldersScreen(
                             name = "type",
                             searchable = true,
                             sortable = true,
-                            sortOrder = if (fileSortKey == GetFilesQuerySortBy.TYPE) fileSortOrder else defaultSortOrder,
+                            sortOrder = if (state.fileSortKey == GetFilesQuerySortBy.TYPE) state.fileSortOrder else defaultSortOrder,
                             onSortChanged = {
-                                if (fileSortKey != GetFilesQuerySortBy.TYPE) {
-                                    fileSortKey = GetFilesQuerySortBy.TYPE
-                                    fileSortOrder = SortOrder.ASC
-                                } else if (fileSortOrder == SortOrder.UNSPECIFIED || fileSortOrder == SortOrder.DESC) {
-                                    fileSortOrder = SortOrder.ASC
-                                } else {
-                                    fileSortOrder = SortOrder.DESC
-                                }
+                                onSortChanged(GetFilesQuerySortBy.TYPE)
                             },
                             onSearchClick = {
-                                fileSearchKey = GetFilesQuerySearchField.TYPE
+                                viewModel.updateFileSearchKey(GetFilesQuerySearchField.TYPE)
                             }
                         ),
                         TableHeaderData(
@@ -1674,16 +1520,9 @@ fun FoldersScreen(
                             width = tableSizeWidth,
                             name = "size",
                             sortable = true,
-                            sortOrder = if (fileSortKey == GetFilesQuerySortBy.SIZE) fileSortOrder else defaultSortOrder,
+                            sortOrder = if (state.fileSortKey == GetFilesQuerySortBy.SIZE) state.fileSortOrder else defaultSortOrder,
                             onSortChanged = {
-                                if (fileSortKey != GetFilesQuerySortBy.SIZE) {
-                                    fileSortKey = GetFilesQuerySortBy.SIZE
-                                    fileSortOrder = SortOrder.ASC
-                                } else if (fileSortOrder == SortOrder.UNSPECIFIED || fileSortOrder == SortOrder.DESC) {
-                                    fileSortOrder = SortOrder.ASC
-                                } else {
-                                    fileSortOrder = SortOrder.DESC
-                                }
+                                onSortChanged(GetFilesQuerySortBy.SIZE)
                             }
                         ),
                         TableHeaderData(
@@ -1696,16 +1535,9 @@ fun FoldersScreen(
                             width = tableCreatedAtWidth,
                             name = "created at",
                             sortable = true,
-                            sortOrder = if (fileSortKey == GetFilesQuerySortBy.CREATED_AT) fileSortOrder else defaultSortOrder,
+                            sortOrder = if (state.fileSortKey == GetFilesQuerySortBy.CREATED_AT) state.fileSortOrder else defaultSortOrder,
                             onSortChanged = {
-                                if (fileSortKey != GetFilesQuerySortBy.CREATED_AT) {
-                                    fileSortKey = GetFilesQuerySortBy.CREATED_AT
-                                    fileSortOrder = SortOrder.ASC
-                                } else if (fileSortOrder == SortOrder.UNSPECIFIED || fileSortOrder == SortOrder.DESC) {
-                                    fileSortOrder = SortOrder.ASC
-                                } else {
-                                    fileSortOrder = SortOrder.DESC
-                                }
+                                onSortChanged(GetFilesQuerySortBy.CREATED_AT)
                             }
                         ),
                         TableHeaderData(
@@ -1718,16 +1550,9 @@ fun FoldersScreen(
                             width = tableFavoriteWidth,
                             name = "favorite",
                             sortable = true,
-                            sortOrder = if (fileSortKey == GetFilesQuerySortBy.FAVORITE) fileSortOrder else defaultSortOrder,
+                            sortOrder = if (state.fileSortKey == GetFilesQuerySortBy.FAVORITE) state.fileSortOrder else defaultSortOrder,
                             onSortChanged = {
-                                if (fileSortKey != GetFilesQuerySortBy.FAVORITE) {
-                                    fileSortKey = GetFilesQuerySortBy.FAVORITE
-                                    fileSortOrder = SortOrder.ASC
-                                } else if (fileSortOrder == SortOrder.UNSPECIFIED || fileSortOrder == SortOrder.DESC) {
-                                    fileSortOrder = SortOrder.ASC
-                                } else {
-                                    fileSortOrder = SortOrder.DESC
-                                }
+                                onSortChanged(GetFilesQuerySortBy.FAVORITE)
                             }
                         ),
                         TableHeaderData(
@@ -1741,19 +1566,12 @@ fun FoldersScreen(
                             name = "ID",
                             searchable = true,
                             sortable = true,
-                            sortOrder = if (fileSortKey == GetFilesQuerySortBy.ID) fileSortOrder else defaultSortOrder,
+                            sortOrder = if (state.fileSortKey == GetFilesQuerySortBy.ID) state.fileSortOrder else defaultSortOrder,
                             onSortChanged = {
-                                if (fileSortKey != GetFilesQuerySortBy.ID) {
-                                    fileSortKey = GetFilesQuerySortBy.ID
-                                    fileSortOrder = SortOrder.ASC
-                                } else if (fileSortOrder == SortOrder.UNSPECIFIED || fileSortOrder == SortOrder.DESC) {
-                                    fileSortOrder = SortOrder.ASC
-                                } else {
-                                    fileSortOrder = SortOrder.DESC
-                                }
+                                onSortChanged(GetFilesQuerySortBy.ID)
                             },
                             onSearchClick = {
-                                fileSearchKey = GetFilesQuerySearchField.ID
+                                viewModel.updateFileSearchKey(GetFilesQuerySearchField.ID)
                             }
                         ),
                         TableHeaderData(
@@ -1768,54 +1586,54 @@ fun FoldersScreen(
                         ),
                     )
 
-                    var deleteFile by remember { mutableStateOf<File?>(null) }
-                    val coroutineScope = rememberCoroutineScope()
-
                     PromptPopup(
-                        showPopup = deleteFile != null,
-                        onDismissRequest = { deleteFile = null },
-                        onCancel = { deleteFile = null },
-                        isLoading = isLoading,
+                        showPopup = state.deleteFile != null,
+                        onDismissRequest = {
+                            viewModel.setDeleteFile(null)
+                        },
+                        onCancel = {
+                            viewModel.setDeleteFile(null)
+                        },
+                        isLoading = state.isLoading,
                         title = "Are you sure?",
-                        description = "Are you sure you want to delete ${deleteFile?.originalName ?: deleteFile?.name}? This action cannot be undone.",
+                        description = "Are you sure you want to delete ${state.deleteFile?.originalName ?: state.deleteFile?.name}? This action cannot be undone.",
                         onSuccess = {
-                            coroutineScope.launch {
-                                if (deleteFile == null) return@launch
-
-                                isLoading = true
-
-                                val deleteRes = deleteFile(
-                                    context = context,
-                                    fileId = deleteFile!!.id
-                                )
-
-                                deleteRes
-                                    .onSuccess {
-                                        updateFiles()
-                                    }
-                                    .onFailure {
-                                        Notification.show(
-                                            context = context,
-                                            activity = activity,
-                                            content = {
-                                                Text(
-                                                    text = "Failed to delete file: ${it.message}"
-                                                )
-                                            },
-                                        )
-                                    }
-
-                                deleteFile = null
-
-                                isLoading = false
-                            }
+                            viewModel.deleteFile(
+                                context = context,
+                                filesPerPage = filesPerPage,
+                                onSuccess = {
+                                    Notification.show(
+                                        context = context,
+                                        activity = activity,
+                                        content = {
+                                            Text(
+                                                text = "File deleted successfully"
+                                            )
+                                        },
+                                    )
+                                },
+                                onError = { error ->
+                                    Notification.show(
+                                        context = context,
+                                        activity = activity,
+                                        content = {
+                                            Text(
+                                                text = error,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        },
+                                    )
+                                }
+                            )
                         }
                     )
 
-                    val rows: List<TableRowData> = folderFiles?.map { file ->
+                    val rows: List<TableRowData> = state.folderFiles?.map { file ->
                         TableRowData(
                             clickable = true,
-                            onClick = { clickedFile = file },
+                            onClick = {
+                                viewModel.setClickedFile(file)
+                            },
                             cells = listOf(
                                 TableCellData(
                                     content = {
@@ -1894,8 +1712,10 @@ fun FoldersScreen(
                                             iconContentDescription = "More details",
                                             color = MaterialTheme.colorScheme.primary,
                                             iconColor = MaterialTheme.colorScheme.onPrimary,
-                                            onClick = { clickedFile = file },
-                                            enabled = !isLoading
+                                            onClick = {
+                                                viewModel.setClickedFile(file)
+                                            },
+                                            enabled = !state.isLoading
                                         )
 
                                         ActionButtonSpacer()
@@ -1906,12 +1726,12 @@ fun FoldersScreen(
                                             color = MaterialTheme.colorScheme.primary,
                                             iconColor = MaterialTheme.colorScheme.onPrimary,
                                             onClick = {
-                                                val fileUrl = "${serverUrl}${file.url}"
+                                                val fileUrl = "${state.serverUrl}${file.url}"
 
                                                 val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
                                                 context.startActivity(intent)
                                             },
-                                            enabled = serverUrl != null && !isLoading
+                                            enabled = state.serverUrl != null && !state.isLoading
                                         )
 
                                         ActionButtonSpacer()
@@ -1924,7 +1744,7 @@ fun FoldersScreen(
                                             color = MaterialTheme.colorScheme.primary,
                                             iconColor = MaterialTheme.colorScheme.onPrimary,
                                             onClick = {
-                                                val fileUrl = "${serverUrl}${file.url}"
+                                                val fileUrl = "${state.serverUrl}${file.url}"
 
                                                 val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
 
@@ -1942,7 +1762,7 @@ fun FoldersScreen(
                                                     )
                                                 }
                                             },
-                                            enabled = serverUrl != null && !isLoading
+                                            enabled = state.serverUrl != null && !state.isLoading
                                         )
 
                                         ActionButtonSpacer()
@@ -1951,16 +1771,29 @@ fun FoldersScreen(
                                             context = context,
                                             activity = activity,
                                             fileId = file.id,
-                                            showPopup = fileRequiresPassword && downloadFilePassword == null,
+                                            showPopup = state.fileRequiresPassword && state.downloadFilePassword == null,
                                             onDismissRequest = {
-                                                fileRequiresPassword = false
-                                                downloadFilePassword = null
+                                                viewModel.setFileRequiresPassword(false)
+                                                viewModel.setDownloadFilePassword(null)
                                             },
                                             onDownload = {
-                                                downloadFilePassword = it
+                                                if (state.selectedFileDownloadUri == null) return@DownloadFilePasswordPrompt
 
-                                                fileToDownload?.let { file ->
-                                                    performFileDownload(file)
+                                                viewModel.setDownloadFilePassword(it)
+
+                                                state.fileToDownload?.let { file ->
+                                                    viewModel.performFileDownload(
+                                                        context = context,
+                                                        file = file,
+                                                        fileDownloadUri = state.selectedFileDownloadUri!!,
+                                                        sendNotification = { content ->
+                                                            Notification.show(
+                                                                context = context,
+                                                                activity = activity,
+                                                                content = content
+                                                            )
+                                                        }
+                                                    )
                                                 }
                                             }
                                         )
@@ -1971,19 +1804,30 @@ fun FoldersScreen(
                                             color = DarkGray,
                                             iconColor = White,
                                             onClick = {
-                                                fileToDownload = file
+                                                viewModel.setFileToDownload(file)
 
-                                                if (selectedFileDownloadUri == null) {
-                                                    downloadFolderType = DownloadFolderType.FILE
+                                                if (state.selectedFileDownloadUri == null) {
+                                                    viewModel.setDownloadFolderType(DownloadFolderType.FILE)
 
                                                     directoryPicker.launch(null)
 
                                                     return@IconButton
                                                 }
 
-                                                performFileDownload(file)
+                                                viewModel.performFileDownload(
+                                                    context = context,
+                                                    file = file,
+                                                    fileDownloadUri = state.selectedFileDownloadUri!!,
+                                                    sendNotification = { content ->
+                                                        Notification.show(
+                                                            context = context,
+                                                            activity = activity,
+                                                            content = content
+                                                        )
+                                                    }
+                                                )
                                             },
-                                            enabled = serverUrl != null && !isLoading
+                                            enabled = state.serverUrl != null && !state.isLoading
                                         )
 
                                         ActionButtonSpacer()
@@ -1994,9 +1838,9 @@ fun FoldersScreen(
                                             color = MaterialTheme.colorScheme.error,
                                             iconColor = MaterialTheme.colorScheme.onError,
                                             onClick = {
-                                                deleteFile = file
+                                                viewModel.setDeleteFile(file)
                                             },
-                                            enabled = serverUrl != null && !isLoading
+                                            enabled = state.serverUrl != null && !state.isLoading
                                         )
                                     },
                                     width = tableActionsWidth,
@@ -2009,7 +1853,7 @@ fun FoldersScreen(
                         modifier = Modifier.fillMaxSize(),
                         headers = headers,
                         rows = rows,
-                        loading = isLoading,
+                        loading = state.folderFiles == null,
                         scrollbarConfig = TableScrollbarConfig(
                             vertical = ScrollbarConfig(
                                 alwaysKeepScrollbar = true
@@ -2030,7 +1874,7 @@ fun FoldersScreen(
                             listState = filesLazyColumnListState,
                         )
                 ) {
-                    if (folderFiles == null || isLoading) {
+                    if (state.folderFiles == null || state.isLoading) {
                         items(5) {
                             Box(
                                 modifier = Modifier
@@ -2047,7 +1891,7 @@ fun FoldersScreen(
                             ) {}
                         }
                     } else {
-                        folderFiles?.let { files ->
+                        state.folderFiles?.let { files ->
                             if (files.size > 0L) {
                                 items(files.size) { index ->
                                     val file = files[index]
@@ -2060,9 +1904,9 @@ fun FoldersScreen(
                                             .height(250.dp)
                                             .padding(5.dp),
                                         onClick = {
-                                            clickedFile = file
+                                            viewModel.setClickedFile(file)
                                         },
-                                        serverUrl = serverUrl,
+                                        serverUrl = state.serverUrl,
                                     )
                                 }
                             } else {
@@ -2117,41 +1961,25 @@ fun FoldersScreen(
             }
 
             Pager(
-                currentPage = currentPage,
-                totalPages = totalPages,
-                onFirstPageClick = { currentPage = 1 },
-                onPreviousPageClick = { currentPage-- },
-                onCustomPageInput = { newPage ->
-                    currentPage = newPage
+                currentPage = state.currentPage,
+                totalPages = state.totalPages,
+                onFirstPageClick = {
+                    viewModel.setCurrentPage(1)
                 },
-                onNextPageClick = { currentPage++ },
-                onLastPageClick = { currentPage = totalPages },
-                enabled = !isLoading && totalPages > 1
+                onPreviousPageClick = {
+                    if (state.currentPage > 1) viewModel.setCurrentPage(state.currentPage - 1)
+                },
+                onCustomPageInput = { newPage ->
+                    viewModel.setCurrentPage(newPage.coerceIn(1, state.totalPages))
+                },
+                onNextPageClick = {
+                    if (state.currentPage < state.totalPages) viewModel.setCurrentPage(state.currentPage + 1)
+                },
+                onLastPageClick = {
+                    viewModel.setCurrentPage(state.totalPages)
+                },
+                enabled = !state.isLoading && state.totalPages > 1
             )
         }
     }
-}
-
-private enum class GetFoldersQuerySortBy(val value: String) {
-    @SerializedName("name")
-    NAME("name"),
-
-    @SerializedName("public")
-    PUBLIC("public"),
-
-    @SerializedName("uploads")
-    UPLOADS("uploads"),
-
-    @SerializedName("createdAt")
-    CREATED_AT("createdAt"),
-
-    @SerializedName("updatedAt")
-    UPDATED_AT("updatedAt");
-
-    override fun toString(): String = value
-}
-
-private enum class DownloadFolderType {
-    FOLDER,
-    FILE,
 }

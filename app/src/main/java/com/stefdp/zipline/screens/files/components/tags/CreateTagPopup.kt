@@ -45,6 +45,8 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
 import com.stefdp.zipline.components.colorpicker.ColorSide
 import com.stefdp.zipline.network.requests.createTag
+import com.stefdp.zipline.screens.files.FilesUiState
+import com.stefdp.zipline.screens.files.FilesViewModel
 import com.stefdp.zipline.ui.theme.ZiplineTheme
 import com.stefdp.zipline.utils.toHex
 import kotlinx.coroutines.launch
@@ -55,10 +57,9 @@ fun CreateTagPopup(
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    updateTags: suspend () -> Unit
+    viewModel: FilesViewModel,
+    state: FilesUiState
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest,
@@ -97,84 +98,68 @@ fun CreateTagPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var tagName by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = tagName,
-            onValueChange = { tagName = it },
+            value = state.createTagName,
+            onValueChange = {
+                viewModel.setCreateTagName(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Name",
             placeholder = "Enter a name...",
-            enabled = !isLoading
+            enabled = !state.tagsLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var tagColor by remember { mutableStateOf(Color.Black) }
-
         ColorPicker(
-            color = tagColor,
-            onColorChange = { tagColor = it },
+            color = state.createTagColor,
+            onColorChange = {
+                viewModel.setCreateTagColor(it)
+            },
             label = "Color",
             showAutomaticColorButton = true,
-            automaticColorText = tagName.text,
+            automaticColorText = state.createTagName.text,
             automaticColorDescription = "Choose a color based on the name",
             colorSide = ColorSide.LEFT,
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            enabled = !state.tagsLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        val coroutineScope = rememberCoroutineScope()
-
         Button(
-            enabled = !isLoading,
+            enabled = !state.tagsLoading,
             onClick = {
-                coroutineScope.launch {
-                    isLoading = true
-
-                    val createTagRes = createTag(
-                        context = context,
-                        name = tagName.text,
-                        color = tagColor.toHex()
-                    )
-
-                    createTagRes
-                        .onSuccess {
-                            Notification.show(
-                                context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Tag created successfully"
-                                    )
-                                }
-                            )
-
-                            updateTags()
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Logger.error("CreateTagPopup", "Failed to create tag", it)
-
-                            Notification.show(
-                                context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to create tag"
-                                    )
-                                }
+                viewModel.createTag(
+                    context = context,
+                    name = state.createTagName.text,
+                    color = state.createTagColor,
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "Tag created successfully"
                             )
                         }
-
-                    isLoading = false
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.onError
+                            )
+                        }
+                    },
+                )
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -29,11 +29,10 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,8 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalWebSettings
@@ -57,14 +56,11 @@ import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
-import com.stefdp.zipline.network.models.Metric
-import com.stefdp.zipline.network.requests.getServerStats
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.metrics.components.Stat
-import com.stefdp.zipline.utils.colorHash
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.formatDate
 import com.stefdp.zipline.utils.getMetricsDifference
@@ -73,25 +69,27 @@ import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.extensions.format
 import ir.ehsannarmani.compose_charts.models.DotProperties
-import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.GridProperties
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
-import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.Pie
 import ir.ehsannarmani.compose_charts.models.PopupProperties
 import ir.ehsannarmani.compose_charts.models.StrokeStyle
-import java.time.Duration
 import java.time.Instant
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
+
+val metricsFileColor = Color.Blue
+val metricsUrlColor = Color.Green
+val metricsStorageColor = Color.Blue
 
 @Composable
 fun MetricsScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    viewModel: MetricsViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -117,64 +115,14 @@ fun MetricsScreen(
         }
     }
 
-    val today = Instant.now()
+    val state by viewModel.state.collectAsState()
 
-    val defaultStartDate = Instant
-        .now()
-        .minus(Duration.ofDays(7))
-
-    val defaultEndDate = today
-
-    var statsRange by rememberSaveable { mutableStateOf(Range.CUSTOM) }
-    var rangeStart by rememberSaveable { mutableStateOf(defaultStartDate) }
-    var rangeEnd by rememberSaveable { mutableStateOf(defaultEndDate) }
-
-    var stats by remember { mutableStateOf<List<Metric>?>(null) }
-
-    var isLoading by remember { mutableStateOf(true) }
-
-    LaunchedEffect(statsRange, rangeStart, rangeEnd) {
-        isLoading = true
-        stats = null
-
-        when (statsRange) {
-            Range.ALL_TIME -> {
-                val serverStatsRes = getServerStats(
-                    context = context,
-                    all = true
-                )
-
-                serverStatsRes.onSuccess {
-                    stats = it.reversed()
-                }
-            }
-
-            Range.CUSTOM -> {
-                val serverStatsRes = getServerStats(
-                    context = context,
-                    from = rangeStart.toString(),
-                    to = rangeEnd.toString()
-                )
-
-                serverStatsRes.onSuccess {
-                    stats = it.reversed()
-                }
-            }
-
-            Range.ONE_DAY -> {
-                val serverStatsRes = getServerStats(
-                    context = context,
-                    from = rangeStart.toString(),
-                    to = rangeEnd.toString()
-                )
-
-                serverStatsRes.onSuccess {
-                    stats = it.reversed()
-                }
-            }
-        }
-
-        isLoading = false
+    LaunchedEffect(
+        state.statsRange,
+        state.rangeStart,
+        state.rangeEnd
+    ) {
+        viewModel.refreshStats(context)
     }
 
     Column(
@@ -184,20 +132,19 @@ fun MetricsScreen(
             top = 12.dp
         )
     ) {
-        var showRangePopup by rememberSaveable { mutableStateOf(false) }
-        val rangeText = when (statsRange) {
+        val rangeText = when (state.statsRange) {
             Range.ALL_TIME -> "All Time"
             Range.CUSTOM -> "${formatDate(
-                date = rangeStart.toString(),
+                date = state.rangeStart.toString(),
                 short = true,
                 dateOnly = true
             )} - ${formatDate(
-                date = rangeEnd.toString(),
+                date = state.rangeEnd.toString(),
                 short = true,
                 dateOnly = true
             )}"
             Range.ONE_DAY -> formatDate(
-                date = rangeStart.toString(),
+                date = state.rangeStart.toString(),
                 short = true,
                 dateOnly = true
             )
@@ -224,10 +171,10 @@ fun MetricsScreen(
         }
 
         OutlinedButton(
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             modifier = Modifier
                 .fillMaxWidth(),
-            onClick = { showRangePopup = true },
+            onClick = { viewModel.openRangePopup() },
 
         ) {
             Text(
@@ -238,8 +185,8 @@ fun MetricsScreen(
         }
 
         Popup(
-            showPopup = showRangePopup,
-            onDismissRequest = { showRangePopup = false },
+            showPopup = state.showRangePopup,
+            onDismissRequest = { viewModel.closeRangePopup() },
         ) {
             val today = Clock.System.now().toEpochMilliseconds()
 
@@ -276,10 +223,13 @@ fun MetricsScreen(
                 val endDateString = Instant
                     .ofEpochMilli(endDate)
 
-                rangeStart = startDateString
-                rangeEnd = endDateString
-                statsRange = if (isOneDay) Range.ONE_DAY else Range.CUSTOM
-                showRangePopup = false
+                viewModel.updateRange(
+                    rangeStart = startDateString,
+                    rangeEnd = endDateString,
+                    statsRange = if (isOneDay) Range.ONE_DAY else Range.CUSTOM
+                )
+
+                viewModel.closeRangePopup()
             }
 
             DateRangePicker(
@@ -304,10 +254,13 @@ fun MetricsScreen(
                     .fillMaxWidth(1f)
                     .padding(start = 5.dp, end = 5.dp, top = 8.dp, bottom = 0.dp),
                 onClick = {
-                    statsRange = Range.ALL_TIME
-                    showRangePopup = false
+                    viewModel.updateRange(
+                        statsRange = Range.ALL_TIME
+                    )
+
+                    viewModel.closeRangePopup()
                 },
-                enabled = statsRange != Range.ALL_TIME
+                enabled = state.statsRange != Range.ALL_TIME
             ) {
                 Text(
                     text = "All Time",
@@ -321,7 +274,7 @@ fun MetricsScreen(
                     .fillMaxWidth(1f)
                     .padding(start = 5.dp, end = 5.dp, top = 8.dp, bottom = 0.dp),
                 onClick = {
-                    showRangePopup = false
+                   viewModel.closeRangePopup()
                 }
             ) {
                 Text(
@@ -336,9 +289,6 @@ fun MetricsScreen(
         )
 
         val scrollState = rememberScrollState()
-
-        val firstStat = stats?.lastOrNull()
-        val lastStat = stats?.firstOrNull()
 
         Column(
             modifier = Modifier
@@ -366,54 +316,54 @@ fun MetricsScreen(
                     )
                 }
 
-                val filesDifference = if (firstStat != null && lastStat != null) {
+                val filesDifference = if (state.firstStat != null && state.lastStat != null) {
                     getMetricsDifference(
-                        firstMetric = firstStat.data.files.toDouble(),
-                        lastMetric = lastStat.data.files.toDouble()
+                        firstMetric = state.firstStat!!.data.files.toDouble(),
+                        lastMetric = state.lastStat!!.data.files.toDouble()
                     )
                 } else 0.0
 
                 Stat(
                     title = "Files",
-                    firstMetric = firstStat?.data?.files,
-                    lastMetric = lastStat?.data?.files,
-                    loading = firstStat == null || lastStat == null,
+                    firstMetric = state.firstStat?.data?.files,
+                    lastMetric = state.lastStat?.data?.files,
+                    loading = state.firstStat == null || state.lastStat == null,
                     difference = filesDifference,
                     infinite = filesDifference == Double.POSITIVE_INFINITY
                 )
 
                 StatDivider()
 
-                val urlsDifference = if (firstStat != null && lastStat != null) {
+                val urlsDifference = if (state.firstStat != null && state.lastStat != null) {
                     getMetricsDifference(
-                        firstMetric = firstStat.data.urls.toDouble(),
-                        lastMetric = lastStat.data.urls.toDouble()
+                        firstMetric = state.firstStat!!.data.urls.toDouble(),
+                        lastMetric = state.lastStat!!.data.urls.toDouble()
                     )
                 } else 0.0
 
                 Stat(
                     title = "URLs",
-                    firstMetric = firstStat?.data?.urls,
-                    lastMetric = lastStat?.data?.urls,
-                    loading = firstStat == null || lastStat == null,
+                    firstMetric = state.firstStat?.data?.urls,
+                    lastMetric = state.lastStat?.data?.urls,
+                    loading = state.firstStat == null || state.lastStat == null,
                     difference = urlsDifference,
                     infinite = urlsDifference == Double.POSITIVE_INFINITY
                 )
 
                 StatDivider()
 
-                val storageDifference = if (firstStat != null && lastStat != null) {
+                val storageDifference = if (state.firstStat != null && state.lastStat != null) {
                     getMetricsDifference(
-                        firstMetric = firstStat.data.storage.toDouble(),
-                        lastMetric = lastStat.data.storage.toDouble()
+                        firstMetric = state.firstStat!!.data.storage.toDouble(),
+                        lastMetric = state.lastStat!!.data.storage.toDouble()
                     )
                 } else 0.0
 
                 Stat(
                     title = "Storage Used",
-                    firstMetric = firstStat?.data?.storage,
-                    lastMetric = lastStat?.data?.storage,
-                    loading = firstStat == null || lastStat == null,
+                    firstMetric = state.firstStat?.data?.storage,
+                    lastMetric = state.lastStat?.data?.storage,
+                    loading = state.firstStat == null || state.lastStat == null,
                     difference = storageDifference,
                     formatValue = { value ->
                         formatBytes(value ?: 0L)
@@ -423,34 +373,34 @@ fun MetricsScreen(
 
                 StatDivider()
 
-                val fileViewsDifference = if (firstStat != null && lastStat != null) {
+                val fileViewsDifference = if (state.firstStat != null && state.lastStat != null) {
                     getMetricsDifference(
-                        firstMetric = firstStat.data.fileViews.toDouble(),
-                        lastMetric = lastStat.data.fileViews.toDouble()
+                        firstMetric = state.firstStat!!.data.fileViews.toDouble(),
+                        lastMetric = state.lastStat!!.data.fileViews.toDouble()
                     )
                 } else 0.0
 
                 Stat(
                     title = "File Views",
-                    firstMetric = firstStat?.data?.fileViews,
-                    lastMetric = lastStat?.data?.fileViews,
-                    loading = firstStat == null || lastStat == null,
+                    firstMetric = state.firstStat?.data?.fileViews,
+                    lastMetric = state.lastStat?.data?.fileViews,
+                    loading = state.firstStat == null || state.lastStat == null,
                     difference = fileViewsDifference,
                     infinite = fileViewsDifference == Double.POSITIVE_INFINITY
                 )
 
-                val urlViewsDifference = if (firstStat != null && lastStat != null) {
+                val urlViewsDifference = if (state.firstStat != null && state.lastStat != null) {
                     getMetricsDifference(
-                        firstMetric = firstStat.data.urlViews.toDouble(),
-                        lastMetric = lastStat.data.urlViews.toDouble()
+                        firstMetric = state.firstStat!!.data.urlViews.toDouble(),
+                        lastMetric = state.lastStat!!.data.urlViews.toDouble()
                     )
                 } else 0.0
 
                 Stat(
                     title = "URL Views",
-                    firstMetric = firstStat?.data?.urlViews,
-                    lastMetric = lastStat?.data?.urlViews,
-                    loading = firstStat == null || lastStat == null,
+                    firstMetric = state.firstStat?.data?.urlViews,
+                    lastMetric = state.lastStat?.data?.urlViews,
+                    loading = state.firstStat == null || state.lastStat == null,
                     difference = urlViewsDifference,
                     infinite = urlViewsDifference == Double.POSITIVE_INFINITY
                 )
@@ -540,7 +490,7 @@ fun MetricsScreen(
                         )
                     )
 
-                    val rows: List<TableRowData>? = firstStat?.data?.urlsUsers?.map { userUrl ->
+                    val rows: List<TableRowData>? = state.firstStat?.data?.urlsUsers?.map { userUrl ->
                         TableRowData(
                             cells = listOf(
                                 TableCellData(
@@ -574,7 +524,7 @@ fun MetricsScreen(
                     Table(
                         headers = headers,
                         rows = rows ?: emptyList(),
-                        loading = firstStat?.data?.urlsUsers == null
+                        loading = state.firstStat?.data?.urlsUsers == null
                     )
                 }
 
@@ -639,7 +589,7 @@ fun MetricsScreen(
                         )
                     )
 
-                    val rows: List<TableRowData>? = firstStat?.data?.filesUsers?.map { userFile ->
+                    val rows: List<TableRowData>? = state.firstStat?.data?.filesUsers?.map { userFile ->
                         TableRowData(
                             cells = listOf(
                                 TableCellData(
@@ -681,7 +631,7 @@ fun MetricsScreen(
                     Table(
                         headers = headers,
                         rows = rows ?: emptyList(),
-                        loading = firstStat?.data?.urlsUsers == null
+                        loading = state.firstStat?.data?.urlsUsers == null
                     )
                 }
 
@@ -726,7 +676,7 @@ fun MetricsScreen(
                         )
                     )
 
-                    val rows: List<TableRowData>? = firstStat?.data?.types?.map { typeData ->
+                    val rows: List<TableRowData>? = state.firstStat?.data?.types?.map { typeData ->
                         TableRowData(
                             cells = listOf(
                                 TableCellData(
@@ -752,7 +702,7 @@ fun MetricsScreen(
                     Table(
                         headers = headers,
                         rows = rows ?: emptyList(),
-                        loading = firstStat?.data?.urlsUsers == null
+                        loading = state.firstStat?.data?.urlsUsers == null
                     )
                 }
 
@@ -779,24 +729,8 @@ fun MetricsScreen(
                         )
                     }
 
-                    var selectedType by remember { mutableStateOf<Pie?>(null) }
-                    var pieChartTypes by remember(firstStat, selectedType) {
-                        val types = firstStat?.data?.types ?: emptyList()
-
-                        mutableStateOf(
-                            types.map { typeData ->
-                                Pie(
-                                    label = typeData.type,
-                                    data = typeData.sum.toDouble(),
-                                    color = colorHash(typeData.type),
-                                    selected = typeData.type == selectedType?.label
-                                )
-                            }
-                        )
-                    }
-
-                    LaunchedEffect(statsRange, rangeStart, rangeEnd) {
-                        selectedType = null
+                    LaunchedEffect(state.firstStat, state.selectedPieChartType) {
+                        viewModel.refreshPieChartTypes()
                     }
 
                     Column(
@@ -812,9 +746,9 @@ fun MetricsScreen(
                             modifier = Modifier.padding(bottom = 10.dp),
                         )
 
-                        if (!isLoading && pieChartTypes.isNotEmpty()) {
+                        if (!state.isLoading && state.pieChartTypes.isNotEmpty()) {
                             PieChart(
-                                data = pieChartTypes,
+                                data = state.pieChartTypes,
                                 modifier = Modifier
                                     .size(chartSize)
                                     .align(Alignment.CenterHorizontally)
@@ -822,19 +756,19 @@ fun MetricsScreen(
                                 style = Pie.Style.Fill,
                                 selectedScale = 1.2f,
                                 onPieClick = { clickedPie ->
-                                    selectedType = clickedPie
+                                    viewModel.setSelectedPieChartType(clickedPie)
                                 },
                                 labelHelperProperties = LabelHelperProperties(
                                     enabled = false
                                 )
                             )
 
-                            if (selectedType != null && pieChartTypes.find { it.label == selectedType?.label } != null) {
+                            if (state.selectedPieChartType != null && state.pieChartTypes.find { it.label == state.selectedPieChartType?.label } != null) {
                                 Row {
                                     Box(
                                         modifier = Modifier
                                             .size(15.dp)
-                                            .background(selectedType?.color ?: Color(0xFFFFFFFF))
+                                            .background(state.selectedPieChartType?.color ?: Color(0xFFFFFFFF))
                                             .align(Alignment.CenterVertically)
                                     )
 
@@ -843,7 +777,7 @@ fun MetricsScreen(
                                     )
 
                                     Text(
-                                        text = "${selectedType?.label}: ${selectedType?.data?.toLong()}"
+                                        text = "${state.selectedPieChartType?.label}: ${state.selectedPieChartType?.data?.toLong()}"
                                     )
                                 }
                             } else {
@@ -883,59 +817,7 @@ fun MetricsScreen(
                         modifier = Modifier.padding(bottom = 10.dp),
                     )
 
-                    val fileColor = Color.Blue
-                    val urlColor = Color.Green
-
-                    if (stats != null) {
-                        var activePopupIndex by remember { mutableStateOf<Int?>(null) }
-
-                        val fileDotProperties = DotProperties(
-                            enabled = true,
-                            color = SolidColor(fileColor),
-                            strokeWidth = 1.dp,
-                            radius = 4.dp,
-                            strokeColor = SolidColor(fileColor),
-                            animationEnabled = false,
-                            confirmDraw = { dot ->
-                                dot.valueIndex == activePopupIndex
-                            }
-                        )
-
-                        val urlDotProperties = DotProperties(
-                            enabled = true,
-                            color = SolidColor(urlColor),
-                            strokeWidth = 1.dp,
-                            radius = 4.dp,
-                            strokeColor = SolidColor(urlColor),
-                            animationEnabled = false,
-                            confirmDraw = { dot ->
-                                dot.valueIndex == activePopupIndex
-                            }
-                        )
-
-                        val lines by remember(stats) {
-                            mutableStateOf(
-                                listOf(
-                                    Line(
-                                        values = (stats?.map { it.data.fileViews.toDouble() } ?: emptyList()),
-                                        color = SolidColor(fileColor),
-                                        dotProperties = fileDotProperties,
-                                        drawStyle = DrawStyle.Fill,
-                                        firstGradientFillColor = fileColor.copy(alpha = 0.2f),
-                                        secondGradientFillColor = fileColor.copy(alpha = 0f)
-                                    ),
-                                    Line(
-                                        values = stats?.map { it.data.urlViews.toDouble() } ?: emptyList(),
-                                        color = SolidColor(urlColor),
-                                        dotProperties = urlDotProperties,
-                                        drawStyle = DrawStyle.Fill,
-                                        firstGradientFillColor = urlColor.copy(alpha = 0.2f),
-                                        secondGradientFillColor = urlColor.copy(alpha = 0f)
-                                    )
-                                )
-                            )
-                        }
-
+                    if (state.stats != null) {
                         val xAxisProperties = GridProperties.AxisProperties(
                             enabled = true,
                             color = SolidColor(
@@ -952,7 +834,7 @@ fun MetricsScreen(
                         )
 
                         LineChart(
-                            data = lines,
+                            data = state.viewsLineChartLines,
                             modifier = Modifier.height(chartSize),
                             dotsProperties = DotProperties(
                                 enabled = false
@@ -968,9 +850,9 @@ fun MetricsScreen(
                                     textAlign = TextAlign.Center
                                 ),
                                 contentBuilder = { value ->
-                                    activePopupIndex = value.valueIndex
+                                    viewModel.setViewsLineChartActivePopupIndex(value.valueIndex)
 
-                                    val metric = stats?.get(value.valueIndex)
+                                    val metric = state.stats?.get(value.valueIndex)
                                     val formattedValue = value.value.format(0)
 
                                     val label = if (value.dataIndex == 0) "Files" else "URLs"
@@ -1036,59 +918,7 @@ fun MetricsScreen(
                         modifier = Modifier.padding(bottom = 10.dp),
                     )
 
-                    val fileColor = Color.Blue
-                    val urlColor = Color.Green
-
-                    if (stats != null) {
-                        var activePopupIndex by remember { mutableStateOf<Int?>(null) }
-
-                        val fileDotProperties = DotProperties(
-                            enabled = true,
-                            color = SolidColor(fileColor),
-                            strokeWidth = 1.dp,
-                            radius = 4.dp,
-                            strokeColor = SolidColor(fileColor),
-                            animationEnabled = false,
-                            confirmDraw = { dot ->
-                                dot.valueIndex == activePopupIndex
-                            }
-                        )
-
-                        val urlDotProperties = DotProperties(
-                            enabled = true,
-                            color = SolidColor(urlColor),
-                            strokeWidth = 1.dp,
-                            radius = 4.dp,
-                            strokeColor = SolidColor(urlColor),
-                            animationEnabled = false,
-                            confirmDraw = { dot ->
-                                dot.valueIndex == activePopupIndex
-                            }
-                        )
-
-                        val lines by remember(stats) {
-                            mutableStateOf(
-                                listOf(
-                                    Line(
-                                        values = (stats?.map { it.data.files.toDouble() } ?: emptyList()),
-                                        color = SolidColor(fileColor),
-                                        dotProperties = fileDotProperties,
-                                        drawStyle = DrawStyle.Fill,
-                                        firstGradientFillColor = fileColor.copy(alpha = 0.2f),
-                                        secondGradientFillColor = fileColor.copy(alpha = 0f)
-                                    ),
-                                    Line(
-                                        values = stats?.map { it.data.urls.toDouble() } ?: emptyList(),
-                                        color = SolidColor(urlColor),
-                                        dotProperties = urlDotProperties,
-                                        drawStyle = DrawStyle.Fill,
-                                        firstGradientFillColor = urlColor.copy(alpha = 0.2f),
-                                        secondGradientFillColor = urlColor.copy(alpha = 0f)
-                                    )
-                                )
-                            )
-                        }
-
+                    if (state.stats != null) {
                         val xAxisProperties = GridProperties.AxisProperties(
                             enabled = true,
                             color = SolidColor(
@@ -1105,7 +935,7 @@ fun MetricsScreen(
                         )
 
                         LineChart(
-                            data = lines,
+                            data = state.countLineChartLines,
                             modifier = Modifier.height(chartSize),
                             dotsProperties = DotProperties(
                                 enabled = false
@@ -1121,9 +951,9 @@ fun MetricsScreen(
                                     textAlign = TextAlign.Center
                                 ),
                                 contentBuilder = { value ->
-                                    activePopupIndex = value.valueIndex
+                                    viewModel.setCountLineChartActivePopupIndex(value.valueIndex)
 
-                                    val metric = stats?.get(value.valueIndex)
+                                    val metric = state.stats?.get(value.valueIndex)
                                     val formattedValue = value.value.format(0)
 
                                     val label = if (value.dataIndex == 0) "Files" else "URLs"
@@ -1189,38 +1019,9 @@ fun MetricsScreen(
                         modifier = Modifier.padding(bottom = 10.dp),
                     )
 
-                    val storageColor = Color.Blue
 
-                    if (stats != null) {
-                        var activePopupIndex by remember { mutableStateOf<Int?>(null) }
 
-                        val storageDotProperties = DotProperties(
-                            enabled = true,
-                            color = SolidColor(storageColor),
-                            strokeWidth = 1.dp,
-                            radius = 4.dp,
-                            strokeColor = SolidColor(storageColor),
-                            animationEnabled = false,
-                            confirmDraw = { dot ->
-                                dot.valueIndex == activePopupIndex
-                            }
-                        )
-
-                        val lines by remember(stats) {
-                            mutableStateOf(
-                                listOf(
-                                    Line(
-                                        values = (stats?.map { it.data.storage.toDouble() } ?: emptyList()),
-                                        color = SolidColor(storageColor),
-                                        dotProperties = storageDotProperties,
-                                        drawStyle = DrawStyle.Fill,
-                                        firstGradientFillColor = storageColor.copy(alpha = 0.2f),
-                                        secondGradientFillColor = storageColor.copy(alpha = 0f)
-                                    ),
-                                )
-                            )
-                        }
-
+                    if (state.stats != null) {
                         val xAxisProperties = GridProperties.AxisProperties(
                             enabled = true,
                             color = SolidColor(
@@ -1237,7 +1038,7 @@ fun MetricsScreen(
                         )
 
                         LineChart(
-                            data = lines,
+                            data = state.storageUsedLineChartLines,
                             modifier = Modifier.height(chartSize),
                             dotsProperties = DotProperties(
                                 enabled = false
@@ -1253,9 +1054,9 @@ fun MetricsScreen(
                                     textAlign = TextAlign.Center
                                 ),
                                 contentBuilder = { value ->
-                                    activePopupIndex = value.valueIndex
+                                    viewModel.setStorageLineChartUsedActivePopupIndex(value.valueIndex)
 
-                                    val metric = stats?.get(value.valueIndex)
+                                    val metric = state.stats?.get(value.valueIndex)
                                     val formattedValue = formatBytes(value.value.toLong())
 
                                     if (metric == null) return@PopupProperties formattedValue
@@ -1297,19 +1098,6 @@ fun MetricsScreen(
             }
         }
     }
-}
-
-private enum class Range(val value: String) {
-    @SerializedName("alltime")
-    ALL_TIME("alltime"),
-
-    @SerializedName("custom")
-    CUSTOM("custom"),
-
-    @SerializedName("1d")
-    ONE_DAY("1d");
-
-    override fun toString(): String = value
 }
 
 

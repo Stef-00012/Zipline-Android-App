@@ -1,4 +1,4 @@
-package com.stefdp.zipline.screens.folders.components
+package com.stefdp.zipline.screens.files.components.tags
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -10,47 +10,36 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
-import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.BaseFolder
-import com.stefdp.zipline.network.requests.createFolder
-import com.stefdp.zipline.screens.folders.FoldersUiState
-import com.stefdp.zipline.screens.folders.FoldersViewModel
-import com.stefdp.zipline.utils.ZiplineViewStateType
-import kotlinx.coroutines.launch
+import com.stefdp.zipline.components.colorpicker.ColorPicker
+import com.stefdp.zipline.components.colorpicker.ColorSide
+import com.stefdp.zipline.screens.files.FilesUiState
+import com.stefdp.zipline.screens.files.FilesViewModel
 
 @Composable
-fun CreateFolderPopup(
+fun EditTagPopup(
     context: Context,
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    viewModel: FoldersViewModel,
-    state: FoldersUiState,
-    viewState: ZiplineViewStateType
+    viewModel: FilesViewModel,
+    state: FilesUiState
 ) {
     Popup(
         showPopup = showPopup,
@@ -62,7 +51,7 @@ fun CreateFolderPopup(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Create a ${if (state.mainFolder == null) "Folder" else "Subfolder"}",
+                text = "Edit Tag",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -74,12 +63,14 @@ fun CreateFolderPopup(
                     .clip(RoundedCornerShape(4.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable(
-                        onClick = onDismissRequest
+                        onClick = {
+                            onDismissRequest()
+                        }
                     )
             ) {
                 Icon(
                     painter = painterResource(R.drawable.close),
-                    contentDescription = "Close create folder menu",
+                    contentDescription = "Close tags menu",
                 )
             }
         }
@@ -89,28 +80,32 @@ fun CreateFolderPopup(
         )
 
         TextInput(
-            label = "Name",
-            placeholder = "Enter a name...",
-            value = state.createFolderName,
+            value = state.editTagName,
             onValueChange = {
-                viewModel.setCreateFolderName(it)
+                viewModel.setEditTagName(it)
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isLoading
+            label = "Name",
+            placeholder = "Enter a name...",
+            enabled = !state.tagsLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        Switch(
-            checked = state.createFolderIsPublic,
-            onCheckedChange = {
-                viewModel.setCreateFolderIsPublic(it)
+        ColorPicker(
+            color = state.editTagColor,
+            onColorChange = {
+                viewModel.setEditTagColor(it)
             },
-            label = "Public",
-            description = "Public folders are visible to everyone.",
-            enabled = !state.isLoading
+            label = "Color",
+            showAutomaticColorButton = true,
+            automaticColorText = state.editTagName.text,
+            automaticColorDescription = "Choose a color based on the name",
+            colorSide = ColorSide.LEFT,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !state.tagsLoading
         )
 
         Spacer(
@@ -118,19 +113,17 @@ fun CreateFolderPopup(
         )
 
         Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isLoading && state.createFolderName.text.isNotBlank(),
+            enabled = !state.tagsLoading,
             onClick = {
-                viewModel.createFolder(
+                viewModel.editTag(
                     context = context,
-                    viewState = viewState,
-                    onSuccess = { folder ->
+                    onSuccess = {
                         Notification.show(
                             context = context,
                             activity = activity,
                         ) {
                             Text(
-                                text = "${folder.name} has been created"
+                                text = "Tag edited successfully"
                             )
                         }
                     },
@@ -141,25 +134,15 @@ fun CreateFolderPopup(
                         ) {
                             Text(
                                 text = error,
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.onError
                             )
                         }
-                    }
+                    },
                 )
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(
-                painter = painterResource(R.drawable.create_new_folder),
-                contentDescription = "Move folder",
-            )
-
-            Spacer(
-                modifier = Modifier.width(8.dp)
-            )
-
-            Text(
-                text = "Create"
-            )
+            Text(text = "Edit Tag")
         }
     }
 }

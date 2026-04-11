@@ -39,7 +39,10 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.requests.moveFolder
 import com.stefdp.zipline.network.requests.updateFolder
+import com.stefdp.zipline.screens.folders.FoldersUiState
+import com.stefdp.zipline.screens.folders.FoldersViewModel
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.getFolderPath
 import com.stefdp.zipline.utils.isChildOf
 import kotlinx.coroutines.launch
@@ -50,11 +53,9 @@ fun MoveFolderPopup(
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    folder: BaseFolder?,
-    isLoading: Boolean,
-    setIsLoading: (Boolean) -> Unit,
-    updateFolders: suspend () -> Unit,
-    allFolders: List<BaseFolder>,
+    viewModel: FoldersViewModel,
+    state: FoldersUiState,
+    viewState: ZiplineViewStateType
 ) {
     Popup(
         showPopup = showPopup,
@@ -66,7 +67,7 @@ fun MoveFolderPopup(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Move \"${folder?.name}\"",
+                text = "Move \"${state.moveFolder?.name}\"",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -101,8 +102,6 @@ fun MoveFolderPopup(
             modifier = Modifier.height(12.dp)
         )
 
-        var destination by remember { mutableStateOf(setOf("default")) }
-
         Select(
             label = "Destination",
             description = "Add this file to a folder. Use the \"/ (Root)\" option to not add the file to a folder. This value is not saved to your browser, and is cleared after uploading.",
@@ -113,18 +112,18 @@ fun MoveFolderPopup(
                         Text("/ (Root)")
                     }
                 )
-            ) + allFolders
+            ) + state.allFolders
                 .filter { !isChildOf(
                     folder = it,
-                    folders = allFolders,
-                    targetParentId = folder?.id ?: ""
+                    folders = state.allFolders,
+                    targetParentId = state.moveFolder?.id ?: ""
                 ) }
                 .map { folder ->
                     SelectOption(
                         id = folder.id,
                         label = { enabled ->
                             Text(
-                                text = getFolderPath(folder, allFolders),
+                                text = getFolderPath(folder, state.allFolders),
                                 color = if (enabled)
                                     MaterialTheme.colorScheme.onBackground
                                 else
@@ -133,64 +132,46 @@ fun MoveFolderPopup(
                         }
                     )
                 },
-            onSelectionChange = { destination = it },
-            selectedIds = destination,
-            enabled = !isLoading
+            onSelectionChange = {
+                viewModel.setMoveFolderDestination(it)
+            },
+            selectedIds = state.moveFolderDestination,
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        val coroutineScope = rememberCoroutineScope()
-
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             onClick = {
-                coroutineScope.launch {
-                    if (folder == null) return@launch
-
-                    setIsLoading(true)
-
-                    val newParentId = destination.firstOrNull()
-
-                    val moveFolderRes = moveFolder(
-                        context = context,
-                        folderId = folder.id,
-                        newParentId = if (newParentId == "default") null else newParentId
-                    )
-
-                    moveFolderRes
-                        .onSuccess {
-                            updateFolders()
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "${folder.name} has been moved"
-                                    )
-                                },
-                            )
-
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to move folder: ${it.message}"
-                                    )
-                                },
+                viewModel.moveFolder(
+                    context = context,
+                    viewState = viewState,
+                    onSuccess = { folderName ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "$folderName has been moved"
                             )
                         }
-
-                    setIsLoading(false)
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             }
         ) {
             Icon(

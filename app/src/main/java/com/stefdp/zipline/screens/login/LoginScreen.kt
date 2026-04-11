@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.stefdp.zipline.BASE_CORNER_RADIUS
@@ -47,6 +49,7 @@ import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateServerVersion
 import com.stefdp.zipline.LocalUpdateWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.PromptPopup
@@ -59,6 +62,7 @@ import com.stefdp.zipline.screens.*
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
 import com.stefdp.zipline.utils.DomainRegex
+import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
@@ -73,7 +77,8 @@ import kotlinx.coroutines.withContext
 fun LoginScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    viewModel: LoginViewModel = viewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -96,7 +101,7 @@ fun LoginScreen(
         }
     }
 
-    var showPopup by rememberSaveable { mutableStateOf(false) }
+    val state by viewModel.state.collectAsState()
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -105,7 +110,7 @@ fun LoginScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 val hasPermission = hasNotificationsPermission(context)
 
-                showPopup = !hasPermission
+                viewModel.setShowNotificationsPopup(!hasPermission)
             }
         }
 
@@ -120,7 +125,7 @@ fun LoginScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            showPopup = false
+            viewModel.closeNotificationsPopup()
         }
 
         val notificationText = if (isGranted)
@@ -138,9 +143,9 @@ fun LoginScreen(
     }
 
     PromptPopup(
-        showPopup = showPopup,
+        showPopup = state.showNotificationsPopup,
         onDismissRequest = {
-            showPopup = false
+            viewModel.closeNotificationsPopup()
         },
         title = "Notifications Permission",
         description = "The notifications permission is required to properly use background uploads and downloads.\n" +
@@ -163,7 +168,7 @@ fun LoginScreen(
         cancelText = "Not Now",
         cancelColor = MaterialTheme.colorScheme.error,
         onCancel = {
-            showPopup = false
+            viewModel.closeNotificationsPopup()
         }
     )
 
@@ -182,29 +187,6 @@ fun LoginScreen(
                 .padding(16.dp),
         ) {
             Column {
-                var serverUrl by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-                var token by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-
-                var username by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-                var password by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-                var totp by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-
-                var isTokenLogin by rememberSaveable { mutableStateOf(false) }
-                var isTotpRequired by rememberSaveable { mutableStateOf(false) }
-
-                var errorMessage by remember { mutableStateOf<String?>(null) }
-
-                var isLoading by remember { mutableStateOf(false) }
-
-                if (errorMessage != null) {
-                    Text(
-                        text = errorMessage!!,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-
                 Text(
                     text = "Login",
                     style = MaterialTheme.typography.titleLarge,
@@ -213,60 +195,72 @@ fun LoginScreen(
 
                 TextInput(
                     modifier = Modifier.fillMaxWidth(),
-                    value = serverUrl,
-                    onValueChange = { serverUrl = it },
+                    value = state.serverUrl,
+                    onValueChange = {
+                        viewModel.setServerUrl(it)
+                    },
                     placeholder = "https://example.com",
                     label = "Zipline URL",
-                    enabled = !isLoading
+                    enabled = !state.isLoading
                 )
 
-                if (isTokenLogin) {
+                if (state.isTokenLogin) {
                     TextInput(
                         modifier = Modifier.fillMaxWidth(),
-                        value = token,
-                        onValueChange = { token = it },
+                        value = state.token,
+                        onValueChange = {
+                            viewModel.setToken(it)
+                        },
                         isPassword = true,
                         placeholder = "MTc5GzAwNDB5Nzk47A==.OGE4ODN2",
                         label = "Token",
-                        enabled = !isLoading
+                        enabled = !state.isLoading
                     )
                 } else {
                     TextInput(
                         modifier = Modifier.fillMaxWidth(),
-                        value = username,
-                        onValueChange = { username = it },
+                        value = state.username,
+                        onValueChange = {
+                            viewModel.setUsername(it)
+                        },
                         placeholder = "My Username",
                         label = "Username",
-                        enabled = !isLoading
+                        enabled = !state.isLoading
                     )
 
                     TextInput(
                         modifier = Modifier.fillMaxWidth(),
-                        value = password,
-                        onValueChange = { password = it },
+                        value = state.password,
+                        onValueChange = {
+                            viewModel.setPassword(it)
+                        },
                         isPassword = true,
                         placeholder = "myCO0lP4ssW0rd!",
                         label = "Password",
-                        enabled = !isLoading
+                        enabled = !state.isLoading
                     )
 
-                    if (isTotpRequired) {
+                    if (state.isTotpRequired) {
                         TextInput(
                             modifier = Modifier.fillMaxWidth(),
-                            value = totp,
-                            onValueChange = { totp = it },
+                            value = state.totp,
+                            onValueChange = {
+                                if (NumberRegex.matches(it.text) && it.text.length <= 6) {
+                                    viewModel.setTotp(it)
+                                }
+                            },
                             placeholder = "123456",
                             label = "TOTP",
-                            enabled = !isLoading
+                            enabled = !state.isLoading
                         )
                     }
                 }
 
                 Button(
                     onClick = {
-                        isTokenLogin = !isTokenLogin
+                        viewModel.toggleTokenLogin()
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
@@ -278,7 +272,7 @@ fun LoginScreen(
                     )
                 ) {
                     Text(
-                        text = "Use ${if (isTokenLogin) "Password" else "Token"} Login",
+                        text = "Use ${if (state.isTokenLogin) "Password" else "Token"} Login",
                     )
                 }
 
@@ -292,134 +286,44 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        val isValidDomain = DomainRegex.matches(serverUrl.text.lowercase())
+                        viewModel.onLogin(
+                            context = context,
+                            onSuccess = {
+                                if (currentDestination?.route == LoginScreen::class.qualifiedName) {
+                                    navController.navigate(HomeScreen) {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                    }
+                                }
+                            },
+                            onError = { error ->
+                                Logger.debug("LoginScreen", "Login error: $error")
 
-                        if (!isValidDomain) {
-                            errorMessage = "Please enter a valid server URL"
-
-                            return@Button
-                        }
-
-                        coroutineScope.launch {
-                            isLoading = true
-
-                            val secureStore = SecureStorage.getInstance(context)
-
-                            secureStore.set(STORAGE_SERVER_URL_KEY, serverUrl.text.lowercase())
-
-                            if (isTokenLogin) {
-                                secureStore.set(STORAGE_TOKEN_KEY, token.text)
-                            } else {
-                                val loginRes = login(
+                                Notification.show(
                                     context = context,
-                                    username = username.text,
-                                    password = password.text,
-                                    code = totp.text.ifEmpty { null },
-                                )
-
-                                loginRes
-                                    .onSuccess { loginStatus ->
-                                        if (loginStatus is LoginResult.TotpRequired) {
-                                            isTotpRequired = true
-                                            isLoading = false
-                                        } else if (loginStatus is LoginResult.Success) {
-                                            val authCookie = loginStatus.authCookie
-
-                                            val tokenRes = getToken(
-                                                context = context,
-                                                cookie = authCookie,
-                                            )
-
-                                            tokenRes
-                                                .onSuccess { tokenData ->
-                                                    if (tokenData.token == null) {
-                                                        errorMessage = "Failed to retrieve token"
-                                                        isLoading = false
-
-                                                        return@launch
-                                                    }
-
-                                                    secureStore.set(STORAGE_TOKEN_KEY, tokenData.token)
-                                                }
-                                                .onFailure { error ->
-                                                    errorMessage = "Failed to fetch user token, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"
-                                                    isLoading = false
-
-                                                    return@launch
-                                                }
-
-                                        }
-                                    }
-                                    .onFailure { error ->
-                                        errorMessage = "Failed to login, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"
-
-                                        isLoading = false
-
-                                        return@launch
-                                    }
-                            }
-
-                            val serverVersionRes = updateServerVersion()
-
-                            serverVersionRes
-                                .onSuccess {
-                                    val version = it.details.version.toVersionOrNull(strict = false)
-
-                                    if (version == null) {
-                                        errorMessage = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater."
-
-                                        isLoading = false
-
-                                        return@launch
-                                    } else if (version < minimumZiplineVersion) {
-                                        errorMessage = "You are currently running Zipline v$version. Please update to at least Zipline v${minimumZiplineVersion}."
-
-                                        isLoading = false
-
-                                        return@launch
-                                    }
+                                    activity = activity,
+                                    duration = 6000L
+                                ) {
+                                    Text(
+                                        text = error,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
                                 }
-                                .onFailure {
-                                    errorMessage = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater and have the \"Version Checking\" feature enabled (${it.message})"
-
-                                    isLoading = false
-
-                                    return@launch
-                                }
-
-                            val userStatsRes = updateLoggedUser()
-
-                            userStatsRes
-                                .onSuccess {
-                                    withContext(NonCancellable) {
-                                        updatePublicSettings()
-                                        updateWebSettings()
-                                        updateLoggedUserAvatar()
-                                    }
-
-                                    if (currentDestination?.route == LoginScreen::class.qualifiedName) {
-                                        navController.navigate(HomeScreen) {
-                                            popUpTo(navController.graph.id) { inclusive = true }
-                                        }
-                                    }
-
-                                    isLoading = false
-                                }
-                                .onFailure { error ->
-                                    errorMessage = "Failed to fetch user, make sure you are running Zipline v$minimumZiplineVersion or greater (${error.message})"
-
-                                    isLoading = false
-                                }
-                        }
+                            },
+                            updateServerVersion = updateServerVersion,
+                            updateLoggedUser = updateLoggedUser,
+                            updateLoggedUserAvatar = updateLoggedUserAvatar,
+                            updatePublicSettings = updatePublicSettings,
+                            updateWebSettings = updateWebSettings,
+                        )
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        if (isLoading) {
+                        if (state.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
                                 strokeWidth = 2.dp,

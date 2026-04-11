@@ -12,11 +12,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
@@ -29,6 +32,8 @@ import com.stefdp.zipline.isShareIntent
 import com.stefdp.zipline.screens.BiometricAuthScreen
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
+import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
+import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.STORAGE_UNLOCK_WITH_BIOMETRICS_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.getBiometricStatus
@@ -40,6 +45,7 @@ fun LoadingScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
+    viewModel: LoadingViewModel = viewModel()
 ) {
     val updateServerVersion = LocalUpdateServerVersion.current
     val updateLoggedUser = LocalUpdateLoggedUser.current
@@ -47,88 +53,34 @@ fun LoadingScreen(
     val updatePublicSettings = LocalUpdatePublicSettings.current
     val updateWebSettings = LocalUpdateWebSettings.current
 
+    val state by viewModel.state.collectAsState()
+
     val intent = activity.intent
 
     LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
+        if (state.isLogging) return@LaunchedEffect
 
-        val unlockWithBiometrics = secureStore.get(STORAGE_UNLOCK_WITH_BIOMETRICS_KEY)?.toBoolean() ?: false
-        val biometricAuthenticationStatus = getBiometricStatus(context)
-
-        val serverVersionRes = updateServerVersion()
-
-        serverVersionRes
-            .onSuccess {
-                val version = it.details.version.toVersionOrNull(strict = false)
-
-                if (version == null) {
+        viewModel.startLoading(
+            context = context,
+            onError = { error ->
+                if (error != null) {
                     Notification.show(
                         context = context,
                         activity = activity,
-                        content = {
-                            Text(
-                                text = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater."
-                            )
-                        }
-                    )
-
-                    navController.navigate(LoginScreen) {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                    }
-
-                    return@LaunchedEffect
-                } else if (version < minimumZiplineVersion) {
-                    Notification.show(
-                        context = context,
-                        activity = activity,
-                        content = {
-                            Text(
-                                text = "You are currently running Zipline v$version. Please update to at least Zipline v${minimumZiplineVersion}."
-                            )
-                        }
-                    )
-
-                    navController.navigate(LoginScreen) {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                    }
-
-                    return@LaunchedEffect
-                }
-            }
-            .onFailure {
-                Notification.show(
-                    context = context,
-                    activity = activity,
-                    content = {
+                    ) {
                         Text(
-                            text = "Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater and have the \"Version Checking\" feature enabled (${it.message})"
+                            text = error,
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
-                )
+                }
 
                 navController.navigate(LoginScreen) {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
-
-                return@LaunchedEffect
-            }
-
-        val newUserStatsRes = updateLoggedUser()
-
-        newUserStatsRes
-            .onFailure {
-                navController.navigate(LoginScreen) {
-                    popUpTo(navController.graph.id) { inclusive = true }
-                }
-
-                return@LaunchedEffect
-            }
-            .onSuccess {
-                updatePublicSettings()
-                updateWebSettings()
-                updateLoggedUserAvatar()
-
-                if (unlockWithBiometrics && biometricAuthenticationStatus == BiometricManager.BIOMETRIC_SUCCESS) {
+            },
+            onSuccess = { goToBiometrics ->
+                if (goToBiometrics) {
                     navController.navigate(BiometricAuthScreen) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
@@ -143,7 +95,13 @@ fun LoadingScreen(
                         }
                     }
                 }
-            }
+            },
+            updateServerVersion = updateServerVersion,
+            updateLoggedUser = updateLoggedUser,
+            updatePublicSettings = updatePublicSettings,
+            updateWebSettings = updateWebSettings,
+            updateLoggedUserAvatar = updateLoggedUserAvatar
+        )
     }
 
     Column(

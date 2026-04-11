@@ -40,6 +40,8 @@ import com.stefdp.zipline.network.models.IncompleteFileMetadata
 import com.stefdp.zipline.network.models.IncompleteFileMetadataFile
 import com.stefdp.zipline.network.models.IncompleteFileStatus
 import com.stefdp.zipline.network.requests.deleteIncompleteFiles
+import com.stefdp.zipline.screens.files.FilesUiState
+import com.stefdp.zipline.screens.files.FilesViewModel
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.DarkGreen
 import com.stefdp.zipline.ui.theme.DarkRed
@@ -57,9 +59,8 @@ fun PendingFile(
     context: Context,
     activity: FragmentActivity,
     file: IncompleteFile,
-    isLoading: Boolean,
-    updateIsLoading: (Boolean) -> Unit,
-    updateData: suspend () -> Unit
+    viewModel: FilesViewModel,
+    state: FilesUiState
 ) {
     Column(
         modifier = Modifier
@@ -117,48 +118,35 @@ fun PendingFile(
             modifier = Modifier.height(8.dp)
         )
 
-        val coroutineScope = rememberCoroutineScope()
-
         Button(
             onClick = {
-                coroutineScope.launch {
-                    updateIsLoading(true)
-
-                    val deleteIncompleteFileRes = deleteIncompleteFiles(
-                        context = context,
-                        ids = listOf(file.id)
-                    )
-
-                    deleteIncompleteFileRes
-                        .onSuccess {
-                            Notification.show(
-                                context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Pending File deleted"
-                                    )
-                                },
-                            )
-
-                            updateData()
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to delete pending file"
-                                    )
-                                },
+                viewModel.deleteIncompleteFiles(
+                    context = context,
+                    ids = listOf(file.id),
+                    onSuccess = {
+                        Notification.show(
+                            context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "Pending File deleted"
                             )
                         }
-
-                    updateIsLoading(false)
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    },
+                )
             },
-            enabled = !isLoading,
+            enabled = !state.pendingFilesLoading,
             modifier = Modifier.fillMaxWidth(),
             colors = getButtonColors().copy(
                 containerColor = MaterialTheme.colorScheme.errorContainer,

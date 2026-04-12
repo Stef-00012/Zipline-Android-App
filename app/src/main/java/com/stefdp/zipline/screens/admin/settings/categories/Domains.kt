@@ -68,7 +68,7 @@ internal fun DomainsCategory(
                     viewModel.setNewDomain(it)
                 },
                 description = "Enter a domain name.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "domains" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = painterResource(R.drawable.add),
                 trailingIconColor = MaterialTheme.colorScheme.primary,

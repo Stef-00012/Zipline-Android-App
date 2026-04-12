@@ -73,7 +73,7 @@ internal fun RatelimitCategory(
                 },
                 label = "Enable Ratelimit",
                 description = "Enable ratelimiting for the server.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "ratelimitEnabled" !in state.tamperedSettings
             )
 
             Switch(
@@ -83,7 +83,7 @@ internal fun RatelimitCategory(
                 },
                 label = "Admin Bypass",
                 description = "Allow admins to bypass the ratelimit.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "ratelimitAdminBypass" !in state.tamperedSettings
             )
 
             TextInput(
@@ -95,7 +95,7 @@ internal fun RatelimitCategory(
                 },
                 label = "Max Requests",
                 description = "The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "ratelimitMax" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -108,7 +108,7 @@ internal fun RatelimitCategory(
                 },
                 label = "Window",
                 description = "The window in seconds to allow the max requests.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "ratelimitWindow" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -119,7 +119,7 @@ internal fun RatelimitCategory(
                 },
                 label = "Allow List",
                 description = "A comma-separated list of IP addresses to bypass the ratelimit.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "ratelimitAllowList" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

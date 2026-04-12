@@ -75,7 +75,7 @@ internal fun DiscordWebhookCategory(
                 },
                 label = "Webhook URL",
                 description = "The Discord webhook URL to send notifications to.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordWebhookUrl" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth(),
                 isPassword = true
             )
@@ -87,7 +87,7 @@ internal fun DiscordWebhookCategory(
                 },
                 label = "Username",
                 description = "The username to send notifications as.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordUsername" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -98,7 +98,7 @@ internal fun DiscordWebhookCategory(
                 },
                 label = "Avatar URL",
                 description = "The avatar for the webhook.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordAvatarUrl" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

@@ -72,7 +72,7 @@ internal fun FilesCategory(
                 },
                 label = "Route",
                 description = "The route to use for file uploads. Requires a server restart.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesRoute" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
             
@@ -85,7 +85,7 @@ internal fun FilesCategory(
                 },
                 label = "Length",
                 description = "The length of the file name (for randomly generated names).",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesLength" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -96,7 +96,7 @@ internal fun FilesCategory(
                 },
                 label = "Assume Mimetypes",
                 description = "Assume the mimetype of a file for its extension.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "filesAssumeMimetypes" !in state.tamperedSettings
             )
 
             Switch(
@@ -106,7 +106,7 @@ internal fun FilesCategory(
                 },
                 label = "Remove GPS Metadata",
                 description = "Remove GPS metadata from files.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "filesRemoveGpsMetadata" !in state.tamperedSettings
             )
 
             Select(
@@ -130,7 +130,7 @@ internal fun FilesCategory(
                     viewModel.setFilesSelectedDefaultFormat(it)
                 },
                 selectedIds = state.filesSelectedDefaultFormat,
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "filesDefaultFormat" !in state.tamperedSettings
             )
 
             TextInput(
@@ -140,7 +140,7 @@ internal fun FilesCategory(
                 },
                 label = "Disabled Extensions",
                 description = "Extensions to disable, separated by commas.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesDisabledExtensions" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -151,7 +151,7 @@ internal fun FilesCategory(
                 },
                 label = "Max File Size",
                 description = "The maximum file size allowed.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesMaxFileSize" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -162,7 +162,7 @@ internal fun FilesCategory(
                 },
                 label = "Default Date Format",
                 description = "The default date format to use.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesDefaultDateFormat" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -173,7 +173,7 @@ internal fun FilesCategory(
                 },
                 label = "Default Expiration",
                 description = "The default expiration time for files.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesDefaultExpiration" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -184,7 +184,7 @@ internal fun FilesCategory(
                 },
                 label = "Max Expiration",
                 description = "The maximum expiration time allowed for files.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesMaxExpiration" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -197,7 +197,7 @@ internal fun FilesCategory(
                 },
                 label = "Random Words Num Adjectives",
                 description = "The number of adjectives to use for the random-words/gfycat format.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesRandomWordsNumAdjectives" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -208,7 +208,7 @@ internal fun FilesCategory(
                 },
                 label = "Random Words Separator",
                 description = "The separator to use for the random-words/gfycat format.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesRandomWordsSeparator" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -233,7 +233,7 @@ internal fun FilesCategory(
                     viewModel.setFilesSelectedDefaultCompressionFormat(it)
                 },
                 selectedIds = state.filesSelectedDefaultCompressionFormat,
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "filesDefaultCompressionFormat" !in state.tamperedSettings
             )
 
             TextInput(
@@ -245,7 +245,7 @@ internal fun FilesCategory(
                 },
                 label = "Max Files Per Upload",
                 description = "The maximum number of files allowed per upload. Requires a server restart.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "filesMaxFilesPerUpload" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

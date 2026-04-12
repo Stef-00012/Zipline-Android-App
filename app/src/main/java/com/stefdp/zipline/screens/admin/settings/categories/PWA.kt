@@ -81,7 +81,7 @@ internal fun PWACategory(
                 },
                 label = "PWA Enabled",
                 description = "Allow users to install the Zipline PWA on their devices.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "pwaEnabled" !in state.tamperedSettings
             )
 
             TextInput(
@@ -91,7 +91,7 @@ internal fun PWACategory(
                 },
                 label = "Title",
                 description = "The title for the PWA.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "pwaTitle" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -102,7 +102,7 @@ internal fun PWACategory(
                 },
                 label = "Short Name",
                 description = "The short name for the PWA.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "pwaShortName" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -113,7 +113,7 @@ internal fun PWACategory(
                 },
                 label = "Description",
                 description = "he description for the PWA.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "pwaDescription" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -124,7 +124,7 @@ internal fun PWACategory(
                 },
                 label = "Theme Color",
                 description = "The theme color for the PWA.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "pwaThemeColor" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -135,7 +135,7 @@ internal fun PWACategory(
                 },
                 label = "Background Color",
                 description = "The background color for the PWA.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "pwaBackgroundColor" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

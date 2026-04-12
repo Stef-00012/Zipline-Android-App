@@ -52,7 +52,7 @@ internal fun ChunksCategory(
                 },
                 label = "Enable Chunks",
                 description = "Enable chunked uploads.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "chunksEnabled" !in state.tamperedSettings
             )
 
             TextInput(
@@ -62,7 +62,7 @@ internal fun ChunksCategory(
                 },
                 label = "Max Chunk Size",
                 description = "Maximum size of an upload before it is split into chunks.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "chunksMax" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -73,7 +73,7 @@ internal fun ChunksCategory(
                 },
                 label = "Chunk Size",
                 description = "Size of each chunk.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "chunksSize" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

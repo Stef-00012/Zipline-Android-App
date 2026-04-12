@@ -82,7 +82,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 },
                 label = "Webhook URL",
                 description = "The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordOnShortenWebhookUrl" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth(),
                 isPassword = true
             )
@@ -94,7 +94,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 },
                 label = "Username",
                 description = "The username to send notifications as. If this is left blank, the main username will be used.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordOnShortenUsername" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -105,7 +105,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 },
                 label = "Avatar URL",
                 description = "The avatar for the webhook. If this is left blank, the main avatar will be used.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordOnShortenAvatarUrl" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -117,7 +117,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 },
                 label = "Content",
                 description = "The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordOnShortenContent" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -140,7 +140,7 @@ internal fun DiscordWebhookOnShortenCategory(
                 },
                 label = "Embed",
                 description = "Send the notification as an embed. This will allow for more customization below.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "discordOnShortenEmbed" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

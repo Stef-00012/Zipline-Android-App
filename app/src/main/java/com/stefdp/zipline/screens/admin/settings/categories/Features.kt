@@ -69,7 +69,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Image Compression",
                 description = "Allows the ability for users to compress images.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresImageCompression" !in state.tamperedSettings
             )
 
             Switch(
@@ -79,7 +79,7 @@ internal fun FeaturesCategory(
                 },
                 label = "/robots.txt",
                 description = "Enables a /robots.txt to stop search crawlers. Requires a server restart.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresRobotsTxt" !in state.tamperedSettings
             )
 
             Switch(
@@ -89,7 +89,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Healthcheck",
                 description = "Enables a healthcheck route for uptime monitoring. Requires a server restart.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresHealthcheck" !in state.tamperedSettings
             )
 
             Switch(
@@ -99,7 +99,7 @@ internal fun FeaturesCategory(
                 },
                 label = "User Registration",
                 description = "Allows users to register an account on the server.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresUserRegistration" !in state.tamperedSettings
             )
 
             Switch(
@@ -109,7 +109,7 @@ internal fun FeaturesCategory(
                 },
                 label = "OAuth Registration",
                 description = "Allows users to register an account using OAuth providers.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresOauthRegistration" !in state.tamperedSettings
             )
 
             Switch(
@@ -119,7 +119,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Delete on Max Views",
                 description = "Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresDeleteOnMaxViews" !in state.tamperedSettings
             )
 
             Switch(
@@ -129,7 +129,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Enable Metrics",
                 description = "Enables metrics for the server. Requires a server restart.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresMetricsEnabled" !in state.tamperedSettings
             )
 
             Switch(
@@ -139,7 +139,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Admin Only Metrics",
                 description = "Requires an administrator to view metrics.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresMetricsAdminOnly" !in state.tamperedSettings
             )
 
             Switch(
@@ -149,7 +149,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Show User Specific Metrics",
                 description = "Shows metrics specific to each user, for all users.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresMetricsShowUserSpecific" !in state.tamperedSettings
             )
 
             Switch(
@@ -159,7 +159,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Enable Thumbnails",
                 description = "Enables thumbnail generation for images. Requires a server restart.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresThumbnailsEnabled" !in state.tamperedSettings
             )
 
             Switch(
@@ -169,7 +169,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Instantaneous Thumbnails",
                 description = "Generates thumbnails immediately after a file is uploaded, instead of waiting for the task to run.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresThumbnailsInstantaneous" !in state.tamperedSettings
             )
 
             TextInput(
@@ -181,7 +181,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Thumbnails Number of Threads",
                 description = "The number of threads to use for thumbnail generation.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "featuresThumbnailsNumberThreads" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -206,7 +206,7 @@ internal fun FeaturesCategory(
                 onSelectionChange = {
                     viewModel.setFeaturesSelectedThumbnailsFormat(it)
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "featuresThumbnailsFormat" !in state.tamperedSettings,
             )
 
             Switch(
@@ -216,7 +216,7 @@ internal fun FeaturesCategory(
                 },
                 label = "Version Checking",
                 description = "Enable version checking for the server. This will check for updates and display the status on the sidebar to all users.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "featuresVersionChecking" !in state.tamperedSettings
             )
 
             TextInput(
@@ -272,7 +272,7 @@ internal fun FeaturesCategory(
                         append(rawString.substring(currentIndex))
                     }
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "featuresVersionAPI" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

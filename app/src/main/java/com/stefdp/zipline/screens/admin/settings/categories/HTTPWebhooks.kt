@@ -51,7 +51,7 @@ internal fun HTTPWebhooksCategory(
                 },
                 label = "On Upload",
                 description = "The URL to send a POST request to when a file is uploaded.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "httpWebhookOnUpload" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -62,7 +62,7 @@ internal fun HTTPWebhooksCategory(
                 },
                 label = "On Shorten",
                 description = "The URL to send a POST request to when a URL is shortened.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "httpWebhookOnShorten" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

@@ -159,6 +159,7 @@ enum class MoveWebsiteExternalLinkDirection {
 data class AdminSettingsUiState(
     val isLoading: Boolean = false,
     var settings: ServerSettings? = null,
+    val tamperedSettings: List<String> = settings?.tampered ?: emptyList(),
     val settingsUpdateTick: Int = 0,
     val selectedCategory: Set<String> = setOf(
         SettingCategory.CORE.toString()
@@ -1353,7 +1354,8 @@ class AdminSettingsViewModel : ViewModel() {
                         it.copy(
                             settings = settings,
                             isLoading = false,
-                            settingsUpdateTick = it.settingsUpdateTick + 1
+                            settingsUpdateTick = it.settingsUpdateTick + 1,
+                            tamperedSettings = settings.tampered
                         )
                     }
 

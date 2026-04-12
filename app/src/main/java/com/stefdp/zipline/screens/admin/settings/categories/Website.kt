@@ -87,7 +87,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Title",
                 description = "The title of the website in browser tabs and at the top.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteTitle" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -98,7 +98,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Title Logo",
                 description = "The URL to use for the title logo. This is placed to the left of the title.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteTitleLogo" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -136,7 +136,7 @@ internal fun WebsiteCategory(
                         onClick = {
                             viewModel.openCreateNewExternalLink()
                         },
-                        enabled = !state.isLoading
+                        enabled = !state.isLoading && "websiteExternalLinks" !in state.tamperedSettings
                     )
                 }
 
@@ -335,7 +335,7 @@ internal fun WebsiteCategory(
                         state.websiteExternalLinks.forEachIndexed { index, url ->
                             ExternalLink(
                                 url = url,
-                                isLoading = state.isLoading,
+                                isLoading = state.isLoading || "websiteExternalLinks" in state.tamperedSettings,
                                 onEdit = {
                                     viewModel.setEditExternalLinkIndex(index)
                                 },
@@ -369,7 +369,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Login Background",
                 description = "The URL to use for the login background.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteLoginBackground" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -380,7 +380,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Login Background Blur",
                 description = "Whether to blur the login background.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "websiteLoginBackgroundBlur" !in state.tamperedSettings,
             )
 
             TextInput(
@@ -390,7 +390,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Default Avatar",
                 description = "The path to use for the default avatar. This must be a path to an image, not a URL.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteDefaultAvatar" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -401,7 +401,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Terms of Service",
                 description = "Path to a Markdown (.md) file to use for the terms of service.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteTos" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -412,7 +412,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Default Theme",
                 description = "The default theme to use for the website.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteThemeDefault" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -423,7 +423,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Dark Theme",
                 description = "The dark theme to use for the website when the default theme is \"system\".",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteThemeDark" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -434,7 +434,7 @@ internal fun WebsiteCategory(
                 },
                 label = "Light Theme",
                 description = "The light theme to use for the website when the default theme is \"system\".",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "websiteThemeLight" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

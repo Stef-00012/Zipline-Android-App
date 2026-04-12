@@ -68,7 +68,7 @@ internal fun TasksCategory(
                 },
                 label = "Delete Files Interval",
                 description = "How often to check and delete expired files.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "tasksDeleteInterval" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -79,7 +79,7 @@ internal fun TasksCategory(
                 },
                 label = "Clear Invites Interval",
                 description = "How often to check and clear expired/used invites.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "tasksClearInvitesInterval" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -90,7 +90,7 @@ internal fun TasksCategory(
                 },
                 label = "Max Views Interval",
                 description = "How often to check and delete files that have reached max views.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "tasksMaxViewsInterval" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -101,7 +101,7 @@ internal fun TasksCategory(
                 },
                 label = "Thumbnails Interval",
                 description = "How often to check and generate thumbnails for video files.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "tasksThumbnailsInterval" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -112,7 +112,7 @@ internal fun TasksCategory(
                 },
                 label = "Clean Thumbnails Interval",
                 description = "How often to check and delete orphaned thumbnails from the filesystem or database.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "tasksCleanThumbnailsInterval" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

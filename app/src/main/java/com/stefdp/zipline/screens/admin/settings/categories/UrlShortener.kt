@@ -59,7 +59,7 @@ internal fun UrlShortenerCategory(
                 },
                 label = "Route",
                 description = "The route to use for short URLs. Requires a server restart.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "urlsRoute" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -72,7 +72,7 @@ internal fun UrlShortenerCategory(
                 },
                 label = "Length",
                 description = "The length of the short URL (for randomly generated names).",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "urlsLength" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

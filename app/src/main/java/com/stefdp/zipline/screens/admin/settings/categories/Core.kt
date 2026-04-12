@@ -63,7 +63,7 @@ internal fun CoreCategory(
                 },
                 label = "Return HTTPS URLs",
                 description = "Return URLs with HTTPS protocol.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "coreReturnHttpsUrls" !in state.tamperedSettings
             )
 
             Switch(
@@ -73,7 +73,7 @@ internal fun CoreCategory(
                 },
                 label = "Trust Proxies",
                 description = "Trust the X-Forwarded-* headers set by proxies. Only enable this if you are behind a trusted proxy (nginx, caddy, etc.). Requires a server restart.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "coreTrustProxy" !in state.tamperedSettings
             )
 
             TextInput(
@@ -83,7 +83,7 @@ internal fun CoreCategory(
                 },
                 label = "Default Domain",
                 description = "The domain to use when generating URLs. This value should not include the protocol.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "coreDefaultDomain" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -94,7 +94,7 @@ internal fun CoreCategory(
                 },
                 label = "Temporary Directory",
                 description = "The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "coreTempDirectory" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

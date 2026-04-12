@@ -144,13 +144,12 @@ fun AdminInvitesScreen(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = error,
-                                    color = MaterialTheme.colorScheme.onError
-                                )
-                            },
-                        )
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.onError
+                            )
+                        }
                     }
                 },
             )
@@ -293,12 +292,6 @@ fun AdminInvitesScreen(
 
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Code",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCodeWidth,
                         name = "code",
                         sortable = true,
@@ -306,14 +299,13 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.CODE)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Code",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Created by",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCreatedByWidth,
                         name = "createdBy",
                         sortable = true,
@@ -321,14 +313,13 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.CREATED_BY)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Created by",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Created",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCreatedWidth,
                         name = "created",
                         sortable = true,
@@ -336,14 +327,13 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.CREATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Created",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Last update at",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableLastUpdatedWidth,
                         name = "updatedAt",
                         sortable = true,
@@ -351,14 +341,13 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.UPDATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Last update at",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Expires",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableExpiresWidth,
                         name = "expires",
                         sortable = true,
@@ -366,14 +355,13 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.EXPIRES_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Expires",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Max uses",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableMaxUsesWidth,
                         name = "maxUses",
                         sortable = true,
@@ -381,14 +369,13 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.MAX_USES)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Max uses",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Uses",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableUsesWidth,
                         name = "uses",
                         sortable = true,
@@ -396,17 +383,21 @@ fun AdminInvitesScreen(
                         onSortChanged = {
                             onSortChanged(GetInvitesQuerySortBy.USES)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Uses",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Actions",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableActionsWidth,
                         name = "actions"
-                    ),
+                    ) {
+                        Text(
+                            text = "Actions",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                 )
 
                 val rows: List<TableRowData> = state.invites?.map { invite ->
@@ -414,136 +405,127 @@ fun AdminInvitesScreen(
                         clickable = true,
                         cells = listOf(
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = invite.code,
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable(
-                                            enabled = state.serverUrl != null,
-                                            onClick = {
-                                                val url = "${state.serverUrl}/invite/${invite.code}"
-
-                                                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                                context.startActivity(intent)
-                                            }
-                                        )
-                                    )
-                                },
                                 width = tableCodeWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = invite.inviter.username,
-                                    )
-                                },
-                                width = tableCreatedByWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(invite.createdAt)),
-                                    )
-                                },
-                                width = tableCreatedWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(invite.updatedAt)),
-                                    )
-                                },
-                                width = tableLastUpdatedWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = invite.expiresAt?.let {
-                                            HumanReadable.timeAgo(Instant.parse(it))
-                                        } ?: "Never",
-                                    )
-                                },
-                                width = tableExpiresWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = (invite.maxUses ?: "Unlimited").toString(),
-                                    )
-                                },
-                                width = tableMaxUsesWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = invite.uses.toString(),
-                                    )
-                                },
-                                width = tableUsesWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    @Composable
-                                    fun ActionButtonSpacer() {
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.content_copy),
-                                        iconContentDescription = "Copy invite URL",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
+                            ) {
+                                Text(
+                                    text = invite.code,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier.clickable(
+                                        enabled = state.serverUrl != null,
                                         onClick = {
-                                            coroutineScope.launch {
-                                                val url = "${state.serverUrl}/invite/${invite.code}"
+                                            val url = "${state.serverUrl}/invite/${invite.code}"
 
-                                                val clipData = ClipData.newRawUri("Invite URL", url.toUri()).toClipEntry()
+                                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                                            context.startActivity(intent)
+                                        }
+                                    )
+                                )
+                            },
+                            TableCellData(
+                                width = tableCreatedByWidth,
+                            ) {
+                                Text(
+                                    text = invite.inviter.username,
+                                )
+                            },
+                            TableCellData(
+                                width = tableCreatedWidth,
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(invite.createdAt)),
+                                )
+                            },
+                            TableCellData(
+                                width = tableLastUpdatedWidth,
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(invite.updatedAt)),
+                                )
+                            },
+                            TableCellData(
+                                width = tableExpiresWidth,
+                            ) {
+                                Text(
+                                    text = invite.expiresAt?.let {
+                                        HumanReadable.timeAgo(Instant.parse(it))
+                                    } ?: "Never",
+                                )
+                            },
+                            TableCellData(
+                                width = tableMaxUsesWidth,
+                            ) {
+                                Text(
+                                    text = (invite.maxUses ?: "Unlimited").toString(),
+                                )
+                            },
+                            TableCellData(
+                                width = tableUsesWidth,
+                            ) {
+                                Text(
+                                    text = invite.uses.toString(),
+                                )
+                            },
+                            TableCellData(
+                                width = tableActionsWidth,
+                            ) {
+                                @Composable
+                                fun ActionButtonSpacer() {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
 
-                                                clipboardManager.setClipEntry(clipData)
+                                IconButton(
+                                    icon = painterResource(R.drawable.content_copy),
+                                    iconContentDescription = "Copy invite URL",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            val url = "${state.serverUrl}/invite/${invite.code}"
 
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                    content = {
-                                                        Text(
-                                                            text = "Invite link copied to clipboard"
-                                                        )
-                                                    },
+                                            val clipData = ClipData.newRawUri("Invite URL", url.toUri()).toClipEntry()
+
+                                            clipboardManager.setClipEntry(clipData)
+
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                            ) {
+                                                Text(
+                                                    text = "Invite link copied to clipboard"
                                                 )
                                             }
-                                        },
-                                        enabled = !state.isLoading
-                                    )
+                                        }
+                                    },
+                                    enabled = !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.qr_code),
-                                        iconContentDescription = "Show QR code",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            viewModel.setQrCodeInvite(invite)
-                                        },
-                                        enabled = !state.isLoading
-                                    )
+                                IconButton(
+                                    icon = painterResource(R.drawable.qr_code),
+                                    iconContentDescription = "Show QR code",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        viewModel.setQrCodeInvite(invite)
+                                    },
+                                    enabled = !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.delete),
-                                        iconContentDescription = "Delete invite",
-                                        color = MaterialTheme.colorScheme.error,
-                                        iconColor = MaterialTheme.colorScheme.onError,
-                                        onClick = {
-                                            viewModel.setDeleteInvite(invite)
-                                        },
-                                        enabled = !state.isLoading
-                                    )
-                                },
-                                width = tableActionsWidth,
-                            )
+                                IconButton(
+                                    icon = painterResource(R.drawable.delete),
+                                    iconContentDescription = "Delete invite",
+                                    color = MaterialTheme.colorScheme.error,
+                                    iconColor = MaterialTheme.colorScheme.onError,
+                                    onClick = {
+                                        viewModel.setDeleteInvite(invite)
+                                    },
+                                    enabled = !state.isLoading
+                                )
+                            }
                         )
                     )
                 } ?: emptyList()

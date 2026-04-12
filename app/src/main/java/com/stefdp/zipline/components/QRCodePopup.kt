@@ -125,12 +125,11 @@ fun QRCodePopup(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "QR code copied to clipboard"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "QR code copied to clipboard"
+                            )
+                        }
                     }
                 },
                 modifier = Modifier.weight(1f)
@@ -165,12 +164,11 @@ fun QRCodePopup(
                                 Notification.show(
                                     context = context,
                                     activity = activity,
-                                    content = {
-                                        Text(
-                                            text = "QR code saved in Pictures/$downloadFileName"
-                                        )
-                                    }
-                                )
+                                ) {
+                                    Text(
+                                        text = "QR code saved in Pictures/$downloadFileName"
+                                    )
+                                }
                             }
                         }
                     }

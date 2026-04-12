@@ -139,12 +139,11 @@ internal fun EditFilePopup(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to remove password: ${it.message}"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "Failed to remove password: ${it.message}"
+                                )
+                            }
                         }
 
                         setLoading(false)
@@ -197,12 +196,11 @@ internal fun EditFilePopup(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "Failed to update file: ${it.message}"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "Failed to update file: ${it.message}"
+                            )
+                        }
                     }
 
                     setLoading(false)

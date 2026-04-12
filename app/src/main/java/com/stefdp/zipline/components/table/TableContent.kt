@@ -143,7 +143,7 @@ fun TableContent(
 }
 
 data class TableCellData(
-    val content: @Composable () -> Unit,
     val width: Dp,
     val padding: Dp = 12.dp,
+    val content: @Composable () -> Unit,
 )

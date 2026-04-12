@@ -75,12 +75,11 @@ fun DownloadFilePasswordPrompt(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Incorrect password. Please try again."
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "Incorrect password. Please try again."
+                                )
+                            }
                         }
                 }
             },

@@ -115,8 +115,6 @@ fun AdminUsersScreen(
         )
     }
 
-    val coroutineScope = rememberCoroutineScope()
-
     if (state.deleteUserLevel == DeleteUserLevel.CONFIRMATION_PROMPT) {
         PromptPopup(
             showPopup = state.deleteUser != null,
@@ -335,22 +333,15 @@ fun AdminUsersScreen(
 
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Avatar",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableAvatarWidth,
                         name = "avatar",
-                    ),
+                    ) {
+                        Text(
+                            text = "Avatar",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Username",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableUsernameWidth,
                         name = "username",
                         sortable = true,
@@ -358,14 +349,13 @@ fun AdminUsersScreen(
                         onSortChanged = {
                             onSortChanged(GetUsersQuerySortBy.USERNAME)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Username",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Role",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableRoleWidth,
                         name = "role",
                         sortable = true,
@@ -373,14 +363,13 @@ fun AdminUsersScreen(
                         onSortChanged = {
                             onSortChanged(GetUsersQuerySortBy.ROLE)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Role",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Created",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCreatedWidth,
                         name = "created",
                         sortable = true,
@@ -388,14 +377,13 @@ fun AdminUsersScreen(
                         onSortChanged = {
                             onSortChanged(GetUsersQuerySortBy.CREATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Created",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Last Updated",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableLastUpdatedWidth,
                         name = "created",
                         sortable = true,
@@ -403,17 +391,21 @@ fun AdminUsersScreen(
                         onSortChanged = {
                             onSortChanged(GetUsersQuerySortBy.UPDATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Last Updated",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Actions",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableActionsWidth,
                         name = "actions"
-                    ),
+                    ) {
+                        Text(
+                            text = "Actions",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                 )
 
                 val rows: List<TableRowData> = state.users?.map { user ->
@@ -423,92 +415,86 @@ fun AdminUsersScreen(
                         clickable = true,
                         cells = listOf(
                             TableCellData(
-                                content = {
-                                    Avatar(
-                                        avatar = user.avatar,
-                                        isAdmin = user.role.level <= UserRole.ADMIN.level,
-                                    )
-                                },
                                 width = tableAvatarWidth,
-                            ),
+                            ) {
+                                Avatar(
+                                    avatar = user.avatar,
+                                    isAdmin = user.role.level <= UserRole.ADMIN.level,
+                                )
+                            },
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = user.username,
-                                    )
-                                },
                                 width = tableUsernameWidth,
-                            ),
+                            ) {
+                                Text(
+                                    text = user.username,
+                                )
+                            },
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = user.role.roleName,
-                                    )
-                                },
                                 width = tableRoleWidth,
-                            ),
+                            ) {
+                                Text(
+                                    text = user.role.roleName,
+                                )
+                            },
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(user.createdAt)),
-                                    )
-                                },
                                 width = tableCreatedWidth,
-                            ),
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(user.createdAt)),
+                                )
+                            },
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(user.updatedAt)),
-                                    )
-                                },
                                 width = tableLastUpdatedWidth,
-                            ),
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(user.updatedAt)),
+                                )
+                            },
                             TableCellData(
-                                content = {
-                                    @Composable
-                                    fun ActionButtonSpacer() {
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.folder_open),
-                                        iconContentDescription = "View user's files",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            navController.navigate(FilesScreen(user.id))
-                                        },
-                                        enabled = !state.isLoading && canInteractWithUser
-                                    )
-
-                                    ActionButtonSpacer()
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.edit),
-                                        iconContentDescription = "Edit User",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            viewModel.setEditUser(user)
-                                        },
-                                        enabled = !state.isLoading && canInteractWithUser
-                                    )
-
-                                    ActionButtonSpacer()
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.delete),
-                                        iconContentDescription = "Delete URL",
-                                        color = MaterialTheme.colorScheme.error,
-                                        iconColor = MaterialTheme.colorScheme.onError,
-                                        onClick = {
-                                            viewModel.setDeleteUser(user)
-                                        },
-                                        enabled = !state.isLoading && canInteractWithUser
-                                    )
-                                },
                                 width = tableActionsWidth,
-                            )
+                            ) {
+                                @Composable
+                                fun ActionButtonSpacer() {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.folder_open),
+                                    iconContentDescription = "View user's files",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        navController.navigate(FilesScreen(user.id))
+                                    },
+                                    enabled = !state.isLoading && canInteractWithUser
+                                )
+
+                                ActionButtonSpacer()
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.edit),
+                                    iconContentDescription = "Edit User",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        viewModel.setEditUser(user)
+                                    },
+                                    enabled = !state.isLoading && canInteractWithUser
+                                )
+
+                                ActionButtonSpacer()
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.delete),
+                                    iconContentDescription = "Delete URL",
+                                    color = MaterialTheme.colorScheme.error,
+                                    iconColor = MaterialTheme.colorScheme.onError,
+                                    onClick = {
+                                        viewModel.setDeleteUser(user)
+                                    },
+                                    enabled = !state.isLoading && canInteractWithUser
+                                )
+                            }
                         )
                     )
                 } ?: emptyList()

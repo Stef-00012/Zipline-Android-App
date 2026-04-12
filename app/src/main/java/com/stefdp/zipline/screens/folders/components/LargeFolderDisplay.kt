@@ -147,12 +147,11 @@ fun LargeFolderDisplay(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Folder URL link copied to clipboard"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "Folder URL link copied to clipboard"
+                                )
+                            }
                         }
                     },
                 ),

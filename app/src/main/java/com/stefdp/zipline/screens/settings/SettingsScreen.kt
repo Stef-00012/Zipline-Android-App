@@ -106,10 +106,9 @@ fun SettingsScreen(
         Notification.show(
             context = context,
             activity = activity,
-            content = {
-                Text(notificationText)
-            }
-        )
+        ) {
+            Text(notificationText)
+        }
     }
 
     fun requestNotificationPermission() {
@@ -119,10 +118,9 @@ fun SettingsScreen(
             Notification.show(
                 context = context,
                 activity = activity,
-                content = {
-                    Text("Notifications Permission is automatically granted on this version of Android")
-                }
-            )
+            ) {
+                Text("Notifications Permission is automatically granted on this version of Android")
+            }
         }
     }
 

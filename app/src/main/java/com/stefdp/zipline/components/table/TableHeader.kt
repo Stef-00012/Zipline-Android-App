@@ -137,7 +137,6 @@ fun TableHeader(
 }
 
 data class TableHeaderData(
-    val content: @Composable () -> Unit,
     val name: String,
     val width: Dp,
     val padding: Dp = 12.dp,
@@ -147,4 +146,5 @@ data class TableHeaderData(
     val onSortChanged: () -> Unit = {},
     val onSearchClick: () -> Unit = {},
     val searchEnabled: Boolean = true,
+    val content: @Composable () -> Unit,
 )

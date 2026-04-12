@@ -131,12 +131,11 @@ fun CreateUrlPopup(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "URL copied to clipboard"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "URL copied to clipboard"
+                                )
+                            }
                         }
                     },
                     color = MaterialTheme.colorScheme.primary,
@@ -342,55 +341,6 @@ fun CreateUrlPopup(
                     password.text.ifBlank { null },
                     selectedOverrideDomain.firstOrNull { it != "default" },
                 )
-
-//                coroutineScope.launch {
-//                    isLoading = true
-//
-//                    val createUrlRes = createUrl(
-//                        context = context,
-//                        destination = destination.text,
-//                        vanity = vanity.text.ifBlank { null },
-//                        maxViews = maxViews.text.toLongOrNull(),
-//                        enabled = enabled,
-//                        domain = selectedOverrideDomain.firstOrNull { it != "default" },
-//                        password = password.text.ifBlank { null }
-//                    )
-//
-//                    createUrlRes
-//                        .onSuccess {
-//                            Notification.show(
-//                                context = context,
-//                                activity = activity,
-//                                content = {
-//                                    Text(
-//                                        text = "URL created successfully"
-//                                    )
-//                                }
-//                            )
-//
-//                            createdUrl = it.url
-//
-//                            updateUrls()
-//                            onDismissRequest()
-//                        }
-//                        .onFailure {
-//                            Logger.error("CreateUrlPopup", "Failed to create url", it)
-//
-//                            errorMessage = it.message ?: "Something went wrong..."
-//
-//                            Notification.show(
-//                                context = context,
-//                                activity = activity,
-//                                content = {
-//                                    Text(
-//                                        text = "Failed to create URL"
-//                                    )
-//                                }
-//                            )
-//                        }
-//
-//                    isLoading = false
-//                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

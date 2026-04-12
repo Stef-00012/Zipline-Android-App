@@ -127,201 +127,191 @@ internal fun ExportFilesCategory(
 
             val tableHeaders = listOf(
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "ID",
-                            fontWeight = FontWeight.Bold,
-                        )
-                    },
                     name = "id",
                     width = tableIdWidth
-                ),
+                ) {
+                    Text(
+                        text = "ID",
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "Started",
-                            fontWeight = FontWeight.Bold,
-                        )
-                    },
                     name = "started",
                     width = tableStartedWidth
-                ),
+                ) {
+                    Text(
+                        text = "Started",
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "Files",
-                            fontWeight = FontWeight.Bold,
-                        )
-                    },
                     name = "files",
                     width = tableFilesWidth
-                ),
+                ) {
+                    Text(
+                        text = "Files",
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "Size",
-                            fontWeight = FontWeight.Bold,
-                        )
-                    },
                     name = "size",
                     width = tableSizeWidth
-                ),
+                ) {
+                    Text(
+                        text = "Size",
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "Actions",
-                            fontWeight = FontWeight.Bold,
-                        )
-                    },
                     name = "actions",
                     width = tableActionsWidth
-                )
+                ) {
+                    Text(
+                        text = "Actions",
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             )
 
             val tableRows = state.exports?.map { export ->
                 TableRowData(
                     cells = listOf(
                         TableCellData(
-                            content = {
-                                Text(
-                                    text = export.id,
-                                    color = if (export.completed)
-                                        DarkGreen
-                                    else
-                                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                                )
-                            },
                             width = tableIdWidth
-                        ),
+                        ) {
+                            Text(
+                                text = export.id,
+                                color = if (export.completed)
+                                    DarkGreen
+                                else
+                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                            )
+                        },
                         TableCellData(
-                            content = {
-                                Text(
-                                    text = HumanReadable.timeAgo(Instant.parse(export.createdAt)),
-                                )
-                            },
                             width = tableStartedWidth
-                        ),
+                        ) {
+                            Text(
+                                text = HumanReadable.timeAgo(Instant.parse(export.createdAt)),
+                            )
+                        },
                         TableCellData(
-                            content = {
-                                Text(
-                                    text = export.files.toString(),
-                                )
-                            },
                             width = tableFilesWidth
-                        ),
+                        ) {
+                            Text(
+                                text = export.files.toString(),
+                            )
+                        },
                         TableCellData(
-                            content = {
-                                Text(
-                                    text = formatBytes(export.size.toLong()),
-                                )
-                            },
                             width = tableSizeWidth,
-                        ),
+                        ) {
+                            Text(
+                                text = formatBytes(export.size.toLong()),
+                            )
+                        },
                         TableCellData(
-                            content = {
-                                @Composable
-                                fun ActionButtonSpacer() {
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-
-                                IconButton(
-                                    icon = painterResource(R.drawable.delete),
-                                    iconContentDescription = "Delete",
-                                    color = MaterialTheme.colorScheme.error,
-                                    iconColor = MaterialTheme.colorScheme.onError,
-                                    onClick = {
-                                        viewModel.deleteExport(
-                                            context = context,
-                                            exportId = export.id,
-                                            onError = { error ->
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                ) {
-                                                    Text(
-                                                        text = "Failed to delete export: $error",
-                                                        color = MaterialTheme.colorScheme.error,
-                                                    )
-                                                }
-                                            },
-                                            onSuccess = {
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                ) {
-                                                    Text(
-                                                        text = "Export deleted successfully",
-                                                    )
-                                                }
-                                            }
-                                        )
-                                    },
-                                    enabled = !state.isLoading
-                                )
-
-                                ActionButtonSpacer()
-
-                                val directoryPicker = rememberLauncherForActivityResult(
-                                    contract = ActivityResultContracts.OpenDocumentTree()
-                                ) { uri: Uri? ->
-                                    uri?.let {
-                                        context.contentResolver.takePersistableUriPermission(
-                                            it,
-                                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                        )
-
-                                        viewModel.setSelectedExportUri(
-                                            context = context,
-                                            exportUri = it
-                                        )
-
-                                        viewModel.performExportDownload(
-                                            context = context,
-                                            export = export,
-                                            exportUri = it,
-                                            sendNotification = { content ->
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                    content = content
-                                                )
-                                            }
-                                        )
-                                    }
-                                }
-
-                                IconButton(
-                                    icon = painterResource(R.drawable.download),
-                                    iconContentDescription = "Download export",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    iconColor = MaterialTheme.colorScheme.onPrimary,
-                                    onClick = {
-                                        if (state.selectedExportUri == null) {
-                                            directoryPicker.launch(null)
-
-                                            return@IconButton
-                                        }
-
-                                        viewModel.performExportDownload(
-                                            context = context,
-                                            export = export,
-                                            exportUri = state.selectedExportUri,
-                                            sendNotification = { content ->
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                    content = content,
-                                                    duration = 5000L
-                                                )
-                                            }
-                                        )
-                                    },
-                                    enabled = !state.isLoading && export.completed
-                                )
-                            },
                             width = tableActionsWidth
-                        ),
+                        ) {
+                            @Composable
+                            fun ActionButtonSpacer() {
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+
+                            IconButton(
+                                icon = painterResource(R.drawable.delete),
+                                iconContentDescription = "Delete",
+                                color = MaterialTheme.colorScheme.error,
+                                iconColor = MaterialTheme.colorScheme.onError,
+                                onClick = {
+                                    viewModel.deleteExport(
+                                        context = context,
+                                        exportId = export.id,
+                                        onError = { error ->
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                            ) {
+                                                Text(
+                                                    text = "Failed to delete export: $error",
+                                                    color = MaterialTheme.colorScheme.error,
+                                                )
+                                            }
+                                        },
+                                        onSuccess = {
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                            ) {
+                                                Text(
+                                                    text = "Export deleted successfully",
+                                                )
+                                            }
+                                        }
+                                    )
+                                },
+                                enabled = !state.isLoading
+                            )
+
+                            ActionButtonSpacer()
+
+                            val directoryPicker = rememberLauncherForActivityResult(
+                                contract = ActivityResultContracts.OpenDocumentTree()
+                            ) { uri: Uri? ->
+                                uri?.let {
+                                    context.contentResolver.takePersistableUriPermission(
+                                        it,
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                    )
+
+                                    viewModel.setSelectedExportUri(
+                                        context = context,
+                                        exportUri = it
+                                    )
+
+                                    viewModel.performExportDownload(
+                                        context = context,
+                                        export = export,
+                                        exportUri = it,
+                                        sendNotification = { content ->
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                                content = content
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+
+                            IconButton(
+                                icon = painterResource(R.drawable.download),
+                                iconContentDescription = "Download export",
+                                color = MaterialTheme.colorScheme.primary,
+                                iconColor = MaterialTheme.colorScheme.onPrimary,
+                                onClick = {
+                                    if (state.selectedExportUri == null) {
+                                        directoryPicker.launch(null)
+
+                                        return@IconButton
+                                    }
+
+                                    viewModel.performExportDownload(
+                                        context = context,
+                                        export = export,
+                                        exportUri = state.selectedExportUri,
+                                        sendNotification = { content ->
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                                content = content,
+                                                duration = 5000L
+                                            )
+                                        }
+                                    )
+                                },
+                                enabled = !state.isLoading && export.completed
+                            )
+                        },
                     )
                 )
             } ?: emptyList()

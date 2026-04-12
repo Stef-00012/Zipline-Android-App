@@ -168,12 +168,11 @@ fun LargeFileDisplay(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to delete file: ${it.message}"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "Failed to delete file: ${it.message}"
+                                )
+                            }
                         }
 
                     isLoading = false
@@ -482,12 +481,11 @@ fun LargeFileDisplay(
                                         Notification.show(
                                             context = context,
                                             activity = activity,
-                                            content = {
-                                                Text(
-                                                    text = "Failed to update file: ${it.message}"
-                                                )
-                                            }
-                                        )
+                                        ) {
+                                            Text(
+                                                text = "Failed to update file: ${it.message}"
+                                            )
+                                        }
                                     }
 
                                 isLoading = false
@@ -550,12 +548,11 @@ fun LargeFileDisplay(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = message
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = message
+                                )
+                            }
                         }
                     }
 

@@ -97,12 +97,11 @@ internal fun UserCategory(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "Biometric authentication failed"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "Biometric authentication failed"
+                            )
+                        }
 
                         continuation.resume(false)
                     },
@@ -150,12 +149,11 @@ internal fun UserCategory(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "Token copied to clipboard"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "Token copied to clipboard"
+                            )
+                        }
                     }
                 }
             )

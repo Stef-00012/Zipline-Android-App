@@ -325,10 +325,9 @@ fun FilesScreen(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(titleText)
-                                }
-                            )
+                            ) {
+                                Text(titleText)
+                            }
                         }
                     ),
             )
@@ -625,12 +624,6 @@ fun FilesScreen(
 
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Name",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableNameWidth,
                         name = "name",
                         searchable = true,
@@ -642,14 +635,13 @@ fun FilesScreen(
                         onSearchClick = {
                             viewModel.updateSearchKey(GetFilesQuerySearchField.NAME)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Name",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Tags",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableTagsWidth,
                         name = "tags",
                         searchable = true,
@@ -657,14 +649,13 @@ fun FilesScreen(
                             viewModel.updateSearchKey(GetFilesQuerySearchField.TAGS)
                         },
                         searchEnabled = !state.tagsLoading && state.tags?.isNotEmpty() ?: false
-                    ),
+                    ) {
+                        Text(
+                            text = "Tags",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Type",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableTypeWidth,
                         name = "type",
                         searchable = true,
@@ -676,14 +667,13 @@ fun FilesScreen(
                         onSearchClick = {
                             viewModel.updateSearchKey(GetFilesQuerySearchField.TYPE)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Type",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Size",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableSizeWidth,
                         name = "size",
                         sortable = true,
@@ -691,14 +681,13 @@ fun FilesScreen(
                         onSortChanged = {
                             onSortChanged(GetFilesQuerySortBy.SIZE)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Size",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Created At",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCreatedAtWidth,
                         name = "created at",
                         sortable = true,
@@ -706,14 +695,13 @@ fun FilesScreen(
                         onSortChanged = {
                             onSortChanged(GetFilesQuerySortBy.CREATED_AT)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Created At",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Favorite",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableFavoriteWidth,
                         name = "favorite",
                         sortable = true,
@@ -721,14 +709,13 @@ fun FilesScreen(
                         onSortChanged = {
                             onSortChanged(GetFilesQuerySortBy.FAVORITE)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Favorite",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "ID",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableIdWidth,
                         name = "ID",
                         searchable = true,
@@ -740,17 +727,21 @@ fun FilesScreen(
                         onSearchClick = {
                             viewModel.updateSearchKey(GetFilesQuerySearchField.ID)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "ID",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Actions",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableActionsWidth,
                         name = "actions"
-                    ),
+                    ) {
+                        Text(
+                            text = "Actions",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                 )
 
                 val coroutineScope = rememberCoroutineScope()
@@ -803,236 +794,227 @@ fun FilesScreen(
                         },
                         cells = listOf(
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = file.name,
-                                    )
-                                },
                                 width = tableNameWidth,
-                            ),
+                            ) {
+                                Text(
+                                    text = file.name,
+                                )
+                            },
                             TableCellData(
-                                content = {
-                                    FlowRow(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(8.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        file.tags?.forEach { tag ->
-                                            Tag(tag = tag)
-                                        }
-                                    }
-                                },
                                 width = tableTagsWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = file.type,
-                                    )
-                                },
-                                width = tableTypeWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = formatBytes(file.size),
-                                    )
-                                },
-                                width = tableSizeWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(file.createdAt)),
-                                    )
-                                },
-                                width = tableCreatedAtWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = if (file.favorite) "Yes" else "No",
-                                        color = if (file.favorite) Yellow else MaterialTheme.colorScheme.onBackground
-                                    )
-                                },
-                                width = tableFavoriteWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = file.id,
-                                    )
-                                },
-                                width = tableIdWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    @Composable
-                                    fun ActionButtonSpacer() {
-                                        Spacer(modifier = Modifier.width(8.dp))
+                            ) {
+                                FlowRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    file.tags?.forEach { tag ->
+                                        Tag(tag = tag)
                                     }
+                                }
+                            },
+                            TableCellData(
+                                width = tableTypeWidth,
+                            ) {
+                                Text(
+                                    text = file.type,
+                                )
+                            },
+                            TableCellData(
+                                width = tableSizeWidth,
+                            ) {
+                                Text(
+                                    text = formatBytes(file.size),
+                                )
+                            },
+                            TableCellData(
+                                width = tableCreatedAtWidth,
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(file.createdAt)),
+                                )
+                            },
+                            TableCellData(
+                                width = tableFavoriteWidth,
+                            ) {
+                                Text(
+                                    text = if (file.favorite) "Yes" else "No",
+                                    color = if (file.favorite) Yellow else MaterialTheme.colorScheme.onBackground
+                                )
+                            },
+                            TableCellData(
+                                width = tableIdWidth,
+                            ) {
+                                Text(
+                                    text = file.id,
+                                )
+                            },
+                            TableCellData(
+                                width = tableActionsWidth,
+                            ) {
+                                @Composable
+                                fun ActionButtonSpacer() {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.draft),
-                                        iconContentDescription = "More details",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            viewModel.setClickedFile(file)
-                                        },
-                                        enabled = !state.isLoading
-                                    )
+                                IconButton(
+                                    icon = painterResource(R.drawable.draft),
+                                    iconContentDescription = "More details",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        viewModel.setClickedFile(file)
+                                    },
+                                    enabled = !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.open_new),
-                                        iconContentDescription = "Open file in browser",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            val fileUrl = "${state.serverUrl}${file.url}"
+                                IconButton(
+                                    icon = painterResource(R.drawable.open_new),
+                                    iconContentDescription = "Open file in browser",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        val fileUrl = "${state.serverUrl}${file.url}"
 
-                                            val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
-                                            context.startActivity(intent)
-                                        },
-                                        enabled = state.serverUrl != null && !state.isLoading
-                                    )
+                                        val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
+                                        context.startActivity(intent)
+                                    },
+                                    enabled = state.serverUrl != null && !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    val clipboardManager = LocalClipboard.current
+                                val clipboardManager = LocalClipboard.current
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.content_copy),
-                                        iconContentDescription = "Copy file link",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            val fileUrl = "${state.serverUrl}${file.url}"
+                                IconButton(
+                                    icon = painterResource(R.drawable.content_copy),
+                                    iconContentDescription = "Copy file link",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        val fileUrl = "${state.serverUrl}${file.url}"
 
-                                            val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
+                                        val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
 
-                                            coroutineScope.launch {
-                                                clipboardManager.setClipEntry(clipData)
+                                        coroutineScope.launch {
+                                            clipboardManager.setClipEntry(clipData)
 
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                            ) {
+                                                Text(
+                                                    text = "File link copied to clipboard"
+                                                )
+                                            }
+                                        }
+                                    },
+                                    enabled = state.serverUrl != null && !state.isLoading
+                                )
+
+                                ActionButtonSpacer()
+
+                                DownloadFilePasswordPrompt(
+                                    context = context,
+                                    activity = activity,
+                                    fileId = file.id,
+                                    showPopup = state.fileRequiresPassword && state.downloadFilePassword == null,
+                                    onDismissRequest = {
+                                        viewModel.setFileRequiresPassword(false)
+                                    },
+                                    onDownload = {
+                                        viewModel.setDownloadFilePassword(it)
+
+                                        viewModel.performDownload(
+                                            context = context,
+                                            file = file,
+                                            uri = state.selectedUri!!,
+                                            password = it,
+                                            sendNotification = { content ->
                                                 Notification.show(
                                                     context = context,
                                                     activity = activity,
-                                                    content = {
-                                                        Text(
-                                                            text = "File link copied to clipboard"
-                                                        )
-                                                    }
+                                                    content = content
                                                 )
                                             }
-                                        },
-                                        enabled = state.serverUrl != null && !state.isLoading
-                                    )
-
-                                    ActionButtonSpacer()
-
-                                    DownloadFilePasswordPrompt(
-                                        context = context,
-                                        activity = activity,
-                                        fileId = file.id,
-                                        showPopup = state.fileRequiresPassword && state.downloadFilePassword == null,
-                                        onDismissRequest = {
-                                            viewModel.setFileRequiresPassword(false)
-                                        },
-                                        onDownload = {
-                                            viewModel.setDownloadFilePassword(it)
-
-                                            viewModel.performDownload(
-                                                context = context,
-                                                file = file,
-                                                uri = state.selectedUri!!,
-                                                password = it,
-                                                sendNotification = { content ->
-                                                    Notification.show(
-                                                        context = context,
-                                                        activity = activity,
-                                                        content = content
-                                                    )
-                                                }
-                                            )
-                                        }
-                                    )
-
-                                    val directoryPicker = rememberLauncherForActivityResult(
-                                        contract = ActivityResultContracts.OpenDocumentTree()
-                                    ) { uri: Uri? ->
-                                        uri?.let {
-                                            context.contentResolver.takePersistableUriPermission(
-                                                it,
-                                                Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                                                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                            )
-
-                                            viewModel.setSelectedUri(context, it)
-
-                                            viewModel.performDownload(
-                                                context = context,
-                                                file = file,
-                                                uri = uri,
-                                                password = state.downloadFilePassword,
-                                                sendNotification = { content ->
-                                                    Notification.show(
-                                                        context = context,
-                                                        activity = activity,
-                                                        content = content
-                                                    )
-                                                }
-                                            )
-                                        }
+                                        )
                                     }
+                                )
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.download),
-                                        iconContentDescription = "Download file",
-                                        color = DarkGray,
-                                        iconColor = White,
-                                        onClick = {
-                                            if (state.selectedUri == null) {
-                                                directoryPicker.launch(null)
+                                val directoryPicker = rememberLauncherForActivityResult(
+                                    contract = ActivityResultContracts.OpenDocumentTree()
+                                ) { uri: Uri? ->
+                                    uri?.let {
+                                        context.contentResolver.takePersistableUriPermission(
+                                            it,
+                                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                        )
 
-                                                return@IconButton
+                                        viewModel.setSelectedUri(context, it)
+
+                                        viewModel.performDownload(
+                                            context = context,
+                                            file = file,
+                                            uri = uri,
+                                            password = state.downloadFilePassword,
+                                            sendNotification = { content ->
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = content
+                                                )
                                             }
+                                        )
+                                    }
+                                }
 
-                                            viewModel.performDownload(
-                                                context = context,
-                                                file = file,
-                                                uri = state.selectedUri!!,
-                                                password = state.downloadFilePassword,
-                                                sendNotification = { content ->
-                                                    Notification.show(
-                                                        context = context,
-                                                        activity = activity,
-                                                        content = content
-                                                    )
-                                                }
-                                            )
-                                        },
-                                        enabled = !state.isLoading
-                                    )
+                                IconButton(
+                                    icon = painterResource(R.drawable.download),
+                                    iconContentDescription = "Download file",
+                                    color = DarkGray,
+                                    iconColor = White,
+                                    onClick = {
+                                        if (state.selectedUri == null) {
+                                            directoryPicker.launch(null)
 
-                                    ActionButtonSpacer()
+                                            return@IconButton
+                                        }
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.delete),
-                                        iconContentDescription = "Delete File",
-                                        color = MaterialTheme.colorScheme.error,
-                                        iconColor = MaterialTheme.colorScheme.onError,
-                                        onClick = {
-                                            viewModel.setDeleteFile(file)
-                                        },
-                                        enabled = !state.isLoading
-                                    )
-                                },
-                                width = tableActionsWidth,
-                            )
+                                        viewModel.performDownload(
+                                            context = context,
+                                            file = file,
+                                            uri = state.selectedUri!!,
+                                            password = state.downloadFilePassword,
+                                            sendNotification = { content ->
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                    content = content
+                                                )
+                                            }
+                                        )
+                                    },
+                                    enabled = !state.isLoading
+                                )
+
+                                ActionButtonSpacer()
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.delete),
+                                    iconContentDescription = "Delete File",
+                                    color = MaterialTheme.colorScheme.error,
+                                    iconColor = MaterialTheme.colorScheme.onError,
+                                    onClick = {
+                                        viewModel.setDeleteFile(file)
+                                    },
+                                    enabled = !state.isLoading
+                                )
+                            }
                         )
                     )
                 } ?: emptyList()

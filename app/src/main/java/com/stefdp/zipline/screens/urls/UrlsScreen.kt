@@ -462,12 +462,6 @@ fun UrlsScreen(
 
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Code",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCodeWidth,
                         name = "code",
                         searchable = true,
@@ -479,14 +473,13 @@ fun UrlsScreen(
                         onSearchClick = {
                             viewModel.updateSearchKey(GetUrlsQuerySearchField.CODE)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Code",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Vanity",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableVanityWidth,
                         name = "vanity",
                         searchable = true,
@@ -498,14 +491,13 @@ fun UrlsScreen(
                         onSearchClick = {
                             viewModel.updateSearchKey(GetUrlsQuerySearchField.VANITY)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Vanity",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Destination",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableDestinationWidth,
                         name = "destination",
                         searchable = true,
@@ -517,14 +509,13 @@ fun UrlsScreen(
                         onSearchClick = {
                             viewModel.updateSearchKey(GetUrlsQuerySearchField.DESTINATION)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Destination",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Views",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableViewsWidth,
                         name = "views",
                         sortable = true,
@@ -532,14 +523,13 @@ fun UrlsScreen(
                         onSortChanged = {
                             onSortChanged(GetUrlsQuerySortBy.VIEWS)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Views",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Max Views",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableMaxViewsWidth,
                         name = "max views",
                         sortable = true,
@@ -547,14 +537,13 @@ fun UrlsScreen(
                         onSortChanged = {
                             onSortChanged(GetUrlsQuerySortBy.MAX_VIEWS)
                         }
-                    ),
+                    ) {
+                        Text(
+                            text = "Max Views",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Created",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCreatedWidth,
                         name = "created",
                         sortable = true,
@@ -562,14 +551,13 @@ fun UrlsScreen(
                         onSortChanged = {
                             onSortChanged(GetUrlsQuerySortBy.CREATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Created",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Enabled",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableEnabledWidth,
                         name = "enabled",
                         sortable = true,
@@ -577,17 +565,21 @@ fun UrlsScreen(
                         onSortChanged = {
                             onSortChanged(GetUrlsQuerySortBy.ENABLED)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Enabled",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Actions",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableActionsWidth,
                         name = "actions"
-                    ),
+                    ) {
+                        Text(
+                            text = "Actions",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                 )
 
                 val rows: List<TableRowData> = state.urls?.map { url ->
@@ -595,167 +587,158 @@ fun UrlsScreen(
                         clickable = true,
                         cells = listOf(
                             TableCellData(
-                                content = {
-                                    Text(
-                                        text = url.code,
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable(
-                                            enabled = state.serverUrl != null,
-                                            onClick = {
-                                                val urlUrl = "${state.serverUrl}${urlsRoute}/${url.code}"
-
-                                                val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                                                context.startActivity(intent)
-                                            }
-                                        )
-                                    )
-                                },
                                 width = tableCodeWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = url.vanity ?: "",
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable(
-                                            enabled = state.serverUrl != null && !url.vanity.isNullOrBlank(),
-                                            onClick = {
-                                                val urlUrl = "${state.serverUrl}${urlsRoute}/${url.vanity}"
-
-                                                val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                                                context.startActivity(intent)
-                                            }
-                                        )
-                                    )
-                                },
-                                width = tableVanityWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = url.destination,
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable(
-                                            enabled = state.serverUrl != null,
-                                            onClick = {
-                                                val intent = Intent(Intent.ACTION_VIEW, url.destination.toUri())
-                                                context.startActivity(intent)
-                                            }
-                                        )
-                                    )
-                                },
-                                width = tableDestinationWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = url.views.toString(),
-                                    )
-                                },
-                                width = tableViewsWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = if (url.maxViews != null) url.maxViews.toString() else ""
-                                    )
-                                },
-                                width = tableMaxViewsWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(url.createdAt)),
-                                    )
-                                },
-                                width = tableCreatedWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    EnabledCheckbox(
-                                        enabled = url.enabled
-                                    )
-                                },
-                                width = tableEnabledWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    @Composable
-                                    fun ActionButtonSpacer() {
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-
-                                    val clipboardManager = LocalClipboard.current
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.content_copy),
-                                        iconContentDescription = "Copy URL",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
+                            ) {
+                                Text(
+                                    text = url.code,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier.clickable(
+                                        enabled = state.serverUrl != null,
                                         onClick = {
-                                            coroutineScope.launch {
-                                                val urlUrl = "${state.serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
+                                            val urlUrl = "${state.serverUrl}${urlsRoute}/${url.code}"
 
-                                                val clipData = ClipData.newRawUri("URL", urlUrl.toUri()).toClipEntry()
+                                            val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
+                                            context.startActivity(intent)
+                                        }
+                                    )
+                                )
+                            },
+                            TableCellData(
+                                width = tableVanityWidth,
+                            ) {
+                                Text(
+                                    text = url.vanity ?: "",
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier.clickable(
+                                        enabled = state.serverUrl != null && !url.vanity.isNullOrBlank(),
+                                        onClick = {
+                                            val urlUrl = "${state.serverUrl}${urlsRoute}/${url.vanity}"
 
-                                                clipboardManager.setClipEntry(clipData)
+                                            val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
+                                            context.startActivity(intent)
+                                        }
+                                    )
+                                )
+                            },
+                            TableCellData(
+                                width = tableDestinationWidth,
+                            ) {
+                                Text(
+                                    text = url.destination,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier.clickable(
+                                        enabled = state.serverUrl != null,
+                                        onClick = {
+                                            val intent = Intent(Intent.ACTION_VIEW, url.destination.toUri())
+                                            context.startActivity(intent)
+                                        }
+                                    )
+                                )
+                            },
+                            TableCellData(
+                                width = tableViewsWidth,
+                            ) {
+                                Text(
+                                    text = url.views.toString(),
+                                )
+                            },
+                            TableCellData(
+                                width = tableMaxViewsWidth,
+                            ) {
+                                Text(
+                                    text = if (url.maxViews != null) url.maxViews.toString() else ""
+                                )
+                            },
+                            TableCellData(
+                                width = tableCreatedWidth,
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(url.createdAt)),
+                                )
+                            },
+                            TableCellData(
+                                width = tableEnabledWidth,
+                            ) {
+                                EnabledCheckbox(
+                                    enabled = url.enabled
+                                )
+                            },
+                            TableCellData(
+                                width = tableActionsWidth,
+                            ) {
+                                @Composable
+                                fun ActionButtonSpacer() {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
 
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                    content = {
-                                                        Text(
-                                                            text = "URL copied to clipboard"
-                                                        )
-                                                    }
+                                val clipboardManager = LocalClipboard.current
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.content_copy),
+                                    iconContentDescription = "Copy URL",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            val urlUrl = "${state.serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
+
+                                            val clipData = ClipData.newRawUri("URL", urlUrl.toUri()).toClipEntry()
+
+                                            clipboardManager.setClipEntry(clipData)
+
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
+                                            ) {
+                                                Text(
+                                                    text = "URL copied to clipboard"
                                                 )
                                             }
-                                        },
-                                        enabled = !state.isLoading
-                                    )
+                                        }
+                                    },
+                                    enabled = !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.qr_code),
-                                        iconContentDescription = "Show QR code",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            viewModel.setQrCodeUrl(url)
-                                        },
-                                        enabled = state.serverUrl != null && !state.isLoading
-                                    )
+                                IconButton(
+                                    icon = painterResource(R.drawable.qr_code),
+                                    iconContentDescription = "Show QR code",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        viewModel.setQrCodeUrl(url)
+                                    },
+                                    enabled = state.serverUrl != null && !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.edit),
-                                        iconContentDescription = "Edit URL",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { viewModel.setEditUrl(url) },
-                                        enabled = state.serverUrl != null && !state.isLoading
-                                    )
+                                IconButton(
+                                    icon = painterResource(R.drawable.edit),
+                                    iconContentDescription = "Edit URL",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = { viewModel.setEditUrl(url) },
+                                    enabled = state.serverUrl != null && !state.isLoading
+                                )
 
-                                    ActionButtonSpacer()
+                                ActionButtonSpacer()
 
-                                    IconButton(
-                                        icon = painterResource(R.drawable.delete),
-                                        iconContentDescription = "Delete URL",
-                                        color = MaterialTheme.colorScheme.error,
-                                        iconColor = MaterialTheme.colorScheme.onError,
-                                        onClick = {
-                                            viewModel.setDeleteUrl(url)
-                                        },
-                                        enabled = state.serverUrl != null && !state.isLoading
-                                    )
-                                },
-                                width = tableActionsWidth,
-                            )
+                                IconButton(
+                                    icon = painterResource(R.drawable.delete),
+                                    iconContentDescription = "Delete URL",
+                                    color = MaterialTheme.colorScheme.error,
+                                    iconColor = MaterialTheme.colorScheme.onError,
+                                    onClick = {
+                                        viewModel.setDeleteUrl(url)
+                                    },
+                                    enabled = state.serverUrl != null && !state.isLoading
+                                )
+                            }
                         )
                     )
                 } ?: emptyList()

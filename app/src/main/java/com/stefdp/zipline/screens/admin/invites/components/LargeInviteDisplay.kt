@@ -98,12 +98,11 @@ fun LargeInviteDisplay(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Invite URL copied to clipboard"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "Invite URL copied to clipboard"
+                                )
+                            }
                         }
                     },
                 ),

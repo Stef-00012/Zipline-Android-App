@@ -65,12 +65,11 @@ fun AvatarInput(
                     Notification.show(
                         context = context,
                         activity = activity,
-                        content = {
-                            Text(
-                                text = "File is too large: $name"
-                            )
-                        }
-                    )
+                    ) {
+                        Text(
+                            text = "File is too large: $name"
+                        )
+                    }
 
                     return@rememberLauncherForActivityResult
                 }

@@ -154,12 +154,11 @@ fun UploadFileScreen(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "File is too large: $name"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "File is too large: $name"
+                            )
+                        }
 
                         return@mapNotNull null
                     }
@@ -270,12 +269,11 @@ fun UploadFileScreen(
                                         Notification.show(
                                             context = context,
                                             activity = activity,
-                                            content = {
-                                                Text(
-                                                    text = "File link copied to clipboard"
-                                                )
-                                            }
-                                        )
+                                        ) {
+                                            Text(
+                                                text = "File link copied to clipboard"
+                                            )
+                                        }
                                     }
                                 },
                                 color = MaterialTheme.colorScheme.primary,
@@ -395,12 +393,11 @@ fun UploadFileScreen(
                     Notification.show(
                         context = context,
                         activity = activity,
-                        content = {
-                            Text(
-                                text = "Permission denied"
-                            )
-                        }
-                    )
+                    ) {
+                        Text(
+                            text = "Permission denied"
+                        )
+                    }
                 }
             }
 

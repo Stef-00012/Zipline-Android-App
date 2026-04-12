@@ -84,12 +84,11 @@ internal fun CopyUrlButton(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "File link copied to clipboard"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "File link copied to clipboard"
+                            )
+                        }
 
                         expanded = false
                     }
@@ -116,12 +115,11 @@ internal fun CopyUrlButton(
                         Notification.show(
                             context = context,
                             activity = activity,
-                            content = {
-                                Text(
-                                    text = "Raw file link copied to clipboard"
-                                )
-                            }
-                        )
+                        ) {
+                            Text(
+                                text = "Raw file link copied to clipboard"
+                            )
+                        }
 
                         expanded = false
                     }

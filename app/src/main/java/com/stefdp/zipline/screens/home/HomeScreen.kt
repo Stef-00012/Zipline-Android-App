@@ -427,46 +427,42 @@ fun HomeScreen(
 
             val headers: List<TableHeaderData> = listOf(
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "File Type",
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
                     name = "file type",
                     width = tableTypeWidth,
-                ),
+                ) {
+                    Text(
+                        text = "File Type",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 TableHeaderData(
-                    content = {
-                        Text(
-                            text = "Count",
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
                     name = "count",
                     width = tableCountWidth,
-                ),
+                ) {
+                    Text(
+                        text = "Count",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
             )
 
             val rows: List<TableRowData>? = state.userStats?.sortTypeCount?.map { (type, count) ->
                 TableRowData(
                     cells = listOf(
                         TableCellData(
-                            content = {
-                                Text(
-                                    text = type,
-                                )
-                            },
                             width = tableTypeWidth
-                        ),
+                        ) {
+                            Text(
+                                text = type,
+                            )
+                        },
                         TableCellData(
-                            content = {
-                                Text(
-                                    text = count.toString(),
-                                )
-                            },
                             width = tableCountWidth
-                        ),
+                        ) {
+                            Text(
+                                text = count.toString(),
+                            )
+                        },
                     )
                 )
             }

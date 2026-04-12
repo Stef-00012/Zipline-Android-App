@@ -459,64 +459,58 @@ fun MetricsScreen(
 
                     val headers: List<TableHeaderData> = listOf(
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "User",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "user",
                             width = tableUserWidth
-                        ),
+                        ) {
+                            Text(
+                                text = "User",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "URLs",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "URLs",
                             width = tableUrlsWidth
-                        ),
+                        ) {
+                            Text(
+                                text = "URLs",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Views",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "views",
                             width = tableViewsWidth
-                        )
+                        ) {
+                            Text(
+                                text = "Views",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     )
 
                     val rows: List<TableRowData>? = state.firstStat?.data?.urlsUsers?.map { userUrl ->
                         TableRowData(
                             cells = listOf(
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = userUrl.username ?: "Unknown User",
-                                        )
-                                    },
                                     width = tableUserWidth
-                                ),
+                                ) {
+                                    Text(
+                                        text = userUrl.username ?: "Unknown User",
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = userUrl.sum.toString(),
-                                        )
-                                    },
                                     width = tableUrlsWidth
-                                ),
+                                ) {
+                                    Text(
+                                        text = userUrl.sum.toString(),
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = userUrl.views.toString(),
-                                        )
-                                    },
                                     width = tableViewsWidth
-                                )
+                                ) {
+                                    Text(
+                                        text = userUrl.views.toString(),
+                                    )
+                                }
                             )
                         )
                     }
@@ -548,82 +542,74 @@ fun MetricsScreen(
 
                     val headers: List<TableHeaderData> = listOf(
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "User",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "user",
                             width = tableUserWidth
-                        ),
+                        ) {
+                            Text(
+                                text = "User",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Files",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "files",
                             width = tableFilesWidth
-                        ),
+                        ) {
+                            Text(
+                                text = "Files",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Storage Used",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "storage used",
                             width = tableStorageUsedWidth
-                        ),
+                        ) {
+                            Text(
+                                text = "Storage Used",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Views",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "views",
                             width = tableViewsWidth
-                        )
+                        ) {
+                            Text(
+                                text = "Views",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     )
 
                     val rows: List<TableRowData>? = state.firstStat?.data?.filesUsers?.map { userFile ->
                         TableRowData(
                             cells = listOf(
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = userFile.username ?: "Unknown User",
-                                        )
-                                    },
                                     width = tableUserWidth
-                                ),
+                                ) {
+                                    Text(
+                                        text = userFile.username ?: "Unknown User",
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = userFile.sum.toString(),
-                                        )
-                                    },
                                     width = tableFilesWidth
-                                ),
+                                ) {
+                                    Text(
+                                        text = userFile.sum.toString(),
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = formatBytes(userFile.storage),
-                                        )
-                                    },
                                     width = tableStorageUsedWidth
-                                ),
+                                ) {
+                                    Text(
+                                        text = formatBytes(userFile.storage),
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = userFile.views.toString(),
-                                        )
-                                    },
                                     width = tableViewsWidth
-                                )
+                                ) {
+                                    Text(
+                                        text = userFile.views.toString(),
+                                    )
+                                }
                             )
                         )
                     }
@@ -655,46 +641,42 @@ fun MetricsScreen(
 
                     val headers: List<TableHeaderData> = listOf(
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Type",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "type",
                             width = tableTypeWidth
-                        ),
+                        ) {
+                            Text(
+                                text = "Type",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Files",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             name = "files",
                             width = tableFilesWidth
-                        )
+                        ) {
+                            Text(
+                                text = "Files",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     )
 
                     val rows: List<TableRowData>? = state.firstStat?.data?.types?.map { typeData ->
                         TableRowData(
                             cells = listOf(
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = typeData.type,
-                                        )
-                                    },
                                     width = tableTypeWidth
-                                ),
+                                ) {
+                                    Text(
+                                        text = typeData.type,
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = typeData.sum.toString(),
-                                        )
-                                    },
                                     width = tableFilesWidth
-                                )
+                                ) {
+                                    Text(
+                                        text = typeData.sum.toString(),
+                                    )
+                                }
                             )
                         )
                     }

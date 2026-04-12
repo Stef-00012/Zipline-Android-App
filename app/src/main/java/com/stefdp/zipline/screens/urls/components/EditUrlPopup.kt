@@ -214,55 +214,6 @@ fun EditUrlPopup(
                     maxViews.text.toLongOrNull(),
                     password.text.takeIf { it.isNotBlank() }
                 )
-
-//                coroutineScope.launch {
-//                    if (url == null) return@launch
-//
-//                    isLoading = true
-//
-//                    val editUrlRes = updateUrl(
-//                        urlId = url.id,
-//                        context = context,
-//                        destination = destination.text,
-//                        vanity = vanity.text.takeIf { it.isNotBlank() },
-//                        maxViews = maxViews.text.toLongOrNull(),
-//                        enabled = enabled,
-//                        password = password.text.takeIf { it.isNotBlank() }
-//                    )
-//
-//                    editUrlRes
-//                        .onSuccess {
-//                            Notification.show(
-//                                context = context,
-//                                activity = activity,
-//                                content = {
-//                                    Text(
-//                                        text = "URL updated successfully"
-//                                    )
-//                                }
-//                            )
-//
-//                            updateUrls()
-//                            onDismissRequest()
-//                        }
-//                        .onFailure {
-//                            Logger.error("EditUrlPopup", "Failed to update url", it)
-//
-//                            errorMessage = it.message
-//
-//                            Notification.show(
-//                                context = context,
-//                                activity = activity,
-//                                content = {
-//                                    Text(
-//                                        text = "Failed to update URL"
-//                                    )
-//                                }
-//                            )
-//                        }
-//
-//                    isLoading = false
-//                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -199,12 +199,11 @@ fun FoldersScreen(
                 Notification.show(
                     context = context,
                     activity = activity,
-                    content = {
-                        Text(
-                            text = "${folder.name} will ${if (folder.allowUploads) "now allow" else "no longer allow"} anonymous uploads"
-                        )
-                    }
-                )
+                ) {
+                    Text(
+                        text = "${folder.name} will ${if (folder.allowUploads) "now allow" else "no longer allow"} anonymous uploads"
+                    )
+                }
             }
         )
     }
@@ -229,236 +228,16 @@ fun FoldersScreen(
                 Notification.show(
                     context = context,
                     activity = activity,
-                    content = {
-                        Text(
-                            text = "${folder.name} is now ${if (folder.public) "public" else "private"}"
-                        )
-                    }
-                )
+                ) {
+                    Text(
+                        text = "${folder.name} is now ${if (folder.public) "public" else "private"}"
+                    )
+                }
             }
         )
     }
 
     val coroutineScope = rememberCoroutineScope()
-
-    // TODO: move to ViewModel
-//    fun performFileDownload(file: File) {
-//        val fileFits = StorageUtil.canFitFile(
-//            context = context,
-//            uri = selectedFileDownloadUri!!,
-//            fileSize = file.size
-//        )
-//
-//        if (!fileFits) {
-//            downloadShowToast("Not enough space in the selected directory to download the file")
-//
-//            return
-//        }
-//
-//        val fileFitsCache = StorageUtil.canFitInternalCache(
-//            context = context,
-//            fileSize = file.size
-//        )
-//
-//        if (!fileFitsCache) {
-//            downloadShowToast("Not enough space in the internal cache to download the file")
-//
-//            return
-//        }
-//
-//        if (file.password == true && downloadFilePassword.isNullOrBlank()) {
-//            fileRequiresPassword = true
-//            return
-//        }
-//
-//        coroutineScope.launch(Dispatchers.IO) {
-//            downloadShowToast("Starting download...")
-//
-//            val fileName = file.originalName ?: file.name
-//
-//            val tempFile = java.io.File(context.cacheDir, fileName)
-//            val tempDestinationPath = tempFile.absolutePath
-//
-//            if (tempFile.exists()) tempFile.delete()
-//
-//            val downloadRes = downloadFile(
-//                context = context,
-//                fileId = file.id,
-//                destinationPath = tempDestinationPath,
-//                notificationTitle = "Downloading file",
-//                notificationContent = "Downloading ${file.name}",
-//                password = downloadFilePassword
-//            )
-//
-//            downloadRes
-//                .onSuccess {
-//                    try {
-//                        val docUri =
-//                            DocumentsContract.buildDocumentUriUsingTree(
-//                                selectedFileDownloadUri,
-//                                DocumentsContract.getTreeDocumentId(
-//                                    selectedFileDownloadUri
-//                                )
-//                            )
-//
-//                        val fileUri = DocumentsContract.createDocument(
-//                            context.contentResolver,
-//                            docUri,
-//                            file.type,
-//                            fileName
-//                        )
-//
-//                        if (fileUri != null) {
-//                            context.contentResolver.openOutputStream(fileUri)
-//                                ?.use { out ->
-//                                    tempFile.inputStream().use { inp ->
-//                                        inp.copyTo(out)
-//                                    }
-//                                }
-//
-//                            downloadShowToast("File downloaded to ${selectedFileDownloadPath}/$fileName")
-//                        } else {
-//                            downloadShowToast("Failed to create file in selected directory")
-//                        }
-//                    } catch (e: Exception) {
-//                        Logger.error(
-//                            "FoldersScreen",
-//                            "Failed to copy file to selected directory",
-//                            e
-//                        )
-//
-//                        downloadShowToast("Failed to copy file to selected directory: ${e.message}")
-//                    } finally {
-//                        tempFile.delete()
-//                    }
-//                }
-//                .onFailure {
-//                    Logger.error("FoldersScreen", "Failed to download file", it)
-//
-//                    downloadShowToast("Failed to download file: ${it.message}")
-//                }
-//
-//            fileRequiresPassword = false
-//            downloadFilePassword = null
-//            fileToDownload = null
-//        }
-//    }
-
-    // TODO: move to ViewModel
-//    fun performFolderExport(folder: BaseFolder) {
-//        coroutineScope.launch(Dispatchers.IO) {
-//            val folderExportSize = getFolderExportSize(
-//                context = context,
-//                folderId = folder.id
-//            )
-//
-//            folderExportSize
-//                .onSuccess {
-//                    val fileFits = StorageUtil.canFitFile(
-//                        context = context,
-//                        uri = selectedFolderExportUri!!,
-//                        fileSize = it
-//                    )
-//
-//                    if (!fileFits) {
-//                        downloadShowToast("Not enough space in the selected directory to download the folder")
-//
-//                        return@launch
-//                    }
-//
-//                    val fileFitsCache = StorageUtil.canFitInternalCache(
-//                        context = context,
-//                        fileSize = it
-//                    )
-//
-//                    if (!fileFitsCache) {
-//                        downloadShowToast("Not enough space in the internal cache to download the folder")
-//
-//                        return@launch
-//                    }
-//                }
-//                .onFailure {
-//                    Notification.show(
-//                        context = context,
-//                        activity = activity,
-//                        content = {
-//                            Text(
-//                                text = "Failed to get folder export size: ${it.message}"
-//                            )
-//                        }
-//                    )
-//                }
-//
-//            downloadShowToast("Starting download...")
-//
-//            val fileName = folder.name
-//
-//            val tempFile = java.io.File(context.cacheDir, fileName)
-//            val tempDestinationPath = tempFile.absolutePath
-//
-//            if (tempFile.exists()) tempFile.delete()
-//
-//            val exportRes = exportFolder(
-//                context = context,
-//                folderId = folder.id,
-//                destinationPath = tempDestinationPath,
-//                notificationTitle = "Downloading folder export",
-//                notificationContent = "Downloading ${folder.name}",
-//            )
-//
-//            exportRes
-//                .onSuccess {
-//                    try {
-//                        val docUri =
-//                            DocumentsContract.buildDocumentUriUsingTree(
-//                                selectedFolderExportUri,
-//                                DocumentsContract.getTreeDocumentId(
-//                                    selectedFolderExportUri
-//                                )
-//                            )
-//
-//                        val fileUri = DocumentsContract.createDocument(
-//                            context.contentResolver,
-//                            docUri,
-//                            "application/zip",
-//                            fileName
-//                        )
-//
-//                        if (fileUri != null) {
-//                            context.contentResolver.openOutputStream(fileUri)
-//                                ?.use { out ->
-//                                    tempFile.inputStream().use { inp ->
-//                                        inp.copyTo(out)
-//                                    }
-//                                }
-//
-//                            downloadShowToast("Folder export downloaded to ${selectedFolderExportPath}/$fileName.zip")
-//                        } else {
-//                            downloadShowToast("Failed to create folder export in selected directory")
-//                        }
-//                    } catch (e: Exception) {
-//                        Logger.error(
-//                            "FoldersScreen",
-//                            "Failed to copy folder export to selected directory",
-//                            e
-//                        )
-//
-//                        downloadShowToast("Failed to copy folder export to selected directory: ${e.message}")
-//                    } finally {
-//                        tempFile.delete()
-//                    }
-//                }
-//                .onFailure {
-//                    Logger.error("FoldersScreen", "Failed to download folder export", it)
-//
-//                    downloadShowToast("Failed to download folder export: ${it.message}")
-//                }
-//
-//            fileRequiresPassword = false
-//            downloadFilePassword = null
-//            folderToExport = null
-//        }
-//    }
 
     val directoryPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -679,12 +458,6 @@ fun FoldersScreen(
 
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Name",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableNameWidth,
                         name = "name",
                         sortable = true,
@@ -692,14 +465,13 @@ fun FoldersScreen(
                         onSortChanged = {
                             onSortChanged(GetFoldersQuerySortBy.NAME)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Name",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Public",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tablePublicWidth,
                         name = "public",
                         sortable = true,
@@ -707,14 +479,13 @@ fun FoldersScreen(
                         onSortChanged = {
                             onSortChanged(GetFoldersQuerySortBy.PUBLIC)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Public",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Uploads?",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableUploadsWidth,
                         name = "uploads",
                         sortable = true,
@@ -722,14 +493,13 @@ fun FoldersScreen(
                         onSortChanged = {
                             onSortChanged(GetFoldersQuerySortBy.UPLOADS)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Uploads?",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Created",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableCreatedWidth,
                         name = "created at",
                         sortable = true,
@@ -737,14 +507,13 @@ fun FoldersScreen(
                         onSortChanged = {
                             onSortChanged(GetFoldersQuerySortBy.CREATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Created",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Last update at",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableLastUpdatedAtWidth,
                         name = "lastUpdatedAt",
                         sortable = true,
@@ -752,17 +521,21 @@ fun FoldersScreen(
                         onSortChanged = {
                             onSortChanged(GetFoldersQuerySortBy.UPDATED_AT)
                         },
-                    ),
+                    ) {
+                        Text(
+                            text = "Last update at",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     TableHeaderData(
-                        content = {
-                            Text(
-                                text = "Actions",
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
                         width = tableActionsWidth,
                         name = "actions"
-                    ),
+                    ) {
+                        Text(
+                            text = "Actions",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                 )
 
                 val rows: List<TableRowData> = state.folders?.map { folder ->
@@ -774,362 +547,355 @@ fun FoldersScreen(
                         },
                         cells = listOf(
                             TableCellData(
-                                content = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = folder.name,
-                                        )
+                                width = tableNameWidth,
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = folder.name,
+                                    )
 
-                                        val folderChildrenCount = folder.count?.children ?: 0
+                                    val folderChildrenCount = folder.count?.children ?: 0
 
-                                        if (folderChildrenCount > 0) {
-                                            Box(
-                                                contentAlignment = Alignment.Center,
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
-                                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
-                                                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                                    if (folderChildrenCount > 0) {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = "$folderChildrenCount SUBFOLDER${if (folderChildrenCount > 1) "S" else ""}",
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            TableCellData(
+                                width = tablePublicWidth,
+                            ) {
+                                EnabledCheckbox(
+                                    enabled = folder.public
+                                )
+                            },
+                            TableCellData(
+                                width = tableUploadsWidth,
+                            ) {
+                                EnabledCheckbox(
+                                    enabled = folder.allowUploads
+                                )
+                            },
+                            TableCellData(
+                                width = tableCreatedWidth,
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(folder.createdAt)),
+                                )
+                            },
+                            TableCellData(
+                                width = tableLastUpdatedAtWidth,
+                            ) {
+                                Text(
+                                    text = HumanReadable.timeAgo(Instant.parse(folder.updatedAt)),
+                                )
+                            },
+                            TableCellData(
+                                width = tableActionsWidth,
+                            ) {
+                                @Composable
+                                fun ActionButtonSpacer() {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+
+                                var expanded by rememberSaveable { mutableStateOf(false) }
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
+                                ) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "Open Folder",
+                                                color = if (state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            viewModel.setMainFolder(folder)
+                                            viewModel.setFolderPath(state.foldersPath + folder)
+
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.folder_open),
+                                                contentDescription = "Open folder",
+                                                tint = if (state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "Move Folder",
+                                                color = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            viewModel.setMoveFolder(folder)
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.folder_copy),
+                                                contentDescription = "Move folder",
+                                                tint = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "Export as ZIP",
+                                                color = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            viewModel.setFolderToExport(folder)
+
+                                            if (state.selectedFolderExportUri == null) {
+                                                viewModel.setDownloadFolderType(DownloadFolderType.FOLDER)
+
+                                                directoryPicker.launch(null)
+
+                                                return@DropdownMenuItem
+                                            }
+
+                                            viewModel.performFolderExport(
+                                                context = context,
+                                                folder = folder,
+                                                folderExportUri = state.selectedFolderExportUri!!,
+                                                sendNotification = { content ->
+                                                    Notification.show(
+                                                        context = context,
+                                                        activity = activity,
+                                                        content = content
+                                                    )
+                                                }
+                                            )
+
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.folder_zip),
+                                                contentDescription = "Export as ZIP",
+                                                tint = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = if (folder.public) "Make Private" else "Make Public",
+                                                color = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            togglePublic(folder)
+
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(
+                                                    if (folder.public)
+                                                        R.drawable.lock
+                                                    else
+                                                        R.drawable.lock_open
+                                                ),
+                                                contentDescription = if (folder.public) "Make private" else "Make public",
+                                                tint = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = if (folder.allowUploads) "Disallow Anonymous Uploads" else "Allow Anonymous Uploads",
+                                                color = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            toggleAnonymousUploads(folder)
+
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(
+                                                    if (folder.allowUploads)
+                                                        R.drawable.share_off
+                                                    else
+                                                        R.drawable.share
+                                                ),
+                                                contentDescription = if (folder.allowUploads) "Disallow anonymous uploads" else "Allow anonymous uploads",
+                                                tint = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "Edit Name",
+                                                color = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            viewModel.setEditNameFolder(folder)
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.edit),
+                                                contentDescription = "Edit name",
+                                                tint = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                else
+                                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "Delete",
+                                                color = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.error
+                                                else
+                                                    MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        enabled = !state.isLoading,
+                                        onClick = {
+                                            viewModel.setDeleteFolder(folder)
+                                            expanded = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.delete),
+                                                contentDescription = "Delete",
+                                                tint = if (!state.isLoading)
+                                                    MaterialTheme.colorScheme.error
+                                                else
+                                                    MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                    )
+                                }
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.more_horiz),
+                                    iconContentDescription = "More actions",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = { expanded = true },
+                                    enabled = !state.isLoading
+                                )
+
+                                ActionButtonSpacer()
+
+                                val clipboardManager = LocalClipboard.current
+
+                                IconButton(
+                                    icon = painterResource(R.drawable.content_copy),
+                                    iconContentDescription = "Copy folder link",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    iconColor = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = {
+                                        val fileUrl = "${state.serverUrl}/folder/${folder.id}"
+
+                                        val clipData = ClipData.newRawUri("Folder URL", fileUrl.toUri()).toClipEntry()
+
+                                        coroutineScope.launch {
+                                            clipboardManager.setClipEntry(clipData)
+
+                                            Notification.show(
+                                                context = context,
+                                                activity = activity,
                                             ) {
                                                 Text(
-                                                    text = "$folderChildrenCount SUBFOLDER${if (folderChildrenCount > 1) "S" else ""}",
+                                                    text = "Folder link copied to clipboard"
                                                 )
                                             }
                                         }
-                                    }
-                                },
-                                width = tableNameWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    EnabledCheckbox(
-                                        enabled = folder.public
-                                    )
-                                },
-                                width = tablePublicWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    EnabledCheckbox(
-                                        enabled = folder.allowUploads
-                                    )
-                                },
-                                width = tableUploadsWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(folder.createdAt)),
-                                    )
-                                },
-                                width = tableCreatedWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    Text(
-                                        text = HumanReadable.timeAgo(Instant.parse(folder.updatedAt)),
-                                    )
-                                },
-                                width = tableLastUpdatedAtWidth,
-                            ),
-                            TableCellData(
-                                content = {
-                                    @Composable
-                                    fun ActionButtonSpacer() {
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
+                                    },
+                                    enabled = state.serverUrl != null && !state.isLoading && folder.public
+                                )
 
-                                    var expanded by rememberSaveable { mutableStateOf(false) }
+                                ActionButtonSpacer()
 
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false },
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                        shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = "Open Folder",
-                                                    color = if (state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                viewModel.setMainFolder(folder)
-                                                viewModel.setFolderPath(state.foldersPath + folder)
-
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.folder_open),
-                                                    contentDescription = "Open folder",
-                                                    tint = if (state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                        )
-
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = "Move Folder",
-                                                    color = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                viewModel.setMoveFolder(folder)
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.folder_copy),
-                                                    contentDescription = "Move folder",
-                                                    tint = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        )
-
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = "Export as ZIP",
-                                                    color = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                viewModel.setFolderToExport(folder)
-
-                                                if (state.selectedFolderExportUri == null) {
-                                                    viewModel.setDownloadFolderType(DownloadFolderType.FOLDER)
-
-                                                    directoryPicker.launch(null)
-
-                                                    return@DropdownMenuItem
-                                                }
-
-                                                viewModel.performFolderExport(
-                                                    context = context,
-                                                    folder = folder,
-                                                    folderExportUri = state.selectedFolderExportUri!!,
-                                                    sendNotification = { content ->
-                                                        Notification.show(
-                                                            context = context,
-                                                            activity = activity,
-                                                            content = content
-                                                        )
-                                                    }
-                                                )
-
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.folder_zip),
-                                                    contentDescription = "Export as ZIP",
-                                                    tint = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        )
-
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = if (folder.public) "Make Private" else "Make Public",
-                                                    color = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                togglePublic(folder)
-
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(
-                                                        if (folder.public)
-                                                            R.drawable.lock
-                                                        else
-                                                            R.drawable.lock_open
-                                                    ),
-                                                    contentDescription = if (folder.public) "Make private" else "Make public",
-                                                    tint = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        )
-
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = if (folder.allowUploads) "Disallow Anonymous Uploads" else "Allow Anonymous Uploads",
-                                                    color = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                toggleAnonymousUploads(folder)
-
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(
-                                                        if (folder.allowUploads)
-                                                            R.drawable.share_off
-                                                        else
-                                                            R.drawable.share
-                                                    ),
-                                                    contentDescription = if (folder.allowUploads) "Disallow anonymous uploads" else "Allow anonymous uploads",
-                                                    tint = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        )
-
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = "Edit Name",
-                                                    color = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                viewModel.setEditNameFolder(folder)
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.edit),
-                                                    contentDescription = "Edit name",
-                                                    tint = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    else
-                                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        )
-
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = "Delete",
-                                                    color = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.error
-                                                    else
-                                                        MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
-                                                )
-                                            },
-                                            enabled = !state.isLoading,
-                                            onClick = {
-                                                viewModel.setDeleteFolder(folder)
-                                                expanded = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.delete),
-                                                    contentDescription = "Delete",
-                                                    tint = if (!state.isLoading)
-                                                        MaterialTheme.colorScheme.error
-                                                    else
-                                                        MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        )
-                                    }
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.more_horiz),
-                                        iconContentDescription = "More actions",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { expanded = true },
-                                        enabled = !state.isLoading
-                                    )
-
-                                    ActionButtonSpacer()
-
-                                    val clipboardManager = LocalClipboard.current
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.content_copy),
-                                        iconContentDescription = "Copy folder link",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = {
-                                            val fileUrl = "${state.serverUrl}/folder/${folder.id}"
-
-                                            val clipData = ClipData.newRawUri("Folder URL", fileUrl.toUri()).toClipEntry()
-
-                                            coroutineScope.launch {
-                                                clipboardManager.setClipEntry(clipData)
-
-                                                Notification.show(
-                                                    context = context,
-                                                    activity = activity,
-                                                    content = {
-                                                        Text(
-                                                            text = "Folder link copied to clipboard"
-                                                        )
-                                                    }
-                                                )
-                                            }
-                                        },
-                                        enabled = state.serverUrl != null && !state.isLoading && folder.public
-                                    )
-
-                                    ActionButtonSpacer()
-
-                                    IconButton(
-                                        icon = painterResource(R.drawable.delete),
-                                        iconContentDescription = "Delete folder",
-                                        color = MaterialTheme.colorScheme.error,
-                                        iconColor = MaterialTheme.colorScheme.onError,
-                                        onClick = {
-                                            viewModel.setDeleteFolder(folder)
-                                        },
-                                        enabled = state.serverUrl != null && !state.isLoading
-                                    )
-                                },
-                                width = tableActionsWidth,
-                            )
+                                IconButton(
+                                    icon = painterResource(R.drawable.delete),
+                                    iconContentDescription = "Delete folder",
+                                    color = MaterialTheme.colorScheme.error,
+                                    iconColor = MaterialTheme.colorScheme.onError,
+                                    onClick = {
+                                        viewModel.setDeleteFolder(folder)
+                                    },
+                                    enabled = state.serverUrl != null && !state.isLoading
+                                )
+                            }
                         )
                     )
                 } ?: emptyList()
@@ -1458,12 +1224,6 @@ fun FoldersScreen(
 
                     val headers: List<TableHeaderData> = listOf(
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Name",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableNameWidth,
                             name = "name",
                             searchable = true,
@@ -1475,14 +1235,13 @@ fun FoldersScreen(
                             onSearchClick = {
                                 viewModel.updateFileSearchKey(GetFilesQuerySearchField.NAME)
                             }
-                        ),
+                        ) {
+                            Text(
+                                text = "Name",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Tags",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableTagsWidth,
                             name = "tags",
                             searchable = true,
@@ -1490,14 +1249,13 @@ fun FoldersScreen(
                                 viewModel.updateFileSearchKey(GetFilesQuerySearchField.TAGS)
                             },
                             searchEnabled = !state.tagsLoading && state.tags?.isNotEmpty() ?: false
-                        ),
+                        ) {
+                            Text(
+                                text = "Tags",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Type",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableTypeWidth,
                             name = "type",
                             searchable = true,
@@ -1509,14 +1267,13 @@ fun FoldersScreen(
                             onSearchClick = {
                                 viewModel.updateFileSearchKey(GetFilesQuerySearchField.TYPE)
                             }
-                        ),
+                        ) {
+                            Text(
+                                text = "Type",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Size",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableSizeWidth,
                             name = "size",
                             sortable = true,
@@ -1524,14 +1281,13 @@ fun FoldersScreen(
                             onSortChanged = {
                                 onSortChanged(GetFilesQuerySortBy.SIZE)
                             }
-                        ),
+                        ) {
+                            Text(
+                                text = "Size",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Created At",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableCreatedAtWidth,
                             name = "created at",
                             sortable = true,
@@ -1539,14 +1295,13 @@ fun FoldersScreen(
                             onSortChanged = {
                                 onSortChanged(GetFilesQuerySortBy.CREATED_AT)
                             }
-                        ),
+                        ) {
+                            Text(
+                                text = "Created At",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Favorite",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableFavoriteWidth,
                             name = "favorite",
                             sortable = true,
@@ -1554,14 +1309,13 @@ fun FoldersScreen(
                             onSortChanged = {
                                 onSortChanged(GetFilesQuerySortBy.FAVORITE)
                             }
-                        ),
+                        ) {
+                            Text(
+                                text = "Favorite",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "ID",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableIdWidth,
                             name = "ID",
                             searchable = true,
@@ -1573,17 +1327,21 @@ fun FoldersScreen(
                             onSearchClick = {
                                 viewModel.updateFileSearchKey(GetFilesQuerySearchField.ID)
                             }
-                        ),
+                        ) {
+                            Text(
+                                text = "ID",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                         TableHeaderData(
-                            content = {
-                                Text(
-                                    text = "Actions",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
                             width = tableActionsWidth,
                             name = "actions"
-                        ),
+                        ) {
+                            Text(
+                                text = "Actions",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
                     )
 
                     PromptPopup(
@@ -1605,24 +1363,22 @@ fun FoldersScreen(
                                     Notification.show(
                                         context = context,
                                         activity = activity,
-                                        content = {
-                                            Text(
-                                                text = "File deleted successfully"
-                                            )
-                                        },
-                                    )
+                                    ) {
+                                        Text(
+                                            text = "File deleted successfully"
+                                        )
+                                    }
                                 },
                                 onError = { error ->
                                     Notification.show(
                                         context = context,
                                         activity = activity,
-                                        content = {
-                                            Text(
-                                                text = error,
-                                                color = MaterialTheme.colorScheme.error
-                                            )
-                                        },
-                                    )
+                                    ) {
+                                        Text(
+                                            text = error,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -1636,184 +1392,145 @@ fun FoldersScreen(
                             },
                             cells = listOf(
                                 TableCellData(
-                                    content = {
-                                        Text(
-                                            text = file.name,
-                                        )
-                                    },
                                     width = tableNameWidth,
-                                ),
+                                ) {
+                                    Text(
+                                        text = file.name,
+                                    )
+                                },
                                 TableCellData(
-                                    content = {
-                                        FlowRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(8.dp),
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                                        ) {
-                                            file.tags?.forEach { tag ->
-                                                Tag(tag = tag)
-                                            }
-                                        }
-                                    },
                                     width = tableTagsWidth,
-                                ),
-                                TableCellData(
-                                    content = {
-                                        Text(
-                                            text = file.type,
-                                        )
-                                    },
-                                    width = tableTypeWidth,
-                                ),
-                                TableCellData(
-                                    content = {
-                                        Text(
-                                            text = formatBytes(file.size),
-                                        )
-                                    },
-                                    width = tableSizeWidth,
-                                ),
-                                TableCellData(
-                                    content = {
-                                        Text(
-                                            text = HumanReadable.timeAgo(Instant.parse(file.createdAt)),
-                                        )
-                                    },
-                                    width = tableCreatedAtWidth,
-                                ),
-                                TableCellData(
-                                    content = {
-                                        Text(
-                                            text = if (file.favorite) "Yes" else "No",
-                                            color = if (file.favorite) Yellow else MaterialTheme.colorScheme.onBackground
-                                        )
-                                    },
-                                    width = tableFavoriteWidth,
-                                ),
-                                TableCellData(
-                                    content = {
-                                        Text(
-                                            text = file.id,
-                                        )
-                                    },
-                                    width = tableIdWidth,
-                                ),
-                                TableCellData(
-                                    content = {
-                                        @Composable
-                                        fun ActionButtonSpacer() {
-                                            Spacer(modifier = Modifier.width(8.dp))
+                                ) {
+                                    FlowRow(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        file.tags?.forEach { tag ->
+                                            Tag(tag = tag)
                                         }
+                                    }
+                                },
+                                TableCellData(
+                                    width = tableTypeWidth,
+                                ) {
+                                    Text(
+                                        text = file.type,
+                                    )
+                                },
+                                TableCellData(
+                                    width = tableSizeWidth,
+                                ) {
+                                    Text(
+                                        text = formatBytes(file.size),
+                                    )
+                                },
+                                TableCellData(
+                                    width = tableCreatedAtWidth,
+                                ) {
+                                    Text(
+                                        text = HumanReadable.timeAgo(Instant.parse(file.createdAt)),
+                                    )
+                                },
+                                TableCellData(
+                                    width = tableFavoriteWidth,
+                                ) {
+                                    Text(
+                                        text = if (file.favorite) "Yes" else "No",
+                                        color = if (file.favorite) Yellow else MaterialTheme.colorScheme.onBackground
+                                    )
+                                },
+                                TableCellData(
+                                    width = tableIdWidth,
+                                ) {
+                                    Text(
+                                        text = file.id,
+                                    )
+                                },
+                                TableCellData(
+                                    width = tableActionsWidth,
+                                ) {
+                                    @Composable
+                                    fun ActionButtonSpacer() {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                    }
 
-                                        IconButton(
-                                            icon = painterResource(R.drawable.draft),
-                                            iconContentDescription = "More details",
-                                            color = MaterialTheme.colorScheme.primary,
-                                            iconColor = MaterialTheme.colorScheme.onPrimary,
-                                            onClick = {
-                                                viewModel.setClickedFile(file)
-                                            },
-                                            enabled = !state.isLoading
-                                        )
+                                    IconButton(
+                                        icon = painterResource(R.drawable.draft),
+                                        iconContentDescription = "More details",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        iconColor = MaterialTheme.colorScheme.onPrimary,
+                                        onClick = {
+                                            viewModel.setClickedFile(file)
+                                        },
+                                        enabled = !state.isLoading
+                                    )
 
-                                        ActionButtonSpacer()
+                                    ActionButtonSpacer()
 
-                                        IconButton(
-                                            icon = painterResource(R.drawable.open_new),
-                                            iconContentDescription = "Open file in browser",
-                                            color = MaterialTheme.colorScheme.primary,
-                                            iconColor = MaterialTheme.colorScheme.onPrimary,
-                                            onClick = {
-                                                val fileUrl = "${state.serverUrl}${file.url}"
+                                    IconButton(
+                                        icon = painterResource(R.drawable.open_new),
+                                        iconContentDescription = "Open file in browser",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        iconColor = MaterialTheme.colorScheme.onPrimary,
+                                        onClick = {
+                                            val fileUrl = "${state.serverUrl}${file.url}"
 
-                                                val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
-                                                context.startActivity(intent)
-                                            },
-                                            enabled = state.serverUrl != null && !state.isLoading
-                                        )
+                                            val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
+                                            context.startActivity(intent)
+                                        },
+                                        enabled = state.serverUrl != null && !state.isLoading
+                                    )
 
-                                        ActionButtonSpacer()
+                                    ActionButtonSpacer()
 
-                                        val clipboardManager = LocalClipboard.current
+                                    val clipboardManager = LocalClipboard.current
 
-                                        IconButton(
-                                            icon = painterResource(R.drawable.content_copy),
-                                            iconContentDescription = "Copy file link",
-                                            color = MaterialTheme.colorScheme.primary,
-                                            iconColor = MaterialTheme.colorScheme.onPrimary,
-                                            onClick = {
-                                                val fileUrl = "${state.serverUrl}${file.url}"
+                                    IconButton(
+                                        icon = painterResource(R.drawable.content_copy),
+                                        iconContentDescription = "Copy file link",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        iconColor = MaterialTheme.colorScheme.onPrimary,
+                                        onClick = {
+                                            val fileUrl = "${state.serverUrl}${file.url}"
 
-                                                val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
+                                            val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
 
-                                                coroutineScope.launch {
-                                                    clipboardManager.setClipEntry(clipData)
+                                            coroutineScope.launch {
+                                                clipboardManager.setClipEntry(clipData)
 
-                                                    Notification.show(
-                                                        context = context,
-                                                        activity = activity,
-                                                        content = {
-                                                            Text(
-                                                                text = "File link copied to clipboard"
-                                                            )
-                                                        }
-                                                    )
-                                                }
-                                            },
-                                            enabled = state.serverUrl != null && !state.isLoading
-                                        )
-
-                                        ActionButtonSpacer()
-
-                                        DownloadFilePasswordPrompt(
-                                            context = context,
-                                            activity = activity,
-                                            fileId = file.id,
-                                            showPopup = state.fileRequiresPassword && state.downloadFilePassword == null,
-                                            onDismissRequest = {
-                                                viewModel.setFileRequiresPassword(false)
-                                                viewModel.setDownloadFilePassword(null)
-                                            },
-                                            onDownload = {
-                                                if (state.selectedFileDownloadUri == null) return@DownloadFilePasswordPrompt
-
-                                                viewModel.setDownloadFilePassword(it)
-
-                                                state.fileToDownload?.let { file ->
-                                                    viewModel.performFileDownload(
-                                                        context = context,
-                                                        file = file,
-                                                        fileDownloadUri = state.selectedFileDownloadUri!!,
-                                                        sendNotification = { content ->
-                                                            Notification.show(
-                                                                context = context,
-                                                                activity = activity,
-                                                                content = content
-                                                            )
-                                                        }
+                                                Notification.show(
+                                                    context = context,
+                                                    activity = activity,
+                                                ) {
+                                                    Text(
+                                                        text = "File link copied to clipboard"
                                                     )
                                                 }
                                             }
-                                        )
+                                        },
+                                        enabled = state.serverUrl != null && !state.isLoading
+                                    )
 
-                                        IconButton(
-                                            icon = painterResource(R.drawable.download),
-                                            iconContentDescription = "Download file",
-                                            color = DarkGray,
-                                            iconColor = White,
-                                            onClick = {
-                                                viewModel.setFileToDownload(file)
+                                    ActionButtonSpacer()
 
-                                                if (state.selectedFileDownloadUri == null) {
-                                                    viewModel.setDownloadFolderType(DownloadFolderType.FILE)
+                                    DownloadFilePasswordPrompt(
+                                        context = context,
+                                        activity = activity,
+                                        fileId = file.id,
+                                        showPopup = state.fileRequiresPassword && state.downloadFilePassword == null,
+                                        onDismissRequest = {
+                                            viewModel.setFileRequiresPassword(false)
+                                            viewModel.setDownloadFilePassword(null)
+                                        },
+                                        onDownload = {
+                                            if (state.selectedFileDownloadUri == null) return@DownloadFilePasswordPrompt
 
-                                                    directoryPicker.launch(null)
+                                            viewModel.setDownloadFilePassword(it)
 
-                                                    return@IconButton
-                                                }
-
+                                            state.fileToDownload?.let { file ->
                                                 viewModel.performFileDownload(
                                                     context = context,
                                                     file = file,
@@ -1826,25 +1543,55 @@ fun FoldersScreen(
                                                         )
                                                     }
                                                 )
-                                            },
-                                            enabled = state.serverUrl != null && !state.isLoading
-                                        )
+                                            }
+                                        }
+                                    )
 
-                                        ActionButtonSpacer()
+                                    IconButton(
+                                        icon = painterResource(R.drawable.download),
+                                        iconContentDescription = "Download file",
+                                        color = DarkGray,
+                                        iconColor = White,
+                                        onClick = {
+                                            viewModel.setFileToDownload(file)
 
-                                        IconButton(
-                                            icon = painterResource(R.drawable.delete),
-                                            iconContentDescription = "Open file in browser",
-                                            color = MaterialTheme.colorScheme.error,
-                                            iconColor = MaterialTheme.colorScheme.onError,
-                                            onClick = {
-                                                viewModel.setDeleteFile(file)
-                                            },
-                                            enabled = state.serverUrl != null && !state.isLoading
-                                        )
-                                    },
-                                    width = tableActionsWidth,
-                                )
+                                            if (state.selectedFileDownloadUri == null) {
+                                                viewModel.setDownloadFolderType(DownloadFolderType.FILE)
+
+                                                directoryPicker.launch(null)
+
+                                                return@IconButton
+                                            }
+
+                                            viewModel.performFileDownload(
+                                                context = context,
+                                                file = file,
+                                                fileDownloadUri = state.selectedFileDownloadUri!!,
+                                                sendNotification = { content ->
+                                                    Notification.show(
+                                                        context = context,
+                                                        activity = activity,
+                                                        content = content
+                                                    )
+                                                }
+                                            )
+                                        },
+                                        enabled = state.serverUrl != null && !state.isLoading
+                                    )
+
+                                    ActionButtonSpacer()
+
+                                    IconButton(
+                                        icon = painterResource(R.drawable.delete),
+                                        iconContentDescription = "Open file in browser",
+                                        color = MaterialTheme.colorScheme.error,
+                                        iconColor = MaterialTheme.colorScheme.onError,
+                                        onClick = {
+                                            viewModel.setDeleteFile(file)
+                                        },
+                                        enabled = state.serverUrl != null && !state.isLoading
+                                    )
+                                }
                             )
                         )
                     } ?: emptyList()

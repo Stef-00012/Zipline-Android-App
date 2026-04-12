@@ -54,12 +54,11 @@ fun BiometricAuthScreen(
                 Notification.show(
                     context = context,
                     activity = activity,
-                    content = {
-                        Text(
-                            text = "Biometric authentication failed"
-                        )
-                    }
-                )
+                ) {
+                    Text(
+                        text = "Biometric authentication failed"
+                    )
+                }
             },
         )
 

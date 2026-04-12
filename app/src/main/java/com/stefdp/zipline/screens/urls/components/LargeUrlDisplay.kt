@@ -115,12 +115,11 @@ fun LargeUrlDisplay(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "URL link copied to clipboard"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "URL link copied to clipboard"
+                                )
+                            }
                         }
                     },
                 ),
@@ -137,12 +136,11 @@ fun LargeUrlDisplay(
                             Notification.show(
                                 context = context,
                                 activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Destination copied to clipboard"
-                                    )
-                                }
-                            )
+                            ) {
+                                Text(
+                                    text = "Destination copied to clipboard"
+                                )
+                            }
                         }
                     },
                 ),

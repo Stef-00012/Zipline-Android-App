@@ -48,7 +48,10 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.largefiledisplay.IconButton
 import com.stefdp.zipline.network.requests.createUrl
+import com.stefdp.zipline.screens.urls.UrlsUiState
+import com.stefdp.zipline.screens.urls.UrlsViewModel
 import com.stefdp.zipline.utils.NumberRegex
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import kotlinx.coroutines.launch
 
 val urlRegex = Regex("""^https?://([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:[/?#]\S*)?$""")
@@ -58,19 +61,10 @@ fun CreateUrlPopup(
     context: Context,
     activity: FragmentActivity,
     showPopup: Boolean,
-    isLoading: Boolean,
     onDismissRequest: () -> Unit,
-    onDismissCreatedUrlRequest: () -> Unit,
-    baseUrl: String? = null,
-    onCreate: (
-        destination: String,
-        vanity: String?,
-        enabled: Boolean,
-        maxViews: Long?,
-        password: String?,
-        domain: String?
-    ) -> Unit,
-    createdUrl: String?,
+    viewModel: UrlsViewModel,
+    state: UrlsUiState,
+    viewState: ZiplineViewStateType
 ) {
     val webSettings = LocalWebSettings.current
 
@@ -79,8 +73,10 @@ fun CreateUrlPopup(
     val coroutineScope = rememberCoroutineScope()
 
     Popup(
-        showPopup = createdUrl != null,
-        onDismissRequest = onDismissCreatedUrlRequest,
+        showPopup = state.createdUrlResult != null,
+        onDismissRequest = {
+            viewModel.clearCreatedUrlResult()
+        },
         scrollable = false,
     ) {
         Text(
@@ -100,14 +96,14 @@ fun CreateUrlPopup(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "$createdUrl",
+                text = "${state.createdUrlResult}",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.tertiary,
                     textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.clickable(
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, createdUrl?.toUri())
+                        val intent = Intent(Intent.ACTION_VIEW, state.createdUrlResult?.toUri())
                         context.startActivity(intent)
                     }
                 )
@@ -124,7 +120,7 @@ fun CreateUrlPopup(
                     iconContentDescription = "Copy URL",
                     onClick = {
                         coroutineScope.launch {
-                            val clipData = ClipData.newRawUri("URL", createdUrl?.toUri()).toClipEntry()
+                            val clipData = ClipData.newRawUri("URL", state.createdUrlResult?.toUri()).toClipEntry()
 
                             clipboardManager.setClipEntry(clipData)
 
@@ -147,7 +143,7 @@ fun CreateUrlPopup(
                     iconContentDescription = "Open URL",
                     onClick = {
                         coroutineScope.launch {
-                            val intent = Intent(Intent.ACTION_VIEW, createdUrl?.toUri())
+                            val intent = Intent(Intent.ACTION_VIEW, state.createdUrlResult?.toUri())
                             context.startActivity(intent)
                         }
                     },
@@ -196,30 +192,30 @@ fun CreateUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var destination by remember { mutableStateOf(TextFieldValue(baseUrl ?: "")) }
-
         TextInput(
-            value = destination,
-            onValueChange = { destination = it },
+            value = state.createUrlDestination,
+            onValueChange = {
+                viewModel.setCreateUrlDestination(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "URL",
             placeholder = "https://google.com",
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var vanity by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = vanity,
-            onValueChange = { vanity = it },
+            value = state.createUrlVanity,
+            onValueChange = {
+                viewModel.setCreateUrlVanity(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Vanity",
             placeholder = "example",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             description = "Optional field, leave blank to generate a random code."
         )
 
@@ -227,13 +223,11 @@ fun CreateUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var maxViews by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = maxViews,
+            value = state.createUrlMaxViews,
             onValueChange = {
                 if (NumberRegex.matches(it.text) || it.text.isBlank()) {
-                    maxViews = it
+                    viewModel.setCreateUrlMaxViews(it)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -241,15 +235,13 @@ fun CreateUrlPopup(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             description = "Optional field, leave blank to disable a view limit."
         )
 
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
-        var selectedOverrideDomain by remember { mutableStateOf(setOf("default")) }
 
         Select(
             label = "Override Domain",
@@ -276,22 +268,24 @@ fun CreateUrlPopup(
                     }
                 )
             },
-            onSelectionChange = { selectedOverrideDomain = it },
-            selectedIds = selectedOverrideDomain,
-            enabled = !isLoading
+            onSelectionChange = {
+                viewModel.setCreateUrlSelectedOverrideDomain(it)
+            },
+            selectedIds = state.createUrlSelectedOverrideDomain,
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var enabled by remember { mutableStateOf(true) }
-
         Switch(
             label = "Enabled",
-            checked = enabled,
-            onCheckedChange = { enabled = it },
-            enabled = !isLoading,
+            checked = state.createUrlEnabled,
+            onCheckedChange = {
+                viewModel.setCreateUrlEnabled(it)
+            },
+            enabled = !state.isLoading,
             description = "Prevent or allow this URL from being visited."
         )
 
@@ -299,14 +293,14 @@ fun CreateUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var password by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = password,
-            onValueChange = { password = it },
+            value = state.createUrlPassword,
+            onValueChange = {
+                viewModel.setCreateUrlPassword(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Password",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             description = "Protect your link with a password.",
             isPassword = true
         )
@@ -316,9 +310,9 @@ fun CreateUrlPopup(
         )
 
         Button(
-            enabled = !isLoading,
+            enabled = !state.isLoading && state.createUrlDestination.text.isNotBlank(),
             onClick = {
-                if (!urlRegex.matches(destination.text)) {
+                if (!urlRegex.matches(state.createUrlDestination.text)) {
                     Notification.show(
                         context = context,
                         activity = activity,
@@ -331,15 +325,28 @@ fun CreateUrlPopup(
                     return@Button
                 }
 
-
-
-                onCreate(
-                    destination.text,
-                    vanity.text.ifBlank { null },
-                    enabled,
-                    maxViews.text.toLongOrNull(),
-                    password.text.ifBlank { null },
-                    selectedOverrideDomain.firstOrNull { it != "default" },
+                viewModel.createUrl(
+                    context = context,
+                    viewState = viewState,
+                    destination = state.createUrlDestination.text,
+                    vanity = state.createUrlVanity.text.ifBlank { null },
+                    enabled = state.createUrlEnabled,
+                    maxViews = state.createUrlMaxViews.text.toLongOrNull(),
+                    password = state.createUrlPassword.text.ifBlank { null },
+                    domain = state.createUrlSelectedOverrideDomain.firstOrNull { it != "default" },
+                    onSuccess = {
+                        onDismissRequest()
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "Failed to create URL: $error"
+                            )
+                        }
+                    }
                 )
             },
             modifier = Modifier.fillMaxWidth()

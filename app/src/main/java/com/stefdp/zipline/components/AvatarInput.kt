@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -45,9 +46,11 @@ fun AvatarInput(
     colors: TextFieldColors = getOutlinedTextFieldColors(!enabled),
     includeSideButton: Boolean = true,
 ) {
-    var filename by remember { mutableStateOf(TextFieldValue("")) }
-    var avatarBase64 by remember { mutableStateOf<String?>(null) }
-    var mimetype by remember { mutableStateOf<String>("image/png") }
+    var filename by rememberSaveable(
+        stateSaver = TextFieldValue.Saver
+    ) { mutableStateOf(TextFieldValue("")) }
+    var avatarBase64 by rememberSaveable { mutableStateOf<String?>(null) }
+    var mimetype by rememberSaveable { mutableStateOf("image/png") }
 
     LaunchedEffect(avatarBase64) {
         onAvatarChange(avatarBase64?.let { "data:${mimetype};base64,$it" })

@@ -9,6 +9,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,8 +30,8 @@ fun VideoPlayer(
     onSuccess: () -> Unit,
     autoPlay: Boolean = false
 ) {
-    var isLoading by remember { mutableStateOf(true) }
-    var hasNotifiedSuccess by remember { mutableStateOf(false) }
+    var isLoading by rememberSaveable { mutableStateOf(true) }
+    var hasNotifiedSuccess by rememberSaveable { mutableStateOf(false) }
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {

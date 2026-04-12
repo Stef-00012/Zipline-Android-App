@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,16 +53,16 @@ fun HsvColorPicker(
         hsv
     }
 
-    var hue by remember { mutableFloatStateOf(initialHsv[0]) }
-    var saturation by remember { mutableFloatStateOf(initialHsv[1]) }
-    var value by remember { mutableFloatStateOf(initialHsv[2]) }
-    var alpha by remember { mutableFloatStateOf(initialColor.alpha) }
+    var hue by rememberSaveable { mutableFloatStateOf(initialHsv[0]) }
+    var saturation by rememberSaveable { mutableFloatStateOf(initialHsv[1]) }
+    var value by rememberSaveable { mutableFloatStateOf(initialHsv[2]) }
+    var alpha by rememberSaveable { mutableFloatStateOf(initialColor.alpha) }
 
     val currentColor = remember(hue, saturation, value, alpha) {
         Color.hsv(hue, saturation, value, alpha)
     }
 
-    var hexText by remember(currentColor) { mutableStateOf(currentColor.toHex()) }
+    var hexText by rememberSaveable(currentColor) { mutableStateOf(currentColor.toHex()) }
 
     Column(
         modifier = Modifier.fillMaxWidth()

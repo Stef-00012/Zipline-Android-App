@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -60,7 +61,9 @@ internal fun EditFilePopup(
 
         Spacer()
 
-        var name by remember { mutableStateOf(TextFieldValue(file.name)) }
+        var name by rememberSaveable(
+            stateSaver = TextFieldValue.Saver
+        ) { mutableStateOf(TextFieldValue(file.name)) }
 
         TextInput(
             modifier = Modifier.fillMaxWidth(),
@@ -72,7 +75,9 @@ internal fun EditFilePopup(
 
         Spacer()
 
-        var maxViews by remember {
+        var maxViews by rememberSaveable(
+            stateSaver = TextFieldValue.Saver
+        ) {
             val value = if (file.maxViews != null) file.maxViews.toString() else ""
 
             mutableStateOf(TextFieldValue(value))
@@ -93,7 +98,9 @@ internal fun EditFilePopup(
 
         Spacer()
 
-        var originalName by remember { mutableStateOf(TextFieldValue(file.originalName ?: "")) }
+        var originalName by rememberSaveable(
+            stateSaver = TextFieldValue.Saver
+        ) { mutableStateOf(TextFieldValue(file.originalName ?: "")) }
 
         TextInput(
             modifier = Modifier.fillMaxWidth(),
@@ -105,7 +112,9 @@ internal fun EditFilePopup(
 
         Spacer()
 
-        var type by remember { mutableStateOf(TextFieldValue(file.type)) }
+        var type by rememberSaveable(
+            stateSaver = TextFieldValue.Saver
+        ) { mutableStateOf(TextFieldValue(file.type)) }
 
         TextInput(
             modifier = Modifier.fillMaxWidth(),
@@ -117,7 +126,9 @@ internal fun EditFilePopup(
 
         Spacer()
 
-        var password by remember { mutableStateOf(TextFieldValue("")) }
+        var password by rememberSaveable(
+            stateSaver = TextFieldValue.Saver
+        ) { mutableStateOf(TextFieldValue("")) }
 
         if (file.password == true) {
             Button(

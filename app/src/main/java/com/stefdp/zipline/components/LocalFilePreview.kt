@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,8 +42,8 @@ fun LocalFilePreview(
     clickEnabled: Boolean = true,
     onImageLoaded: () -> Unit = { },
 ) {
-    var imageLoading by remember { mutableStateOf(true) }
-    var imageFailed by remember { mutableStateOf(false) }
+    var imageLoading by rememberSaveable { mutableStateOf(true) }
+    var imageFailed by rememberSaveable { mutableStateOf(false) }
     val isLargeFile = fileState.file.size >= MAX_PREVIEW_FILE_SIZE
 
     val fileName = fileState.file.displayName

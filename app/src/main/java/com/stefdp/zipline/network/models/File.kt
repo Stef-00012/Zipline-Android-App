@@ -1,5 +1,9 @@
 package com.stefdp.zipline.network.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class File(
     val createdAt: String,
     val updatedAt: String,
@@ -18,8 +22,9 @@ data class File(
     val tags: List<Tag>? = null,
     val url: String? = null,
     val similarity: Double? = null,
-)
+) : Parcelable
 
+@Parcelize
 data class FileThumbnail(
     val path: String
-)
+) : Parcelable

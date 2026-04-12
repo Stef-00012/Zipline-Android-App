@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -73,15 +74,15 @@ fun LargeFileDisplay(
     tags: List<Tag>? = null,
     onDelete: () -> Unit = {}
 ) {
-    var activeFile by remember { mutableStateOf<File?>(null) }
-    var isPopupVisible by remember { mutableStateOf(true) }
+    var activeFile by rememberSaveable { mutableStateOf<File?>(null) }
+    var isPopupVisible by rememberSaveable { mutableStateOf(true) }
 
-    var allTags by remember(tags) { mutableStateOf(tags ?: emptyList()) }
-    var allFolders by remember { mutableStateOf<List<BaseFolder>>(emptyList()) }
+    var allTags by rememberSaveable(tags) { mutableStateOf(tags ?: emptyList()) }
+    var allFolders by rememberSaveable { mutableStateOf<List<BaseFolder>>(emptyList()) }
 
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by rememberSaveable { mutableStateOf(true) }
 
-    var serverUrl by remember { mutableStateOf<String?>(null) }
+    var serverUrl by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
@@ -128,8 +129,8 @@ fun LargeFileDisplay(
     }
 
     activeFile?.let { currentFile ->
-        var showConfirmDeletePopup by remember { mutableStateOf(false) }
-        var showEditFilePopup by remember { mutableStateOf(false) }
+        var showConfirmDeletePopup by rememberSaveable { mutableStateOf(false) }
+        var showEditFilePopup by rememberSaveable { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -200,7 +201,7 @@ fun LargeFileDisplay(
             showPopup = file != null && isPopupVisible,
             onDismissRequest = onDismissRequest,
         ) {
-            var isPreviewLoading by remember { mutableStateOf(true) }
+            var isPreviewLoading by rememberSaveable { mutableStateOf(true) }
 
             val baseModifier = Modifier
                 .fillMaxWidth()
@@ -297,12 +298,12 @@ fun LargeFileDisplay(
 
                 Spacer()
 
-                val fileTags by remember(currentFile.tags) {
+                val fileTags by rememberSaveable(currentFile.tags) {
                     mutableStateOf(
                         currentFile.tags ?: emptyList()
                     )
                 }
-                var selectedTagIds by remember(currentFile.tags) {
+                var selectedTagIds by rememberSaveable(currentFile.tags) {
                     mutableStateOf(
                         fileTags.map { tag -> tag.id }.toSet()
                     )
@@ -311,7 +312,7 @@ fun LargeFileDisplay(
                 Select(
                     label = "Tags",
                     multiple = true,
-                    enabled = !isLoading && !tags.isNullOrEmpty(),
+                    enabled = !isLoading && allTags.isNotEmpty(),
                     options = allTags.map { tag ->
                         SelectOption(
                             id = tag.id,
@@ -348,12 +349,12 @@ fun LargeFileDisplay(
 
                 Spacer()
 
-                val fileFolderId by remember(currentFile.folderId) {
+                val fileFolderId by rememberSaveable(currentFile.folderId) {
                     mutableStateOf(
                         currentFile.folderId ?: UNKNOWN_FOLDER_ID
                     )
                 }
-                var selectedFolderId by remember(currentFile.folderId) {
+                var selectedFolderId by rememberSaveable(currentFile.folderId) {
                     mutableStateOf(
                         setOf(fileFolderId)
                     )
@@ -529,8 +530,8 @@ fun LargeFileDisplay(
 
                     IconButtonSpacer()
 
-                    var selectedUri by remember { mutableStateOf<Uri?>(null) }
-                    var selectedPath by remember { mutableStateOf<String?>(null) }
+                    var selectedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+                    var selectedPath by rememberSaveable { mutableStateOf<String?>(null) }
 
                     LaunchedEffect(Unit) {
                         val secureStore = SecureStorage.getInstance(context)
@@ -556,8 +557,8 @@ fun LargeFileDisplay(
                         }
                     }
 
-                    var downloadFilePassword by remember { mutableStateOf<String?>(null) }
-                    var fileRequiresPassword by remember { mutableStateOf(false) }
+                    var downloadFilePassword by rememberSaveable { mutableStateOf<String?>(null) }
+                    var fileRequiresPassword by rememberSaveable { mutableStateOf(false) }
 
                     fun performDownload() {
                         val fileFits = StorageUtil.canFitFile(

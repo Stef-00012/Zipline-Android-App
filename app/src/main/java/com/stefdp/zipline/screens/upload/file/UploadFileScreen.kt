@@ -89,6 +89,7 @@ import com.stefdp.zipline.utils.hasCameraPermission
 import com.stefdp.zipline.utils.horizontalLazyScrollbar
 import com.stefdp.zipline.utils.nameFormats
 import com.stefdp.zipline.utils.parseBytes
+import com.stefdp.zipline.utils.parseTimeToMillis
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import ir.ehsannarmani.compose_charts.extensions.format
@@ -125,6 +126,9 @@ fun UploadFileScreen(
     )
     val chunkSize = parseBytes(
         webSettings?.config?.chunks?.size ?: "25mb"
+    )
+    val maxFileExpiration = parseTimeToMillis(
+        webSettings?.config?.files?.maxExpiration ?: "365d"
     )
 
     val chunksEnabled = webSettings?.config?.chunks?.enabled ?: false
@@ -584,20 +588,22 @@ fun UploadFileScreen(
                         }
 
                     )
-                ) + deletesAtDates.map { (id, label) ->
-                    SelectOption(
-                        id = id,
-                        label = { enabled ->
-                            Text(
-                                text = label,
-                                color = if (enabled)
-                                    MaterialTheme.colorScheme.onBackground
-                                else
-                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                            )
-                        }
-                    )
-                },
+                ) + deletesAtDates
+                    .filter { (id, _) -> parseTimeToMillis(id) <= maxFileExpiration }
+                    .map { (id, label) ->
+                        SelectOption(
+                            id = id,
+                            label = { enabled ->
+                                Text(
+                                    text = label,
+                                    color = if (enabled)
+                                        MaterialTheme.colorScheme.onBackground
+                                    else
+                                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                )
+                            }
+                        )
+                    },
                 onSelectionChange = {
                     viewModel.setSelectedDeletesAt(it)
                 },

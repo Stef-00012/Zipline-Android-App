@@ -113,7 +113,7 @@ fun EditTagPopup(
         )
 
         Button(
-            enabled = !state.tagsLoading,
+            enabled = !state.tagsLoading && state.editTagName.text.isNotBlank(),
             onClick = {
                 viewModel.editTag(
                     context = context,

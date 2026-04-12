@@ -63,7 +63,7 @@ internal fun MFACategory(
                 },
                 label = "Passkeys",
                 description = "Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "mfaPasskeysEnabled" !in state.tamperedSettings
             )
 
             TextInput(
@@ -73,7 +73,7 @@ internal fun MFACategory(
                 },
                 label = "Relying Party ID",
                 description = "The Relying Party ID (RP ID) to use for WebAuthn passkeys.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "mfaPasskeysRpID" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -84,7 +84,7 @@ internal fun MFACategory(
                 },
                 label = "Origin",
                 description = "The Origin to use for WebAuthn passkeys.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "mfaPasskeysOrigin" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -95,7 +95,7 @@ internal fun MFACategory(
                 },
                 label = "Enable TOTP",
                 description = "Enable Time-based One-Time Passwords with the use of an authenticator app.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "mfaTotpEnabled" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -106,7 +106,7 @@ internal fun MFACategory(
                 },
                 label = "Issuer",
                 description = "The issuer to use for the TOTP token.",
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && "mfaTotpIssuer" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

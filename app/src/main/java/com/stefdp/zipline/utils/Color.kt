@@ -43,8 +43,8 @@ fun Color.toHex(withAlpha: Boolean = false): String {
     }
 }
 
-val Color.Companion.Saver: Saver<MutableState<Color>, Int>
+val Color.Companion.Saver: Saver<Color, Int>
     get() = Saver(
-        save = { it.value.toArgb() },
-        restore = { mutableStateOf(Color(it)) }
+        save = { it.toArgb() },
+        restore = { Color(it) }
     )

@@ -176,7 +176,7 @@ fun CreateUserPopup(
         )
 
         Button(
-            enabled = !state.isLoading,
+            enabled = !state.isLoading && state.newUserUsername.text.isNotBlank() && state.newUserPassword.text.isNotBlank(),
             onClick = {
                 viewModel.createUser(
                     context = context,

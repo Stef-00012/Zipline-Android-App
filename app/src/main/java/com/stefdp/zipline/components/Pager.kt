@@ -1,6 +1,5 @@
 package com.stefdp.zipline.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -114,8 +114,11 @@ fun Pager(
 
         val customInputEnabled = enabled && totalPages > 1
 
-        var pageValue by remember { mutableLongStateOf(currentPage) }
-        var _pageValue by remember(currentPage) { mutableStateOf(TextFieldValue("$currentPage")) }
+        var pageValue by rememberSaveable { mutableLongStateOf(currentPage) }
+        var uiPageValue by rememberSaveable(
+            currentPage,
+            stateSaver = TextFieldValue.Saver
+        ) { mutableStateOf(TextFieldValue("$currentPage")) }
 
         LaunchedEffect(pageValue) {
             onCustomPageInput(pageValue)
@@ -126,15 +129,15 @@ fun Pager(
         val focusManager = LocalFocusManager.current
 
         fun onEnter() {
-            if (numberRegex.matches(_pageValue.text)) {
-                pageValue = _pageValue.text.toLong().coerceIn(1, totalPages)
+            if (numberRegex.matches(uiPageValue.text)) {
+                pageValue = uiPageValue.text.toLong().coerceIn(1, totalPages)
             }
         }
 
         TextInput(
-            value = _pageValue,
+            value = uiPageValue,
             onValueChange = {
-                _pageValue = if (it.text.isEmpty()) it
+                uiPageValue = if (it.text.isEmpty()) it
                 else if (!numberRegex.matches(it.text)) return@TextInput
                 else if (it.text.toLong() > totalPages) TextFieldValue("$totalPages")
                 else if (it.text.toLong() < 1) TextFieldValue("1")

@@ -135,41 +135,43 @@ fun UrlsScreen(
 
     PromptPopup(
         showPopup = state.deleteUrl != null,
-        onDismissRequest = { viewModel.setDeleteUrl(null) },
-        onCancel = { viewModel.setDeleteUrl(null) },
+        onDismissRequest = {
+            viewModel.setDeleteUrl(null)
+        },
+        onCancel = {
+            viewModel.setDeleteUrl(null)
+        },
         isLoading = state.isLoading,
         title = "Are you sure?",
         description = "Are you sure you want to delete ${state.deleteUrl?.code}? This action cannot be undone.",
         onSuccess = {
-            coroutineScope.launch {
-                if (state.deleteUrl == null) return@launch
+            if (state.deleteUrl == null) return@PromptPopup
 
-                viewModel.deleteUrl(
-                    context = context,
-                    urlId = state.deleteUrl!!.id,
-                    viewState = viewState,
-                    onSuccess = {
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                        ) {
-                            Text(
-                                text = "URL deleted successfully"
-                            )
-                        }
-                    },
-                    onError = { error ->
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                        ) {
-                            Text(
-                                text = "Failed to delete URL: ${error}"
-                            )
-                        }
+            viewModel.deleteUrl(
+                context = context,
+                urlId = state.deleteUrl!!.id,
+                viewState = viewState,
+                onSuccess = {
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "URL deleted successfully"
+                        )
                     }
-                )
-            }
+                },
+                onError = { error ->
+                    Notification.show(
+                        context = context,
+                        activity = activity,
+                    ) {
+                        Text(
+                            text = "Failed to delete URL: ${error}"
+                        )
+                    }
+                }
+            )
         }
     )
 
@@ -177,92 +179,22 @@ fun UrlsScreen(
         context = context,
         activity = activity,
         showPopup = state.isCreatePopupOpen,
-        isLoading = state.popupIsLoading,
         onDismissRequest = {
-            Notification.show(
-                context = context,
-                activity = activity,
-            ) {
-                Text(
-                    text = "URL created successfully"
-                )
-            }
-
             viewModel.closeCreatePopup()
         },
-        createdUrl = state.createdUrlResult,
-        onDismissCreatedUrlRequest = {
-            viewModel.clearCreatedUrlResult()
-        },
-        baseUrl = state.createPopupBaseUrl,
-        onCreate = { destination, vanity, enabled, maxViews, password, domain ->
-            viewModel.createUrl(
-                context = context,
-                destination = destination,
-                vanity = vanity,
-                maxViews = maxViews,
-                password = password,
-                enabled = enabled,
-                domain = domain,
-                viewState = viewState,
-                onSuccess = {
-                    viewModel.closeCreatePopup()
-                },
-                onError = { error ->
-                    Notification.show(
-                        context = context,
-                        activity = activity,
-                    ) {
-                        Text(
-                            text = "Failed to create URL: $error"
-                        )
-                    }
-                }
-            )
-        }
+        viewModel = viewModel,
+        viewState = viewState,
+        state = state,
     )
 
     EditUrlPopup(
         context = context,
         activity = activity,
-        url = state.editUrl,
         showPopup = state.editUrl != null,
-        isLoading = state.popupIsLoading,
         onDismissRequest = { viewModel.setEditUrl(null) },
-        onEdit = { urlId, destination, vanity, enabled, maxViews, password ->
-            viewModel.editUrl(
-                context = context,
-                urlId = urlId,
-                destination = destination,
-                vanity = vanity,
-                maxViews = maxViews,
-                password = password,
-                enabled = enabled,
-                viewState = viewState,
-                onSuccess = {
-                    Notification.show(
-                        context = context,
-                        activity = activity,
-                    ) {
-                        Text(
-                            text = "URL updated successfully"
-                        )
-                    }
-
-                    viewModel.setEditUrl(null)
-                },
-                onError = { error ->
-                    Notification.show(
-                        context = context,
-                        activity = activity,
-                    ) {
-                        Text(
-                            text = "Failed to edit URL: $error"
-                        )
-                    }
-                }
-            )
-        }
+        viewModel = viewModel,
+        viewState = viewState,
+        state = state,
     )
 
     QRCodePopup(

@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,8 +74,8 @@ fun Select(
     description: CharSequence? = null,
     colors: TextFieldColors = getOutlinedTextFieldColors()
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var tempSelectedIds by remember { mutableStateOf(selectedIds) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var tempSelectedIds by rememberSaveable { mutableStateOf(selectedIds) }
     val interactionSource = remember { MutableInteractionSource() }
 
     val handleClose = {
@@ -85,7 +86,7 @@ fun Select(
         }
     }
 
-    var anchorY by remember { mutableFloatStateOf(0f) }
+    var anchorY by rememberSaveable { mutableFloatStateOf(0f) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -183,7 +184,7 @@ fun Select(
                 }
             )
 
-            var isDropdownAbove by remember { mutableStateOf(false) }
+            var isDropdownAbove by rememberSaveable { mutableStateOf(false) }
 
             ExposedDropdownMenu(
                 expanded = expanded,

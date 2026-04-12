@@ -53,7 +53,7 @@ internal fun InvitesCategory(
                 },
                 label = "Invites Enabled",
                 description = "Enable the use of invite links to register new users.",
-                enabled = !state.isLoading
+                enabled = !state.isLoading && "invitesEnabled" !in state.tamperedSettings
             )
 
             TextInput(
@@ -65,7 +65,7 @@ internal fun InvitesCategory(
                 },
                 label = "Length",
                 description = "The length of the invite code.",
-                enabled = !state.isLoading && state.settings?.settings?.invitesEnabled == true,
+                enabled = !state.isLoading && state.settings?.settings?.invitesEnabled == true && "invitesLength" !in state.tamperedSettings,
                 modifier = Modifier.fillMaxWidth()
             )
 

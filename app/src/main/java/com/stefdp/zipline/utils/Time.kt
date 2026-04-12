@@ -75,12 +75,12 @@ private val secondUnit = listOf("seconds", "second", "secs", "sec", "s")
 private val combinedUnits = (yearUnit + monthUnit + dayUnit + hourUnit + minuteUnit + secondUnit).joinToString("|")
 private val timeRegex = Regex("(\\d+)\\s*($combinedUnits)", RegexOption.IGNORE_CASE)
 
-fun parseTimeToMillis(input: String): Long? {
-    if (input.isBlank()) return null
+fun parseTimeToMillis(input: String): Long {
+    if (input.isBlank()) return 0L
 
     val matches = timeRegex.findAll(input.lowercase())
 
-    if (!matches.any()) return null
+    if (!matches.any()) return 0L
 
     var totalMillis = 0L
 
@@ -99,7 +99,7 @@ fun parseTimeToMillis(input: String): Long? {
         }
     }
 
-    if (totalMillis < 0) return null
+    if (totalMillis < 0) return 0L
 
     return totalMillis
 }

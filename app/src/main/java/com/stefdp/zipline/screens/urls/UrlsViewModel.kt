@@ -64,7 +64,18 @@ data class UrlsUiState(
     val qrCodeText: String = "",
     val popupIsLoading: Boolean = false,
     val popupErrorMessage: String? = null,
-    val createdUrlResult: String? = null
+    val createdUrlResult: String? = null,
+    val createUrlDestination: TextFieldValue = TextFieldValue(""),
+    val createUrlVanity: TextFieldValue = TextFieldValue(""),
+    val createUrlMaxViews: TextFieldValue = TextFieldValue(""),
+    val createUrlSelectedOverrideDomain: Set<String> = setOf("default"),
+    val createUrlEnabled: Boolean = true,
+    val createUrlPassword: TextFieldValue = TextFieldValue(""),
+    val editUrlDestination: TextFieldValue = TextFieldValue(""),
+    val editUrlVanity: TextFieldValue = TextFieldValue(""),
+    val editUrlMaxViews: TextFieldValue = TextFieldValue(""),
+    val editUrlEnabled: Boolean = true,
+    val editUrlPassword: TextFieldValue = TextFieldValue("")
 )
 
 class UrlsViewModel : ViewModel() {
@@ -85,7 +96,8 @@ class UrlsViewModel : ViewModel() {
                     serverUrl = serverUrl,
                     urlsRoute = urlsRoute,
                     createPopupBaseUrl = sharedUrl,
-                    isCreatePopupOpen = sharedUrl != null
+                    isCreatePopupOpen = sharedUrl != null,
+                    createUrlDestination = TextFieldValue(sharedUrl ?: "")
                 )
             }
         }
@@ -141,12 +153,87 @@ class UrlsViewModel : ViewModel() {
         }
     }
 
+    fun setCreateUrlDestination(value: TextFieldValue) {
+        _state.update {
+            it.copy(createUrlDestination = value)
+        }
+    }
+
+    fun setCreateUrlVanity(value: TextFieldValue) {
+        _state.update {
+            it.copy(createUrlVanity = value)
+        }
+    }
+
+    fun setCreateUrlMaxViews(value: TextFieldValue) {
+        _state.update {
+            it.copy(createUrlMaxViews = value)
+        }
+    }
+
+    fun setCreateUrlSelectedOverrideDomain(overrideDomain: Set<String>) {
+        _state.update {
+            it.copy(createUrlSelectedOverrideDomain = overrideDomain)
+        }
+    }
+
+    fun setCreateUrlEnabled(enabled: Boolean) {
+        _state.update {
+            it.copy(createUrlEnabled = enabled)
+        }
+    }
+
+    fun setCreateUrlPassword(value: TextFieldValue) {
+        _state.update {
+            it.copy(createUrlPassword = value)
+        }
+    }
+
     fun setEditUrl(url: Url?) {
         _state.update {
             it.copy(
                 editUrl = url,
-                popupErrorMessage = null
+                popupErrorMessage = null,
+                editUrlDestination = TextFieldValue(url?.destination ?: ""),
+                editUrlVanity = TextFieldValue(url?.vanity ?: ""),
+                editUrlMaxViews = TextFieldValue(
+                    if (url?.maxViews != null)
+                        (url.maxViews.takeIf { maxViews -> maxViews > 0L } ?: "").toString()
+                    else ""
+                ),
+                editUrlEnabled = url?.enabled ?: true,
+                editUrlPassword = TextFieldValue("")
             )
+        }
+    }
+
+    fun setEditUrlDestination(value: TextFieldValue) {
+        _state.update {
+            it.copy(editUrlDestination = value)
+        }
+    }
+
+    fun setEditUrlVanity(value: TextFieldValue) {
+        _state.update {
+            it.copy(editUrlVanity = value)
+        }
+    }
+
+    fun setEditUrlMaxViews(value: TextFieldValue) {
+        _state.update {
+            it.copy(editUrlMaxViews = value)
+        }
+    }
+
+    fun setEditUrlEnabled(enabled: Boolean) {
+        _state.update {
+            it.copy(editUrlEnabled = enabled)
+        }
+    }
+
+    fun setEditUrlPassword(value: TextFieldValue) {
+        _state.update {
+            it.copy(editUrlPassword = value)
         }
     }
 

@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +44,7 @@ import com.stefdp.zipline.utils.toHex
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Popup
+import com.stefdp.zipline.utils.Saver
 import com.stefdp.zipline.utils.colorHash
 import com.stefdp.zipline.utils.drawCheckerboard
 import com.stefdp.zipline.utils.toAnnotatedString
@@ -71,11 +73,23 @@ fun ColorPicker(
     val colorRegex = if (alpha) AlphaColorRegex else ColorRegex
     val maxLength = if (alpha) 9 else 7
 
-    var value by remember(color) { mutableStateOf(TextFieldValue(color.toHex(alpha))) }
-    val originalValue by remember { mutableStateOf(value) }
-    var showPicker by remember { mutableStateOf(false) }
+    var value by rememberSaveable(
+        color,
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(TextFieldValue(color.toHex(alpha)))
+    }
+    val originalValue by rememberSaveable(
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(value)
+    }
+    var showPicker by rememberSaveable { mutableStateOf(false) }
 
-    var currentColor by remember(value) {
+    var currentColor by rememberSaveable(
+        value,
+        stateSaver = Color.Saver
+    ) {
         mutableStateOf(
             if (colorRegex.matches(value.text)) {
                 Color(value.text.toColorInt())
@@ -84,7 +98,11 @@ fun ColorPicker(
             }
         )
     }
-    var pickerColor by remember { mutableStateOf(currentColor) }
+    var pickerColor by rememberSaveable(
+        stateSaver = Color.Saver
+    ) {
+        mutableStateOf(currentColor)
+    }
 
     LaunchedEffect(value.text) {
         if (colorRegex.matches(value.text)) {

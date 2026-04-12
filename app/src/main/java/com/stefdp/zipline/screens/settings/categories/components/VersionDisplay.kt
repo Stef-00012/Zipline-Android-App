@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +52,7 @@ fun VersionDisplay(
 ) {
     val versionData = version?.data
 
-    var showVersionPopup by remember { mutableStateOf(false) }
+    var showVersionPopup by rememberSaveable { mutableStateOf(false) }
 
     Popup(
         showPopup = showVersionPopup,

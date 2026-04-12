@@ -132,7 +132,7 @@ fun CreateTagPopup(
         )
 
         Button(
-            enabled = !state.tagsLoading,
+            enabled = !state.tagsLoading && state.createTagName.text.isNotBlank(),
             onClick = {
                 viewModel.createTag(
                     context = context,

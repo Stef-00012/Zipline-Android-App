@@ -140,11 +140,6 @@ val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState
     {}
 }
 
-// TODO: if not already done, disable the save button in popups when not all the required options have been filled
-// TODO: move all remember {} variables from remember to rememberSavable
-// TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
-// TODO: only show dates smaller than "settings.filesMaxExpiration in upload menu
-// TODO: disable the admin settings that are in the tampered List
 // TODO: create widgets
 
 const val APP_VERSION = "2.0.0"

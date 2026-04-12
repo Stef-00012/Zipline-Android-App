@@ -321,8 +321,20 @@ fun EditUserPopup(
             modifier = Modifier.height(8.dp)
         )
 
+        val isButtonEnabled = !state.isLoading && (
+                state.editUserUsername.text.isNotBlank() ||
+                state.editUserPassword.text.isNotBlank() ||
+                (
+                        state.editUserSelectedFilesQuota.firstOrNull() == UserQuotaFilesQuota.BY_BYTES.toString() &&
+                        state.editUserMaxBytes.text.isNotBlank()
+                ) || (
+                        state.editUserSelectedFilesQuota.firstOrNull() == UserQuotaFilesQuota.BY_FILES.toString() &&
+                        state.editUserMaxFileCount.text.isNotBlank()
+                )
+        )
+
         Button(
-            enabled = !state.isLoading,
+            enabled = isButtonEnabled,
             onClick = {
                 viewModel.editUser(
                     context = context,

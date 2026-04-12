@@ -43,25 +43,21 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.Url
 import com.stefdp.zipline.network.requests.createUrl
 import com.stefdp.zipline.network.requests.updateUrl
+import com.stefdp.zipline.screens.urls.UrlsUiState
+import com.stefdp.zipline.screens.urls.UrlsViewModel
 import com.stefdp.zipline.utils.NumberRegex
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import kotlinx.coroutines.launch
 
 @Composable
 fun EditUrlPopup(
     context: Context,
     activity: FragmentActivity,
-    url: Url?,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    isLoading: Boolean,
-    onEdit: (
-        urlId: String,
-        destination: String,
-        vanity: String?,
-        enabled: Boolean,
-        maxViews: Long?,
-        password: String?,
-    ) -> Unit
+    viewModel: UrlsViewModel,
+    state: UrlsUiState,
+    viewState: ZiplineViewStateType,
 ) {
     Popup(
         showPopup = showPopup,
@@ -73,7 +69,7 @@ fun EditUrlPopup(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Editing \"${url?.code}\"",
+                text = "Editing \"${state.editUrl?.code}\"",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -101,30 +97,30 @@ fun EditUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var destination by remember { mutableStateOf(TextFieldValue(url?.destination ?: "")) }
-
         TextInput(
-            value = destination,
-            onValueChange = { destination = it },
+            value = state.editUrlDestination,
+            onValueChange = {
+                viewModel.setEditUrlDestination(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Destination",
             placeholder = "https://google.com",
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var vanity by remember { mutableStateOf(TextFieldValue(url?.vanity ?: "")) }
-
         TextInput(
-            value = vanity,
-            onValueChange = { vanity = it },
+            value = state.editUrlVanity,
+            onValueChange = {
+                viewModel.setEditUrlVanity(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Vanity",
             placeholder = "example",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             description = "A custom alias for your URL. Leave blank to use the randomly generated code."
         )
 
@@ -132,17 +128,11 @@ fun EditUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var maxViews by remember { mutableStateOf(TextFieldValue(
-            if (url?.maxViews != null)
-                (url.maxViews.takeIf { it > 0L } ?: "").toString()
-            else ""
-        )) }
-
         TextInput(
-            value = maxViews,
+            value = state.editUrlMaxViews,
             onValueChange = {
                 if (NumberRegex.matches(it.text) || it.text.isBlank()) {
-                    maxViews = it
+                    viewModel.setEditUrlMaxViews(it)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -150,7 +140,7 @@ fun EditUrlPopup(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             description = "The maximum number of clicks this URL can have before it is automatically deleted. Leave blank to allow as many views as you want."
         )
 
@@ -158,13 +148,13 @@ fun EditUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var enabled by remember { mutableStateOf(url?.enabled ?: true) }
-
         Switch(
             label = "Enabled",
-            checked = enabled,
-            onCheckedChange = { enabled = it },
-            enabled = !isLoading,
+            checked = state.editUrlEnabled,
+            onCheckedChange = {
+                viewModel.setEditUrlEnabled(it)
+            },
+            enabled = !state.isLoading,
             description = "Prevent or allow this URL from being visited."
         )
 
@@ -172,14 +162,14 @@ fun EditUrlPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var password by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = password,
-            onValueChange = { password = it },
+            value = state.editUrlPassword,
+            onValueChange = {
+                viewModel.setEditUrlPassword(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Password",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             description = "Set a password for this URL. Leave blank to disable password protection.",
             isPassword = true
         )
@@ -189,9 +179,9 @@ fun EditUrlPopup(
         )
 
         Button(
-            enabled = !isLoading,
+            enabled = !state.isLoading && state.editUrlDestination.text.isNotBlank(),
             onClick = {
-                if (!urlRegex.matches(destination.text)) {
+                if (!urlRegex.matches(state.editUrlDestination.text)) {
                     Notification.show(
                         context = context,
                         activity = activity,
@@ -204,15 +194,39 @@ fun EditUrlPopup(
                     return@Button
                 }
 
-                if (url == null) return@Button
+                if (state.editUrl == null) return@Button
 
-                onEdit(
-                    url.id,
-                    destination.text,
-                    vanity.text.takeIf { it.isNotBlank() },
-                    enabled,
-                    maxViews.text.toLongOrNull(),
-                    password.text.takeIf { it.isNotBlank() }
+                viewModel.editUrl(
+                    context = context,
+                    viewState = viewState,
+                    urlId = state.editUrl.id,
+                    destination = state.editUrlDestination.text,
+                    vanity = state.editUrlVanity.text.takeIf { it.isNotBlank() },
+                    enabled = state.editUrlEnabled,
+                    maxViews = state.editUrlMaxViews.text.toLongOrNull(),
+                    password = state.editUrlPassword.text.takeIf { it.isNotBlank() },
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "URL updated successfully"
+                            )
+                        }
+
+                        viewModel.setEditUrl(null)
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "Failed to edit URL: $error"
+                            )
+                        }
+                    }
                 )
             },
             modifier = Modifier.fillMaxWidth()

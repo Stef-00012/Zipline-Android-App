@@ -26,9 +26,9 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.network.models.DomainsSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun DomainsCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (DomainsSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState,
@@ -73,7 +73,7 @@ internal fun DomainsCategory(
                 trailingIcon = painterResource(R.drawable.add),
                 trailingIconColor = MaterialTheme.colorScheme.primary,
                 onTrailingIconPress = {
-                    val data = PartialServerSettingsSettings(
+                    val data = DomainsSettings(
                         domains = state.domains + state.newDomain.text.trim()
                     )
 
@@ -104,8 +104,9 @@ internal fun DomainsCategory(
                             iconContentDescription = "Delete Domain",
                             color = MaterialTheme.colorScheme.error,
                             iconColor = MaterialTheme.colorScheme.onError,
+                            enabled = !state.isLoading,
                             onClick = {
-                                val data = PartialServerSettingsSettings(
+                                val data = DomainsSettings(
                                     domains = state.domains - domain
                                 )
 

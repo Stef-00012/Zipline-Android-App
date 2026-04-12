@@ -34,8 +34,8 @@ import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
+import com.stefdp.zipline.network.models.DiscordOnUploadSettings
 import com.stefdp.zipline.network.models.FilesFormat
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.ServerSettingsSettingsDiscordUploadEmbed
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun DiscordWebhookOnUploadCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (DiscordOnUploadSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState,
@@ -247,7 +247,7 @@ internal fun DiscordWebhookOnUploadCategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = DiscordOnUploadSettings(
                         discordOnUploadWebhookUrl = state.discordOnUploadWebhookUrl.text.takeIf { it.isNotBlank() },
                         discordOnUploadUsername = state.discordOnUploadUsername.text,
                         discordOnUploadAvatarUrl = state.discordOnUploadAvatarUrl.text.takeIf { it.isNotBlank() },

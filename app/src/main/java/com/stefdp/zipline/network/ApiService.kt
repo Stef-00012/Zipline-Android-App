@@ -1,21 +1,37 @@
 package com.stefdp.zipline.network
 
 import com.stefdp.zipline.network.models.BaseFolder
+import com.stefdp.zipline.network.models.ChunksSettings
+import com.stefdp.zipline.network.models.CoreSettings
+import com.stefdp.zipline.network.models.DiscordOnShortenSettings
+import com.stefdp.zipline.network.models.DiscordOnUploadSettings
+import com.stefdp.zipline.network.models.DiscordSettings
+import com.stefdp.zipline.network.models.DomainsSettings
 import com.stefdp.zipline.network.models.Export
+import com.stefdp.zipline.network.models.FeaturesSettings
 import com.stefdp.zipline.network.models.File
+import com.stefdp.zipline.network.models.FilesSettings
 import com.stefdp.zipline.network.models.FilesFormat
 import com.stefdp.zipline.network.models.IncompleteFile
 import com.stefdp.zipline.network.models.Invite
+import com.stefdp.zipline.network.models.InvitesSettings
 import com.stefdp.zipline.network.models.Metric
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
+import com.stefdp.zipline.network.models.MfaSettings
+import com.stefdp.zipline.network.models.OauthSettings
 import com.stefdp.zipline.network.models.PublicFolder
 import com.stefdp.zipline.network.models.PublicServerConfig
+import com.stefdp.zipline.network.models.PwaSettings
+import com.stefdp.zipline.network.models.RatelimitSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.Tag
+import com.stefdp.zipline.network.models.TasksSettings
 import com.stefdp.zipline.network.models.Url
+import com.stefdp.zipline.network.models.UrlShortenerSettings
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebInvite
 import com.stefdp.zipline.network.models.WebSettings
+import com.stefdp.zipline.network.models.WebhooksSettings
+import com.stefdp.zipline.network.models.WebsiteSettings
 import com.stefdp.zipline.network.models.requests.BulkDeleteFilesBody
 import com.stefdp.zipline.network.models.requests.BulkUpdateFilesBody
 import com.stefdp.zipline.network.models.requests.CreateFolderBody
@@ -199,9 +215,105 @@ interface ZiplineApiService {
     ): Response<ServerSettings>
 
     @PATCH("server/settings")
-    suspend fun updateServerSettings(
+    suspend fun updateCoreSettings(
         @Header("Authorization") token: String,
-        @Body data: PartialServerSettingsSettings,
+        @Body data: CoreSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateChunksSettings(
+        @Header("Authorization") token: String,
+        @Body data: ChunksSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateTasksSettings(
+        @Header("Authorization") token: String,
+        @Body data: TasksSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateFilesSettings(
+        @Header("Authorization") token: String,
+        @Body data: FilesSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateUrlsSettings(
+        @Header("Authorization") token: String,
+        @Body data: UrlShortenerSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateFeaturesSettings(
+        @Header("Authorization") token: String,
+        @Body data: FeaturesSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateInvitesSettings(
+        @Header("Authorization") token: String,
+        @Body data: InvitesSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateWebsiteSettings(
+        @Header("Authorization") token: String,
+        @Body data: WebsiteSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateOauthSettings(
+        @Header("Authorization") token: String,
+        @Body data: OauthSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateMfaSettings(
+        @Header("Authorization") token: String,
+        @Body data: MfaSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateRatelimitSettings(
+        @Header("Authorization") token: String,
+        @Body data: RatelimitSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateWebhookSettings(
+        @Header("Authorization") token: String,
+        @Body data: WebhooksSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateDiscordSettings(
+        @Header("Authorization") token: String,
+        @Body data: DiscordSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateDiscordOnUploadSettings(
+        @Header("Authorization") token: String,
+        @Body data: DiscordOnUploadSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateDiscordOnShortenSettings(
+        @Header("Authorization") token: String,
+        @Body data: DiscordOnShortenSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updatePwaSettings(
+        @Header("Authorization") token: String,
+        @Body data: PwaSettings,
+    ): Response<ServerSettings>
+
+    @PATCH("server/settings")
+    suspend fun updateDomainsSettings(
+        @Header("Authorization") token: String,
+        @Body data: DomainsSettings,
     ): Response<ServerSettings>
 
     @GET("server/settings/web")

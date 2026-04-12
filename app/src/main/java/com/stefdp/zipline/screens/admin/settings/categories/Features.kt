@@ -11,11 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.LinkAnnotation
@@ -23,7 +18,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.R
@@ -33,20 +27,16 @@ import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
-import com.stefdp.zipline.network.models.ServerSettings
-import com.stefdp.zipline.network.models.ThumbnailFormat
+import com.stefdp.zipline.network.models.FeaturesSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
-import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.thumbnailFormats
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun FeaturesCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (FeaturesSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState
@@ -293,7 +283,7 @@ internal fun FeaturesCategory(
                         it.first.toString() == state.featuresSelectedThumbnailsFormat.firstOrNull()
                     }?.first
 
-                    val data = PartialServerSettingsSettings(
+                    val data = FeaturesSettings(
                         featuresImageCompression = state.featuresImageCompression,
                         featuresRobotsTxt = state.featuresRobotsTxt,
                         featuresHealthcheck = state.featuresHealthcheck,
@@ -304,6 +294,7 @@ internal fun FeaturesCategory(
                         featuresMetricsAdminOnly = state.featuresMetricsAdminOnly,
                         featuresMetricsShowUserSpecific = state.featuresMetricsShowUserSpecific,
                         featuresThumbnailsEnabled = state.featuresThumbnailsEnabled,
+                        featuresThumbnailsInstantaneous = state.featuresThumbnailsInstantaneous,
                         featuresThumbnailsNumberThreads = state.featuresThumbnailsNumberThreads.text.toLongOrNull(),
                         featuresThumbnailsFormat = thumbnailsFormat,
                         featuresVersionChecking = state.featuresVersionChecking,

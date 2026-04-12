@@ -138,6 +138,7 @@ fun TextInput(
                 {
                     IconButton(
                         modifier = Modifier.padding(end = 4.dp),
+                        enabled = enabled,
                         onClick = if (isPassword) {
                             ::handlePasswordToggle
                         } else onTrailingIconPress
@@ -158,7 +159,10 @@ fun TextInput(
                                 */
                                 trailingIcon as Painter
                             },
-                            tint = trailingIconColor,
+                            tint = if (enabled)
+                                trailingIconColor
+                            else
+                                trailingIconColor.copy(alpha = 0.5f),
                             contentDescription = if (isPassword) {
                                 if (passwordVisible)
                                     "Hide Password"
@@ -173,11 +177,15 @@ fun TextInput(
                 {
                     IconButton(
                         modifier = Modifier.padding(end = 4.dp),
-                        onClick = onLeadingIconPress
+                        onClick = onLeadingIconPress,
+                        enabled = enabled
                     ) {
                         Icon(
                             painter = leadingIcon,
-                            tint = leadingIconColor,
+                            tint = if (enabled)
+                                leadingIconColor
+                            else
+                                leadingIconColor.copy(alpha = 0.5f),
                             contentDescription = leadingIconContentDescription ?: "Unknown",
                             modifier = Modifier.requiredSize(28.dp)
                         )

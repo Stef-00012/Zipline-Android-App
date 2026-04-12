@@ -26,7 +26,7 @@ import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
+import com.stefdp.zipline.network.models.MfaSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun MFACategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (MfaSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState
@@ -113,7 +113,7 @@ internal fun MFACategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = MfaSettings(
                         mfaPasskeysEnabled = state.mfaPasskeysEnabled,
                         mfaPasskeysRpID = state.mfaPasskeysRpID.text,
                         mfaPasskeysOrigin = state.mfaPasskeysOrigin.text,

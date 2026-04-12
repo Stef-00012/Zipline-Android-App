@@ -32,8 +32,8 @@ import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
+import com.stefdp.zipline.network.models.DiscordOnShortenSettings
 import com.stefdp.zipline.network.models.FilesFormat
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.ServerSettingsSettingsDiscordShortenEmbed
 import com.stefdp.zipline.network.models.ServerSettingsSettingsDiscordUploadEmbed
@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun DiscordWebhookOnShortenCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (DiscordOnShortenSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState,
@@ -242,7 +242,7 @@ internal fun DiscordWebhookOnShortenCategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = DiscordOnShortenSettings(
                         discordOnShortenWebhookUrl = state.discordOnShortenWebhookUrl.text.takeIf { it.isNotBlank() },
                         discordOnShortenUsername = state.discordOnShortenUsername.text,
                         discordOnShortenAvatarUrl = state.discordOnShortenAvatarUrl.text.takeIf { it.isNotBlank() },

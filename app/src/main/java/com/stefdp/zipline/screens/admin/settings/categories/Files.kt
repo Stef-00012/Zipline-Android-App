@@ -11,11 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,22 +23,17 @@ import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.FilesFormat
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
-import com.stefdp.zipline.network.models.ServerSettings
-import com.stefdp.zipline.network.models.requests.UploadCompressionType
+import com.stefdp.zipline.network.models.FilesSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
-import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.compressionFormats
 import com.stefdp.zipline.utils.nameFormats
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun FilesCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (FilesSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState,
@@ -270,7 +260,7 @@ internal fun FilesCategory(
                         it.first.toString() == state.filesSelectedDefaultCompressionFormat.firstOrNull()
                     }?.first
 
-                    val data = PartialServerSettingsSettings(
+                    val data = FilesSettings(
                         filesRoute = state.filesRoute.text,
                         filesLength = state.filesLength.text.toLongOrNull(),
                         filesAssumeMimetypes = state.filesAssumeMimetypes,

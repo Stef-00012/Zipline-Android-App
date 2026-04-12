@@ -3,6 +3,7 @@ package com.stefdp.zipline.network.models
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
+import com.stefdp.zipline.network.models.responses.UpdateServerSettingsErrorResponse
 import kotlinx.parcelize.Parcelize
 
 data class ServerSettings(
@@ -145,23 +146,29 @@ data class ServerSettingsSettings(
     val domains: List<String>,
 )
 
-data class PartialServerSettingsSettings(
+data class CoreSettings(
     val coreReturnHttpsUrls: Boolean? = null,
     val coreDefaultDomain: String? = null,
     val coreTempDirectory: String? = null,
-    val coreTrustProxy: Boolean? = null,
+    val coreTrustProxy: Boolean? = null
+)
 
+data class ChunksSettings(
     val chunksEnabled: Boolean? = null,
     val chunksMax: String? = null,
-    val chunksSize: String? = null,
+    val chunksSize: String? = null
+)
 
+data class TasksSettings(
     val tasksDeleteInterval: String? = null,
     val tasksClearInvitesInterval: String? = null,
     val tasksMaxViewsInterval: String? = null,
     val tasksThumbnailsInterval: String? = null,
     val tasksMetricsInterval: String? = null,
-    val tasksCleanThumbnailsInterval: String? = null,
+    val tasksCleanThumbnailsInterval: String? = null
+)
 
+data class FilesSettings(
     val filesRoute: String? = null,
     val filesLength: Long? = null,
     val filesDefaultFormat: FilesFormat? = null,
@@ -175,33 +182,38 @@ data class PartialServerSettingsSettings(
     val filesRandomWordsNumAdjectives: Long? = null,
     val filesRandomWordsSeparator: String? = null,
     val filesDefaultCompressionFormat: UploadCompressionType? = null,
-    val filesMaxFilesPerUpload: Long? = null,
+    val filesMaxFilesPerUpload: Long? = null
+)
 
+data class UrlShortenerSettings(
     val urlsRoute: String? = null,
-    val urlsLength: Long? = null,
+    val urlsLength: Long? = null
+)
 
+data class FeaturesSettings(
     val featuresImageCompression: Boolean? = null,
     val featuresRobotsTxt: Boolean? = null,
     val featuresHealthcheck: Boolean? = null,
     val featuresUserRegistration: Boolean? = null,
     val featuresOauthRegistration: Boolean? = null,
     val featuresDeleteOnMaxViews: Boolean? = null,
-
     val featuresThumbnailsEnabled: Boolean? = null,
     val featuresThumbnailsNumberThreads: Long? = null,
     val featuresThumbnailsInstantaneous: Boolean? = null,
     val featuresThumbnailsFormat: ThumbnailFormat? = null,
-
     val featuresMetricsEnabled: Boolean? = null,
     val featuresMetricsAdminOnly: Boolean? = null,
     val featuresMetricsShowUserSpecific: Boolean? = null,
-
     val featuresVersionChecking: Boolean? = null,
-    val featuresVersionAPI: String? = null,
+    val featuresVersionAPI: String? = null
+)
 
+data class InvitesSettings(
     val invitesEnabled: Boolean? = null,
-    val invitesLength: Long? = null,
+    val invitesLength: Long? = null
+)
 
+data class WebsiteSettings(
     val websiteTitle: String? = null,
     val websiteTitleLogo: String? = null,
     val websiteExternalLinks: List<WebsiteExternalLink>? = null,
@@ -209,76 +221,93 @@ data class PartialServerSettingsSettings(
     val websiteLoginBackgroundBlur: Boolean? = null,
     val websiteDefaultAvatar: String? = null,
     val websiteTos: String? = null,
-
     val websiteThemeDefault: String? = null,
     val websiteThemeDark: String? = null,
-    val websiteThemeLight: String? = null,
+    val websiteThemeLight: String? = null
+)
 
+data class OauthSettings(
     val oauthBypassLocalLogin: Boolean? = null,
     val oauthLoginOnly: Boolean? = null,
-
     val oauthDiscordClientId: String? = null,
     val oauthDiscordClientSecret: String? = null,
     val oauthDiscordRedirectUri: String? = null,
     val oauthDiscordAllowedIds: List<String>? = null,
     val oauthDiscordDeniedIds: List<String>? = null,
-
     val oauthGoogleClientId: String? = null,
     val oauthGoogleClientSecret: String? = null,
     val oauthGoogleRedirectUri: String? = null,
-
     val oauthGithubClientId: String? = null,
     val oauthGithubClientSecret: String? = null,
     val oauthGithubRedirectUri: String? = null,
-
     val oauthOidcClientId: String? = null,
     val oauthOidcClientSecret: String? = null,
     val oauthOidcAuthorizeUrl: String? = null,
     val oauthOidcTokenUrl: String? = null,
     val oauthOidcUserinfoUrl: String? = null,
-    val oauthOidcRedirectUri: String? = null,
+    val oauthOidcRedirectUri: String? = null
+)
 
+data class MfaSettings(
     val mfaTotpEnabled: Boolean? = null,
     val mfaTotpIssuer: String? = null,
-
     val mfaPasskeysEnabled: Boolean? = null,
     val mfaPasskeysRpID: String? = null,
-    val mfaPasskeysOrigin: String? = null,
+    val mfaPasskeysOrigin: String? = null
+)
 
+data class RatelimitSettings(
     val ratelimitEnabled: Boolean? = null,
     val ratelimitMax: Long? = null,
     val ratelimitWindow: Long? = null,
     val ratelimitAdminBypass: Boolean? = null,
-    val ratelimitAllowList: List<String>? = null,
+    val ratelimitAllowList: List<String>? = null
+)
 
+data class WebhooksSettings(
     val httpWebhookOnUpload: String? = null,
-    val httpWebhookOnShorten: String? = null,
+    val httpWebhookOnShorten: String? = null
+)
 
+data class DiscordSettings(
     val discordWebhookUrl: String? = null,
     val discordUsername: String? = null,
     val discordAvatarUrl: String? = null,
+)
 
+data class DiscordOnUploadSettings(
     val discordOnUploadWebhookUrl: String? = null,
     val discordOnUploadUsername: String? = null,
     val discordOnUploadAvatarUrl: String? = null,
     val discordOnUploadContent: String? = null,
     val discordOnUploadEmbed: ServerSettingsSettingsDiscordUploadEmbed? = null,
+)
 
+data class DiscordOnShortenSettings(
     val discordOnShortenWebhookUrl: String? = null,
     val discordOnShortenUsername: String? = null,
     val discordOnShortenAvatarUrl: String? = null,
     val discordOnShortenContent: String? = null,
-    val discordOnShortenEmbed: ServerSettingsSettingsDiscordShortenEmbed? = null,
+    val discordOnShortenEmbed: ServerSettingsSettingsDiscordShortenEmbed? = null
+)
 
+data class PwaSettings(
     val pwaEnabled: Boolean? = null,
     val pwaTitle: String? = null,
     val pwaShortName: String? = null,
     val pwaDescription: String? = null,
     val pwaThemeColor: String? = null,
-    val pwaBackgroundColor: String? = null,
-
-    val domains: List<String>? = null,
+    val pwaBackgroundColor: String? = null
 )
+
+data class DomainsSettings(
+    val domains: List<String>? = null
+)
+
+sealed interface UpdateServerSettingsResult {
+    data class Success(val settings: ServerSettings) : UpdateServerSettingsResult
+    data class Error(val error: UpdateServerSettingsErrorResponse) : UpdateServerSettingsResult
+}
 
 @Parcelize
 data class WebsiteExternalLink(

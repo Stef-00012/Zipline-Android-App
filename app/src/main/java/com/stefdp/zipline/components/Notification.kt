@@ -87,7 +87,7 @@ object Notification {
 
                 currentDialog = dialog
             }
-        } catch (e: Exception) { return }
+        } catch (_: Exception) { return }
 
         delay(duration)
 

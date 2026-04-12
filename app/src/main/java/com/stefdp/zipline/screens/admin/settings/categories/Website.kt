@@ -40,11 +40,11 @@ import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.WebsiteExternalLink
 import com.stefdp.zipline.screens.admin.settings.categories.components.ExternalLink
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.network.models.WebsiteSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.screens.admin.settings.MoveWebsiteExternalLinkDirection
@@ -54,7 +54,7 @@ import java.util.Collections
 
 @Composable
 internal fun WebsiteCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (WebsiteSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState,
@@ -441,7 +441,7 @@ internal fun WebsiteCategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = WebsiteSettings(
                         websiteTitle = state.websiteTitle.text,
                         websiteTitleLogo = state.websiteTitleLogo.text.takeIf { it.isNotBlank() },
                         websiteLoginBackground = state.websiteLoginBackground.text.takeIf { it.isNotBlank() },

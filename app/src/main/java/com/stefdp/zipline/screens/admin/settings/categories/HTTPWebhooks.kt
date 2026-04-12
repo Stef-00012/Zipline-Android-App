@@ -10,29 +10,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
-import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.network.models.WebhooksSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun HTTPWebhooksCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (WebhooksSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState
@@ -77,7 +69,7 @@ internal fun HTTPWebhooksCategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = WebhooksSettings(
                         httpWebhookOnUpload = state.httpWebhookOnUpload.text.takeIf { it.isNotBlank() },
                         httpWebhookOnShorten = state.httpWebhookOnShorten.text.takeIf { it.isNotBlank() }
                     )

@@ -26,7 +26,7 @@ import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
+import com.stefdp.zipline.network.models.RatelimitSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun RatelimitCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (RatelimitSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState,
@@ -126,7 +126,7 @@ internal fun RatelimitCategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = RatelimitSettings(
                         ratelimitEnabled = state.ratelimitEnabled,
                         ratelimitAdminBypass = state.ratelimitAdminBypass,
                         ratelimitMax = state.ratelimitMax.text.toLongOrNull(),

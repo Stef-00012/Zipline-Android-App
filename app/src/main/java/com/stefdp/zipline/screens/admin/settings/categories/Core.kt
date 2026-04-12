@@ -26,7 +26,7 @@ import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
+import com.stefdp.zipline.network.models.CoreSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun CoreCategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (CoreSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState
@@ -101,7 +101,7 @@ internal fun CoreCategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = CoreSettings(
                         coreReturnHttpsUrls = state.coreReturnHttpsUrls,
                         coreTrustProxy = state.coreTrustProxy,
                         coreDefaultDomain = state.coreDefaultDomain.text.takeIf { it.isNotBlank() },

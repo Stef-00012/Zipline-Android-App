@@ -29,7 +29,7 @@ import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
+import com.stefdp.zipline.network.models.PwaSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun PWACategory(
-    updateSettings: (PartialServerSettingsSettings) -> Unit,
+    updateSettings: (PwaSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
     state: AdminSettingsUiState
@@ -142,7 +142,7 @@ internal fun PWACategory(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    val data = PartialServerSettingsSettings(
+                    val data = PwaSettings(
                         pwaEnabled = state.pwaEnabled,
                         pwaTitle = state.pwaTitle.text.takeIf { it.isNotBlank() },
                         pwaShortName = state.pwaShortName.text.takeIf { it.isNotBlank() },

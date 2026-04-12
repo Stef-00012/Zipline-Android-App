@@ -1,24 +1,18 @@
 package com.stefdp.zipline.screens.admin.settings
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,12 +29,7 @@ import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
-import com.stefdp.zipline.network.models.PartialServerSettingsSettings
-import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.UserRole
-import com.stefdp.zipline.network.requests.UpdateServerSettingsResult
-import com.stefdp.zipline.network.requests.getServerSettings
-import com.stefdp.zipline.network.requests.updateServerSettings
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.settings.categories.ChunksCategory
@@ -60,9 +49,6 @@ import com.stefdp.zipline.screens.admin.settings.categories.RatelimitCategory
 import com.stefdp.zipline.screens.admin.settings.categories.TasksCategory
 import com.stefdp.zipline.screens.admin.settings.categories.UrlShortenerCategory
 import com.stefdp.zipline.screens.admin.settings.categories.WebsiteCategory
-import com.stefdp.zipline.utils.ScrollbarConfig
-import com.stefdp.zipline.utils.getSettingName
-import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -90,28 +76,14 @@ fun AdminSettingsScreen(
 
     val state by viewModel.state.collectAsState()
 
-    val coroutineScope = rememberCoroutineScope()
-
     val updateWebSettings = LocalUpdateWebSettings.current
     val updatePublicSettings = LocalUpdatePublicSettings.current
 
-    fun updateSettings(data: PartialServerSettingsSettings? = null) {
-        viewModel.updateSettings(
+    LaunchedEffect(Unit) {
+        viewModel.refreshSettings(
             context = context,
-            updateWebSettings = updateWebSettings,
-            updatePublicSettings = updatePublicSettings,
-            data = data,
-            onSuccess = {
-                Notification.show(
-                    context = context,
-                    activity = activity,
-                ) {
-                    Text(
-                        text = "Settings updated successfully"
-                    )
-                }
-            },
-            onError = { errors, isUpdate ->
+            onSuccess = {},
+            onError = { errors ->
                 Notification.show(
                     context = context,
                     activity = activity,
@@ -120,7 +92,7 @@ fun AdminSettingsScreen(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text("Failed to ${if (isUpdate) "update" else "fetch"} server settings:")
+                        Text("Failed to fetch server settings:")
 
                         errors.forEach {
                             Text(
@@ -132,10 +104,6 @@ fun AdminSettingsScreen(
                 }
             }
         )
-    }
-
-    LaunchedEffect(Unit) {
-        updateSettings()
     }
 
     LaunchedEffect(state.settingsUpdateTick) {
@@ -171,9 +139,39 @@ fun AdminSettingsScreen(
                     icon = painterResource(R.drawable.refresh),
                     contentDescription = "Refresh settings",
                     onClick = {
-                        coroutineScope.launch {
-                            updateSettings()
-                        }
+                        viewModel.refreshSettings(
+                            context = context,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings fetched successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to fetch server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
                     },
                     enabled = !state.isLoading,
                 )
@@ -222,77 +220,484 @@ fun AdminSettingsScreen(
         ) {
             when (state.selectedCategory.first()) {
                 SettingCategory.CORE.toString() -> CoreCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateCoreSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.CORE.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.CHUNKS.toString() -> ChunksCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateChunksSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.CHUNKS.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.TASKS.toString() -> TasksCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateTasksSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.TASKS.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.MFA.toString() -> MFACategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateMfaSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.MFA.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.FEATURES.toString() -> FeaturesCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateFeaturesSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.FEATURES.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.FILES.toString() -> FilesCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateFilesSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.FILES.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.URL_SHORTENER.toString() -> UrlShortenerCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateUrlsSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.URL_SHORTENER.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.RATELIMIT.toString() -> RatelimitCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateRatelimitSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.RATELIMIT.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.INVITES.toString() -> InvitesCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateInvitesSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.INVITES.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.WEBSITE.toString() -> WebsiteCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateWebsiteSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.WEBSITE.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.OAUTH.toString() -> OAuthCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateOauthSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     context = context,
                     title = SettingCategory.OAUTH.categoryName,
                     viewModel = viewModel,
@@ -300,42 +705,264 @@ fun AdminSettingsScreen(
                 )
 
                 SettingCategory.PWA.toString() -> PWACategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updatePwaSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.PWA.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.HTTP_WEBHOOKS.toString() -> HTTPWebhooksCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateWebhooksSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.HTTP_WEBHOOKS.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.DOMAINS.toString() -> DomainsCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateDomainsSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.DOMAINS.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.DISCORD_WEBHOOK.toString() -> DiscordWebhookCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateDiscordSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.DISCORD_WEBHOOK.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.toString() -> DiscordWebhookOnUploadCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateDiscordOnUploadSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.categoryName,
                     viewModel = viewModel,
                     state = state
                 )
 
                 SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.toString() -> DiscordWebhookOnShortenCategory(
-                    updateSettings = ::updateSettings,
+                    updateSettings = { data ->
+                        viewModel.updateDiscordOnShortenSettings(
+                            context = context,
+                            updateWebSettings = updateWebSettings,
+                            updatePublicSettings = updatePublicSettings,
+                            data = data,
+                            onSuccess = {
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                ) {
+                                    Text(
+                                        text = "Settings updated successfully"
+                                    )
+                                }
+                            },
+                            onError = { errors ->
+                                Notification.show(
+                                    context = context,
+                                    activity = activity,
+                                    duration = 8000L,
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Failed to update server settings:")
+
+                                        errors.forEach {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    },
                     title = SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.categoryName,
                     viewModel = viewModel,
                     state = state

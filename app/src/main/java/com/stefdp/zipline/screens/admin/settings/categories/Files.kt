@@ -32,6 +32,8 @@ import com.stefdp.zipline.network.models.FilesFormat
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.compressionFormats
@@ -41,12 +43,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun FilesCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -69,86 +69,55 @@ internal fun FilesCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var route by remember(settings?.settings?.filesRoute, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesRoute ?: "/"))
-            }
-
             TextInput(
-                value = route,
+                value = state.filesRoute,
                 onValueChange = {
                     if (it.text.isBlank()) {
-                        route = TextFieldValue("/")
+                        viewModel.setFilesRoute(TextFieldValue("/"))
                     }
 
                     if (it.text.startsWith("/")) {
-                        route = it
+                        viewModel.setFilesRoute(it)
                     }
                 },
                 label = "Route",
                 description = "The route to use for file uploads. Requires a server restart.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var length by remember(settings?.settings?.filesLength, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.filesLength ?: "").toString()))
-            }
-
+            
             TextInput(
-                value = length,
+                value = state.filesLength,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        length = it
+                        viewModel.setFilesLength(it)
                     }
                 },
                 label = "Length",
                 description = "The length of the file name (for randomly generated names).",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var assumeMimetypes by remember(settings?.settings?.filesAssumeMimetypes, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.filesAssumeMimetypes ?: false)
-            }
-
             Switch(
-                checked = assumeMimetypes,
-                onCheckedChange = { assumeMimetypes = it },
+                checked = state.filesAssumeMimetypes,
+                onCheckedChange = {
+                    viewModel.setFilesAssumeMimetypes(it)
+                },
                 label = "Assume Mimetypes",
                 description = "Assume the mimetype of a file for its extension.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var removeGPSMetadata by remember(settings?.settings?.filesRemoveGpsMetadata, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.filesRemoveGpsMetadata ?: false)
-            }
 
             Switch(
-                checked = removeGPSMetadata,
-                onCheckedChange = { removeGPSMetadata = it },
+                checked = state.filesRemoveGpsMetadata,
+                onCheckedChange = {
+                    viewModel.setFilesRemoveGpsMetadata(it)
+                },
                 label = "Remove GPS Metadata",
                 description = "Remove GPS metadata from files.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var selectedDefaultFormat by remember(settings?.settings?.filesDefaultFormat, settingsUpdateTick) {
-                mutableStateOf(setOf((settings?.settings?.filesDefaultFormat ?: FilesFormat.RANDOM).toString()))
-            }
 
             Select(
                 label = "Default Format",
@@ -167,121 +136,91 @@ internal fun FilesCategory(
                         }
                     )
                 },
-                onSelectionChange = { selectedDefaultFormat = it },
-                selectedIds = selectedDefaultFormat,
-                enabled = !isLoading
+                onSelectionChange = {
+                    viewModel.setFilesSelectedDefaultFormat(it)
+                },
+                selectedIds = state.filesSelectedDefaultFormat,
+                enabled = !state.isLoading
             )
 
-            var disabledExtensions by remember(settings?.settings?.filesDisabledExtensions, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesDisabledExtensions?.joinToString(", ") ?: ""))
-            }
-
             TextInput(
-                value = disabledExtensions,
+                value = state.filesDisabledExtensions,
                 onValueChange = {
-                    disabledExtensions = it
+                    viewModel.setFilesDisabledExtensions(it)
                 },
                 label = "Disabled Extensions",
                 description = "Extensions to disable, separated by commas.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var maxFileSize by remember(settings?.settings?.filesMaxFileSize, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesMaxFileSize ?: ""))
-            }
-
             TextInput(
-                value = maxFileSize,
+                value = state.filesMaxFileSize,
                 onValueChange = {
-                    maxFileSize = it
+                    viewModel.setFilesMaxFileSize(it)
                 },
                 label = "Max File Size",
                 description = "The maximum file size allowed.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var defaultDateFormat by remember(settings?.settings?.filesDefaultDateFormat, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesDefaultDateFormat ?: ""))
-            }
-
             TextInput(
-                value = defaultDateFormat,
+                value = state.filesDefaultDateFormat,
                 onValueChange = {
-                    defaultDateFormat = it
+                    viewModel.setFilesDefaultDateFormat(it)
                 },
                 label = "Default Date Format",
                 description = "The default date format to use.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var defaultExpiration by remember(settings?.settings?.filesDefaultExpiration, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesDefaultExpiration ?: ""))
-            }
-
             TextInput(
-                value = defaultExpiration,
+                value = state.filesDefaultExpiration,
                 onValueChange = {
-                    defaultExpiration = it
+                    viewModel.setFilesDefaultExpiration(it)
                 },
                 label = "Default Expiration",
                 description = "The default expiration time for files.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var maxExpiration by remember(settings?.settings?.filesMaxExpiration, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesMaxExpiration ?: ""))
-            }
-
             TextInput(
-                value = maxExpiration,
+                value = state.filesMaxExpiration,
                 onValueChange = {
-                    maxExpiration = it
+                    viewModel.setFilesMaxExpiration(it)
                 },
                 label = "Max Expiration",
                 description = "The maximum expiration time allowed for files.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var randomWordsAdjectivesNumber by remember(settings?.settings?.filesRandomWordsNumAdjectives, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.filesRandomWordsNumAdjectives ?: "").toString()))
-            }
-
             TextInput(
-                value = randomWordsAdjectivesNumber,
+                value = state.filesRandomWordsNumAdjectives,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        randomWordsAdjectivesNumber = it
+                        viewModel.setFilesRandomWordsNumAdjectives(it)
                     }
                 },
                 label = "Random Words Num Adjectives",
                 description = "The number of adjectives to use for the random-words/gfycat format.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var randomWordsSeparator by remember(settings?.settings?.filesRandomWordsSeparator, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.filesRandomWordsSeparator ?: ""))
-            }
-
             TextInput(
-                value = randomWordsSeparator,
+                value = state.filesRandomWordsSeparator,
                 onValueChange = {
-                    randomWordsSeparator = it
+                    viewModel.setFilesRandomWordsSeparator(it)
                 },
                 label = "Random Words Separator",
                 description = "The separator to use for the random-words/gfycat format.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var selectedDefaultCompressionFormat by remember(settings?.settings?.filesDefaultCompressionFormat, settingsUpdateTick) {
-                mutableStateOf(setOf((settings?.settings?.filesDefaultCompressionFormat ?: UploadCompressionType.PNG).toString()))
-            }
 
             Select(
                 label = "Default Compression Format",
@@ -300,72 +239,60 @@ internal fun FilesCategory(
                         }
                     )
                 },
-                onSelectionChange = { selectedDefaultCompressionFormat = it },
-                selectedIds = selectedDefaultCompressionFormat,
-                enabled = !isLoading
+                onSelectionChange = {
+                    viewModel.setFilesSelectedDefaultCompressionFormat(it)
+                },
+                selectedIds = state.filesSelectedDefaultCompressionFormat,
+                enabled = !state.isLoading
             )
 
-            var maxFilesPerUpload by remember(settings?.settings?.filesMaxFilesPerUpload, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.filesMaxFilesPerUpload ?: "").toString()))
-            }
-
             TextInput(
-                value = maxFilesPerUpload,
+                value = state.filesMaxFilesPerUpload,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        maxFilesPerUpload = it
+                        viewModel.setFilesMaxFilesPerUpload(it)
                     }
                 },
                 label = "Max Files Per Upload",
                 description = "The maximum number of files allowed per upload. Requires a server restart.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val defaultFormat = nameFormats.firstOrNull {
+                        it.first.toString() == state.filesSelectedDefaultFormat.firstOrNull()
+                    }?.first
 
-                        val defaultFormat = nameFormats.firstOrNull {
-                            it.first.toString() == selectedDefaultFormat.firstOrNull()
-                        }?.first
+                    val defaultCompressionFormat = compressionFormats.firstOrNull {
+                        it.first.toString() == state.filesSelectedDefaultCompressionFormat.firstOrNull()
+                    }?.first
 
-                        val defaultCompressionFormat = compressionFormats.firstOrNull {
-                            it.first.toString() == selectedDefaultCompressionFormat.firstOrNull()
-                        }?.first
+                    val data = PartialServerSettingsSettings(
+                        filesRoute = state.filesRoute.text,
+                        filesLength = state.filesLength.text.toLongOrNull(),
+                        filesAssumeMimetypes = state.filesAssumeMimetypes,
+                        filesRemoveGpsMetadata = state.filesRemoveGpsMetadata,
+                        filesDefaultFormat = defaultFormat,
+                        filesDisabledExtensions = state.filesDisabledExtensions.text
+                            .split(", ", ",")
+                            .map { it.trim() }
+                            .filter { it.isNotEmpty() },
+                        filesMaxFileSize = state.filesMaxFileSize.text,
+                        filesDefaultDateFormat = state.filesDefaultDateFormat.text,
+                        filesDefaultExpiration = state.filesDefaultExpiration.text.takeIf { it.isNotBlank() },
+                        filesMaxExpiration = state.filesMaxExpiration.text.takeIf { it.isNotBlank() },
+                        filesRandomWordsNumAdjectives = state.filesRandomWordsNumAdjectives.text.toLongOrNull(),
+                        filesRandomWordsSeparator = state.filesRandomWordsSeparator.text,
+                        filesDefaultCompressionFormat = defaultCompressionFormat,
+                        filesMaxFilesPerUpload = state.filesMaxFilesPerUpload.text.toLongOrNull(),
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            filesRoute = route.text,
-                            filesLength = length.text.toLongOrNull(),
-                            filesAssumeMimetypes = assumeMimetypes,
-                            filesRemoveGpsMetadata = removeGPSMetadata,
-                            filesDefaultFormat = defaultFormat,
-                            filesDisabledExtensions = disabledExtensions.text
-                                .split(", ", ",")
-                                .map { it.trim() }
-                                .filter { it.isNotEmpty() },
-                            filesMaxFileSize = maxFileSize.text,
-                            filesDefaultDateFormat = defaultDateFormat.text,
-                            filesDefaultExpiration = defaultExpiration.text.takeIf { it.isNotBlank() },
-                            filesMaxExpiration = maxExpiration.text.takeIf { it.isNotBlank() },
-                            filesRandomWordsNumAdjectives = randomWordsAdjectivesNumber.text.toLongOrNull(),
-                            filesRandomWordsSeparator = randomWordsSeparator.text,
-                            filesDefaultCompressionFormat = defaultCompressionFormat,
-                            filesMaxFilesPerUpload = maxFilesPerUpload.text.toLongOrNull(),
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

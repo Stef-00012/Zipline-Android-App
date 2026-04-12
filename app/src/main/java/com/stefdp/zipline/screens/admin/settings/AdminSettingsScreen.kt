@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalUpdatePublicSettings
@@ -35,9 +37,12 @@ import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.requests.UpdateServerSettingsResult
 import com.stefdp.zipline.network.requests.getServerSettings
 import com.stefdp.zipline.network.requests.updateServerSettings
+import com.stefdp.zipline.screens.HomeScreen
+import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.settings.categories.ChunksCategory
 import com.stefdp.zipline.screens.admin.settings.categories.CoreCategory
 import com.stefdp.zipline.screens.admin.settings.categories.DiscordWebhookCategory
@@ -64,91 +69,77 @@ import kotlinx.coroutines.launch
 fun AdminSettingsScreen(
     navController: NavHostController,
     context: Context,
-    activity: FragmentActivity
+    activity: FragmentActivity,
+    viewModel: AdminSettingsViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
-//    if (localLoggedUser == null) {
-//        navController.navigate(LoginScreen) {
-//            popUpTo(navController.graph.id) { inclusive = true }
-//        }
-//    }
-//
-//    localLoggedUser?.role?.level?.let {
-//        if (it > UserRole.SUPERADMIN.level) {
-//            navController.navigate(HomeScreen) {
-//                popUpTo(navController.graph.id) { inclusive = true }
-//            }
-//        }
-//    }
+    if (localLoggedUser == null) {
+        navController.navigate(LoginScreen) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
 
-    var isLoading by remember { mutableStateOf(false) }
+    localLoggedUser?.role?.level?.let {
+        if (it > UserRole.SUPERADMIN.level) {
+            navController.navigate(HomeScreen) {
+                popUpTo(navController.graph.id) { inclusive = true }
+            }
+        }
+    }
 
-    var settings by remember { mutableStateOf<ServerSettings?>(null) }
-    var settingsUpdateTick by remember { mutableIntStateOf(0) }
+    val state by viewModel.state.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
     val updateWebSettings = LocalUpdateWebSettings.current
     val updatePublicSettings = LocalUpdatePublicSettings.current
 
-    fun setLoading(loading: Boolean) {
-        isLoading = loading
-    }
+    fun updateSettings(data: PartialServerSettingsSettings? = null) {
+        viewModel.updateSettings(
+            context = context,
+            updateWebSettings = updateWebSettings,
+            updatePublicSettings = updatePublicSettings,
+            data = data,
+            onSuccess = {
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                ) {
+                    Text(
+                        text = "Settings updated successfully"
+                    )
+                }
+            },
+            onError = { errors, isUpdate ->
+                Notification.show(
+                    context = context,
+                    activity = activity,
+                    duration = 8000L,
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Failed to ${if (isUpdate) "update" else "fetch"} server settings:")
 
-    suspend fun updateSettings(data: PartialServerSettingsSettings? = null): List<String> {
-        isLoading = true
-
-        if (data != null) {
-            val updateServerSettingsRes = updateServerSettings(
-                context = context,
-                data = data
-            )
-
-            updateServerSettingsRes
-                .onSuccess {
-                    if (it is UpdateServerSettingsResult.Error) {
-                        return it.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(it.error.message ?: it.error.error)
-                    } else if (it is UpdateServerSettingsResult.Success) {
-                        settings = it.settings
-
-                        updateWebSettings()
-                        updatePublicSettings()
-
-                        Notification.show(
-                            context = context,
-                            activity = activity,
-                            content = {
-                                Text(
-                                    text = "Settings updated successfully"
-                                )
-                            }
-                        )
-
-                        settingsUpdateTick += 1
+                        errors.forEach {
+                            Text(
+                                text = it,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
                     }
                 }
-                .onFailure {
-                    return listOf(it.message ?: "Something went wrong...")
-                }
-        } else {
-            val settingsRes = getServerSettings(
-                context = context,
-            )
-
-            settingsRes.onSuccess {
-                settings = it
             }
-
-            settingsUpdateTick += 1
-        }
-
-        isLoading = false
-        return emptyList()
+        )
     }
 
     LaunchedEffect(Unit) {
         updateSettings()
+    }
+
+    LaunchedEffect(state.settingsUpdateTick) {
+        viewModel.resetInputs()
     }
 
     Column(
@@ -184,20 +175,16 @@ fun AdminSettingsScreen(
                             updateSettings()
                         }
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
             }
         }
 
-        var selectedCategory by remember {
-            mutableStateOf(
-                setOf(SettingCategory.CORE.toString())
-            )
-        }
-
         Select(
-            onSelectionChange = { selectedCategory = it },
-            selectedIds = selectedCategory,
+            onSelectionChange = {
+                viewModel.setSelectedCategory(it)
+            },
+            selectedIds = state.selectedCategory,
             options = settingCategories.map { category ->
                 SelectOption(
                     id = category.toString(),
@@ -210,7 +197,7 @@ fun AdminSettingsScreen(
                                 MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     },
-                    enabled = selectedCategory.first() != category.toString()
+                    enabled = state.selectedCategory.first() != category.toString()
                 )
             },
             containerModifier = Modifier
@@ -233,266 +220,135 @@ fun AdminSettingsScreen(
                     horizontal = 12.dp,
                 ),
         ) {
-            when (selectedCategory.first()) {
+            when (state.selectedCategory.first()) {
                 SettingCategory.CORE.toString() -> CoreCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.CORE.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.CHUNKS.toString() -> ChunksCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.CHUNKS.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.TASKS.toString() -> TasksCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.TASKS.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.MFA.toString() -> MFACategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.MFA.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.FEATURES.toString() -> FeaturesCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.FEATURES.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.FILES.toString() -> FilesCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.FILES.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.URL_SHORTENER.toString() -> UrlShortenerCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.URL_SHORTENER.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.RATELIMIT.toString() -> RatelimitCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.RATELIMIT.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.INVITES.toString() -> InvitesCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.INVITES.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.WEBSITE.toString() -> WebsiteCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.WEBSITE.categoryName,
-                    settingsUpdateTick = settingsUpdateTick,
-                    context = context,
-                    activity = activity
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.OAUTH.toString() -> OAuthCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     context = context,
                     title = SettingCategory.OAUTH.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.PWA.toString() -> PWACategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.PWA.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.HTTP_WEBHOOKS.toString() -> HTTPWebhooksCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.HTTP_WEBHOOKS.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.DOMAINS.toString() -> DomainsCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.DOMAINS.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.DISCORD_WEBHOOK.toString() -> DiscordWebhookCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.DISCORD_WEBHOOK.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.toString() -> DiscordWebhookOnUploadCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.DISCORD_WEBHOOK_ON_UPLOAD.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
                 SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.toString() -> DiscordWebhookOnShortenCategory(
-                    settings = settings,
-                    isLoading = isLoading,
                     updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
                     title = SettingCategory.DISCORD_WEBHOOK_ON_SHORTEN.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
+                    viewModel = viewModel,
+                    state = state
                 )
 
-                else -> CoreCategory(
-                    settings = settings,
-                    isLoading = isLoading,
-                    updateSettings = ::updateSettings,
-                    setLoading = ::setLoading,
-                    title = SettingCategory.CORE.categoryName,
-                    settingsUpdateTick = settingsUpdateTick
-                )
+                else -> {
+                    viewModel.setSelectedCategory(
+                        setOf(SettingCategory.CORE.toString())
+                    )
+                }
             }
         }
     }
-}
-
-private enum class SettingCategory(
-    val value: String,
-    val categoryName: String
-) {
-    CORE(
-        value = "CORE",
-        categoryName = "Core"
-    ),
-
-    CHUNKS(
-        value = "CHUNKS",
-        categoryName = "Chunks"
-    ),
-
-    TASKS(
-        value = "TASKS",
-        categoryName = "Tasks"
-    ),
-
-    MFA(
-        value = "MFA",
-        categoryName = "Multi-Factor Authentication"
-    ),
-
-    FEATURES(
-        value = "FEATURES",
-        categoryName = "Features"
-    ),
-
-    FILES(
-        value = "FILES",
-        categoryName = "Files"
-    ),
-
-    URL_SHORTENER(
-        value = "URL_SHORTENER",
-        categoryName = "URL Shortener"
-    ),
-
-    RATELIMIT(
-        value = "RATELIMIT",
-        categoryName = "Ratelimit"
-    ),
-
-    INVITES(
-        value = "INVITES",
-        categoryName = "Invites"
-    ),
-
-    WEBSITE(
-        value = "WEBSITE",
-        categoryName = "Website"
-    ),
-
-    OAUTH(
-        value = "OAUTH",
-        categoryName = "OAuth"
-    ),
-
-    PWA(
-        value = "PWA",
-        categoryName = "PWA"
-    ),
-
-    HTTP_WEBHOOKS(
-        value = "HTTP_WEBHOOKS",
-        categoryName = "HTTP Webhooks"
-    ),
-
-    DOMAINS(
-        value = "DOMAINS",
-        categoryName = "Domains"
-    ),
-
-    DISCORD_WEBHOOK(
-        value = "DISCORD_WEBHOOK",
-        categoryName = "Discord Webhook"
-    ),
-
-    DISCORD_WEBHOOK_ON_UPLOAD(
-        value = "DISCORD_WEBHOOK_ON_UPLOAD",
-        categoryName = "Discord Webhook (On Upload)"
-    ),
-
-    DISCORD_WEBHOOK_ON_SHORTEN(
-        value = "DISCORD_WEBHOOK_ON_SHORTEN",
-        categoryName = "Discord Webhook (On Shorten)"
-    );
-
-    override fun toString(): String = value
 }
 
 private val settingCategories = listOf(

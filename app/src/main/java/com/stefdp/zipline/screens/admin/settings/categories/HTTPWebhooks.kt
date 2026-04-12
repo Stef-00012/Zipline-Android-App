@@ -26,16 +26,16 @@ import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun HTTPWebhooksCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -52,68 +52,39 @@ internal fun HTTPWebhooksCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var onUpload by remember(settings?.settings?.httpWebhookOnUpload, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.httpWebhookOnUpload ?: ""))
-            }
-
             TextInput(
-                value = onUpload,
-                onValueChange = { onUpload = it },
+                value = state.httpWebhookOnUpload,
+                onValueChange = {
+                    viewModel.setHttpWebhookOnUpload(it)
+                },
                 label = "On Upload",
                 description = "The URL to send a POST request to when a file is uploaded.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var onShorten by remember(settings?.settings?.httpWebhookOnUpload, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.httpWebhookOnUpload ?: ""))
-            }
 
             TextInput(
-                value = onShorten,
-                onValueChange = { onShorten = it },
+                value = state.httpWebhookOnShorten,
+                onValueChange = {
+                    viewModel.setHttpWebhookOnShorten(it)
+                },
                 label = "On Shorten",
                 description = "The URL to send a POST request to when a URL is shortened.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        httpWebhookOnUpload = state.httpWebhookOnUpload.text.takeIf { it.isNotBlank() },
+                        httpWebhookOnShorten = state.httpWebhookOnShorten.text.takeIf { it.isNotBlank() }
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            httpWebhookOnUpload = onUpload.text.takeIf { it.isNotBlank() },
-                            httpWebhookOnShorten = onShorten.text.takeIf { it.isNotBlank() }
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

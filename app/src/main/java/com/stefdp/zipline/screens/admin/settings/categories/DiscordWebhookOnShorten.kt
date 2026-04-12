@@ -38,6 +38,8 @@ import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.ServerSettingsSettingsDiscordShortenEmbed
 import com.stefdp.zipline.network.models.ServerSettingsSettingsDiscordUploadEmbed
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.compressionFormats
 import com.stefdp.zipline.utils.nameFormats
@@ -47,12 +49,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun DiscordWebhookOnShortenCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -75,136 +75,77 @@ internal fun DiscordWebhookOnShortenCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var webhookUrl by remember(settings?.settings?.discordOnShortenWebhookUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenWebhookUrl ?: ""))
-            }
-
             TextInput(
-                value = webhookUrl,
-                onValueChange = { webhookUrl = it },
+                value = state.discordOnShortenWebhookUrl,
+                onValueChange = {
+                    viewModel.setDiscordOnShortenWebhookUrl(it)
+                },
                 label = "Webhook URL",
                 description = "The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth(),
                 isPassword = true
             )
 
-            var username by remember(settings?.settings?.discordOnShortenUsername, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenUsername ?: ""))
-            }
-
             TextInput(
-                value = username,
-                onValueChange = { username = it },
+                value = state.discordOnShortenUsername,
+                onValueChange = {
+                    viewModel.setDiscordOnShortenUsername(it)
+                },
                 label = "Username",
                 description = "The username to send notifications as. If this is left blank, the main username will be used.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var avatarUrl by remember(settings?.settings?.discordOnShortenAvatarUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenAvatarUrl ?: ""))
-            }
-
             TextInput(
-                value = avatarUrl,
-                onValueChange = { avatarUrl = it },
+                value = state.discordOnShortenAvatarUrl,
+                onValueChange = {
+                    viewModel.setDiscordOnShortenAvatarUrl(it)
+                },
                 label = "Avatar URL",
                 description = "The avatar for the webhook. If this is left blank, the main avatar will be used.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var content by remember(settings?.settings?.discordOnShortenContent, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenContent ?: ""))
-            }
 
             TextInput(
-                value = content,
+                value = state.discordOnShortenContent,
                 singleLine = false,
-                onValueChange = { content = it },
+                onValueChange = {
+                    viewModel.setDiscordOnShortenContent(it)
+                },
                 label = "Content",
                 description = "The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var embed by remember(settings?.settings?.discordOnShortenEmbed, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnShortenEmbed)
-            }
-
-            var embedTitle by remember(settings?.settings?.discordOnShortenEmbed?.title, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenEmbed?.title ?: ""))
-            }
-
-            var embedDescription by remember(settings?.settings?.discordOnShortenEmbed?.description, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenEmbed?.description ?: ""))
-            }
-
-            var embedFooter by remember(settings?.settings?.discordOnShortenEmbed?.footer, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnShortenEmbed?.footer ?: ""))
-            }
-
-            var embedColor by remember(settings?.settings?.discordOnShortenEmbed?.color, settingsUpdateTick) {
-                val color = settings?.settings?.discordOnShortenEmbed?.color?.toColorInt()
-
-                mutableStateOf(if (color != null) Color(color) else Color.Black)
-            }
-
-            var thumbnail by remember(settings?.settings?.discordOnShortenEmbed?.thumbnail, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnShortenEmbed?.thumbnail ?: false)
-            }
-
-            var imageOrVideo by remember(settings?.settings?.discordOnShortenEmbed?.imageOrVideo, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnShortenEmbed?.imageOrVideo ?: false)
-            }
-
-            var timestamp by remember(settings?.settings?.discordOnShortenEmbed?.timestamp, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnShortenEmbed?.timestamp ?: false)
-            }
-
-            var url by remember(settings?.settings?.discordOnShortenEmbed?.url, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnShortenEmbed?.url ?: false)
-            }
-
             Switch(
-                checked = embed != null,
+                checked = state.discordOnShortenEmbed != null,
                 onCheckedChange = { checked ->
-                    embed = if (checked) ServerSettingsSettingsDiscordShortenEmbed(
-                        title = embedTitle.text,
-                        description = embedDescription.text,
-                        footer = embedFooter.text,
-                        color = embedColor.toHex(),
-                        thumbnail = thumbnail,
-                        imageOrVideo = imageOrVideo,
-                        timestamp = timestamp,
-                        url = url
+                    val embed = if (checked) ServerSettingsSettingsDiscordShortenEmbed(
+                        title = state.discordOnShortenEmbedTitle.text,
+                        description = state.discordOnShortenEmbedDescription.text,
+                        footer = state.discordOnShortenEmbedFooter.text,
+                        color = state.discordOnShortenEmbedColor.toHex(),
+                        thumbnail = state.discordOnShortenEmbedThumbnail,
+                        imageOrVideo = state.discordOnShortenEmbedImageOrVideo,
+                        timestamp = state.discordOnShortenEmbedTimestamp,
+                        url = state.discordOnShortenEmbedUrl
                     )
                     else null
+
+                    viewModel.setDiscordOnShortenEmbed(embed)
                 },
                 label = "Embed",
                 description = "Send the notification as an embed. This will allow for more customization below.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
             AnimatedVisibility(
-                visible = embed != null
+                visible = state.discordOnShortenEmbed != null
             ) {
                 Container(
                     scrollable = false,
@@ -215,39 +156,47 @@ internal fun DiscordWebhookOnShortenCategory(
                         modifier = Modifier.padding(12.dp)
                     ) {
                         TextInput(
-                            value = embedTitle,
-                            onValueChange = { embedTitle = it },
+                            value = state.discordOnShortenEmbedTitle,
+                            onValueChange = {
+                                viewModel.setDiscordOnShortenEmbedTitle(it)
+                            },
                             label = "Title",
                             description = "The title of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         TextInput(
-                            value = embedDescription,
-                            onValueChange = { embedDescription = it },
+                            value = state.discordOnShortenEmbedDescription,
+                            onValueChange = {
+                                viewModel.setDiscordOnShortenEmbedDescription(it)
+                            },
                             singleLine = false,
                             label = "Description",
                             description = "The description of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         TextInput(
-                            value = embedFooter,
-                            onValueChange = { embedFooter = it },
+                            value = state.discordOnShortenEmbedFooter,
+                            onValueChange = {
+                                viewModel.setDiscordOnShortenEmbedFooter(it)
+                            },
                             label = "Footer",
                             description = "The footer of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         ColorPicker(
-                            color = embedColor,
-                            onColorChange = { embedColor = it },
+                            color = state.discordOnShortenEmbedColor,
+                            onColorChange = {
+                                viewModel.setDiscordOnShortenEmbedColor(it)
+                            },
                             label = "Color",
                             description = "The color of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -256,7 +205,7 @@ internal fun DiscordWebhookOnShortenCategory(
 //                            onCheckedChange = { thumbnail = it },
 //                            label = "Thumbnail",
 //                            description = "Show the thumbnail (it will show the file if it's an image) in the embed.",
-//                            enabled = !isLoading,
+//                            enabled = !state.isLoading,
 //                        )
 //
 //                        Switch(
@@ -264,61 +213,55 @@ internal fun DiscordWebhookOnShortenCategory(
 //                            onCheckedChange = { imageOrVideo = it },
 //                            label = "Image/Video",
 //                            description = "Show the image or video in the embed.",
-//                            enabled = !isLoading,
+//                            enabled = !state.isLoading,
 //                        )
 
                         Switch(
-                            checked = timestamp,
-                            onCheckedChange = { timestamp = it },
+                            checked = state.discordOnShortenEmbedTimestamp,
+                            onCheckedChange = {
+                                viewModel.setDiscordOnShortenEmbedTimestamp(it)
+                            },
                             label = "Timestamp",
                             description = "Show the timestamp in the embed.",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
 
                         Switch(
-                            checked = url,
-                            onCheckedChange = { url = it },
+                            checked = state.discordOnShortenEmbedUrl,
+                            onCheckedChange = {
+                                viewModel.setDiscordOnShortenEmbedUrl(it)
+                            },
                             label = "URL",
                             description = "Makes the title clickable and links to the URL of the file.",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
                     }
                 }
             }
 
-            val coroutineScope = rememberCoroutineScope()
-
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
-
-                        val data = PartialServerSettingsSettings(
-                            discordOnShortenWebhookUrl = webhookUrl.text.takeIf { it.isNotBlank() },
-                            discordOnShortenUsername = username.text,
-                            discordOnShortenAvatarUrl = avatarUrl.text.takeIf { it.isNotBlank() },
-                            discordOnShortenContent = content.text,
-                            discordOnShortenEmbed = embed?.copy(
-                                title = embedTitle.text,
-                                description = embedDescription.text,
-                                footer = embedFooter.text,
-                                color = embedColor.toHex(),
-                                thumbnail = thumbnail,
-                                imageOrVideo = imageOrVideo,
-                                timestamp = timestamp,
-                                url = url
-                            )
+                    val data = PartialServerSettingsSettings(
+                        discordOnShortenWebhookUrl = state.discordOnShortenWebhookUrl.text.takeIf { it.isNotBlank() },
+                        discordOnShortenUsername = state.discordOnShortenUsername.text,
+                        discordOnShortenAvatarUrl = state.discordOnShortenAvatarUrl.text.takeIf { it.isNotBlank() },
+                        discordOnShortenContent = state.discordOnShortenContent.text,
+                        discordOnShortenEmbed = state.discordOnShortenEmbed?.copy(
+                            title = state.discordOnShortenEmbedTitle.text,
+                            description = state.discordOnShortenEmbedDescription.text,
+                            footer = state.discordOnShortenEmbedFooter.text,
+                            color = state.discordOnShortenEmbedColor.toHex(),
+                            thumbnail = state.discordOnShortenEmbedThumbnail,
+                            imageOrVideo = state.discordOnShortenEmbedImageOrVideo,
+                            timestamp = state.discordOnShortenEmbedTimestamp,
+                            url = state.discordOnShortenEmbedUrl
                         )
+                    )
 
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

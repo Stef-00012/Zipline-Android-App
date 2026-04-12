@@ -28,18 +28,18 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun MFACategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -56,109 +56,74 @@ internal fun MFACategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var passkeys by remember(settings?.settings?.mfaPasskeysEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.mfaPasskeysEnabled ?: false)
-            }
-
             Switch(
-                checked = passkeys,
-                onCheckedChange = { passkeys = it },
+                checked = state.mfaPasskeysEnabled,
+                onCheckedChange = {
+                    viewModel.setMfaPasskeysEnabled(it)
+                },
                 label = "Passkeys",
                 description = "Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var relyingPartyId by remember(settings?.settings?.mfaPasskeysRpID, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.mfaPasskeysRpID ?: ""))
-            }
-
             TextInput(
-                value = relyingPartyId,
-                onValueChange = { relyingPartyId = it },
+                value = state.mfaPasskeysRpID,
+                onValueChange = {
+                    viewModel.setMfaPasskeysRpID(it)
+                },
                 label = "Relying Party ID",
                 description = "The Relying Party ID (RP ID) to use for WebAuthn passkeys.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var origin by remember(settings?.settings?.mfaPasskeysOrigin, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.mfaPasskeysOrigin ?: ""))
-            }
-
             TextInput(
-                value = origin,
-                onValueChange = { origin = it },
+                value = state.mfaPasskeysOrigin,
+                onValueChange = {
+                    viewModel.setMfaPasskeysOrigin(it)
+                },
                 label = "Origin",
                 description = "The Origin to use for WebAuthn passkeys.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var enableTOTP by remember(settings?.settings?.mfaTotpEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.mfaTotpEnabled ?: false)
-            }
 
             Switch(
-                checked = enableTOTP,
-                onCheckedChange = { enableTOTP = it },
+                checked = state.mfaTotpEnabled,
+                onCheckedChange = {
+                    viewModel.setMfaTotpEnabled(it)
+                },
                 label = "Enable TOTP",
                 description = "Enable Time-based One-Time Passwords with the use of an authenticator app.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var issuer by remember(settings?.settings?.mfaTotpIssuer, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.mfaTotpIssuer ?: ""))
-            }
 
             TextInput(
-                value = issuer,
-                onValueChange = { issuer = it },
+                value = state.mfaTotpIssuer,
+                onValueChange = {
+                    viewModel.setMfaTotpIssuer(it)
+                },
                 label = "Issuer",
                 description = "The issuer to use for the TOTP token.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        mfaPasskeysEnabled = state.mfaPasskeysEnabled,
+                        mfaPasskeysRpID = state.mfaPasskeysRpID.text,
+                        mfaPasskeysOrigin = state.mfaPasskeysOrigin.text,
+                        mfaTotpEnabled = state.mfaTotpEnabled,
+                        mfaTotpIssuer = state.mfaTotpIssuer.text,
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            mfaPasskeysEnabled = passkeys,
-                            mfaPasskeysRpID = relyingPartyId.text,
-                            mfaPasskeysOrigin = origin.text,
-                            mfaTotpEnabled = enableTOTP,
-                            mfaTotpIssuer = issuer.text,
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

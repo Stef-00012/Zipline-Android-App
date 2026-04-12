@@ -228,9 +228,12 @@ fun UploadFileScreen(
                 ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (state.successfulFiles.isNotEmpty()) {
-                items(state.successfulFiles.size) { index ->
-                    val fileState = state.successfulFiles[index]
+            val successfulFiles = state.fileStates.filter { it.status == UploadStatus.COMPLETE }
+            val failedFiles = state.fileStates.filter { it.status == UploadStatus.FAILED }
+
+            if (successfulFiles.isNotEmpty()) {
+                items(successfulFiles.size) { index ->
+                    val fileState = successfulFiles[index]
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -296,9 +299,9 @@ fun UploadFileScreen(
                 }
             }
 
-            if (state.failedFiles.isNotEmpty()) {
-                items(state.failedFiles.size) { index ->
-                    val fileState =state. failedFiles[index]
+            if (failedFiles.isNotEmpty()) {
+                items(failedFiles.size) { index ->
+                    val fileState = failedFiles[index]
 
                     Text(
                         text = "${fileState.file.displayName} - ${fileState.errorMessage ?: "Unknown error"}",

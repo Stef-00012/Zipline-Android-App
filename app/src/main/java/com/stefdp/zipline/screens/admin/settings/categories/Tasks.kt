@@ -27,18 +27,18 @@ import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun TasksCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -70,110 +70,75 @@ internal fun TasksCategory(
                 )
             }
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var deleteFilesInterval by remember(settings?.settings?.tasksDeleteInterval, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.tasksDeleteInterval ?: ""))
-            }
-
             TextInput(
-                value = deleteFilesInterval,
-                onValueChange = { deleteFilesInterval = it },
+                value = state.tasksDeleteInterval,
+                onValueChange = {
+                    viewModel.setTasksDeleteInterval(it)
+                },
                 label = "Delete Files Interval",
                 description = "How often to check and delete expired files.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var clearInvitesInterval by remember(settings?.settings?.tasksClearInvitesInterval, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.tasksClearInvitesInterval ?: ""))
-            }
-
             TextInput(
-                value = clearInvitesInterval,
-                onValueChange = { clearInvitesInterval = it },
+                value = state.tasksClearInvitesInterval,
+                onValueChange = {
+                    viewModel.setTasksClearInvitesInterval(it)
+                },
                 label = "Clear Invites Interval",
                 description = "How often to check and clear expired/used invites.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var maxViewsInterval by remember(settings?.settings?.tasksMaxViewsInterval, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.tasksMaxViewsInterval ?: ""))
-            }
-
             TextInput(
-                value = maxViewsInterval,
-                onValueChange = { maxViewsInterval = it },
+                value = state.tasksMaxViewsInterval,
+                onValueChange = {
+                    viewModel.setTasksMaxViewsInterval(it)
+                },
                 label = "Max Views Interval",
                 description = "How often to check and delete files that have reached max views.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var thumbnailsInterval by remember(settings?.settings?.tasksThumbnailsInterval, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.tasksThumbnailsInterval ?: ""))
-            }
-
             TextInput(
-                value = thumbnailsInterval,
-                onValueChange = { thumbnailsInterval = it },
+                value = state.tasksThumbnailsInterval,
+                onValueChange = {
+                    viewModel.setTasksThumbnailsInterval(it)
+                },
                 label = "Thumbnails Interval",
                 description = "How often to check and generate thumbnails for video files.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var cleanThumbnailsInterval by remember(settings?.settings?.tasksCleanThumbnailsInterval, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.tasksCleanThumbnailsInterval ?: ""))
-            }
 
             TextInput(
-                value = cleanThumbnailsInterval,
-                onValueChange = { cleanThumbnailsInterval = it },
+                value = state.tasksCleanThumbnailsInterval,
+                onValueChange = {
+                    viewModel.setTasksCleanThumbnailsInterval(it)
+                },
                 label = "Clean Thumbnails Interval",
                 description = "How often to check and delete orphaned thumbnails from the filesystem or database.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        tasksDeleteInterval = state.tasksDeleteInterval.text,
+                        tasksClearInvitesInterval = state.tasksClearInvitesInterval.text,
+                        tasksMaxViewsInterval = state.tasksMaxViewsInterval.text,
+                        tasksThumbnailsInterval = state.tasksThumbnailsInterval.text,
+                        tasksCleanThumbnailsInterval = state.tasksCleanThumbnailsInterval.text,
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            tasksDeleteInterval = deleteFilesInterval.text,
-                            tasksClearInvitesInterval = clearInvitesInterval.text,
-                            tasksMaxViewsInterval = maxViewsInterval.text,
-                            tasksThumbnailsInterval = thumbnailsInterval.text,
-                            tasksCleanThumbnailsInterval = cleanThumbnailsInterval.text,
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

@@ -28,6 +28,8 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
@@ -35,12 +37,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun UrlShortenerCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -57,80 +57,47 @@ internal fun UrlShortenerCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var route by remember(settings?.settings?.urlsRoute, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.urlsRoute ?: ""))
-            }
-
             TextInput(
-                value = route,
+                value = state.urlsRoute,
                 onValueChange = {
                     if (it.text.isBlank()) {
-                        route = TextFieldValue("/")
+                        viewModel.setUrlsRoute(TextFieldValue("/"))
                     }
 
                     if (it.text.startsWith("/")) {
-                        route = it
+                        viewModel.setUrlsRoute(it)
                     }
                 },
                 label = "Route",
                 description = "The route to use for short URLs. Requires a server restart.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var length by remember(settings?.settings?.urlsLength, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.urlsLength ?: "").toString()))
-            }
-
             TextInput(
-                value = length,
+                value = state.urlsLength,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        length = it
+                        viewModel.setUrlsLength(it)
                     }
                 },
                 label = "Length",
                 description = "The length of the short URL (for randomly generated names).",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        urlsRoute = state.urlsRoute.text,
+                        urlsLength = state.urlsLength.text.toLongOrNull(),
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            urlsRoute = route.text,
-                            urlsLength = length.text.toLongOrNull(),
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

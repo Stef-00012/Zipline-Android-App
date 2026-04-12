@@ -49,6 +49,9 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.requests.createUser
+import com.stefdp.zipline.screens.admin.invites.AdminInvitesUiState
+import com.stefdp.zipline.screens.admin.invites.AdminInvitesViewModel
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,14 +60,10 @@ fun CreateInvitePopup(
     activity: FragmentActivity,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    updateInvites: suspend () -> Unit
+    viewModel: AdminInvitesViewModel,
+    state: AdminInvitesUiState,
+    viewState: ZiplineViewStateType
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest,
@@ -99,26 +98,9 @@ fun CreateInvitePopup(
             }
         }
 
-        if (errorMessage != null) {
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error
-            )
-
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-        }
-
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
-        var selectedExpiresAt by remember { mutableStateOf(setOf("never")) }
 
         Select(
             label = "Expires at",
@@ -137,23 +119,23 @@ fun CreateInvitePopup(
                     }
                 )
             },
-            selectedIds = selectedExpiresAt,
-            onSelectionChange = { selectedExpiresAt = it },
-            enabled = !isLoading
+            selectedIds = state.selectedExpiresAt,
+            onSelectionChange = {
+                viewModel.setSelectedExpiresAt(it)
+            },
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var maxUses by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = maxUses,
+            value = state.maxUses,
             description = "Set a maximum number of uses for this invite, or leave blank for unlimited uses.",
             onValueChange = {
                 if (NumberRegex.matches(it.text) || it.text.isEmpty()) {
-                    maxUses = it
+                    viewModel.setMaxUses(it)
                 }
             },
             label = "Max Uses",
@@ -161,7 +143,7 @@ fun CreateInvitePopup(
                 keyboardType = KeyboardType.Number
             ),
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
@@ -169,51 +151,33 @@ fun CreateInvitePopup(
         )
 
         Button(
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             onClick = {
-                coroutineScope.launch {
-                    isLoading = true
-
-                    val createInviteRes = createInvite(
-                        context = context,
-                        expiresAt = selectedExpiresAt.firstOrNull() ?: "never",
-                        maxUses = maxUses.text.toLongOrNull(),
-                    )
-
-                    createInviteRes
-                        .onSuccess {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Invite created successfully"
-                                    )
-                                },
-                            )
-
-                            updateInvites()
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Logger.error("CreateInvitePopup", "Failed to create invite", it)
-
-                            errorMessage = it.message ?: "Something went wrong..."
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to create invite"
-                                    )
-                                }
+                viewModel.createInvite(
+                    context = context,
+                    viewState = viewState,
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "Invite created successfully"
                             )
                         }
-
-                    isLoading = false
-                    onDismissRequest()
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             },
             modifier = Modifier.fillMaxWidth()
         ) {

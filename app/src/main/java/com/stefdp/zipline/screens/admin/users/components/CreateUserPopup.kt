@@ -44,6 +44,9 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.requests.createUser
+import com.stefdp.zipline.screens.admin.users.AdminUsersUiState
+import com.stefdp.zipline.screens.admin.users.AdminUsersViewModel
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,14 +56,10 @@ fun CreateUserPopup(
     currentUser: User?,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    updateUsers: suspend () -> Unit
+    viewModel: AdminUsersViewModel,
+    state: AdminUsersUiState,
+    viewState: ZiplineViewStateType
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest,
@@ -95,48 +94,33 @@ fun CreateUserPopup(
             }
         }
 
-        if (errorMessage != null) {
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error
-            )
-
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-        }
-
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var username by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = username,
-            onValueChange = { username = it },
+            value = state.newUserUsername,
+            onValueChange = {
+                viewModel.setNewUserUsername(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Username",
             placeholder = "Enter a username...",
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var password by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = password,
-            onValueChange = { password = it },
+            value = state.newUserPassword,
+            onValueChange = {
+                viewModel.setNewUserPassword(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Password",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             placeholder = "Enter a password...",
             isPassword = true
         )
@@ -145,22 +129,20 @@ fun CreateUserPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var avatar by remember { mutableStateOf<String?>(null) }
-
         AvatarInput(
             context = context,
             activity = activity,
-            onAvatarChange = { avatar = it },
+            onAvatarChange = {
+                viewModel.setNewUserAvatar(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Avatar",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
         )
 
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
-        var selectedRole by remember { mutableStateOf(setOf(UserRole.USER.toString())) }
 
         Select(
             options = listOf(
@@ -182,8 +164,11 @@ fun CreateUserPopup(
                     enabled = currentUser?.role == UserRole.SUPERADMIN
                 )
             ),
-            selectedIds = selectedRole,
-            onSelectionChange = { selectedRole = it }
+            enabled = !state.isLoading,
+            selectedIds = state.newUserSelectedRole,
+            onSelectionChange = {
+                viewModel.setNewUserSelectedRole(it)
+            }
         )
 
         Spacer(
@@ -191,55 +176,33 @@ fun CreateUserPopup(
         )
 
         Button(
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             onClick = {
-                coroutineScope.launch {
-                    isLoading = true
-
-                    val userRole = UserRole.valueOf(selectedRole.firstOrNull() ?: UserRole.USER.toString())
-
-                    val createUserRes = createUser(
-                        context = context,
-                        username = username.text,
-                        password = password.text,
-                        role = userRole,
-                        avatar = avatar
-                    )
-
-                    createUserRes
-                        .onSuccess {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "User created successfully"
-                                    )
-                                }
-                            )
-
-                            updateUsers()
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Logger.error("CreateUrlPopup", "Failed to create user", it)
-
-                            errorMessage = it.message ?: "Something went wrong..."
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to create user"
-                                    )
-                                }
+                viewModel.createUser(
+                    context = context,
+                    viewState = viewState,
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "User created successfully"
                             )
                         }
-
-                    isLoading = false
-                    onDismissRequest()
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             },
             modifier = Modifier.fillMaxWidth()
         ) {

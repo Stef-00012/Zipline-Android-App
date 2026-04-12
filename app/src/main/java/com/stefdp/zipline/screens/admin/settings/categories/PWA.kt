@@ -31,18 +31,18 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.toHex
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun PWACategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -74,133 +74,86 @@ internal fun PWACategory(
                 )
             }
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var pwaEnabled by remember(settings?.settings?.pwaEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.pwaEnabled ?: false)
-            }
-
             Switch(
-                checked = pwaEnabled,
-                onCheckedChange = { pwaEnabled = it },
+                checked = state.pwaEnabled,
+                onCheckedChange = {
+                    viewModel.setPwaEnabled(it)
+                },
                 label = "PWA Enabled",
                 description = "Allow users to install the Zipline PWA on their devices.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var title by remember(settings?.settings?.pwaTitle, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.pwaTitle ?: ""))
-            }
-
             TextInput(
-                value = title,
+                value = state.pwaTitle,
                 onValueChange = {
-                    title = it
+                    viewModel.setPwaTitle(it)
                 },
                 label = "Title",
                 description = "The title for the PWA.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var shortName by remember(settings?.settings?.pwaShortName, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.pwaShortName ?: ""))
-            }
-
             TextInput(
-                value = shortName,
+                value = state.pwaShortName,
                 onValueChange = {
-                    shortName = it
+                    viewModel.setPwaShortName(it)
                 },
                 label = "Short Name",
                 description = "The short name for the PWA.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var description by remember(settings?.settings?.pwaDescription, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.pwaDescription ?: ""))
-            }
-
             TextInput(
-                value = description,
+                value = state.pwaDescription,
                 onValueChange = {
-                    description = it
+                    viewModel.setPwaDescription(it)
                 },
                 label = "Description",
                 description = "he description for the PWA.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var themeColor by remember(settings?.settings?.pwaThemeColor, settingsUpdateTick) {
-                val color = settings?.settings?.pwaThemeColor?.toColorInt()
-
-                mutableStateOf(if (color != null) Color(color) else Color.Black)
-            }
-
             ColorPicker(
-                color = themeColor,
-                onColorChange = { themeColor = it },
+                color = state.pwaThemeColor,
+                onColorChange = {
+                    viewModel.setPwaThemeColor(it)
+                },
                 label = "Theme Color",
                 description = "The theme color for the PWA.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var backgroundColor by remember(settings?.settings?.pwaBackgroundColor, settingsUpdateTick) {
-                val color = settings?.settings?.pwaBackgroundColor?.toColorInt()
-
-                mutableStateOf(if (color != null) Color(color) else Color.Black)
-            }
 
             ColorPicker(
-                color = backgroundColor,
-                onColorChange = { backgroundColor = it },
+                color = state.pwaBackgroundColor,
+                onColorChange = {
+                    viewModel.setPwaBackgroundColor(it)
+                },
                 label = "Background Color",
                 description = "The background color for the PWA.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        pwaEnabled = state.pwaEnabled,
+                        pwaTitle = state.pwaTitle.text.takeIf { it.isNotBlank() },
+                        pwaShortName = state.pwaShortName.text.takeIf { it.isNotBlank() },
+                        pwaDescription = state.pwaDescription.text.takeIf { it.isNotBlank() },
+                        pwaThemeColor = state.pwaThemeColor.toHex(),
+                        pwaBackgroundColor = state.pwaBackgroundColor.toHex(),
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            pwaEnabled = pwaEnabled,
-                            pwaTitle = title.text.takeIf { it.isNotBlank() },
-                            pwaShortName = shortName.text.takeIf { it.isNotBlank() },
-                            pwaDescription = description.text.takeIf { it.isNotBlank() },
-                            pwaThemeColor = themeColor.toHex(),
-                            pwaBackgroundColor = backgroundColor.toHex(),
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

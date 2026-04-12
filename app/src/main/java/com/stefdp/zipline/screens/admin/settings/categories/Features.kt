@@ -36,6 +36,8 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.ThumbnailFormat
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.thumbnailFormats
@@ -44,12 +46,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun FeaturesCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -72,161 +72,128 @@ internal fun FeaturesCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var imageCompression by remember(settings?.settings?.featuresImageCompression, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresImageCompression ?: false)
-            }
-
             Switch(
-                checked = imageCompression,
-                onCheckedChange = { imageCompression = it },
+                checked = state.featuresImageCompression,
+                onCheckedChange = {
+                    viewModel.setFeaturesImageCompression(it)
+                },
                 label = "Image Compression",
                 description = "Allows the ability for users to compress images.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var robotsTxt by remember(settings?.settings?.featuresRobotsTxt, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresRobotsTxt ?: false)
-            }
-
             Switch(
-                checked = robotsTxt,
-                onCheckedChange = { robotsTxt = it },
+                checked = state.featuresRobotsTxt,
+                onCheckedChange = {
+                    viewModel.setFeaturesRobotsTxt(it)
+                },
                 label = "/robots.txt",
                 description = "Enables a /robots.txt to stop search crawlers. Requires a server restart.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var healthcheck by remember(settings?.settings?.featuresHealthcheck, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresHealthcheck ?: false)
-            }
-
             Switch(
-                checked = healthcheck,
-                onCheckedChange = { healthcheck = it },
+                checked = state.featuresHealthcheck,
+                onCheckedChange = {
+                    viewModel.setFeaturesHealthcheck(it)
+                },
                 label = "Healthcheck",
                 description = "Enables a healthcheck route for uptime monitoring. Requires a server restart.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var userRegistration by remember(settings?.settings?.featuresUserRegistration, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresUserRegistration ?: false)
-            }
-
             Switch(
-                checked = userRegistration,
-                onCheckedChange = { userRegistration = it },
+                checked = state.featuresUserRegistration,
+                onCheckedChange = {
+                    viewModel.setFeaturesUserRegistration(it)
+                },
                 label = "User Registration",
                 description = "Allows users to register an account on the server.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var oauthRegistration by remember(settings?.settings?.featuresOauthRegistration, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresOauthRegistration ?: false)
-            }
-
             Switch(
-                checked = oauthRegistration,
-                onCheckedChange = { oauthRegistration = it },
+                checked = state.featuresOauthRegistration,
+                onCheckedChange = {
+                    viewModel.setFeaturesOauthRegistration(it)
+                },
                 label = "OAuth Registration",
                 description = "Allows users to register an account using OAuth providers.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var deleteOnMaxViews by remember(settings?.settings?.featuresDeleteOnMaxViews, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresDeleteOnMaxViews ?: false)
-            }
-
             Switch(
-                checked = deleteOnMaxViews,
-                onCheckedChange = { deleteOnMaxViews = it },
+                checked = state.featuresDeleteOnMaxViews,
+                onCheckedChange = {
+                    viewModel.setFeaturesDeleteOnMaxViews(it)
+                },
                 label = "Delete on Max Views",
                 description = "Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var enableMetrics by remember(settings?.settings?.featuresMetricsEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresMetricsEnabled ?: false)
-            }
-
             Switch(
-                checked = enableMetrics,
-                onCheckedChange = { enableMetrics = it },
+                checked = state.featuresMetricsEnabled,
+                onCheckedChange = {
+                    viewModel.setFeaturesMetricsEnabled(it)
+                },
                 label = "Enable Metrics",
                 description = "Enables metrics for the server. Requires a server restart.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var adminOnlyMetrics by remember(settings?.settings?.featuresMetricsAdminOnly, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresMetricsAdminOnly ?: false)
-            }
-
             Switch(
-                checked = adminOnlyMetrics,
-                onCheckedChange = { adminOnlyMetrics = it },
+                checked = state.featuresMetricsAdminOnly,
+                onCheckedChange = {
+                    viewModel.setFeaturesMetricsAdminOnly(it)
+                },
                 label = "Admin Only Metrics",
                 description = "Requires an administrator to view metrics.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var showUserSpecificMetrics by remember(settings?.settings?.featuresMetricsShowUserSpecific, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresMetricsShowUserSpecific ?: false)
-            }
-
             Switch(
-                checked = showUserSpecificMetrics,
-                onCheckedChange = { showUserSpecificMetrics = it },
+                checked = state.featuresMetricsShowUserSpecific,
+                onCheckedChange = {
+                    viewModel.setFeaturesMetricsShowUserSpecific(it)
+                },
                 label = "Show User Specific Metrics",
                 description = "Shows metrics specific to each user, for all users.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var enableThumbnails by remember(settings?.settings?.featuresThumbnailsEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresThumbnailsEnabled ?: false)
-            }
 
             Switch(
-                checked = enableThumbnails,
-                onCheckedChange = { enableThumbnails = it },
+                checked = state.featuresThumbnailsEnabled,
+                onCheckedChange = {
+                    viewModel.setFeaturesThumbnailsEnabled(it)
+                },
                 label = "Enable Thumbnails",
                 description = "Enables thumbnail generation for images. Requires a server restart.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var thumbnailsNumberThreads by remember(settings?.settings?.featuresThumbnailsNumberThreads, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.featuresThumbnailsNumberThreads?.toString() ?: ""))
-            }
+            Switch(
+                checked = state.featuresThumbnailsInstantaneous,
+                onCheckedChange = {
+                    viewModel.setFeaturesThumbnailsInstantaneous(it)
+                },
+                label = "Instantaneous Thumbnails",
+                description = "Generates thumbnails immediately after a file is uploaded, instead of waiting for the task to run.",
+                enabled = !state.isLoading
+            )
 
             TextInput(
-                value = thumbnailsNumberThreads,
+                value = state.featuresThumbnailsNumberThreads,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        thumbnailsNumberThreads = it
+                        viewModel.setFeaturesThumbnailsNumberThreads(it)
                     }
                 },
                 label = "Thumbnails Number of Threads",
                 description = "The number of threads to use for thumbnail generation.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var selectedThumbnailsFormat by remember(settings?.settings?.featuresThumbnailsFormat, settingsUpdateTick) {
-                mutableStateOf(setOf((settings?.settings?.featuresThumbnailsFormat ?: ThumbnailFormat.PNG).toString()))
-            }
 
             Select(
                 label = "Thumbnails Format",
@@ -245,31 +212,27 @@ internal fun FeaturesCategory(
                         }
                     )
                 },
-                selectedIds = selectedThumbnailsFormat,
-                onSelectionChange = { selectedThumbnailsFormat = it },
-                enabled = !isLoading,
+                selectedIds = state.featuresSelectedThumbnailsFormat,
+                onSelectionChange = {
+                    viewModel.setFeaturesSelectedThumbnailsFormat(it)
+                },
+                enabled = !state.isLoading,
             )
-
-            var versionChecking by remember(settings?.settings?.featuresVersionChecking, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.featuresVersionChecking ?: false)
-            }
 
             Switch(
-                checked = versionChecking,
-                onCheckedChange = { versionChecking = it },
+                checked = state.featuresVersionChecking,
+                onCheckedChange = {
+                    viewModel.setFeaturesVersionChecking(it)
+                },
                 label = "Version Checking",
                 description = "Enable version checking for the server. This will check for updates and display the status on the sidebar to all users.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var versionAPIUrl by remember(settings?.settings?.featuresVersionAPI, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.featuresVersionAPI ?: ""))
-            }
-
             TextInput(
-                value = versionAPIUrl,
+                value = state.featuresVersionAPI,
                 onValueChange = {
-                    versionAPIUrl = it
+                    viewModel.setFeaturesVersionAPI(it)
                 },
                 label = "Version API URL",
                 description = buildAnnotatedString {
@@ -319,47 +282,37 @@ internal fun FeaturesCategory(
                         append(rawString.substring(currentIndex))
                     }
                 },
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val thumbnailsFormat = thumbnailFormats.firstOrNull {
+                        it.first.toString() == state.featuresSelectedThumbnailsFormat.firstOrNull()
+                    }?.first
 
-                        val thumbnailsFormat = thumbnailFormats.firstOrNull {
-                            it.first.toString() == selectedThumbnailsFormat.firstOrNull()
-                        }?.first
+                    val data = PartialServerSettingsSettings(
+                        featuresImageCompression = state.featuresImageCompression,
+                        featuresRobotsTxt = state.featuresRobotsTxt,
+                        featuresHealthcheck = state.featuresHealthcheck,
+                        featuresUserRegistration = state.featuresUserRegistration,
+                        featuresOauthRegistration = state.featuresOauthRegistration,
+                        featuresDeleteOnMaxViews = state.featuresDeleteOnMaxViews,
+                        featuresMetricsEnabled = state.featuresMetricsEnabled,
+                        featuresMetricsAdminOnly = state.featuresMetricsAdminOnly,
+                        featuresMetricsShowUserSpecific = state.featuresMetricsShowUserSpecific,
+                        featuresThumbnailsEnabled = state.featuresThumbnailsEnabled,
+                        featuresThumbnailsNumberThreads = state.featuresThumbnailsNumberThreads.text.toLongOrNull(),
+                        featuresThumbnailsFormat = thumbnailsFormat,
+                        featuresVersionChecking = state.featuresVersionChecking,
+                        featuresVersionAPI = state.featuresVersionAPI.text,
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            featuresImageCompression = imageCompression,
-                            featuresRobotsTxt = robotsTxt,
-                            featuresHealthcheck = healthcheck,
-                            featuresUserRegistration = userRegistration,
-                            featuresOauthRegistration = oauthRegistration,
-                            featuresDeleteOnMaxViews = deleteOnMaxViews,
-                            featuresMetricsEnabled = enableMetrics,
-                            featuresMetricsAdminOnly = adminOnlyMetrics,
-                            featuresMetricsShowUserSpecific = showUserSpecificMetrics,
-                            featuresThumbnailsEnabled = enableThumbnails,
-                            featuresThumbnailsNumberThreads = thumbnailsNumberThreads.text.toLongOrNull(),
-                            featuresThumbnailsFormat = thumbnailsFormat,
-                            featuresVersionChecking = versionChecking,
-                            featuresVersionAPI = versionAPIUrl.text,
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

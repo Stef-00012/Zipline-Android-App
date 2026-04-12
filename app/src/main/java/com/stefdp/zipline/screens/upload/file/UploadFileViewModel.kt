@@ -43,8 +43,6 @@ data class UploadFileUiState(
     val overrideFileName: TextFieldValue = TextFieldValue(""),
     val password: TextFieldValue = TextFieldValue(""),
     val addOriginalName: Boolean = false,
-    val successfulFiles: List<FileUploadState> = emptyList(),
-    val failedFiles: List<FileUploadState> = emptyList()
 )
 
 class UploadFileViewModel : ViewModel() {
@@ -426,10 +424,10 @@ class UploadFileViewModel : ViewModel() {
                 withContext(Dispatchers.IO) {
                     tempFile.delete()
                 }
+            }
 
-                _state.update {
-                    it.copy(isUploading = false)
-                }
+            _state.update {
+                it.copy(isUploading = false)
             }
         }
     }

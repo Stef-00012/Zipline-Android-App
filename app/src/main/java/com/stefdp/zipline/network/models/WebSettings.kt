@@ -87,7 +87,8 @@ data class WebSettingsConfigFeatures(
 data class WebSettingsConfigFeaturesThumbnails(
     val enabled: Boolean,
     @SerializedName("num_threads") val threadsCount: Long,
-    val format: ThumbnailFormat
+    val format: ThumbnailFormat,
+    val instantaneous: Boolean,
 ) : Parcelable
 
 @Parcelize

@@ -54,6 +54,7 @@ data class ServerSettingsSettings(
 
     val featuresThumbnailsEnabled: Boolean,
     val featuresThumbnailsNumberThreads: Long,
+    val featuresThumbnailsInstantaneous: Boolean,
     val featuresThumbnailsFormat: ThumbnailFormat,
 
     val featuresMetricsEnabled: Boolean,
@@ -188,6 +189,7 @@ data class PartialServerSettingsSettings(
 
     val featuresThumbnailsEnabled: Boolean? = null,
     val featuresThumbnailsNumberThreads: Long? = null,
+    val featuresThumbnailsInstantaneous: Boolean? = null,
     val featuresThumbnailsFormat: ThumbnailFormat? = null,
 
     val featuresMetricsEnabled: Boolean? = null,

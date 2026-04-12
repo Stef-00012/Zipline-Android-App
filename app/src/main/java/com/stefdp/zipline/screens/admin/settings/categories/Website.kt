@@ -45,20 +45,19 @@ import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.WebsiteExternalLink
 import com.stefdp.zipline.screens.admin.settings.categories.components.ExternalLink
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
+import com.stefdp.zipline.screens.admin.settings.MoveWebsiteExternalLinkDirection
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 import java.util.Collections
 
 @Composable
 internal fun WebsiteCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int,
-    context: Context,
-    activity: FragmentActivity
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -81,56 +80,31 @@ internal fun WebsiteCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var title by remember(settings?.settings?.websiteTitle, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteTitle ?: ""))
-            }
-
             TextInput(
-                value = title,
-                onValueChange = { title = it },
+                value = state.websiteTitle,
+                onValueChange = {
+                    viewModel.setWebsiteTitle(it)
+                },
                 label = "Title",
                 description = "The title of the website in browser tabs and at the top.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var titleLogo by remember(settings?.settings?.websiteTitleLogo, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteTitleLogo ?: ""))
-            }
 
             TextInput(
-                value = titleLogo,
-                onValueChange = { titleLogo = it },
+                value = state.websiteTitleLogo,
+                onValueChange = {
+                    viewModel.setWebsiteTitleLogo(it)
+                },
                 label = "Title Logo",
                 description = "The URL to use for the title logo. This is placed to the left of the title.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var externalLinks by remember(settings?.settings?.websiteExternalLinks, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.websiteExternalLinks ?: emptyList())
-            }
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                var createNewExternalUrl by remember { mutableStateOf(false) }
-
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -159,8 +133,10 @@ internal fun WebsiteCategory(
                         iconContentDescription = "Add external link",
                         color = MaterialTheme.colorScheme.primary,
                         iconColor = MaterialTheme.colorScheme.onPrimary,
-                        onClick = { createNewExternalUrl = true },
-                        enabled = !isLoading
+                        onClick = {
+                            viewModel.openCreateNewExternalLink()
+                        },
+                        enabled = !state.isLoading
                     )
                 }
 
@@ -175,11 +151,11 @@ internal fun WebsiteCategory(
                 ) {
                     val externalLinksScrollState = rememberScrollState()
 
-                    var editExternalLinkIndex by remember { mutableIntStateOf(-1) }
-
                     Popup(
-                        showPopup = createNewExternalUrl,
-                        onDismissRequest = { createNewExternalUrl = false },
+                        showPopup = state.createNewExternalUrl,
+                        onDismissRequest = {
+                            viewModel.closeCreateNewExternalLink()
+                        },
                     ) {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -199,7 +175,9 @@ internal fun WebsiteCategory(
                                     .clip(RoundedCornerShape(4.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable(
-                                        onClick = { createNewExternalUrl = false }
+                                        onClick = {
+                                            viewModel.closeCreateNewExternalLink()
+                                        }
                                     )
                             ) {
                                 Icon(
@@ -213,15 +191,13 @@ internal fun WebsiteCategory(
                             modifier = Modifier.height(8.dp)
                         )
 
-                        var name by remember {
-                            mutableStateOf(TextFieldValue(""))
-                        }
-
                         TextInput(
-                            value = name,
-                            onValueChange = { name = it },
+                            value = state.createExternalLinkName,
+                            onValueChange = {
+                                viewModel.setCreateExternalLinkName(it)
+                            },
                             label = "Name",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -229,15 +205,13 @@ internal fun WebsiteCategory(
                             modifier = Modifier.height(8.dp)
                         )
 
-                        var url by remember {
-                            mutableStateOf(TextFieldValue(""))
-                        }
-
                         TextInput(
-                            value = url,
-                            onValueChange = { url = it },
+                            value = state.createExternalLinkUrl,
+                            onValueChange = {
+                                viewModel.setCreateExternalLinkUrl(it)
+                            },
                             label = "URL",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -248,30 +222,14 @@ internal fun WebsiteCategory(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                if (name.text.isBlank() || url.text.isBlank()) {
-                                    Notification.show(
-                                        context = context,
-                                        activity = activity,
-                                        content = {
-                                            Text(
-                                                text = "Please fill in all fields"
-                                            )
-                                        }
-                                    )
-
-                                    return@Button
-                                }
-
                                 val newExternalLink = WebsiteExternalLink(
-                                    name = name.text,
-                                    url = url.text
+                                    name = state.createExternalLinkName.text,
+                                    url = state.createExternalLinkUrl.text
                                 )
 
-                                externalLinks = externalLinks + newExternalLink
-
-                                createNewExternalUrl = false
+                                viewModel.addWebsiteExternalLink(newExternalLink)
                             },
-                            enabled = !isLoading
+                            enabled = !state.isLoading && state.createExternalLinkName.text.isNotBlank() && state.createExternalLinkUrl.text.isNotBlank()
                         ) {
                             Text(
                                 text = "Create Link"
@@ -280,11 +238,11 @@ internal fun WebsiteCategory(
                     }
 
                     Popup(
-                        showPopup = editExternalLinkIndex != -1,
-                        onDismissRequest = { editExternalLinkIndex = -1 },
+                        showPopup = state.editExternalLinkIndex != -1,
+                        onDismissRequest = {
+                            viewModel.setEditExternalLinkIndex(-1)
+                        },
                     ) {
-                        val externalLink = externalLinks[editExternalLinkIndex]
-
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
@@ -303,7 +261,9 @@ internal fun WebsiteCategory(
                                     .clip(RoundedCornerShape(4.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable(
-                                        onClick = { editExternalLinkIndex = -1 }
+                                        onClick = {
+                                            viewModel.setEditExternalLinkIndex(-1)
+                                        }
                                     )
                             ) {
                                 Icon(
@@ -317,15 +277,13 @@ internal fun WebsiteCategory(
                             modifier = Modifier.height(8.dp)
                         )
 
-                        var name by remember(externalLink.name) {
-                            mutableStateOf(TextFieldValue(externalLink.name))
-                        }
-
                         TextInput(
-                            value = name,
-                            onValueChange = { name = it },
+                            value = state.editExternalLinkName,
+                            onValueChange = {
+                                viewModel.setEditExternalLinkName(it)
+                            },
                             label = "Name",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -333,15 +291,13 @@ internal fun WebsiteCategory(
                             modifier = Modifier.height(8.dp)
                         )
 
-                        var url by remember(externalLink.url) {
-                            mutableStateOf(TextFieldValue(externalLink.url))
-                        }
-
                         TextInput(
-                            value = url,
-                            onValueChange = { url = it },
+                            value = state.editExternalLinkUrl,
+                            onValueChange = {
+                                viewModel.setEditExternalLinkUrl(it)
+                            },
                             label = "URL",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -353,17 +309,13 @@ internal fun WebsiteCategory(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 val updatedExternalLink = WebsiteExternalLink(
-                                    name = name.text,
-                                    url = url.text
+                                    name = state.editExternalLinkName.text,
+                                    url = state.editExternalLinkUrl.text
                                 )
 
-                                externalLinks = externalLinks.toMutableList().also {
-                                    it[editExternalLinkIndex] = updatedExternalLink
-                                }.toList()
-
-                                editExternalLinkIndex = -1
+                                viewModel.editWebsiteExternalLink(state.editExternalLinkIndex, updatedExternalLink)
                              },
-                            enabled = !isLoading
+                            enabled = !state.isLoading && state.editExternalLinkName.text.isNotBlank() && state.editExternalLinkUrl.text.isNotBlank()
                         ) {
                             Text(
                                 text = "Edit Link"
@@ -380,157 +332,131 @@ internal fun WebsiteCategory(
                             )
                             .padding(8.dp)
                     ) {
-                        externalLinks.forEachIndexed { index, url ->
+                        state.websiteExternalLinks.forEachIndexed { index, url ->
                             ExternalLink(
                                 url = url,
-                                isLoading = isLoading,
+                                isLoading = state.isLoading,
                                 onEdit = {
-                                    editExternalLinkIndex = index
+                                    viewModel.setEditExternalLinkIndex(index)
                                 },
                                 onDelete = {
-                                    externalLinks = externalLinks - url
+                                    viewModel.removeWebsiteExternalLink(url)
                                 },
                                 onMoveUp = {
-                                    val _externalLinks = externalLinks.toMutableList()
-
-                                    Collections.swap(_externalLinks, index, index - 1)
-
-                                    externalLinks = _externalLinks.toList()
+                                    viewModel.moveWebsiteExternalLink(
+                                        index = index,
+                                        direction = MoveWebsiteExternalLinkDirection.UP
+                                    )
                                 },
                                 onMoveDown = {
-                                    val _externalLinks = externalLinks.toMutableList()
-
-                                    Collections.swap(_externalLinks, index, index + 1)
-
-                                    externalLinks = _externalLinks.toList()
+                                    viewModel.moveWebsiteExternalLink(
+                                        index = index,
+                                        direction = MoveWebsiteExternalLinkDirection.DOWN
+                                    )
                                 },
                                 isFirst = index == 0,
-                                isLast = index == externalLinks.lastIndex,
+                                isLast = index == state.websiteExternalLinks.lastIndex,
                             )
                         }
                     }
                 }
             }
 
-            var loginBackground by remember(settings?.settings?.websiteLoginBackground, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteLoginBackground ?: ""))
-            }
-
             TextInput(
-                value = loginBackground,
-                onValueChange = { loginBackground = it },
+                value = state.websiteLoginBackground,
+                onValueChange = {
+                    viewModel.setWebsiteLoginBackground(it)
+                },
                 label = "Login Background",
                 description = "The URL to use for the login background.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var loginBackgroundBlur by remember(settings?.settings?.websiteLoginBackgroundBlur, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.websiteLoginBackgroundBlur ?: false)
-            }
 
             Switch(
-                checked = loginBackgroundBlur,
-                onCheckedChange = { loginBackgroundBlur = it },
+                checked = state.websiteLoginBackgroundBlur,
+                onCheckedChange = {
+                    viewModel.setWebsiteLoginBackgroundBlur(it)
+                },
                 label = "Login Background Blur",
                 description = "Whether to blur the login background.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var defaultAvatar by remember(settings?.settings?.websiteDefaultAvatar, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteDefaultAvatar ?: ""))
-            }
-
             TextInput(
-                value = defaultAvatar,
-                onValueChange = { defaultAvatar = it },
+                value = state.websiteDefaultAvatar,
+                onValueChange = {
+                    viewModel.setWebsiteDefaultAvatar(it)
+                },
                 label = "Default Avatar",
                 description = "The path to use for the default avatar. This must be a path to an image, not a URL.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var termsOfService by remember(settings?.settings?.websiteTos, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteTos ?: ""))
-            }
-
             TextInput(
-                value = termsOfService,
-                onValueChange = { termsOfService = it },
+                value = state.websiteTos,
+                onValueChange = {
+                    viewModel.setWebsiteTos(it)
+                },
                 label = "Terms of Service",
                 description = "Path to a Markdown (.md) file to use for the terms of service.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var defaultTheme by remember(settings?.settings?.websiteThemeDefault, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteThemeDefault ?: ""))
-            }
-
             TextInput(
-                value = defaultTheme,
-                onValueChange = { defaultTheme = it },
+                value = state.websiteThemeDefault,
+                onValueChange = {
+                    viewModel.setWebsiteThemeDefault(it)
+                },
                 label = "Default Theme",
                 description = "The default theme to use for the website.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var darkTheme by remember(settings?.settings?.websiteThemeDark, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteThemeDark ?: ""))
-            }
-
             TextInput(
-                value = darkTheme,
-                onValueChange = { darkTheme = it },
+                value = state.websiteThemeDark,
+                onValueChange = {
+                    viewModel.setWebsiteThemeDark(it)
+                },
                 label = "Dark Theme",
                 description = "The dark theme to use for the website when the default theme is \"system\".",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var lightTheme by remember(settings?.settings?.websiteThemeLight, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.websiteThemeLight ?: ""))
-            }
 
             TextInput(
-                value = lightTheme,
-                onValueChange = { lightTheme = it },
+                value = state.websiteThemeLight,
+                onValueChange = {
+                    viewModel.setWebsiteThemeLight(it)
+                },
                 label = "Light Theme",
                 description = "The light theme to use for the website when the default theme is \"system\".",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        websiteTitle = state.websiteTitle.text,
+                        websiteTitleLogo = state.websiteTitleLogo.text.takeIf { it.isNotBlank() },
+                        websiteLoginBackground = state.websiteLoginBackground.text.takeIf { it.isNotBlank() },
+                        websiteLoginBackgroundBlur = state.websiteLoginBackgroundBlur,
+                        websiteDefaultAvatar = state.websiteDefaultAvatar.text.takeIf { it.isNotBlank() },
+                        websiteTos = state.websiteTos.text.takeIf { it.isNotBlank() },
+                        websiteThemeDefault = state.websiteThemeDefault.text,
+                        websiteThemeDark = state.websiteThemeDark.text,
+                        websiteThemeLight = state.websiteThemeLight.text,
+                        websiteExternalLinks = state.websiteExternalLinks
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            websiteTitle = title.text,
-                            websiteTitleLogo = titleLogo.text.takeIf { it.isNotBlank() },
-                            websiteLoginBackground = loginBackground.text.takeIf { it.isNotBlank() },
-                            websiteLoginBackgroundBlur = loginBackgroundBlur,
-                            websiteDefaultAvatar = defaultAvatar.text.takeIf { it.isNotBlank() },
-                            websiteTos = termsOfService.text.takeIf { it.isNotBlank() },
-                            websiteThemeDefault = defaultTheme.text,
-                            websiteThemeDark = darkTheme.text,
-                            websiteThemeLight = lightTheme.text,
-                            websiteExternalLinks = externalLinks
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

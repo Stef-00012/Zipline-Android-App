@@ -35,6 +35,8 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
@@ -42,12 +44,10 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun OAuthCategory(
     context: Context,
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -79,60 +79,25 @@ internal fun OAuthCategory(
                 )
             }
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var bypassLocalLogin by remember(settings?.settings?.oauthBypassLocalLogin, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.oauthBypassLocalLogin ?: false)
-            }
-
             Switch(
-                checked = bypassLocalLogin,
-                onCheckedChange = { bypassLocalLogin = it },
+                checked = state.oauthBypassLocalLogin,
+                onCheckedChange = {
+                    viewModel.setOauthBypassLocalLogin(it)
+                },
                 label = "Bypass Local Login",
                 description = "Skips the local login page and redirects to the OAuth provider, this only works with one provider enabled.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var loginOnly by remember(settings?.settings?.oauthLoginOnly, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.oauthLoginOnly ?: false)
-            }
 
             Switch(
-                checked = loginOnly,
-                onCheckedChange = { loginOnly = it },
+                checked = state.oauthLoginOnly,
+                onCheckedChange = {
+                    viewModel.setOauthLoginOnly(it)
+                },
                 label = "Login Only",
                 description = "Disables registration and only allows login with OAuth, existing users can link providers for example.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var discordClientId by remember(settings?.settings?.oauthDiscordClientId, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordClientId ?: ""))
-            }
-            var discordClientSecret by remember(settings?.settings?.oauthDiscordClientSecret, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordClientSecret ?: ""))
-            }
-            var discordAllowedIds by remember(settings?.settings?.oauthDiscordAllowedIds, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordAllowedIds?.joinToString(", ") ?: ""))
-            }
-            var discordDeniedIds by remember(settings?.settings?.oauthDiscordDeniedIds, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordDeniedIds?.joinToString(", ") ?: ""))
-            }
-            var discordRedirectUrl by remember(settings?.settings?.oauthDiscordRedirectUri, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthDiscordRedirectUri ?: ""))
-            }
 
             Container(
                 scrollable = false,
@@ -162,69 +127,59 @@ internal fun OAuthCategory(
                     )
 
                     TextInput(
-                        value = discordClientId,
+                        value = state.oauthDiscordClientId,
                         onValueChange = {
-                            discordClientId = it
+                            viewModel.setOauthDiscordClientId(it)
                         },
                         label = "Discord Client ID",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = discordClientSecret,
+                        value = state.oauthDiscordClientSecret,
                         onValueChange = {
-                            discordClientSecret = it
+                            viewModel.setOauthDiscordClientSecret(it)
                         },
                         label = "Discord Client Secret",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         isPassword = true,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = discordAllowedIds,
+                        value = state.oauthDiscordAllowedIds,
                         onValueChange = {
-                            discordAllowedIds = it
+                            viewModel.setOauthDiscordAllowedIds(it)
                         },
                         label = "Discord Allowed IDs",
                         description = "A comma-separated list of Discord user IDs that are allowed to log in. Leave empty to disable allow list.",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = discordDeniedIds,
+                        value = state.oauthDiscordDeniedIds,
                         onValueChange = {
-                            discordDeniedIds = it
+                            viewModel.setOauthDiscordDeniedIds(it)
                         },
                         label = "Discord Denied IDs",
                         description = "A comma-separated list of Discord user IDs that are denied from logging in. Leave empty to disable deny list.",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = discordRedirectUrl,
+                        value = state.oauthDiscordRedirectUri,
                         onValueChange = {
-                            discordRedirectUrl = it
+                            viewModel.setOauthDiscordRedirectUri(it)
                         },
                         label = "Discord Redirect URL",
                         description = "The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-            }
-
-            var googleClientId by remember(settings?.settings?.oauthGoogleClientId, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthGoogleClientId ?: ""))
-            }
-            var googleClientSecret by remember(settings?.settings?.oauthGoogleClientSecret, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthGoogleClientSecret ?: ""))
-            }
-            var googleRedirectUrl by remember(settings?.settings?.oauthGoogleRedirectUri, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthGoogleRedirectUri ?: ""))
             }
 
             Container(
@@ -255,47 +210,37 @@ internal fun OAuthCategory(
                     )
 
                     TextInput(
-                        value = googleClientId,
+                        value = state.oauthGoogleClientId,
                         onValueChange = {
-                            googleClientId = it
+                            viewModel.setOauthGoogleClientId(it)
                         },
                         label = "Google Client ID",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = googleClientSecret,
+                        value = state.oauthGoogleClientSecret,
                         onValueChange = {
-                            googleClientSecret = it
+                            viewModel.setOauthGoogleClientSecret(it)
                         },
                         label = "Google Client Secret",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         isPassword = true,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = googleRedirectUrl,
+                        value = state.oauthGoogleRedirectUri,
                         onValueChange = {
-                            googleRedirectUrl = it
+                            viewModel.setOauthGoogleRedirectUri(it)
                         },
                         label = "Google Redirect URL",
                         description = "The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-            }
-
-            var githubClientId by remember(settings?.settings?.oauthGithubClientId, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthGithubClientId ?: ""))
-            }
-            var githubClientSecret by remember(settings?.settings?.oauthGithubClientSecret, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthGithubClientSecret ?: ""))
-            }
-            var githubRedirectUrl by remember(settings?.settings?.oauthGithubRedirectUri, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthGithubRedirectUri ?: ""))
             }
 
             Container(
@@ -326,56 +271,37 @@ internal fun OAuthCategory(
                     )
 
                     TextInput(
-                        value = githubClientId,
+                        value = state.oauthGithubClientId,
                         onValueChange = {
-                            githubClientId = it
+                            viewModel.setOauthGithubClientId(it)
                         },
                         label = "GitHub Client ID",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = githubClientSecret,
+                        value = state.oauthGithubClientSecret,
                         onValueChange = {
-                            githubClientSecret = it
+                            viewModel.setOauthGithubClientSecret(it)
                         },
                         label = "GitHub Client Secret",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         isPassword = true,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = githubRedirectUrl,
+                        value = state.oauthGithubRedirectUri,
                         onValueChange = {
-                            githubRedirectUrl = it
+                            viewModel.setOauthGithubRedirectUri(it)
                         },
                         label = "GitHub Redirect URL",
                         description = "The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-            }
-
-            var oidcClientId by remember(settings?.settings?.oauthOidcClientId, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcClientId ?: ""))
-            }
-            var oidcClientSecret by remember(settings?.settings?.oauthOidcClientSecret, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcClientSecret ?: ""))
-            }
-            var oidcAuthorizeUrl by remember(settings?.settings?.oauthOidcAuthorizeUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcAuthorizeUrl ?: ""))
-            }
-            var oidcTokenUrl by remember(settings?.settings?.oauthOidcTokenUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcTokenUrl ?: ""))
-            }
-            var oidcUserinfoUrl by remember(settings?.settings?.oauthOidcUserinfoUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcUserinfoUrl ?: ""))
-            }
-            var oidcRedirectUrl by remember(settings?.settings?.oauthOidcRedirectUri, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.oauthOidcRedirectUri ?: ""))
             }
 
             Container(
@@ -394,114 +320,104 @@ internal fun OAuthCategory(
                     )
 
                     TextInput(
-                        value = oidcClientId,
+                        value = state.oauthOidcClientId,
                         onValueChange = {
-                            oidcClientId = it
+                            viewModel.setOauthOidcClientId(it)
                         },
                         label = "OIDC Client ID",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = oidcClientSecret,
+                        value = state.oauthOidcClientSecret,
                         onValueChange = {
-                            oidcClientSecret = it
+                            viewModel.setOauthOidcClientSecret(it)
                         },
                         label = "OIDC Client Secret",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         isPassword = true,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = oidcAuthorizeUrl,
+                        value = state.oauthOidcAuthorizeUrl,
                         onValueChange = {
-                            oidcAuthorizeUrl = it
+                            viewModel.setOauthOidcAuthorizeUrl(it)
                         },
                         label = "OIDC Authorize URL",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = oidcTokenUrl,
+                        value = state.oauthOidcTokenUrl,
                         onValueChange = {
-                            oidcTokenUrl = it
+                            viewModel.setOauthOidcTokenUrl(it)
                         },
                         label = "OIDC Token URL",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = oidcUserinfoUrl,
+                        value = state.oauthOidcUserinfoUrl,
                         onValueChange = {
-                            oidcUserinfoUrl = it
+                            viewModel.setOauthOidcUserinfoUrl(it)
                         },
                         label = "OIDC Userinfo URL",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     TextInput(
-                        value = oidcRedirectUrl,
+                        value = state.oauthOidcRedirectUri,
                         onValueChange = {
-                            oidcRedirectUrl = it
+                            viewModel.setOauthOidcRedirectUri(it)
                         },
                         label = "OIDC Redirect URL",
                         description = "The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended.",
-                        enabled = !isLoading,
+                        enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
 
-            val coroutineScope = rememberCoroutineScope()
-
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        oauthBypassLocalLogin = state.oauthBypassLocalLogin,
+                        oauthLoginOnly = state.oauthLoginOnly,
+                        oauthDiscordClientId = state.oauthDiscordClientId.text.takeIf { it.isNotBlank() },
+                        oauthDiscordClientSecret = state.oauthDiscordClientSecret.text.takeIf { it.isNotBlank() },
+                        oauthDiscordAllowedIds = state.oauthDiscordAllowedIds.text
+                            .split(", ", ",")
+                            .map { it.trim() }
+                            .filter { it.isNotBlank() },
+                        oauthDiscordDeniedIds = state.oauthDiscordDeniedIds.text
+                            .split(", ", ",")
+                            .map { it.trim() }
+                            .filter { it.isNotBlank() }
+                        ,
+                        oauthDiscordRedirectUri = state.oauthDiscordRedirectUri.text.takeIf { it.isNotBlank() },
+                        oauthGoogleClientId = state.oauthGoogleClientId.text.takeIf { it.isNotBlank() },
+                        oauthGoogleClientSecret = state.oauthGoogleClientSecret.text.takeIf { it.isNotBlank() },
+                        oauthGoogleRedirectUri = state.oauthGoogleRedirectUri.text.takeIf { it.isNotBlank() },
+                        oauthGithubClientId = state.oauthGithubClientId.text.takeIf { it.isNotBlank() },
+                        oauthGithubClientSecret = state.oauthGithubClientSecret.text.takeIf { it.isNotBlank() },
+                        oauthGithubRedirectUri = state.oauthGithubRedirectUri.text.takeIf { it.isNotBlank() },
+                        oauthOidcClientId = state.oauthOidcClientId.text.takeIf { it.isNotBlank() },
+                        oauthOidcClientSecret = state.oauthOidcClientSecret.text.takeIf { it.isNotBlank() },
+                        oauthOidcAuthorizeUrl = state.oauthOidcAuthorizeUrl.text.takeIf { it.isNotBlank() },
+                        oauthOidcTokenUrl = state.oauthOidcTokenUrl.text.takeIf { it.isNotBlank() },
+                        oauthOidcUserinfoUrl = state.oauthOidcUserinfoUrl.text.takeIf { it.isNotBlank() },
+                        oauthOidcRedirectUri = state.oauthOidcRedirectUri.text.takeIf { it.isNotBlank() },
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            oauthBypassLocalLogin = bypassLocalLogin,
-                            oauthLoginOnly = loginOnly,
-                            oauthDiscordClientId = discordClientId.text.takeIf { it.isNotBlank() },
-                            oauthDiscordClientSecret = discordClientSecret.text.takeIf { it.isNotBlank() },
-                            oauthDiscordAllowedIds = discordAllowedIds.text
-                                .split(", ", ",")
-                                .map { it.trim() }
-                                .filter { it.isNotBlank() },
-                            oauthDiscordDeniedIds = discordDeniedIds.text
-                                .split(", ", ",")
-                                .map { it.trim() }
-                                .filter { it.isNotBlank() }
-                            ,
-                            oauthDiscordRedirectUri = discordRedirectUrl.text.takeIf { it.isNotBlank() },
-                            oauthGoogleClientId = googleClientId.text.takeIf { it.isNotBlank() },
-                            oauthGoogleClientSecret = googleClientSecret.text.takeIf { it.isNotBlank() },
-                            oauthGoogleRedirectUri = googleRedirectUrl.text.takeIf { it.isNotBlank() },
-                            oauthGithubClientId = githubClientId.text.takeIf { it.isNotBlank() },
-                            oauthGithubClientSecret = githubClientSecret.text.takeIf { it.isNotBlank() },
-                            oauthGithubRedirectUri = githubRedirectUrl.text.takeIf { it.isNotBlank() },
-                            oauthOidcClientId = oidcClientId.text.takeIf { it.isNotBlank() },
-                            oauthOidcClientSecret = oidcClientSecret.text.takeIf { it.isNotBlank() },
-                            oauthOidcAuthorizeUrl = oidcAuthorizeUrl.text.takeIf { it.isNotBlank() },
-                            oauthOidcTokenUrl = oidcTokenUrl.text.takeIf { it.isNotBlank() },
-                            oauthOidcUserinfoUrl = oidcUserinfoUrl.text.takeIf { it.isNotBlank() },
-                            oauthOidcRedirectUri = oidcRedirectUrl.text.takeIf { it.isNotBlank() },
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

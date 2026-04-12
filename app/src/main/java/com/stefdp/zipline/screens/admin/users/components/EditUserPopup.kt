@@ -49,7 +49,10 @@ import com.stefdp.zipline.network.models.UserRole
 import com.stefdp.zipline.network.models.requests.UpdateUserBodyQuota
 import com.stefdp.zipline.network.requests.createUser
 import com.stefdp.zipline.network.requests.updateUser
+import com.stefdp.zipline.screens.admin.users.AdminUsersUiState
+import com.stefdp.zipline.screens.admin.users.AdminUsersViewModel
 import com.stefdp.zipline.utils.NumberRegex
+import com.stefdp.zipline.utils.ZiplineViewStateType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,17 +60,12 @@ fun EditUserPopup(
     context: Context,
     activity: FragmentActivity,
     currentUser: User?,
-    user: User?,
     showPopup: Boolean,
     onDismissRequest: () -> Unit,
-    updateUsers: suspend () -> Unit
+    viewModel: AdminUsersViewModel,
+    state: AdminUsersUiState,
+    viewState: ZiplineViewStateType
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
-
     Popup(
         showPopup = showPopup,
         onDismissRequest = onDismissRequest,
@@ -78,7 +76,7 @@ fun EditUserPopup(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Edit ${user?.username ?: "User"}",
+                text = "Edit ${state.editUser?.username ?: "User"}",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -113,48 +111,33 @@ fun EditUserPopup(
             ),
         )
 
-        if (errorMessage != null) {
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error
-            )
-
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
-        }
-
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var username by remember { mutableStateOf(TextFieldValue(user?.username ?: "")) }
-
         TextInput(
-            value = username,
-            onValueChange = { username = it },
+            value = state.editUserUsername,
+            onValueChange = {
+                viewModel.setEditUserUsername(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Username",
             placeholder = "Enter a username...",
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-        var password by remember { mutableStateOf(TextFieldValue("")) }
-
         TextInput(
-            value = password,
-            onValueChange = { password = it },
+            value = state.editUserPassword,
+            onValueChange = {
+                viewModel.setEditUserPassword(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Password",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             placeholder = "Enter a password...",
             isPassword = true
         )
@@ -163,22 +146,20 @@ fun EditUserPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var avatar by remember { mutableStateOf(user?.avatar) }
-
         AvatarInput(
             context = context,
             activity = activity,
-            onAvatarChange = { avatar = it },
+            onAvatarChange = {
+                viewModel.setEditUserAvatar(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             label = "Avatar",
-            enabled = !isLoading,
+            enabled = !state.isLoading,
         )
 
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
-        var selectedRole by remember { mutableStateOf(setOf((user?.role ?: UserRole.USER).toString())) }
 
         Select(
             options = listOf(
@@ -200,8 +181,11 @@ fun EditUserPopup(
                     enabled = currentUser?.role == UserRole.SUPERADMIN
                 )
             ),
-            selectedIds = selectedRole,
-            onSelectionChange = { selectedRole = it }
+            enabled = !state.isLoading,
+            selectedIds = state.editUserSelectedRole,
+            onSelectionChange = {
+                viewModel.setEditUserSelectedRole(it)
+            }
         )
 
         Spacer(
@@ -227,15 +211,6 @@ fun EditUserPopup(
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
-        val currentUserQuota = when (user?.quota?.filesQuota) {
-            UserQuotaFilesQuota.BY_BYTES if !user.quota.maxBytes.isNullOrBlank() -> UserQuotaFilesQuota.BY_BYTES
-            UserQuotaFilesQuota.BY_FILES if user.quota.maxFiles != null -> UserQuotaFilesQuota.BY_FILES
-            UserQuotaFilesQuota.NONE -> UserQuotaFilesQuota.NONE
-            null -> UserQuotaFilesQuota.NONE
-            else -> UserQuotaFilesQuota.NONE
-        }
-        var selectedFilesQuota by remember { mutableStateOf(setOf(currentUserQuota.toString())) }
 
         Select(
             label = "File Quota Type",
@@ -266,8 +241,11 @@ fun EditUserPopup(
                     }
                 ),
             ),
-            selectedIds = selectedFilesQuota,
-            onSelectionChange = { selectedFilesQuota = it }
+            enabled = !state.isLoading,
+            selectedIds = state.editUserSelectedFilesQuota,
+            onSelectionChange = {
+                viewModel.setEditUserSelectedFilesQuota(it)
+            }
         )
 
         val extraMenuQuotas = listOf(
@@ -275,10 +253,7 @@ fun EditUserPopup(
             UserQuotaFilesQuota.BY_BYTES,
         )
 
-        var maxBytes by remember { mutableStateOf(TextFieldValue(user?.quota?.maxBytes ?: "")) }
-        var maxFileCount by remember { mutableStateOf(TextFieldValue((user?.quota?.maxFiles ?: "").toString())) }
-
-        if (UserQuotaFilesQuota.valueOf(selectedFilesQuota.firstOrNull() ?: UserQuotaFilesQuota.NONE.toString()) in extraMenuQuotas) {
+        if (UserQuotaFilesQuota.valueOf(state.editUserSelectedFilesQuota.firstOrNull() ?: UserQuotaFilesQuota.NONE.toString()) in extraMenuQuotas) {
             Spacer(
                 modifier = Modifier.height(8.dp)
             )
@@ -288,32 +263,34 @@ fun EditUserPopup(
                     .padding(start = 16.dp)
                     .fillMaxWidth()
             ) {
-                when (UserQuotaFilesQuota.valueOf(selectedFilesQuota.firstOrNull() ?: UserQuotaFilesQuota.NONE.toString())) {
+                when (UserQuotaFilesQuota.valueOf(state.editUserSelectedFilesQuota.firstOrNull() ?: UserQuotaFilesQuota.NONE.toString())) {
                     UserQuotaFilesQuota.BY_BYTES -> {
                         TextInput(
-                            value = maxBytes,
-                            onValueChange = { maxBytes = it },
+                            value = state.editUserMaxBytes,
+                            onValueChange = {
+                                viewModel.setEditUserMaxBytes(it)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             label = "Max Bytes",
                             description = "The maximum number of bytes the user can upload.",
                             placeholder = "Enter a human readable byte-format...",
-                            enabled = !isLoading
+                            enabled = !state.isLoading
                         )
                     }
 
                     UserQuotaFilesQuota.BY_FILES -> {
                         TextInput(
-                            value = maxFileCount,
+                            value = state.editUserMaxFileCount,
                             onValueChange = {
                                 if (NumberRegex.matches(it.text)) {
-                                    maxFileCount = it
+                                    viewModel.setEditUserMaxFileCount(it)
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             label = "Max Files",
                             description = "The maximum number of files the user can upload.",
                             placeholder = "Enter a number...",
-                            enabled = !isLoading
+                            enabled = !state.isLoading
                         )
                     }
 
@@ -326,20 +303,18 @@ fun EditUserPopup(
             modifier = Modifier.height(8.dp)
         )
 
-        var maxUrls by remember { mutableStateOf(TextFieldValue((user?.quota?.maxUrls ?: "").toString())) }
-
         TextInput(
-            value = maxUrls,
+            value = state.editUserMaxUrls,
             onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        maxUrls = it
+                        viewModel.setEditUserMaxUrls(it)
                     }
             },
             modifier = Modifier.fillMaxWidth(),
             label = "Max URLs",
             description = "The maximum number of URLs the user can create. Leave as 0 for unlimited.",
             placeholder = "Enter a number...",
-            enabled = !isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(
@@ -347,94 +322,33 @@ fun EditUserPopup(
         )
 
         Button(
-            enabled = !isLoading,
+            enabled = !state.isLoading,
             onClick = {
-                coroutineScope.launch {
-                    if (user == null) {
-                        return@launch
-                    }
-
-                    isLoading = true
-
-                    val userRole = UserRole.valueOf(selectedRole.firstOrNull() ?: UserRole.USER.toString())
-
-                    val userQuota = UserQuotaFilesQuota.valueOf(selectedFilesQuota.firstOrNull() ?: UserQuotaFilesQuota.NONE.toString())
-
-                    val userQuotaBody = when (userQuota) {
-                        UserQuotaFilesQuota.BY_BYTES -> UpdateUserBodyQuota(
-                            filesType = userQuota,
-                            maxBytes = maxBytes.text.ifBlank { null },
-                            maxFiles = null,
-                            maxUrls = if (maxUrls.text.isBlank())
-                                null
-                            else maxUrls.text.toLong()
-                        )
-
-                        UserQuotaFilesQuota.BY_FILES -> UpdateUserBodyQuota(
-                            filesType = userQuota,
-                            maxBytes = null,
-                            maxFiles = if (maxFileCount.text.isBlank())
-                                null
-                            else maxFileCount.text.toLong(),
-                            maxUrls = if (maxUrls.text.isBlank())
-                                null
-                            else maxUrls.text.toLong()
-                        )
-
-                        UserQuotaFilesQuota.NONE -> UpdateUserBodyQuota(
-                            filesType = userQuota,
-                            maxBytes = null,
-                            maxFiles = null,
-                            maxUrls = if (maxUrls.text.isBlank())
-                                null
-                            else maxUrls.text.toLong()
-                        )
-                    }
-
-                    val editUserRes = updateUser(
-                        context = context,
-                        userId = user.id,
-                        username = username.text.ifBlank { null },
-                        password = password.text.ifBlank { null },
-                        avatar = avatar,
-                        role = userRole,
-                        quota = userQuotaBody
-
-                    )
-
-                    editUserRes
-                        .onSuccess {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "User edited successfully"
-                                    )
-                                }
-                            )
-
-                            updateUsers()
-                            onDismissRequest()
-                        }
-                        .onFailure {
-                            Logger.error("EditUrlPopup", "Failed to edit user", it)
-
-                            errorMessage = it.message ?: "Something went wrong..."
-
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to edit user"
-                                    )
-                                },
+                viewModel.editUser(
+                    context = context,
+                    viewState = viewState,
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "User edited successfully"
                             )
                         }
-
-                    isLoading = false
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             },
             modifier = Modifier.fillMaxWidth()
         ) {

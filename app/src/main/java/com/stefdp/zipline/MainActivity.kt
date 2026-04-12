@@ -142,9 +142,8 @@ val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState
 
 // TODO: i think i have to include "null" values in updateServerSettings requests
 // TODO: move from "Notification.show([...], content = {...})" to "Notification.show(...) { ... }"
-// TODO: add "Instantaneous Thumbnails" in admin server settings (features)
 // TODO: if not already done, disable the save button in popups when not all the required options have been filled
-// TODO: move all remember {} variables from remember to a ViewModel
+// TODO: move all remember {} variables from remember to rememberSavable
 // TODO: create a custom function to parse dates like "30d", "2y" etc. in order to do the next line
 // TODO: only show dates smaller than "settings.filesMaxExpiration in upload menu
 // TODO: disable the admin settings that are in the tampered List

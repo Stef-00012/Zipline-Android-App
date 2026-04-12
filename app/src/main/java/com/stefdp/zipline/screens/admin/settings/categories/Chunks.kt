@@ -28,18 +28,18 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun ChunksCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -56,81 +56,50 @@ internal fun ChunksCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var enableChunks by remember(settings?.settings?.chunksEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.chunksEnabled ?: false)
-            }
-
             Switch(
-                checked = enableChunks,
-                onCheckedChange = { enableChunks = it },
+                checked = state.chunksEnabled,
+                onCheckedChange = {
+                    viewModel.setChunksEnabled(it)
+                },
                 label = "Enable Chunks",
                 description = "Enable chunked uploads.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var maxChunkSize by remember(settings?.settings?.chunksMax, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.chunksMax ?: ""))
-            }
-
             TextInput(
-                value = maxChunkSize,
-                onValueChange = { maxChunkSize = it },
+                value = state.chunksMax,
+                onValueChange = {
+                    viewModel.setChunksMax(it)
+                },
                 label = "Max Chunk Size",
                 description = "Maximum size of an upload before it is split into chunks.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var chunksSize by remember(settings?.settings?.chunksSize, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.chunksSize ?: ""))
-            }
 
             TextInput(
-                value = chunksSize,
-                onValueChange = { chunksSize = it },
+                value = state.chunksSize,
+                onValueChange = {
+                    viewModel.setChunksSize(it)
+                },
                 label = "Chunk Size",
                 description = "Size of each chunk.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        chunksEnabled = state.chunksEnabled,
+                        chunksMax = state.chunksMax.text,
+                        chunksSize = state.chunksSize.text,
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            chunksEnabled = enableChunks,
-                            chunksMax = maxChunkSize.text,
-                            chunksSize = chunksSize.text,
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

@@ -27,17 +27,17 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun InvitesCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -54,71 +54,40 @@ internal fun InvitesCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var invitesEnabled by remember(settings?.settings?.invitesEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.invitesEnabled ?: false)
-            }
-
             Switch(
-                checked = invitesEnabled,
-                onCheckedChange = { invitesEnabled = it },
+                checked = state.invitesEnabled,
+                onCheckedChange = {
+                    viewModel.setInvitesEnabled(it)
+                },
                 label = "Invites Enabled",
                 description = "Enable the use of invite links to register new users.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var length by remember(settings?.settings?.invitesLength, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.invitesLength ?: "").toString()))
-            }
-
             TextInput(
-                value = length,
+                value = state.invitesLength,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        length = it
+                        viewModel.setInvitesLength(it)
                     }
                 },
                 label = "Length",
                 description = "The length of the invite code.",
-                enabled = !isLoading && settings?.settings?.invitesEnabled == true,
+                enabled = !state.isLoading && state.settings?.settings?.invitesEnabled == true,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        invitesEnabled = state.invitesEnabled,
+                        invitesLength = state.invitesLength.text.toLongOrNull(),
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            invitesEnabled = invitesEnabled,
-                            invitesLength = length.text.toLongOrNull(),
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

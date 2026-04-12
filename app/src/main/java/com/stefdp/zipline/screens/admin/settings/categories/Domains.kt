@@ -29,17 +29,17 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.components.IconButton
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun DomainsCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -62,60 +62,31 @@ internal fun DomainsCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var domains by remember(settings?.settings?.domains, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.domains ?: emptyList())
-            }
-
-            var newDomain by remember { mutableStateOf(TextFieldValue("")) }
-
-            val coroutineScope = rememberCoroutineScope()
-
             TextInput(
-                value = newDomain,
-                onValueChange = { newDomain = it },
+                value = state.newDomain,
+                onValueChange = {
+                    viewModel.setNewDomain(it)
+                },
                 description = "Enter a domain name.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = painterResource(R.drawable.add),
                 trailingIconColor = MaterialTheme.colorScheme.primary,
                 onTrailingIconPress = {
-                    coroutineScope.launch {
-                        if (newDomain.text.isNotBlank()) {
-                            setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        domains = state.domains + state.newDomain.text.trim()
+                    )
 
-                            val data = PartialServerSettingsSettings(
-                                domains = domains + newDomain.text.trim()
-                            )
+                    viewModel.setNewDomain(TextFieldValue(""))
 
-                            newDomain = TextFieldValue("")
-
-                            updateSettings(data)
-
-                            setLoading(false)
-                        }
-                    }
+                    updateSettings(data)
                 }
             )
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                domains.forEach { domain ->
+                state.domains.forEach { domain ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -134,17 +105,11 @@ internal fun DomainsCategory(
                             color = MaterialTheme.colorScheme.error,
                             iconColor = MaterialTheme.colorScheme.onError,
                             onClick = {
-                                coroutineScope.launch {
-                                    setLoading(true)
+                                val data = PartialServerSettingsSettings(
+                                    domains = state.domains - domain
+                                )
 
-                                    val data = PartialServerSettingsSettings(
-                                        domains = domains - domain
-                                    )
-
-                                    updateSettings(data)
-
-                                    setLoading(false)
-                                }
+                                updateSettings(data)
                             }
                         )
                     }

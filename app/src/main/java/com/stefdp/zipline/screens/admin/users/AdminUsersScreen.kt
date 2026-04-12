@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
@@ -79,6 +81,7 @@ fun AdminUsersScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
+    viewModel: AdminUsersViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -96,173 +99,108 @@ fun AdminUsersScreen(
         }
     }
 
-    var users by remember { mutableStateOf<List<User>?>(null) }
-
-    var isLoading by remember { mutableStateOf(true) }
+    val state by viewModel.state.collectAsState()
 
     val screenViewState = LocalScreenViewState.current
     val updateScreenViewState = LocalUpdateScreenViewState.current
 
     val viewState = screenViewState.adminUsers
 
-    var sortKey by remember { mutableStateOf(GetUsersQuerySortBy.CREATED_AT) }
-    var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
     val defaultSortOrder = SortOrder.UNSPECIFIED
 
-    var createdNewUserPopupOpen by remember { mutableStateOf(false) }
-
-    var deleteUser by remember { mutableStateOf<User?>(null) }
-    var deleteUserLevel by remember { mutableIntStateOf(0) }
-    var editUser by remember { mutableStateOf<User?>(null) }
-
-    fun sortUsers(users: List<User>): List<User> {
-        if (viewState == ZiplineViewStateType.LARGE) return users.sortedBy { Instant.parse(it.createdAt) }.reversed()
-
-        val ascending = when (sortKey) {
-            GetUsersQuerySortBy.USERNAME ->
-                users.sortedBy { it.username }
-
-            GetUsersQuerySortBy.ROLE ->
-                users.sortedBy { it.role.level }
-
-            GetUsersQuerySortBy.CREATED_AT ->
-                users.sortedBy { Instant.parse(it.createdAt) }
-
-            GetUsersQuerySortBy.UPDATED_AT ->
-                users.sortedBy { Instant.parse(it.updatedAt) }
-        }
-
-        return when (sortOrder) {
-            SortOrder.ASC -> ascending
-            SortOrder.DESC -> ascending.reversed()
-            SortOrder.UNSPECIFIED -> users
-        }
-    }
-
-    suspend fun updateUsers(sort: Boolean = true) {
-        isLoading = true
-
-        val usersRes = getUsers(
-            context = context,
-            excludeSelf = true
-        )
-
-        usersRes.onSuccess {
-            users = if (sort) sortUsers(it) else it
-        }
-
-        isLoading = false
-    }
-
     LaunchedEffect(Unit) {
-        updateUsers()
+        viewModel.refreshUsers(
+            context = context,
+            viewState = viewState
+        )
     }
 
     val coroutineScope = rememberCoroutineScope()
 
-    if (deleteUserLevel == 0) {
+    if (state.deleteUserLevel == DeleteUserLevel.CONFIRMATION_PROMPT) {
         PromptPopup(
-            showPopup = deleteUser != null,
-            onDismissRequest = { deleteUser = null },
-            onCancel = { deleteUser = null },
-            isLoading = isLoading,
-            title = "Delete ${deleteUser?.username}?",
-            description = "Are you sure you want to delete ${deleteUser?.username}? This action cannot be undone.",
+            showPopup = state.deleteUser != null,
+            onDismissRequest = {
+                viewModel.setDeleteUser(null)
+            },
+            onCancel = {
+                viewModel.setDeleteUser(null)
+            },
+            isLoading = state.isLoading,
+            title = "Delete ${state.deleteUser?.username}?",
+            description = "Are you sure you want to delete ${state.deleteUser?.username}? This action cannot be undone.",
             onSuccess = {
-                coroutineScope.launch {
-                    if (deleteUser == null) return@launch
+                if (state.deleteUser == null) return@PromptPopup
 
-                    deleteUserLevel = 1
-                }
+                viewModel.setDeleteUserLevel(DeleteUserLevel.FILE_DELETION_PROMPT)
             }
         )
     } else {
         PromptPopup(
-            showPopup = deleteUser != null,
-            isLoading = isLoading,
-            title = "Delete ${deleteUser?.username}'s data?",
-            description = "Would you like to delete ${deleteUser?.username}'s files and urls? This action cannot be undone.",
+            showPopup = state.deleteUser != null,
+            isLoading = state.isLoading,
+            title = "Delete ${state.deleteUser?.username}'s data?",
+            description = "Would you like to delete ${state.deleteUser?.username}'s files and urls? This action cannot be undone.",
             buttonLayout = DeletePromptButtonLayout.VERTICAL,
             onDismissRequest = {
-                deleteUserLevel = 0
-                deleteUser = null
+                viewModel.setDeleteUserLevel(DeleteUserLevel.CONFIRMATION_PROMPT)
+                viewModel.setDeleteUser(null)
             },
             onSuccess = {
-                coroutineScope.launch {
-                    if (deleteUser == null) return@launch
-
-                    isLoading = true
-
-                    val deleteRes = deleteUser(
-                        context = context,
-                        userId = deleteUser!!.id,
-                        deleteUserFilesAndUrls = true
-                    )
-
-                    deleteRes
-                        .onSuccess {
-                            if (viewState == ZiplineViewStateType.COMPACT) {
-                                updateUsers()
-                            } else {
-                                updateUsers(
-                                    sort = false
-                                )
-                            }
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to delete user: ${it.message}"
-                                    )
-                                },
+                viewModel.deleteUser(
+                    context = context,
+                    viewState = viewState,
+                    deleteUserFilesAndUrls = true,
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "User deleted successfully"
                             )
                         }
-
-                    isLoading = false
-                    deleteUser = null
-                    deleteUserLevel = 0
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             },
             onCancel = {
-                coroutineScope.launch {
-                    if (deleteUser == null) return@launch
-
-                    isLoading = true
-
-                    val deleteRes = deleteUser(
-                        context = context,
-                        userId = deleteUser!!.id,
-                    )
-
-                    deleteRes
-                        .onSuccess {
-                            if (viewState == ZiplineViewStateType.COMPACT) {
-                                updateUsers()
-                            } else {
-                                updateUsers(
-                                    sort = false
-                                )
-                            }
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to delete user: ${it.message}"
-                                    )
-                                }
+                viewModel.deleteUser(
+                    context = context,
+                    viewState = viewState,
+                    deleteUserFilesAndUrls = false,
+                    onSuccess = {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = "User deleted successfully"
                             )
                         }
-
-                    isLoading = false
-                    deleteUser = null
-                    deleteUserLevel = 0
-                }
+                    },
+                    onError = { error ->
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                        ) {
+                            Text(
+                                text = error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
             },
             cancelText = "No, keep everything & only delete user",
             successText = "Yes, delete everything"
@@ -273,19 +211,26 @@ fun AdminUsersScreen(
         context = context,
         activity = activity,
         currentUser = localLoggedUser,
-        showPopup = createdNewUserPopupOpen,
-        onDismissRequest = { createdNewUserPopupOpen = false },
-        updateUsers = ::updateUsers
+        showPopup = state.createNewUserPopupOpen,
+        onDismissRequest = {
+            viewModel.closeCreateNewUserPopup()
+        },
+        viewModel = viewModel,
+        viewState = viewState,
+        state = state,
     )
 
     EditUserPopup(
         context = context,
         activity = activity,
         currentUser = localLoggedUser,
-        user = editUser,
-        showPopup = editUser != null,
-        onDismissRequest = { editUser = null },
-        updateUsers = ::updateUsers
+        showPopup = state.editUser != null,
+        onDismissRequest = {
+            viewModel.setEditUser(null)
+        },
+        viewModel = viewModel,
+        viewState = viewState,
+        state = state,
     )
 
     Column(
@@ -315,9 +260,9 @@ fun AdminUsersScreen(
                     icon = painterResource(R.drawable.person_add),
                     contentDescription = "Create User",
                     onClick = {
-                        createdNewUserPopupOpen = true
+                        viewModel.openCreateNewUserPopup()
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
 
                 Spacer(
@@ -338,7 +283,7 @@ fun AdminUsersScreen(
                             )
                         )
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
             }
         }
@@ -346,20 +291,18 @@ fun AdminUsersScreen(
         val lazyColumnListState = rememberLazyListState()
 
         LaunchedEffect(
-            sortOrder,
-            sortKey,
+            state.sortOrder,
+            state.sortKey,
             viewState,
         ) {
-            users = users?.let { sortUsers(it) }
+            viewModel.triggerSort(viewState)
         }
 
         LaunchedEffect(viewState) {
             if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
 
-            if (sortKey != GetUsersQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC) {
-                updateUsers(
-                    sort = false
-                )
+            if (state.sortKey != GetUsersQuerySortBy.CREATED_AT && state.sortOrder != SortOrder.DESC) {
+                viewModel.triggerSort(viewState)
             }
         }
 
@@ -382,6 +325,14 @@ fun AdminUsersScreen(
                 val tableLastUpdatedWidth = 170.dp
                 val tableActionsWidth = 140.dp
 
+                fun onSortChanged(sortKey: GetUsersQuerySortBy) {
+                    if (state.sortKey != sortKey || state.sortOrder == SortOrder.UNSPECIFIED || state.sortOrder == SortOrder.DESC) {
+                        viewModel.updateSort(sortKey, SortOrder.ASC)
+                    } else {
+                        viewModel.updateSort(sortKey, SortOrder.DESC)
+                    }
+                }
+
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
                         content = {
@@ -403,16 +354,9 @@ fun AdminUsersScreen(
                         width = tableUsernameWidth,
                         name = "username",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUsersQuerySortBy.USERNAME) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUsersQuerySortBy.USERNAME) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUsersQuerySortBy.USERNAME) {
-                                sortKey = GetUsersQuerySortBy.USERNAME
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUsersQuerySortBy.USERNAME)
                         },
                     ),
                     TableHeaderData(
@@ -425,16 +369,9 @@ fun AdminUsersScreen(
                         width = tableRoleWidth,
                         name = "role",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUsersQuerySortBy.ROLE) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUsersQuerySortBy.ROLE) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUsersQuerySortBy.ROLE) {
-                                sortKey = GetUsersQuerySortBy.ROLE
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUsersQuerySortBy.ROLE)
                         },
                     ),
                     TableHeaderData(
@@ -447,16 +384,9 @@ fun AdminUsersScreen(
                         width = tableCreatedWidth,
                         name = "created",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUsersQuerySortBy.CREATED_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUsersQuerySortBy.CREATED_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUsersQuerySortBy.CREATED_AT) {
-                                sortKey = GetUsersQuerySortBy.CREATED_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUsersQuerySortBy.CREATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -469,16 +399,9 @@ fun AdminUsersScreen(
                         width = tableLastUpdatedWidth,
                         name = "created",
                         sortable = true,
-                        sortOrder = if (sortKey == GetUsersQuerySortBy.UPDATED_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetUsersQuerySortBy.UPDATED_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetUsersQuerySortBy.UPDATED_AT) {
-                                sortKey = GetUsersQuerySortBy.UPDATED_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetUsersQuerySortBy.UPDATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -493,7 +416,7 @@ fun AdminUsersScreen(
                     ),
                 )
 
-                val rows: List<TableRowData> = users?.map { user ->
+                val rows: List<TableRowData> = state.users?.map { user ->
                     val canInteractWithUser = canInteract(localLoggedUser?.role, user.role)
 
                     TableRowData(
@@ -555,7 +478,7 @@ fun AdminUsersScreen(
                                         onClick = {
                                             navController.navigate(FilesScreen(user.id))
                                         },
-                                        enabled = !isLoading && canInteractWithUser
+                                        enabled = !state.isLoading && canInteractWithUser
                                     )
 
                                     ActionButtonSpacer()
@@ -565,8 +488,10 @@ fun AdminUsersScreen(
                                         iconContentDescription = "Edit User",
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { editUser = user },
-                                        enabled = !isLoading && canInteractWithUser
+                                        onClick = {
+                                            viewModel.setEditUser(user)
+                                        },
+                                        enabled = !state.isLoading && canInteractWithUser
                                     )
 
                                     ActionButtonSpacer()
@@ -577,9 +502,9 @@ fun AdminUsersScreen(
                                         color = MaterialTheme.colorScheme.error,
                                         iconColor = MaterialTheme.colorScheme.onError,
                                         onClick = {
-                                            deleteUser = user
+                                            viewModel.setDeleteUser(user)
                                         },
-                                        enabled = !isLoading && canInteractWithUser
+                                        enabled = !state.isLoading && canInteractWithUser
                                     )
                                 },
                                 width = tableActionsWidth,
@@ -592,7 +517,7 @@ fun AdminUsersScreen(
                     modifier = Modifier.fillMaxSize(),
                     headers = headers,
                     rows = rows,
-                    loading = isLoading,
+                    loading = state.isLoading,
                     scrollbarConfig = TableScrollbarConfig(
                         vertical = ScrollbarConfig(
                             alwaysKeepScrollbar = true
@@ -614,7 +539,7 @@ fun AdminUsersScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (users == null || isLoading) {
+                if (state.users == null || state.isLoading) {
                     items(5) {
                         Box(
                             modifier = Modifier
@@ -630,16 +555,20 @@ fun AdminUsersScreen(
                         ) {}
                     }
                 } else {
-                    if (users!!.size > 0L) {
-                        items(users!!.size) { index ->
-                            val user = users!![index]
+                    if (state.users!!.size > 0L) {
+                        items(state.users!!.size) { index ->
+                            val user = state.users!![index]
                             val canInteractWithUser = canInteract(localLoggedUser?.role, user.role)
 
                             LargeUserDisplay(
                                 user = user,
                                 canInteractWithUser = canInteractWithUser,
-                                onDelete = { deleteUser = user },
-                                onEdit = { editUser = user },
+                                onDelete = {
+                                    viewModel.setDeleteUser(user)
+                                },
+                                onEdit = {
+                                    viewModel.setEditUser(user)
+                                },
                                 onOpenFiles = {
                                     navController.navigate(FilesScreen(user.id))
                                 }
@@ -681,20 +610,4 @@ fun AdminUsersScreen(
             }
         }
     }
-}
-
-private enum class GetUsersQuerySortBy(val value: String) {
-    @SerializedName("username")
-    USERNAME("username"),
-
-    @SerializedName("role")
-    ROLE("role"),
-
-    @SerializedName("createdAt")
-    CREATED_AT("createdAt"),
-
-    @SerializedName("updatedAt")
-    UPDATED_AT("updatedAt");
-
-    override fun toString(): String = value
 }

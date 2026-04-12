@@ -28,18 +28,18 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun CoreCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState
 ) {
     Container(
         scrollable = false,
@@ -56,94 +56,61 @@ internal fun CoreCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var returnHttpsUrls by remember(settings?.settings?.coreReturnHttpsUrls, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.coreReturnHttpsUrls ?: false)
-            }
-
             Switch(
-                checked = returnHttpsUrls,
-                onCheckedChange = { returnHttpsUrls = it },
+                checked = state.coreReturnHttpsUrls,
+                onCheckedChange = {
+                    viewModel.setCoreReturnHttpsUrls(it)
+                },
                 label = "Return HTTPS URLs",
                 description = "Return URLs with HTTPS protocol.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var trustProxies by remember(settings?.settings?.coreTrustProxy, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.coreTrustProxy ?: false)
-            }
 
             Switch(
-                checked = trustProxies,
-                onCheckedChange = { trustProxies = it },
+                checked = state.coreTrustProxy,
+                onCheckedChange = {
+                    viewModel.setCoreTrustProxy(it)
+                },
                 label = "Trust Proxies",
                 description = "Trust the X-Forwarded-* headers set by proxies. Only enable this if you are behind a trusted proxy (nginx, caddy, etc.). Requires a server restart.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var defaultDomain by remember(settings?.settings?.coreDefaultDomain, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.coreDefaultDomain ?: ""))
-            }
-
             TextInput(
-                value = defaultDomain,
-                onValueChange = { defaultDomain = it },
+                value = state.coreDefaultDomain,
+                onValueChange = {
+                    viewModel.setCoreDefaultDomain(it)
+                },
                 label = "Default Domain",
                 description = "The domain to use when generating URLs. This value should not include the protocol.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var temporaryDirectory by remember(settings?.settings?.coreTempDirectory, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.coreTempDirectory ?: ""))
-            }
 
             TextInput(
-                value = temporaryDirectory,
-                onValueChange = { temporaryDirectory = it },
+                value = state.coreTempDirectory,
+                onValueChange = {
+                    viewModel.setCoreTempDirectory(it)
+                },
                 label = "Temporary Directory",
                 description = "The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        coreReturnHttpsUrls = state.coreReturnHttpsUrls,
+                        coreTrustProxy = state.coreTrustProxy,
+                        coreDefaultDomain = state.coreDefaultDomain.text.takeIf { it.isNotBlank() },
+                        coreTempDirectory = state.coreTempDirectory.text,
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            coreReturnHttpsUrls = returnHttpsUrls,
-                            coreTrustProxy = trustProxies,
-                            coreDefaultDomain = defaultDomain.text.takeIf { it.isNotBlank() },
-                            coreTempDirectory = temporaryDirectory.text,
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

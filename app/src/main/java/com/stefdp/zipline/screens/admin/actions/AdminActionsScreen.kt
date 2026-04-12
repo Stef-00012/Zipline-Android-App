@@ -345,7 +345,7 @@ fun AdminActionsScreen(
     PromptPopup(
         showPopup = state.popupEnabled == AdminActionType.CLEAR_ZERO_BYTE_FILES,
         title = "Are you sure?",
-        description = "This will delete ${state.zeroByteFileCount ?: 0} files from the database and datasource.",
+        description = "This will delete ${state.zeroByteFileCount} files from the database and datasource.",
         onDismissRequest = {
             viewModel.setPopupEnabled(null)
         },

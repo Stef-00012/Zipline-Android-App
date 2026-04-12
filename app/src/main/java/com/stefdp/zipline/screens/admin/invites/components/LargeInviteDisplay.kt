@@ -145,6 +145,12 @@ fun LargeInviteDisplay(
             text = AnnotatedString.fromHtml("<b>Created:</b> ${HumanReadable.timeAgo(Instant.parse(invite.createdAt))}"),
         )
 
+        if (invite.expiresAt != null) {
+            Text(
+                text = AnnotatedString.fromHtml("<b>Expires:</b> ${HumanReadable.timeAgo(Instant.parse(invite.expiresAt))}"),
+            )
+        }
+
         Text(
             text = AnnotatedString.fromHtml("<b>Uses:</b> ${invite.uses}${if (invite.maxUses != null) " / ${invite.maxUses}" else ""}"),
         )

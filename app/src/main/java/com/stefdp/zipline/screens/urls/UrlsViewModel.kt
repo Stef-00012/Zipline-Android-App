@@ -158,7 +158,12 @@ class UrlsViewModel : ViewModel() {
 
     fun setQrCodeUrl(url: Url?) {
         if (url == null) {
-            _state.update { it.copy(qrCodeUrl = null, qrCodeText = "") }
+            _state.update {
+                it.copy(
+                    qrCodeUrl = null,
+                    qrCodeText = ""
+                )
+            }
         } else {
             val serverUrl = _state.value.serverUrl
             val urlsRoute = _state.value.urlsRoute

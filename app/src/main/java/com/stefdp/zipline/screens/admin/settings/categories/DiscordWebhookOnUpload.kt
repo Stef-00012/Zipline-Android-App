@@ -39,6 +39,8 @@ import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.ServerSettingsSettingsDiscordUploadEmbed
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.compressionFormats
 import com.stefdp.zipline.utils.nameFormats
@@ -48,12 +50,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun DiscordWebhookOnUploadCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -76,141 +76,77 @@ internal fun DiscordWebhookOnUploadCategory(
                 ),
             )
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var webhookUrl by remember(settings?.settings?.discordOnUploadWebhookUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadWebhookUrl ?: ""))
-            }
-
             TextInput(
-                value = webhookUrl,
-                onValueChange = { webhookUrl = it },
+                value = state.discordOnUploadWebhookUrl,
+                onValueChange = {
+                    viewModel.setDiscordOnUploadWebhookUrl(it)
+                },
                 label = "Webhook URL",
                 description = "The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth(),
                 isPassword = true
             )
 
-            var username by remember(settings?.settings?.discordOnUploadUsername, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadUsername ?: ""))
-            }
-
             TextInput(
-                value = username,
-                onValueChange = { username = it },
+                value = state.discordOnUploadUsername,
+                onValueChange = {
+                    viewModel.setDiscordOnUploadUsername(it)
+                },
                 label = "Username",
                 description = "The username to send notifications as. If this is left blank, the main username will be used.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var avatarUrl by remember(settings?.settings?.discordOnUploadAvatarUrl, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadAvatarUrl ?: ""))
-            }
-
             TextInput(
-                value = avatarUrl,
-                onValueChange = { avatarUrl = it },
+                value = state.discordOnUploadAvatarUrl,
+                onValueChange = {
+                    viewModel.setDiscordOnUploadAvatarUrl(it)
+                },
                 label = "Avatar URL",
                 description = "The avatar for the webhook. If this is left blank, the main avatar will be used.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            var content by remember(settings?.settings?.discordOnUploadContent, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadContent ?: ""))
-            }
 
             TextInput(
-                value = content,
+                value = state.discordOnUploadContent,
                 singleLine = false,
-                onValueChange = { content = it },
+                onValueChange = {
+                    viewModel.setDiscordOnUploadContent(it)
+                },
                 label = "Content",
                 description = "The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var embed by remember(settings?.settings?.discordOnUploadEmbed, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnUploadEmbed)
-            }
-
-            var embedTitle by remember(settings?.settings?.discordOnUploadEmbed?.title, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadEmbed?.title ?: ""))
-            }
-
-            var embedDescription by remember(settings?.settings?.discordOnUploadEmbed?.description, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadEmbed?.description ?: ""))
-            }
-
-            var embedFooter by remember(settings?.settings?.discordOnUploadEmbed?.footer, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.discordOnUploadEmbed?.footer ?: ""))
-            }
-
-            var embedColor by remember(settings?.settings?.discordOnUploadEmbed?.color, settingsUpdateTick) {
-                Logger.debug("DiscordWebhookOnUploadCategory", "embed: ${settings?.settings?.discordOnUploadEmbed}")
-                Logger.debug("DiscordWebhookOnUploadCategory", "Initial color: ${settings?.settings?.discordOnUploadEmbed?.color}")
-
-                val color = settings?.settings?.discordOnUploadEmbed?.color?.toColorInt()
-
-                Logger.debug("DiscordWebhookOnUploadCategory", "Parsed color int: $color, Color: ${if (color != null) Color(color) else "none"}")
-
-                mutableStateOf(if (color != null) Color(color) else Color.Black)
-            }
-
-            var thumbnail by remember(settings?.settings?.discordOnUploadEmbed?.thumbnail, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnUploadEmbed?.thumbnail ?: false)
-            }
-
-            var imageOrVideo by remember(settings?.settings?.discordOnUploadEmbed?.imageOrVideo, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnUploadEmbed?.imageOrVideo ?: false)
-            }
-
-            var timestamp by remember(settings?.settings?.discordOnUploadEmbed?.timestamp, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnUploadEmbed?.timestamp ?: false)
-            }
-
-            var url by remember(settings?.settings?.discordOnUploadEmbed?.url, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.discordOnUploadEmbed?.url ?: false)
-            }
-
             Switch(
-                checked = embed != null,
+                checked = state.discordOnUploadEmbed != null,
                 onCheckedChange = { checked ->
-                    embed = if (checked) ServerSettingsSettingsDiscordUploadEmbed(
-                        title = embedTitle.text,
-                        description = embedDescription.text,
-                        footer = embedFooter.text,
-                        color = embedColor.toHex(),
-                        thumbnail = thumbnail,
-                        imageOrVideo = imageOrVideo,
-                        timestamp = timestamp,
-                        url = url
+                    val embed = if (checked) ServerSettingsSettingsDiscordUploadEmbed(
+                        title = state.discordOnUploadEmbedTitle.text,
+                        description = state.discordOnUploadEmbedDescription.text,
+                        footer = state.discordOnUploadEmbedFooter.text,
+                        color = state.discordOnUploadEmbedColor.toHex(),
+                        thumbnail = state.discordOnUploadEmbedThumbnail,
+                        imageOrVideo = state.discordOnUploadEmbedImageOrVideo,
+                        timestamp = state.discordOnUploadEmbedTimestamp,
+                        url = state.discordOnUploadEmbedUrl
                     )
                     else null
+
+                    viewModel.setDiscordOnUploadEmbed(embed)
                 },
                 label = "Embed",
                 description = "Send the notification as an embed. This will allow for more customization below.",
-                enabled = !isLoading,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
             AnimatedVisibility(
-                visible = embed != null
+                visible = state.discordOnUploadEmbed != null
             ) {
                 Container(
                     scrollable = false,
@@ -221,110 +157,116 @@ internal fun DiscordWebhookOnUploadCategory(
                         modifier = Modifier.padding(12.dp)
                     ) {
                         TextInput(
-                            value = embedTitle,
-                            onValueChange = { embedTitle = it },
+                            value = state.discordOnUploadEmbedTitle,
+                            onValueChange = {
+                                viewModel.setDiscordOnUploadEmbedTitle(it)
+                            },
                             label = "Title",
                             description = "The title of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         TextInput(
-                            value = embedDescription,
-                            onValueChange = { embedDescription = it },
+                            value = state.discordOnUploadEmbedDescription,
+                            onValueChange = {
+                                viewModel.setDiscordOnUploadEmbedDescription(it)
+                            },
                             singleLine = false,
                             label = "Description",
                             description = "The description of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         TextInput(
-                            value = embedFooter,
-                            onValueChange = { embedFooter = it },
+                            value = state.discordOnUploadEmbedFooter,
+                            onValueChange = {
+                                viewModel.setDiscordOnUploadEmbedFooter(it)
+                            },
                             label = "Footer",
                             description = "The footer of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         ColorPicker(
-                            color = embedColor,
-                            onColorChange = { embedColor = it },
+                            color = state.discordOnUploadEmbedColor,
+                            onColorChange = {
+                                viewModel.setDiscordOnUploadEmbedColor(it)
+                            },
                             label = "Color",
                             description = "The color of the embed",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         Switch(
-                            checked = thumbnail,
-                            onCheckedChange = { thumbnail = it },
+                            checked = state.discordOnUploadEmbedThumbnail,
+                            onCheckedChange = {
+                                viewModel.setDiscordOnUploadEmbedThumbnail(it)
+                            },
                             label = "Thumbnail",
                             description = "Show the thumbnail (it will show the file if it's an image) in the embed.",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
 
                         Switch(
-                            checked = imageOrVideo,
-                            onCheckedChange = { imageOrVideo = it },
+                            checked = state.discordOnUploadEmbedImageOrVideo,
+                            onCheckedChange = {
+                                viewModel.setDiscordOnUploadEmbedImageOrVideo(it)
+                            },
                             label = "Image/Video",
                             description = "Show the image or video in the embed.",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
 
                         Switch(
-                            checked = timestamp,
-                            onCheckedChange = { timestamp = it },
+                            checked = state.discordOnUploadEmbedTimestamp,
+                            onCheckedChange = {
+                                viewModel.setDiscordOnUploadEmbedTimestamp(it)
+                            },
                             label = "Timestamp",
                             description = "Show the timestamp in the embed.",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
 
                         Switch(
-                            checked = url,
-                            onCheckedChange = { url = it },
+                            checked = state.discordOnUploadEmbedUrl,
+                            onCheckedChange = {
+                                viewModel.setDiscordOnUploadEmbedUrl(it)
+                            },
                             label = "URL",
                             description = "Makes the title clickable and links to the URL of the file.",
-                            enabled = !isLoading,
+                            enabled = !state.isLoading,
                         )
                     }
                 }
             }
 
-            val coroutineScope = rememberCoroutineScope()
-
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
-
-                        val data = PartialServerSettingsSettings(
-                            discordOnUploadWebhookUrl = webhookUrl.text.takeIf { it.isNotBlank() },
-                            discordOnUploadUsername = username.text,
-                            discordOnUploadAvatarUrl = avatarUrl.text.takeIf { it.isNotBlank() },
-                            discordOnUploadContent = content.text,
-                            discordOnUploadEmbed = embed?.copy(
-                                title = embedTitle.text,
-                                description = embedDescription.text,
-                                footer = embedFooter.text,
-                                color = embedColor.toHex(),
-                                thumbnail = thumbnail,
-                                imageOrVideo = imageOrVideo,
-                                timestamp = timestamp,
-                                url = url
-                            )
+                    val data = PartialServerSettingsSettings(
+                        discordOnUploadWebhookUrl = state.discordOnUploadWebhookUrl.text.takeIf { it.isNotBlank() },
+                        discordOnUploadUsername = state.discordOnUploadUsername.text,
+                        discordOnUploadAvatarUrl = state.discordOnUploadAvatarUrl.text.takeIf { it.isNotBlank() },
+                        discordOnUploadContent = state.discordOnUploadContent.text,
+                        discordOnUploadEmbed = state.discordOnUploadEmbed?.copy(
+                            title = state.discordOnUploadEmbedTitle.text,
+                            description = state.discordOnUploadEmbedDescription.text,
+                            footer = state.discordOnUploadEmbedFooter.text,
+                            color = state.discordOnUploadEmbedColor.toHex(),
+                            thumbnail = state.discordOnUploadEmbedThumbnail,
+                            imageOrVideo = state.discordOnUploadEmbedImageOrVideo,
+                            timestamp = state.discordOnUploadEmbedTimestamp,
+                            url = state.discordOnUploadEmbedUrl
                         )
+                    )
 
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

@@ -28,6 +28,8 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.PartialServerSettingsSettings
 import com.stefdp.zipline.network.models.ServerSettings
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
+import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.NumberRegex
 import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
@@ -35,12 +37,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun RatelimitCategory(
-    settings: ServerSettings?,
-    updateSettings: suspend (PartialServerSettingsSettings) -> List<String>,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit,
+    updateSettings: (PartialServerSettingsSettings) -> Unit,
     title: String,
-    settingsUpdateTick: Int
+    viewModel: AdminSettingsViewModel,
+    state: AdminSettingsUiState,
 ) {
     Container(
         scrollable = false,
@@ -66,121 +66,80 @@ internal fun RatelimitCategory(
                 )
             }
 
-            var errors by remember { mutableStateOf<List<String>>(emptyList()) }
-
-            if (errors.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    errors.forEach {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-            }
-
-            var enableRatelimit by remember(settings?.settings?.ratelimitEnabled, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.ratelimitEnabled ?: false)
-            }
-
             Switch(
-                checked = enableRatelimit,
-                onCheckedChange = { enableRatelimit = it },
+                checked = state.ratelimitEnabled,
+                onCheckedChange = {
+                    viewModel.setRatelimitEnabled(it)
+                },
                 label = "Enable Ratelimit",
                 description = "Enable ratelimiting for the server.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
-
-            var adminBypass by remember(settings?.settings?.ratelimitAdminBypass, settingsUpdateTick) {
-                mutableStateOf(settings?.settings?.ratelimitAdminBypass ?: false)
-            }
 
             Switch(
-                checked = adminBypass,
-                onCheckedChange = { adminBypass = it },
+                checked = state.ratelimitAdminBypass,
+                onCheckedChange = {
+                    viewModel.setRatelimitAdminBypass(it)
+                },
                 label = "Admin Bypass",
                 description = "Allow admins to bypass the ratelimit.",
-                enabled = !isLoading
+                enabled = !state.isLoading
             )
 
-            var maxRequests by remember(settings?.settings?.ratelimitMax, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.ratelimitMax ?: "").toString()))
-            }
-
             TextInput(
-                value = maxRequests,
+                value = state.ratelimitMax,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        maxRequests = it
+                        viewModel.setRatelimitMax(it)
                     }
                 },
                 label = "Max Requests",
                 description = "The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.",
-                enabled = !isLoading && settings?.settings?.invitesEnabled == true,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var window by remember(settings?.settings?.ratelimitWindow, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue((settings?.settings?.ratelimitWindow ?: "").toString()))
-            }
-
             TextInput(
-                value = window,
+                value = state.ratelimitWindow,
                 onValueChange = {
                     if (NumberRegex.matches(it.text)) {
-                        window = it
+                        viewModel.setRatelimitWindow(it)
                     }
                 },
                 label = "Window",
                 description = "The window in seconds to allow the max requests.",
-                enabled = !isLoading && settings?.settings?.invitesEnabled == true,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            var allowList by remember(settings?.settings?.ratelimitAllowList, settingsUpdateTick) {
-                mutableStateOf(TextFieldValue(settings?.settings?.ratelimitAllowList?.joinToString(", ") ?: ""))
-            }
-
             TextInput(
-                value = allowList,
+                value = state.ratelimitAllowList,
                 onValueChange = {
-                    allowList = it
+                    viewModel.setRatelimitAllowList(it)
                 },
                 label = "Allow List",
                 description = "A comma-separated list of IP addresses to bypass the ratelimit.",
-                enabled = !isLoading && settings?.settings?.invitesEnabled == true,
+                enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            val coroutineScope = rememberCoroutineScope()
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    coroutineScope.launch {
-                        setLoading(true)
+                    val data = PartialServerSettingsSettings(
+                        ratelimitEnabled = state.ratelimitEnabled,
+                        ratelimitAdminBypass = state.ratelimitAdminBypass,
+                        ratelimitMax = state.ratelimitMax.text.toLongOrNull(),
+                        ratelimitWindow = state.ratelimitWindow.text.toLongOrNull(),
+                        ratelimitAllowList = state.ratelimitAllowList.text
+                            .split(", ", ",")
+                            .map { it.trim() }
+                            .filter { it.isNotEmpty() },
+                    )
 
-                        val data = PartialServerSettingsSettings(
-                            ratelimitEnabled = enableRatelimit,
-                            ratelimitAdminBypass = adminBypass,
-                            ratelimitMax = maxRequests.text.toLongOrNull(),
-                            ratelimitWindow = window.text.toLongOrNull(),
-                            ratelimitAllowList = allowList.text
-                                .split(", ", ",")
-                                .map { it.trim() }
-                                .filter { it.isNotEmpty() },
-                        )
-
-                        val updateSettingsErrors = updateSettings(data)
-
-                        errors = updateSettingsErrors
-
-                        setLoading(false)
-                    }
+                    updateSettings(data)
                 },
-                enabled = !isLoading
+                enabled = !state.isLoading
             ) {
                 Icon(
                     painter = painterResource(R.drawable.save),

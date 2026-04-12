@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,12 +41,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
 import com.stefdp.zipline.LocalUpdateScreenViewState
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
@@ -83,6 +86,7 @@ fun AdminInvitesScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
+    viewModel: AdminInvitesViewModel = viewModel()
 ) {
     val localLoggedUser = LocalLoggedUser.current
 
@@ -100,161 +104,87 @@ fun AdminInvitesScreen(
         }
     }
 
-    var invites by remember { mutableStateOf<List<Invite>?>(null) }
-
-    var serverUrl by remember { mutableStateOf<String?>(null) }
-
-    var isLoading by remember { mutableStateOf(true) }
+    val state by viewModel.state.collectAsState()
 
     val screenViewState = LocalScreenViewState.current
     val updateScreenViewState = LocalUpdateScreenViewState.current
 
     val viewState = screenViewState.adminInvites
 
-    var sortKey by remember { mutableStateOf(GetInvitesQuerySortBy.CREATED_AT) }
-    var sortOrder by remember { mutableStateOf(SortOrder.DESC) }
     val defaultSortOrder = SortOrder.UNSPECIFIED
 
-    var createdNewInvitePopupOpen by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        viewModel.initData(context)
 
-    var deleteInvite by remember { mutableStateOf<Invite?>(null) }
-
-    var qrCodeInvite by remember { mutableStateOf<Invite?>(null) }
-    var qrCodeText by remember { mutableStateOf("") }
-
-    LaunchedEffect(qrCodeInvite) {
-        if (qrCodeInvite == null) {
-            qrCodeText = ""
-            return@LaunchedEffect
-        }
-
-        qrCodeText = "${serverUrl}/invite/${qrCodeInvite!!.code}"
-    }
-
-    fun sortInvites(invites: List<Invite>): List<Invite> {
-        if (viewState == ZiplineViewStateType.LARGE) return invites.sortedBy { Instant.parse(it.createdAt) }.reversed()
-
-        val ascending = when (sortKey) {
-            GetInvitesQuerySortBy.CODE ->
-                invites.sortedBy { it.code }
-
-            GetInvitesQuerySortBy.CREATED_BY ->
-                invites.sortedBy { it.inviter.username }
-
-            GetInvitesQuerySortBy.CREATED_AT ->
-                invites.sortedBy { Instant.parse(it.createdAt) }
-
-            GetInvitesQuerySortBy.UPDATED_AT ->
-                invites.sortedBy { Instant.parse(it.updatedAt) }
-
-            GetInvitesQuerySortBy.EXPIRES_AT ->
-                invites.sortedBy { it.expiresAt?.let { expiresAt -> Instant.parse(expiresAt) } }
-
-            GetInvitesQuerySortBy.MAX_USES ->
-                invites.sortedBy { it.maxUses }
-
-            GetInvitesQuerySortBy.USES ->
-                invites.sortedBy { it.uses }
-        }
-
-        return when (sortOrder) {
-            SortOrder.ASC -> ascending
-            SortOrder.DESC -> ascending.reversed()
-            SortOrder.UNSPECIFIED -> invites
-        }
-    }
-
-    suspend fun updateInvites(sort: Boolean = true) {
-        isLoading = true
-
-        val usersRes = getInvites(
+        viewModel.refreshInvites(
             context = context,
+            viewState = viewState
         )
-
-        usersRes.onSuccess {
-            invites = if (sort) sortInvites(it) else it
-        }
-
-        isLoading = false
-    }
-
-    LaunchedEffect(Unit) {
-        val secureStore = SecureStorage.getInstance(context)
-
-        serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
-    }
-
-    LaunchedEffect(Unit) {
-        updateInvites()
     }
 
     val coroutineScope = rememberCoroutineScope()
 
     PromptPopup(
-        showPopup = deleteInvite != null,
-        onDismissRequest = { deleteInvite = null },
-        onCancel = { deleteInvite = null },
-        isLoading = isLoading,
+        showPopup = state.deleteInvite != null,
+        onDismissRequest = {
+            viewModel.setDeleteInvite(null)
+        },
+        onCancel = {
+            viewModel.setDeleteInvite(null)
+        },
+        isLoading = state.isLoading,
         title = "Are you sure?",
-        description = "Are you sure you want to delete invite ${deleteInvite?.code}? This action cannot be undone.",
+        description = "Are you sure you want to delete invite ${state.deleteInvite?.code}? This action cannot be undone.",
         onSuccess = {
-            coroutineScope.launch {
-                if (deleteInvite == null) return@launch
-
-                coroutineScope.launch {
-                    if (deleteInvite == null) return@launch
-
-                    isLoading = true
-
-                    val deleteRes = deleteInvite(
-                        context = context,
-                        codeOrId = deleteInvite!!.id
-                    )
-
-                    deleteRes
-                        .onSuccess {
-                            if (viewState == ZiplineViewStateType.COMPACT) {
-                                updateInvites()
-                            } else {
-                                updateInvites(
-                                    sort = false
+            viewModel.deleteInvite(
+                context = context,
+                viewState = viewState,
+                onError = { error ->
+                    coroutineScope.launch {
+                        Notification.show(
+                            context = context,
+                            activity = activity,
+                            content = {
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.onError
                                 )
-                            }
-                        }
-                        .onFailure {
-                            Notification.show(
-                                context = context,
-                                activity = activity,
-                                content = {
-                                    Text(
-                                        text = "Failed to delete invite: ${it.message}"
-                                    )
-                                },
-                            )
-                        }
-
-                    isLoading = false
-                    deleteInvite = null
-                }
-            }
+                            },
+                        )
+                    }
+                },
+            )
         }
     )
 
     CreateInvitePopup(
         context = context,
         activity = activity,
-        showPopup = createdNewInvitePopupOpen,
-        onDismissRequest = { createdNewInvitePopupOpen = false },
-        updateInvites = ::updateInvites
+        showPopup = state.createNewInvitePopupOpen,
+        onDismissRequest = {
+            viewModel.closeCreateNewInvitePopup()
+        },
+        viewState = viewState,
+        state = state,
+        viewModel = viewModel
     )
+
+    LaunchedEffect(
+        state.qrCodeInvite,
+        state.serverUrl
+    ) {
+        Logger.debug("AdminInvitesScreen", "QR code invite or server URL changed, qrCodeInvite: ${state.qrCodeInvite}, serverUrl: ${state.serverUrl}")
+    }
 
     QRCodePopup(
         context = context,
         activity = activity,
-        qrCodeText = qrCodeText,
-        showPopup = qrCodeInvite != null && serverUrl != null,
-        onDismissRequest = { qrCodeInvite = null },
-        downloadFileName = "QR_${qrCodeInvite?.id ?: "code"}.png"
+        qrCodeText = state.qrCodeText,
+        showPopup = state.qrCodeInvite != null && state.serverUrl != null,
+        onDismissRequest = {
+            viewModel.setQrCodeInvite(null)
+        },
+        downloadFileName = "QR_${state.qrCodeInvite?.id ?: "code"}.png"
     )
 
     Column(
@@ -284,9 +214,9 @@ fun AdminInvitesScreen(
                     icon = painterResource(R.drawable.add),
                     contentDescription = "Create Invite",
                     onClick = {
-                        createdNewInvitePopupOpen = true
+                        viewModel.openCreateNewInvitePopup()
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
 
                 Spacer(
@@ -307,7 +237,7 @@ fun AdminInvitesScreen(
                             )
                         )
                     },
-                    enabled = !isLoading,
+                    enabled = !state.isLoading,
                 )
             }
         }
@@ -317,20 +247,18 @@ fun AdminInvitesScreen(
         val lazyColumnListState = rememberLazyListState()
 
         LaunchedEffect(
-            sortOrder,
-            sortKey,
+            state.sortOrder,
+            state.sortKey,
             viewState,
         ) {
-            invites = invites?.let { sortInvites(it) }
+            viewModel.triggerSort(viewState)
         }
 
         LaunchedEffect(viewState) {
             if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
 
-            if (sortKey != GetInvitesQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC) {
-                updateInvites(
-                    sort = false
-                )
+            if (state.sortKey != GetInvitesQuerySortBy.CREATED_AT && state.sortOrder != SortOrder.DESC) {
+                viewModel.triggerSort(viewState)
             }
         }
 
@@ -355,6 +283,14 @@ fun AdminInvitesScreen(
                 val tableUsesWidth = 130.dp
                 val tableActionsWidth = 140.dp
 
+                fun onSortChanged(sortKey: GetInvitesQuerySortBy) {
+                    if (state.sortKey != sortKey || state.sortOrder == SortOrder.UNSPECIFIED || state.sortOrder == SortOrder.DESC) {
+                        viewModel.updateSort(sortKey, SortOrder.ASC)
+                    } else {
+                        viewModel.updateSort(sortKey, SortOrder.DESC)
+                    }
+                }
+
                 val headers: List<TableHeaderData> = listOf(
                     TableHeaderData(
                         content = {
@@ -366,16 +302,9 @@ fun AdminInvitesScreen(
                         width = tableCodeWidth,
                         name = "code",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.CODE) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.CODE) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.CODE) {
-                                sortKey = GetInvitesQuerySortBy.CODE
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.CODE)
                         },
                     ),
                     TableHeaderData(
@@ -388,16 +317,9 @@ fun AdminInvitesScreen(
                         width = tableCreatedByWidth,
                         name = "createdBy",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.CREATED_BY) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.CREATED_BY) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.CREATED_BY) {
-                                sortKey = GetInvitesQuerySortBy.CREATED_BY
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.CREATED_BY)
                         },
                     ),
                     TableHeaderData(
@@ -410,16 +332,9 @@ fun AdminInvitesScreen(
                         width = tableCreatedWidth,
                         name = "created",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.CREATED_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.CREATED_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.CREATED_AT) {
-                                sortKey = GetInvitesQuerySortBy.CREATED_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.CREATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -432,16 +347,9 @@ fun AdminInvitesScreen(
                         width = tableLastUpdatedWidth,
                         name = "updatedAt",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.UPDATED_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.UPDATED_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.UPDATED_AT) {
-                                sortKey = GetInvitesQuerySortBy.UPDATED_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.UPDATED_AT)
                         },
                     ),
                     TableHeaderData(
@@ -454,16 +362,9 @@ fun AdminInvitesScreen(
                         width = tableExpiresWidth,
                         name = "expires",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.EXPIRES_AT) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.EXPIRES_AT) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.EXPIRES_AT) {
-                                sortKey = GetInvitesQuerySortBy.EXPIRES_AT
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.EXPIRES_AT)
                         },
                     ),
                     TableHeaderData(
@@ -476,16 +377,9 @@ fun AdminInvitesScreen(
                         width = tableMaxUsesWidth,
                         name = "maxUses",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.MAX_USES) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.MAX_USES) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.MAX_USES) {
-                                sortKey = GetInvitesQuerySortBy.MAX_USES
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.MAX_USES)
                         },
                     ),
                     TableHeaderData(
@@ -498,16 +392,9 @@ fun AdminInvitesScreen(
                         width = tableUsesWidth,
                         name = "uses",
                         sortable = true,
-                        sortOrder = if (sortKey == GetInvitesQuerySortBy.USES) sortOrder else defaultSortOrder,
+                        sortOrder = if (state.sortKey == GetInvitesQuerySortBy.USES) state.sortOrder else defaultSortOrder,
                         onSortChanged = {
-                            if (sortKey != GetInvitesQuerySortBy.USES) {
-                                sortKey = GetInvitesQuerySortBy.USES
-                                sortOrder = SortOrder.ASC
-                            } else if (sortOrder == SortOrder.UNSPECIFIED || sortOrder == SortOrder.DESC) {
-                                sortOrder = SortOrder.ASC
-                            } else {
-                                sortOrder = SortOrder.DESC
-                            }
+                            onSortChanged(GetInvitesQuerySortBy.USES)
                         },
                     ),
                     TableHeaderData(
@@ -522,7 +409,7 @@ fun AdminInvitesScreen(
                     ),
                 )
 
-                val rows: List<TableRowData> = invites?.map { invite ->
+                val rows: List<TableRowData> = state.invites?.map { invite ->
                     TableRowData(
                         clickable = true,
                         cells = listOf(
@@ -533,9 +420,9 @@ fun AdminInvitesScreen(
                                         color = MaterialTheme.colorScheme.tertiary,
                                         textDecoration = TextDecoration.Underline,
                                         modifier = Modifier.clickable(
-                                            enabled = serverUrl != null,
+                                            enabled = state.serverUrl != null,
                                             onClick = {
-                                                val url = "$serverUrl/invite/${invite.code}"
+                                                val url = "${state.serverUrl}/invite/${invite.code}"
 
                                                 val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                                                 context.startActivity(intent)
@@ -609,7 +496,7 @@ fun AdminInvitesScreen(
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
                                             coroutineScope.launch {
-                                                val url = "$serverUrl/invite/${invite.code}"
+                                                val url = "${state.serverUrl}/invite/${invite.code}"
 
                                                 val clipData = ClipData.newRawUri("Invite URL", url.toUri()).toClipEntry()
 
@@ -626,7 +513,7 @@ fun AdminInvitesScreen(
                                                 )
                                             }
                                         },
-                                        enabled = !isLoading
+                                        enabled = !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -636,8 +523,10 @@ fun AdminInvitesScreen(
                                         iconContentDescription = "Show QR code",
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { qrCodeInvite = invite },
-                                        enabled = !isLoading
+                                        onClick = {
+                                            viewModel.setQrCodeInvite(invite)
+                                        },
+                                        enabled = !state.isLoading
                                     )
 
                                     ActionButtonSpacer()
@@ -648,9 +537,9 @@ fun AdminInvitesScreen(
                                         color = MaterialTheme.colorScheme.error,
                                         iconColor = MaterialTheme.colorScheme.onError,
                                         onClick = {
-                                            deleteInvite = invite
+                                            viewModel.setDeleteInvite(invite)
                                         },
-                                        enabled = !isLoading
+                                        enabled = !state.isLoading
                                     )
                                 },
                                 width = tableActionsWidth,
@@ -663,7 +552,7 @@ fun AdminInvitesScreen(
                     modifier = Modifier.fillMaxSize(),
                     headers = headers,
                     rows = rows,
-                    loading = isLoading,
+                    loading = state.isLoading,
                     scrollbarConfig = TableScrollbarConfig(
                         vertical = ScrollbarConfig(
                             alwaysKeepScrollbar = true
@@ -685,7 +574,7 @@ fun AdminInvitesScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (invites == null || isLoading) {
+                if (state.invites == null || state.isLoading) {
                     items(5) {
                         Box(
                             modifier = Modifier
@@ -701,17 +590,21 @@ fun AdminInvitesScreen(
                         ) {}
                     }
                 } else {
-                    if (invites!!.size > 0L) {
-                        items(invites!!.size) { index ->
-                            val invite = invites!![index]
+                    if (state.invites!!.size > 0L) {
+                        items(state.invites!!.size) { index ->
+                            val invite = state.invites!![index]
 
                             LargeInviteDisplay(
                                 context = context,
                                 activity = activity,
                                 invite = invite,
-                                serverUrl = serverUrl,
-                                onDelete = { deleteInvite = invite },
-                                onShowQRCode = { qrCodeInvite = invite }
+                                serverUrl = state.serverUrl,
+                                onDelete = {
+                                    viewModel.setDeleteInvite(invite)
+                                },
+                                onShowQRCode = {
+                                    viewModel.setQrCodeInvite(invite)
+                                }
                             )
                         }
                     } else {
@@ -750,29 +643,4 @@ fun AdminInvitesScreen(
             }
         }
     }
-}
-
-private enum class GetInvitesQuerySortBy(val value: String) {
-    @SerializedName("code")
-    CODE("code"),
-
-    @SerializedName("createdBy")
-    CREATED_BY("createdBy"),
-
-    @SerializedName("createdAt")
-    CREATED_AT("createdAt"),
-
-    @SerializedName("updatedAt")
-    UPDATED_AT("updatedAt"),
-
-    @SerializedName("expiresAt")
-    EXPIRES_AT("expiresAt"),
-
-    @SerializedName("maxUses")
-    MAX_USES("maxUses"),
-
-    @SerializedName("uses")
-    USES("uses");
-
-    override fun toString(): String = value
 }

@@ -1,0 +1,117 @@
+name: Generated APK AAB
+
+env:
+  main_project_module: app
+
+on:
+  push:
+    branches:
+      - native
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: forgejo.event_name == 'workflow_dispatch' || (forgejo.event_name == 'push' && (startsWith(forgejo.event.head_commit.message, '[build]') || startsWith(forgejo.event.head_commit.message, '[release]')))
+    runs-on: node
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ZIP Util
+        run: |
+          apt-get update
+          apt-get install zip -y
+
+      - name: Get App Version
+        id: app_version
+        run: |
+          VERSION_NAME=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' ${{ env.main_project_module }}/build.gradle.kts | head -1)
+          echo "app_version=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "Found version: $VERSION_NAME"
+
+      - name: Get NDK Version
+        id: ndk_version
+        run: |
+          NDK_VERSION=$(sed -n 's/.*ndkVersion = "\(.*\)".*/\1/p' ${{ env.main_project_module }}/build.gradle.kts | head -1)
+          echo "ndk_version=$NDK_VERSION" >> $GITHUB_OUTPUT
+          echo "Found NDK version: $NDK_VERSION"
+
+      - name: Get Commit SHA
+        id: sha
+        run: |
+          echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+#          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: https://github.com/android-actions/setup-android@v3
+        with:
+          packages: 'tools build-tools;34.0.0 platform-tools ndk;${{ steps.ndk_version.outputs.ndk_version }}'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Build All Artifacts
+        run: |
+          ./gradlew assembleDebug
+          ./gradlew assembleRelease
+          ./gradlew ${{ env.main_project_module }}:bundleRelease
+
+      - name: Zip Native Debug Symbols
+        run: |
+          mkdir -p ${{ github.workspace }}/output
+          
+          SYMBOLS_DIR="${{ env.main_project_module }}/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/"
+          
+          if [ -d "$SYMBOLS_DIR" ]; then
+            cd "$SYMBOLS_DIR"
+          
+            zip -r ${{ github.workspace }}/output/native-debug-symbols.zip .
+            cd -
+          
+            echo "Symbols zipped successfully"
+          else
+            echo "Warning: Native symbols directory not found. Skipping zip"
+          fi
+
+      - name: Prepare for signing
+        run: |
+          mkdir -p signing_staging
+          cp ${{ env.main_project_module }}/build/outputs/apk/release/*.apk signing_staging/
+          cp ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab signing_staging/
+
+      - name: Sign Release Artifacts
+        id: sign_app
+        uses: https://github.com/r0adkll/sign-android-release@v1
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
+        with:
+          releaseDirectory: signing_staging
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Copy debug and signed artifacts to output
+        run: |
+          cp ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk ${{ github.workspace }}/output/
+          
+          cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-release-signed.apk
+          cp signing_staging/*.aab ${{ github.workspace }}/output/
+
+      - name: Publish Release
+        uses: actions/forgejo-release@v2.7.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        with:
+          direction: upload
+          prerelease: false
+          url: https://git.stefdp.com
+          repo: Stef/Zipline-Android-App
+          token: ${{ secrets.FORGEJO_TOKEN }}
+          tag: "v${{ steps.app_version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
+          release-dir: ${{ github.workspace }}/output

@@ -1,0 +1,30 @@
+Zipline is an app that allows you to manage the files & URLs and shorten URLs & upload files to your self-hosted Zipline instance (Requires Zipline v4.2.3 or greater).
+
+Upload Files:
+You can upload any file to your Zipline instance along with all of its settings such as hide the file behind a password, limit the amount of views it can receive or delete it after a specified amount of time.
+
+Manage Files:
+You can see, download, edit and delete all the files on your Zipline instance.
+
+Shorten URLs:
+You can shorten any URL through your Zipline instance with an optional vanity ID, password or max views.
+
+Manage URLs:
+You can open, edit and delete all the shortened URLs on your Zipline instance.
+
+Manage Folders:
+You can create, edit, delete, view and upload files to the folders you own on your Zipline instance.
+
+View Metrics:
+You can view the stats of your uploads such as storage used, views, total files and URLs.
+
+Manage your own User:
+You can change your username, password, avatar and any other personal setting (except for OAuth and sessions).
+
+Manage other Users:
+If you are an admin, you can create, edit, delete and view the files of any user on your Zipline instance.
+
+Manage Settings:
+If you are a Superadmin, you can view and modify the settings of your Zipline instance such as maximum file size, rateilimits etc.
+
+The app is open source and available on GitHub: https://git.stefdp.com/Stef/Zipline-Android-App.

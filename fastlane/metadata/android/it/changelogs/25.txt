@@ -1,0 +1,3 @@
+Riscritta l'app da react-native a Kotlin
+Aggiunti 2 widget (file recenti e statistiche del server)
+Aggiunto il supporto per upload e download in background

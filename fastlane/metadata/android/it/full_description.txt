@@ -1,0 +1,30 @@
+Zipline è un'app che ti permette di gestire file e link e accorciare link e caricare file sulla tua instanza self-hosted di Zipline (È richiesta la versione 4.2.3 o superiore di Zipline).
+
+Caricare File:
+Puoi caricare qualsiasi file sulla tua instanza di Zipline insieme a tutte le sue impostazioni come nascondere il file dietro una password, limitare il numero di visualizzazioni che può ricevere o eliminarlo dopo un periodo di tempo da te scelto.
+
+Gestire File:
+Puoi aprire, scaricare, modificare e eliminare tutti i file sulla tua instanza di Zipline.
+
+Accorciare Link:
+Puoi accorciare qualsiasi link tramite la tua instanza di Zipline con un opzionale link personalizzato, password o limite di visualizzazioni.
+
+Gestire Link:
+Puoi aprire, modificare e eliminare tutti i link accorciati tramite la tua instanza di Zipline.
+
+Gestire Cartelle:
+Puoi creare, modificare, eliminare, visualizzare e caricare file nelle cartelle di tua proprietà sulla tua instanza di Zipline.
+
+Visualizzare le Statistiche:
+Puoi visualizzare le statistiche dei tuoi upload come memoria utilizzata, visualizzazioni, file totali e link.
+
+Gestire il tuo utente:
+Puoi cambiare il tuo username, password, immagine profilo e qualsiasi altra impostazione personale (eccetto per l'OAuth e le sessioni).
+
+Gestire altri Utenti:
+Se sei un admin, puoi creare, modificare, eliminare e visualizzare i file di qualsiasi utente sulla tua instanza di Zipline.
+
+Gestire le Impostazioni:
+Se sei un superadmin, puoi visualizzare e modificare le impostazioni della tua instanza di Zipline come grandezza massima dei file, ratelimit etc.
+
+L'app è open source è disponibile su GitHub: https://git.stefdp.com/Stef/Zipline-Android-App.

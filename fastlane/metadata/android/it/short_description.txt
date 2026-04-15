@@ -1,0 +1,1 @@
+Un'app per gestire la tua instanza self-hosted di Zipline.

@@ -3,7 +3,6 @@ package com.stefdp.zipline.screens.settings
 import android.Manifest
 import android.content.Context
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +17,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -38,15 +33,7 @@ import com.stefdp.zipline.LocalUpdateLoggedUserAvatar
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
-import com.stefdp.zipline.network.models.Export
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
-import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
-import com.stefdp.zipline.network.requests.UpdateCurrentUserResult
-import com.stefdp.zipline.network.requests.getCurrentUser
-import com.stefdp.zipline.network.requests.getExports
-import com.stefdp.zipline.network.requests.getServerVersion
-import com.stefdp.zipline.network.requests.getTokenWithToken
-import com.stefdp.zipline.network.requests.updateCurrentUser
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.settings.categories.AppSettingsCategory
 import com.stefdp.zipline.screens.settings.categories.AvatarCategory

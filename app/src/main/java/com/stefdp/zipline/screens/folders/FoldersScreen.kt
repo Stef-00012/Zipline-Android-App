@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.provider.DocumentsContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -36,7 +35,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -63,7 +61,6 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
 import com.stefdp.zipline.LocalUpdateScreenViewState
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.DownloadFilePasswordPrompt
@@ -74,7 +71,6 @@ import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.network.models.BaseFolder
-import com.stefdp.zipline.network.models.File
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySearchField
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.components.Notification
@@ -88,14 +84,6 @@ import com.stefdp.zipline.components.largefiledisplay.LargeFileDisplay
 import com.stefdp.zipline.components.table.Table
 import com.stefdp.zipline.components.table.TableScrollbarConfig
 import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
-import com.stefdp.zipline.network.requests.deleteFile
-import com.stefdp.zipline.network.requests.downloadFile
-import com.stefdp.zipline.network.requests.exportFolder
-import com.stefdp.zipline.network.requests.getFiles
-import com.stefdp.zipline.network.requests.getFolderExportSize
-import com.stefdp.zipline.network.requests.getFolders
-import com.stefdp.zipline.network.requests.getTags
-import com.stefdp.zipline.network.requests.updateFolder
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.UploadFileScreen
 import com.stefdp.zipline.screens.folders.components.CreateFolderPopup
@@ -106,20 +94,13 @@ import com.stefdp.zipline.screens.folders.components.MoveFolderPopup
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
-import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
-import com.stefdp.zipline.utils.STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY
-import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.ScrollbarConfig
-import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
-import com.stefdp.zipline.utils.StorageUtil
 import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.camelCaseToHumanReadable
 import com.stefdp.zipline.utils.formatBytes
-import com.stefdp.zipline.utils.getDisplayPath
 import com.stefdp.zipline.utils.shimmerable
 import com.stefdp.zipline.utils.verticalLazyScrollbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import nl.jacobras.humanreadable.HumanReadable
 import kotlin.time.Instant

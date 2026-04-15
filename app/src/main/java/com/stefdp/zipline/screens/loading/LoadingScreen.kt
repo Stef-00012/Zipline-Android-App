@@ -1,7 +1,6 @@
 package com.stefdp.zipline.screens.loading
 
 import android.content.Context
-import androidx.biometric.BiometricManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,13 +31,6 @@ import com.stefdp.zipline.isShareIntent
 import com.stefdp.zipline.screens.BiometricAuthScreen
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
-import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
-import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
-import com.stefdp.zipline.utils.STORAGE_UNLOCK_WITH_BIOMETRICS_KEY
-import com.stefdp.zipline.utils.SecureStorage
-import com.stefdp.zipline.utils.getBiometricStatus
-import com.stefdp.zipline.utils.minimumZiplineVersion
-import io.github.z4kn4fein.semver.toVersionOrNull
 
 @Composable
 fun LoadingScreen(

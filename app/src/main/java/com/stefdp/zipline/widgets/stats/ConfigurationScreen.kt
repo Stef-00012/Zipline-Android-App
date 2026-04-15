@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.lifecycle.lifecycleScope
-import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Slider
 import com.stefdp.zipline.network.models.Metric
 import com.stefdp.zipline.network.requests.getServerStats
@@ -115,50 +113,6 @@ class TopStatsWidgetConfigurationActivity : ComponentActivity() {
         }
     }
 }
-
-val sizes = listOf(
-    WidgetConfigSize(
-        width = 2,
-        height = 1,
-        label = "2x1"
-    ),
-    WidgetConfigSize(
-        width = 3,
-        height = 1,
-        label = "3x1"
-    ),
-    WidgetConfigSize(
-        width = 4,
-        height = 1,
-        label = "4x1"
-    ),
-    WidgetConfigSize(
-        width = 5,
-        height = 1,
-        label = "5x1"
-    ),
-    WidgetConfigSize(
-        width = 2,
-        height = 2,
-        label = "2x2"
-    ),
-    WidgetConfigSize(
-        width = 3,
-        height = 2,
-        label = "3x2"
-    ),
-    WidgetConfigSize(
-        width = 4,
-        height = 2,
-        label = "4x2"
-    ),
-    WidgetConfigSize(
-        width = 5,
-        height = 2,
-        label = "5x2",
-        default = true
-    ),
-)
 
 @Composable
 fun WidgetConfigScreen(

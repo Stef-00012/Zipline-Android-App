@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,8 +23,6 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalUpdatePublicSettings
 import com.stefdp.zipline.LocalUpdateWebSettings
-import com.stefdp.zipline.LocalWebSettings
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.HeaderButton
 import com.stefdp.zipline.components.Notification
@@ -51,7 +48,6 @@ import com.stefdp.zipline.screens.admin.settings.categories.RatelimitCategory
 import com.stefdp.zipline.screens.admin.settings.categories.TasksCategory
 import com.stefdp.zipline.screens.admin.settings.categories.UrlShortenerCategory
 import com.stefdp.zipline.screens.admin.settings.categories.WebsiteCategory
-import kotlinx.coroutines.launch
 
 @Composable
 fun AdminSettingsScreen(

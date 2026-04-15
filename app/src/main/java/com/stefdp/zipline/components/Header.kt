@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-//import com.stefdp.hackatime.LocalLoggedUser
 import com.stefdp.zipline.screens.BiometricAuthScreen
 import com.stefdp.zipline.screens.LoadingScreen
 import com.stefdp.zipline.screens.LoginScreen

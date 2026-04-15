@@ -24,15 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -55,23 +50,13 @@ import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
-import com.stefdp.zipline.network.requests.LoginResult
-import com.stefdp.zipline.network.requests.getToken
-import com.stefdp.zipline.network.requests.login
 import com.stefdp.zipline.screens.*
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
-import com.stefdp.zipline.utils.DomainRegex
 import com.stefdp.zipline.utils.NumberRegex
-import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
-import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
-import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.hasNotificationsPermission
 import com.stefdp.zipline.utils.minimumZiplineVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(

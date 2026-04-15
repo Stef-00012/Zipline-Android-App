@@ -16,17 +16,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
@@ -35,12 +29,9 @@ import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.BaseFolder
-import com.stefdp.zipline.network.requests.createFolder
 import com.stefdp.zipline.screens.folders.FoldersUiState
 import com.stefdp.zipline.screens.folders.FoldersViewModel
 import com.stefdp.zipline.utils.ZiplineViewStateType
-import kotlinx.coroutines.launch
 
 @Composable
 fun CreateFolderPopup(

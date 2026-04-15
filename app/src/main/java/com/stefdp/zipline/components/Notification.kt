@@ -1,12 +1,10 @@
 package com.stefdp.zipline.components
 
-import android.R
 import android.app.Dialog
 import android.content.Context
 import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +51,7 @@ object Notification {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
 
         dialog.window?.apply {
-            setBackgroundDrawableResource(R.color.transparent)
+            setBackgroundDrawableResource(android.R.color.transparent)
             clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
 
             addFlags(

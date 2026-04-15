@@ -1,6 +1,5 @@
 package com.stefdp.zipline.screens.admin.settings.categories
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,28 +18,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
-import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.network.models.WebsiteExternalLink
 import com.stefdp.zipline.screens.admin.settings.categories.components.ExternalLink
 import com.stefdp.zipline.components.IconButton
@@ -49,8 +38,6 @@ import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.screens.admin.settings.MoveWebsiteExternalLinkDirection
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
-import kotlinx.coroutines.launch
-import java.util.Collections
 
 @Composable
 internal fun WebsiteCategory(

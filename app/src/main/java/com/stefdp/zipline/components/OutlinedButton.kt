@@ -2,7 +2,6 @@ package com.stefdp.zipline.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,10 +13,8 @@ import androidx.compose.material3.OutlinedButton as NativeOutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.BASE_CORNER_RADIUS
-import com.stefdp.zipline.ui.theme.ZiplineTheme
 
 @Composable
 fun OutlinedButton(

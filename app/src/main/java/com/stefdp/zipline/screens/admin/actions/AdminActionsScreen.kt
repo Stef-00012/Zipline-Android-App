@@ -3,9 +3,6 @@ package com.stefdp.zipline.screens.admin.actions
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.provider.DocumentsContract
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -21,10 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -32,13 +26,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.PromptPopup
@@ -46,21 +38,9 @@ import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.network.models.UserRole
-import com.stefdp.zipline.network.requests.deleteZeroByteFiles
-import com.stefdp.zipline.network.requests.exportData
-import com.stefdp.zipline.network.requests.getExportSize
-import com.stefdp.zipline.network.requests.runDeleteTemporaryFilesJob
-import com.stefdp.zipline.network.requests.runRequerySizeJob
-import com.stefdp.zipline.network.requests.runThumbnailGenerationJob
-import com.stefdp.zipline.network.requests.scanForZeroByteFiles
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.admin.actions.components.ActionContainer
-import com.stefdp.zipline.utils.STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY
-import com.stefdp.zipline.utils.SecureStorage
-import com.stefdp.zipline.utils.StorageUtil
-import com.stefdp.zipline.utils.getDisplayPath
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable

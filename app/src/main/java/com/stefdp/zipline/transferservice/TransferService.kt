@@ -19,7 +19,6 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.utils.formatBytes
 import com.stefdp.zipline.utils.formatSpeed
 import java.io.File
-import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 

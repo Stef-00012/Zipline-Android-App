@@ -1,42 +1,27 @@
 package com.stefdp.zipline.screens.files.components.tags
 
 import android.content.Context
-import android.content.res.Configuration
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
@@ -44,12 +29,8 @@ import com.stefdp.zipline.components.Popup
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.components.colorpicker.ColorPicker
 import com.stefdp.zipline.components.colorpicker.ColorSide
-import com.stefdp.zipline.network.requests.createTag
 import com.stefdp.zipline.screens.files.FilesUiState
 import com.stefdp.zipline.screens.files.FilesViewModel
-import com.stefdp.zipline.ui.theme.ZiplineTheme
-import com.stefdp.zipline.utils.toHex
-import kotlinx.coroutines.launch
 
 @Composable
 fun CreateTagPopup(

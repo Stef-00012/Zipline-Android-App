@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings

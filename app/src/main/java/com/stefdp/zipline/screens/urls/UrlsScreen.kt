@@ -29,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -58,7 +57,6 @@ import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
 import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.LocalWebSettings
-import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
@@ -70,7 +68,6 @@ import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.components.table.TableScrollbarConfig
 import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
-import com.stefdp.zipline.network.requests.deleteUrl
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.screens.urls.components.CreateUrlPopup

@@ -11,9 +11,3 @@ fun hasCameraPermission(context: Context): Boolean {
         Manifest.permission.CAMERA
     ) == PackageManager.PERMISSION_GRANTED
 }
-
-enum class HasCameraPermissionResult {
-    GRANTED,
-    SHOULD_REQUEST,
-    UNKNOWN
-}

@@ -11,11 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -26,13 +21,11 @@ import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.TextInput
-import com.stefdp.zipline.network.models.ServerSettings
 import com.stefdp.zipline.components.IconButton
 import com.stefdp.zipline.network.models.DomainsSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
 import com.stefdp.zipline.utils.verticalScrollWithScrollbar
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun DomainsCategory(

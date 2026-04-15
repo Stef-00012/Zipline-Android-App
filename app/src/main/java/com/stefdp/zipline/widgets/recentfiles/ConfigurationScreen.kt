@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
@@ -27,20 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.lifecycle.lifecycleScope
-import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Slider
 import com.stefdp.zipline.network.models.File
-import com.stefdp.zipline.network.models.Metric
 import com.stefdp.zipline.network.requests.getRecentFiles
-import com.stefdp.zipline.network.requests.getServerStats
 import com.stefdp.zipline.ui.theme.ZiplineTheme
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.widgets.CELL_HEIGHT
 import com.stefdp.zipline.widgets.CELL_WIDTH
-import com.stefdp.zipline.widgets.WidgetConfigSize
 import com.stefdp.zipline.widgets.cornerRadius
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -237,8 +231,6 @@ fun WidgetConfigScreen(
                 Spacer(
                     modifier = Modifier.width(20.dp)
                 )
-
-                val coroutineScope = rememberCoroutineScope()
 
                 Button(
                     onClick = {

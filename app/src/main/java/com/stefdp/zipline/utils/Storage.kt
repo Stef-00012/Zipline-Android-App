@@ -2,9 +2,7 @@ package com.stefdp.zipline.utils
 
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.os.storage.StorageManager
-import android.util.Log
 import java.util.UUID
 
 object StorageUtil {

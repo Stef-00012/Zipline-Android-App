@@ -7,7 +7,6 @@ import android.provider.OpenableColumns
 import com.google.common.math.LongMath.pow
 import nl.jacobras.humanreadable.HumanReadable
 import java.io.File
-import kotlin.math.roundToLong
 
 data class SelectedFile(
     val uri: Uri,

@@ -37,7 +37,6 @@ import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.STORAGE_UNLOCK_WITH_BIOMETRICS_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.StorageUtil
-import com.stefdp.zipline.utils.getBiometricStatus
 import com.stefdp.zipline.utils.getDisplayPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

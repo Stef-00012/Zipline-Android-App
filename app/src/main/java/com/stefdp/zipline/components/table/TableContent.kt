@@ -2,9 +2,7 @@ package com.stefdp.zipline.components.table
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.stefdp.zipline.R
-import com.stefdp.zipline.utils.ScrollbarConfig
 import com.stefdp.zipline.utils.horizontalScrollWithScrollbar
 import com.stefdp.zipline.utils.verticalLazyScrollbar
 

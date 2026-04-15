@@ -23,11 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
@@ -53,10 +47,7 @@ import com.stefdp.zipline.components.table.TableCellData
 import com.stefdp.zipline.components.table.TableHeaderData
 import com.stefdp.zipline.components.table.TableRowData
 import com.stefdp.zipline.components.table.TableScrollbarConfig
-import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.UserRole
-import com.stefdp.zipline.network.requests.deleteUser
-import com.stefdp.zipline.network.requests.getUsers
 import com.stefdp.zipline.screens.FilesScreen
 import com.stefdp.zipline.screens.HomeScreen
 import com.stefdp.zipline.screens.LoginScreen
@@ -70,7 +61,6 @@ import com.stefdp.zipline.utils.ZiplineViewStateType
 import com.stefdp.zipline.utils.canInteract
 import com.stefdp.zipline.utils.shimmerable
 import com.stefdp.zipline.utils.verticalLazyScrollbar
-import kotlinx.coroutines.launch
 import nl.jacobras.humanreadable.HumanReadable
 import kotlin.time.Instant
 

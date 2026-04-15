@@ -33,13 +33,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image as GlanceImage
 import androidx.glance.ImageProvider as GlanceImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn as GlanceLazyColumn
@@ -91,6 +91,7 @@ const val StringOpacityKey = "recentFiles_backgroundOpacity"
 val OpacityKey = floatPreferencesKey(StringOpacityKey)
 
 const val StringFileCountKey = "recentFiles_fileCount"
+val FileCountKey = intPreferencesKey("recentFiles_fileCount")
 
 private val supportedMimeTypes = listOf(
     "image/png",
@@ -107,27 +108,26 @@ open class RecentFilesWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val secureStore = SecureStorage.getInstance(context)
 
-        val manager = GlanceAppWidgetManager(context)
-
-        val appWidgetId = manager.getAppWidgetId(id)
-
-        val recentFileCount = secureStore.get("${StringFileCountKey}_$appWidgetId")?.toIntOrNull() ?: 5
         val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY) ?: return
-
-        var recentFiles: List<File> = emptyList()
-
-        val recentFilesRes = getRecentFiles(
-            context = context,
-            count = recentFileCount
-        )
-
-        recentFilesRes.onSuccess {
-            recentFiles = it
-        }
 
         provideContent {
             val prefs = currentState<Preferences>()
             val backgroundOpacity = prefs[OpacityKey] ?: 1f
+            val recentFileCount = prefs[FileCountKey] ?: 5
+
+            var recentFiles by remember(recentFileCount) {
+                mutableStateOf<List<File>>(emptyList())
+            }
+
+            LaunchedEffect(recentFileCount) {
+                val recentFilesRes = getRecentFiles(
+                    context = context,
+                    count = recentFileCount
+                )
+                recentFilesRes.onSuccess {
+                    recentFiles = it
+                }
+            }
 
             WidgetContent(
                 recentFiles = recentFiles,
@@ -159,8 +159,7 @@ private suspend fun Context.fetchImage(url: String, force: Boolean = false): Bit
         is SuccessResult -> result.image.toBitmap()
     }
 }
-//TODO: limit recent file count
-// 300x300 = 30 images
+
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(
     widthDp = CELL_WIDTH * 2,

@@ -140,9 +140,6 @@ val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState
     {}
 }
 
-// TODO: create widgets
-// TODO: make recent files widget
-
 const val APP_VERSION = "2.0.0"
 
 class MainActivity : FragmentActivity() {

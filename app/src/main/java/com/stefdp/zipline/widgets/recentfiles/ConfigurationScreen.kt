@@ -105,6 +105,7 @@ class RecentFilesWidgetConfigurationActivity : ComponentActivity() {
 
             updateAppWidgetState(context, glanceId) { prefs ->
                 prefs[OpacityKey] = backgroundOpacity
+                prefs[FileCountKey] = fileCount
             }
 
             RecentFilesWidget().update(applicationContext, glanceId)

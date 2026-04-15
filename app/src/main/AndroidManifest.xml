@@ -66,6 +66,26 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".widgets.stats.TopStatsWidgetConfigurationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WallpaperBackground"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".widgets.recentfiles.RecentFilesWidgetConfigurationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WallpaperBackground"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".transferservice.TransferService"
             android:exported="false"
@@ -81,6 +101,36 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <receiver
+            android:name=".widgets.stats.Receiver"
+            android:exported="true"
+            android:label="@string/stats_widget_name"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/stats_widget"
+                />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.recentfiles.Receiver"
+            android:exported="true"
+            android:label="@string/recent_files_widget_name"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/recent_files_widget"
+                />
+        </receiver>
     </application>
 
 </manifest>

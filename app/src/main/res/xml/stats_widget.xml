@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="130dp"
+    android:minHeight="102dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="1800000"
+    android:description="@string/stats_widget_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:widgetCategory="home_screen"
+    android:configure="com.stefdp.zipline.widgets.stats.TopStatsWidgetConfigurationActivity"
+    android:widgetFeatures="reconfigurable|configuration_optional"
+    />
+
+<!--    <?xml version="1.0" encoding="utf-8"?>-->
+<!--<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--android:minWidth="130dp"-->
+<!--android:minHeight="51dp"-->
+<!--android:targetCellWidth="2"-->
+<!--android:targetCellHeight="2"-->
+<!--android:minResizeWidth="130dp"-->
+<!--android:minResizeHeight="51dp"-->
+<!--android:updatePeriodMillis="1800000"-->
+<!--android:description="@string/stats_widget_description"-->
+<!--android:initialLayout="@layout/glance_default_loading_layout"-->
+<!--android:resizeMode="horizontal|vertical"-->
+<!--android:widgetCategory="home_screen"-->
+<!--android:widgetFeatures="reconfigurable|configuration_optional"-->
+<!--android:previewImage="@drawable/goal_widget_preview"-->
+<!--    />-->

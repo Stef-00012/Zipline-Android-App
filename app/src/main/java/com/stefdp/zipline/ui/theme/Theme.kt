@@ -9,6 +9,8 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.glance.GlanceTheme
+import androidx.glance.material3.ColorProviders
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryDark,
@@ -28,6 +30,10 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = LinkDark
 )
 
+val DarkWidgetBackground = BackgroundDark
+val DarkWidgetSurface = SurfaceDark
+val DarkWidgetOnSurfaceVariant = OnSurfaceVariantDark
+
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryLight,
     onPrimary = OnPrimaryLight,
@@ -45,6 +51,10 @@ private val LightColorScheme = lightColorScheme(
     onError = OnErrorLight,
     tertiary = LinkLight
 )
+
+val LightWidgetBackground = BackgroundLight
+val LightWidgetSurface = SurfaceLight
+val LightWidgetOnSurfaceVariant = OnSurfaceVariantLight
 
 @Composable
 fun ZiplineTheme(
@@ -66,6 +76,21 @@ fun ZiplineTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        content = content
+    )
+}
+
+@Composable
+fun ZiplineWidgetTheme(
+    content: @Composable () -> Unit
+) {
+    val colorProviders = ColorProviders(
+        light = LightColorScheme,
+        dark = DarkColorScheme
+    )
+
+    GlanceTheme(
+        colors = colorProviders,
         content = content
     )
 }

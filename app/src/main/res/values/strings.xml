@@ -49,4 +49,10 @@
     <string name="invalid_token">Invalid Token</string>
     <string name="missing_server_url">Missing Server URL</string>
     <string name="generic_error">Something went wrong…</string>
+    
+    <string name="stats_widget_name">Server Stats</string>
+    <string name="stats_widget_description">Displays the current server stats</string>
+
+    <string name="recent_files_widget_name">Recent Files</string>
+    <string name="recent_files_widget_description">Displays recently uploaded files</string>
 </resources>

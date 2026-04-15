@@ -350,8 +350,15 @@ private fun StatDifference(
         night = _color
     )
 
+    val backgroundColor = ColorProvider(
+        day = _color.copy(alpha = 0.1f),
+        night = _color.copy(alpha = 0.1f)
+    )
+
     GlanceRow(
         modifier = GlanceModifier
+            .background(backgroundColor)
+            .cornerRadius(4.dp)
             .padding(4.dp),
         verticalAlignment = GlanceAlignment.CenterVertically
     ) {

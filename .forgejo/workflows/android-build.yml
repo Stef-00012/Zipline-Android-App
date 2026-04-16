@@ -136,19 +136,40 @@ jobs:
       - name: Copy debug and signed artifacts to output
         run: |
           cp ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk ${{ github.workspace }}/output/
-          
+
           cp signing_staging/*.apk ${{ github.workspace }}/output/app-release-signed.apk
           cp signing_staging/*.aab ${{ github.workspace }}/output/
 
+      # - name: Publish Release
+      #   uses: actions/forgejo-release@v2.7.3
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+      #   with:
+      #     direction: upload
+      #     prerelease: false
+      #     url: https://git.stefdp.com
+      #     repo: Stef/Zipline-Android-App
+      #     token: ${{ secrets.FORGEJO_TOKEN }}
+      #     tag: "v${{ steps.app_version.outputs.app_version }}" # this tag will be used in fdroid for build checks
+      #     release-dir: ${{ github.workspace }}/output
+
       - name: Publish Release
-        uses: actions/forgejo-release@v2.7.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
-        with:
-          direction: upload
-          prerelease: false
-          url: https://git.stefdp.com
-          repo: Stef/Zipline-Android-App
-          token: ${{ secrets.FORGEJO_TOKEN }}
-          tag: "v${{ steps.app_version.outputs.app_version }}" # this tag will be used in fdroid for build checks
-          release-dir: ${{ github.workspace }}/output
+        run: |
+          TAG="v${{ steps.app_version.outputs.app_version }}"
+          REPO="Stef/Zipline-Android-App"
+          API="https://git.stefdp.com/api/v1"
+          TOKEN="${{ secrets.FORGEJO_TOKEN }}"
+          
+          # Create release
+          RELEASE_ID=$(curl -s -X POST "$API/repos/$REPO/releases" \
+            -H "Authorization: token $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"tag_name\": \"$TAG\", \"name\": \"$TAG\", \"prerelease\": false}" \
+            | grep -o '"id":[0-9]*' | head -1 | cut -d: -f2)
+          
+          # Upload assets
+          for file in ${{ github.workspace }}/output/*; do
+            curl -s -X POST "$API/repos/$REPO/releases/$RELEASE_ID/assets" \
+              -H "Authorization: token $TOKEN" \
+              -F "attachment=@$file"
+          done

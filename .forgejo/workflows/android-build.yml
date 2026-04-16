@@ -93,17 +93,37 @@ jobs:
           cp ${{ env.main_project_module }}/build/outputs/apk/release/*.apk signing_staging/
           cp ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab signing_staging/
 
+      # - name: Sign Release Artifacts
+      #   id: sign_app
+      #   uses: https://github.com/r0adkll/sign-android-release@v1
+      #   env:
+      #     BUILD_TOOLS_VERSION: "36.0.0"
+      #   with:
+      #     releaseDirectory: signing_staging
+      #     signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+      #     alias: ${{ secrets.KEY_ALIAS }}
+      #     keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+      #     keyPassword: ${{ secrets.KEY_PASSWORD }}
+
       - name: Sign Release Artifacts
-        id: sign_app
-        uses: https://github.com/r0adkll/sign-android-release@v1
-        env:
-          BUILD_TOOLS_VERSION: "36.0.0"
-        with:
-          releaseDirectory: signing_staging
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > /tmp/keystore.jks
+          
+          for file in signing_staging/*.apk; do
+            apksigner sign \
+              --ks /tmp/keystore.jks \
+              --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+              --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+              --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+              "$file"
+          done
+          
+          jarsigner -keystore /tmp/keystore.jks \
+            -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+            -keypass ${{ secrets.KEY_PASSWORD }} \
+            signing_staging/*.aab ${{ secrets.KEY_ALIAS }}
+          
+          rm /tmp/keystore.jks
 
       - name: Copy debug and signed artifacts to output
         run: |

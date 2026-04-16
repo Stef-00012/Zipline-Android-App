@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     if: forgejo.event_name == 'workflow_dispatch' || (forgejo.event_name == 'push' && (startsWith(forgejo.event.head_commit.message, '[build]') || startsWith(forgejo.event.head_commit.message, '[release]')))
-    runs-on: node
+    runs-on: fdroid
     steps:
       - uses: actions/checkout@v4
 
@@ -40,17 +40,21 @@ jobs:
         run: |
           echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Set Up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-#          cache: 'gradle'
+#       - name: Set Up JDK
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: 'zulu'
+#           java-version: '17'
+# #          cache: 'gradle'
+
+      # - name: Setup Android SDK
+      #   uses: https://github.com/android-actions/setup-android@v3
+      #   with:
+      #     packages: 'tools build-tools;34.0.0 platform-tools ndk;${{ steps.ndk_version.outputs.ndk_version }}'
 
       - name: Setup Android SDK
-        uses: https://github.com/android-actions/setup-android@v3
-        with:
-          packages: 'tools build-tools;34.0.0 platform-tools ndk;${{ steps.ndk_version.outputs.ndk_version }}'
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools" "ndk;${{ steps.ndk_version.outputs.ndk_version }}"
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
@@ -88,7 +92,7 @@ jobs:
         id: sign_app
         uses: https://github.com/r0adkll/sign-android-release@v1
         env:
-          BUILD_TOOLS_VERSION: "34.0.0"
+          BUILD_TOOLS_VERSION: "36.0.0"
         with:
           releaseDirectory: signing_staging
           signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
@@ -114,5 +118,5 @@ jobs:
           url: https://git.stefdp.com
           repo: Stef/Zipline-Android-App
           token: ${{ secrets.FORGEJO_TOKEN }}
-          tag: "v${{ steps.app_version.outputs.app_version }}"
+          tag: "v${{ steps.app_version.outputs.app_version }}" # this tag will be used in fdroid for build checks
           release-dir: ${{ github.workspace }}/output

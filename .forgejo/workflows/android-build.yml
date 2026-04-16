@@ -43,14 +43,14 @@ jobs:
       - name: Set Up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: 'temurin'
+          java-version: '21'
 #          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: https://github.com/android-actions/setup-android@v3
         with:
-          packages: 'tools build-tools;34.0.0 platform-tools ndk;${{ steps.ndk_version.outputs.ndk_version }}'
+          packages: 'tools build-tools;36.0.0 platform-tools ndk;${{ steps.ndk_version.outputs.ndk_version }}'
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
@@ -88,7 +88,7 @@ jobs:
         id: sign_app
         uses: https://github.com/r0adkll/sign-android-release@v1
         env:
-          BUILD_TOOLS_VERSION: "34.0.0"
+          BUILD_TOOLS_VERSION: "36.0.0"
         with:
           releaseDirectory: signing_staging
           signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}

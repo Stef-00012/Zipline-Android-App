@@ -14,7 +14,10 @@ jobs:
     if: forgejo.event_name == 'workflow_dispatch' || (forgejo.event_name == 'push' && (startsWith(forgejo.event.head_commit.message, '[build]') || startsWith(forgejo.event.head_commit.message, '[release]')))
     runs-on: fdroid
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        run: |
+          apt-get update && apt-get install -y git
+          git clone https://git.stefdp.com/Stef/Zipline-Android-App.git . --branch native
 
       - name: Install ZIP Util
         run: |

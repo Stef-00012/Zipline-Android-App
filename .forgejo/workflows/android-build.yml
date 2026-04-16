@@ -84,19 +84,47 @@ jobs:
           cp ${{ env.main_project_module }}/build/outputs/apk/release/*.apk signing_staging/
           cp ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab signing_staging/
 
+      # - name: Sign Release Artifacts
+      #   id: sign_app
+      #   uses: https://github.com/r0adkll/sign-android-release@v1
+      #   env:
+      #     BUILD_TOOLS_VERSION: "36.0.0"
+      #   with:
+      #     releaseDirectory: signing_staging
+      #     signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+      #     alias: ${{ secrets.KEY_ALIAS }}
+      #     keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+      #     keyPassword: ${{ secrets.KEY_PASSWORD }}
+
       - name: Sign Release Artifacts
-        id: sign_app
-        uses: https://github.com/r0adkll/sign-android-release@v1
-        env:
-          BUILD_TOOLS_VERSION: "36.0.0"
-        with:
-          releaseDirectory: signing_staging
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          v1SigningEnabled: false
-          v2SigningEnabled: true
+        run: |
+          set -e
+
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > keystore.jks
+
+          for apk in signing_staging/*.apk; do
+            ${ANDROID_SDK_ROOT}/build-tools/36.0.0/apksigner sign \
+              --ks keystore.jks \
+              --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+              --ks-pass "pass:${{ secrets.KEYSTORE_PASSWORD }}" \
+              --key-pass "pass:${{ secrets.KEY_PASSWORD }}" \
+              --v1-signing-enabled true \
+              --v2-signing-enabled true \
+              --v3-signing-enabled true \
+              --out "${apk%.apk}-signed.apk" \
+              "$apk"
+          done
+
+          for aab in signing_staging/*.aab; do
+            jarsigner \
+              -keystore keystore.jks \
+              -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+              -keypass "${{ secrets.KEY_PASSWORD }}" \
+              -signedjar "${aab%.aab}-signed.aab" \
+              "$aab" "${{ secrets.KEY_ALIAS }}"
+          done
+
+          rm keystore.jks
 
       - name: Copy debug and signed artifacts to output
         run: |
@@ -104,7 +132,7 @@ jobs:
           
           # ---- reminder for myself, if this apk file name is changed, change in the froid repo too in the binary part ----
           cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-release-signed.apk
-          cp signing_staging/*.aab ${{ github.workspace }}/output/
+          cp signing_staging/*-signed*.aab ${{ github.workspace }}/output/
 
       - name: Publish Release
         uses: actions/forgejo-release@v2.7.3

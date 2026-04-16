@@ -100,6 +100,7 @@ jobs:
         run: |
           cp ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk ${{ github.workspace }}/output/
           
+          # ---- reminder for myself, if this apk file name is changed, change in the froid repo too in the binary part ----
           cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-release-signed.apk
           cp signing_staging/*.aab ${{ github.workspace }}/output/
 
@@ -113,5 +114,5 @@ jobs:
           url: https://git.stefdp.com
           repo: Stef/Zipline-Android-App
           token: ${{ secrets.FORGEJO_TOKEN }}
-          tag: "v${{ steps.app_version.outputs.app_version }}-${{ steps.sha.outputs.commit_sha }}"
+          tag: "v${{ steps.app_version.outputs.app_version }}"
           release-dir: ${{ github.workspace }}/output

@@ -108,7 +108,7 @@ jobs:
               --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
               --ks-pass "pass:${{ secrets.KEYSTORE_PASSWORD }}" \
               --key-pass "pass:${{ secrets.KEY_PASSWORD }}" \
-              --v1-signing-enabled true \
+              --v1-signing-enabled false \
               --v2-signing-enabled true \
               --v3-signing-enabled true \
               --out "${apk%.apk}-signed.apk" \

@@ -2,6 +2,8 @@ package com.stefdp.zipline.screens.settings.categories
 
 import android.content.ClipData
 import android.content.Context
+import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -134,7 +136,13 @@ internal fun UserCategory(
 
                         if (!proceed) return@launch
 
-                        val clipData = ClipData.newPlainText("User Token", state.tokenInput.text).toClipEntry()
+                        val clipData = ClipData.newPlainText("User Token", state.tokenInput.text)
+                            .apply {
+                                description.extras = PersistableBundle().apply {
+                                    putBoolean("android.content.extra,IS_SENSITIVE", true)
+                                }
+                            }
+                            .toClipEntry()
 
                         clipboardManager.setClipEntry(clipData)
 

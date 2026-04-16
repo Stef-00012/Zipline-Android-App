@@ -474,7 +474,7 @@ fun AdminInvitesScreen(
                                         coroutineScope.launch {
                                             val url = "${state.serverUrl}/invite/${invite.code}"
 
-                                            val clipData = ClipData.newRawUri("Invite URL", url.toUri()).toClipEntry()
+                                            val clipData = ClipData.newPlainText("Invite URL", url).toClipEntry()
 
                                             clipboardManager.setClipEntry(clipData)
 

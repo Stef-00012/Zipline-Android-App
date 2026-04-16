@@ -84,7 +84,7 @@ fun LargeInviteDisplay(
                         coroutineScope.launch {
                             val inviteUrl = "${serverUrl}/invite/${invite.code}"
 
-                            val clipData = ClipData.newRawUri("Invite URL", inviteUrl.toUri()).toClipEntry()
+                            val clipData = ClipData.newPlainText("Invite URL", inviteUrl).toClipEntry()
 
                             clipboardManager.setClipEntry(clipData)
 

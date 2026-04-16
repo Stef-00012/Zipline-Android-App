@@ -846,7 +846,7 @@ fun FoldersScreen(
                                     onClick = {
                                         val fileUrl = "${state.serverUrl}/folder/${folder.id}"
 
-                                        val clipData = ClipData.newRawUri("Folder URL", fileUrl.toUri()).toClipEntry()
+                                        val clipData = ClipData.newPlainText("Folder URL", fileUrl).toClipEntry()
 
                                         coroutineScope.launch {
                                             clipboardManager.setClipEntry(clipData)
@@ -1477,7 +1477,7 @@ fun FoldersScreen(
                                         onClick = {
                                             val fileUrl = "${state.serverUrl}${file.url}"
 
-                                            val clipData = ClipData.newRawUri("File URL", fileUrl.toUri()).toClipEntry()
+                                            val clipData = ClipData.newPlainText("File URL", fileUrl).toClipEntry()
 
                                             coroutineScope.launch {
                                                 clipboardManager.setClipEntry(clipData)

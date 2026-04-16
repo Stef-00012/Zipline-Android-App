@@ -614,7 +614,7 @@ fun UrlsScreen(
                                         coroutineScope.launch {
                                             val urlUrl = "${state.serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
 
-                                            val clipData = ClipData.newRawUri("URL", urlUrl.toUri()).toClipEntry()
+                                            val clipData = ClipData.newPlainText("URL", urlUrl).toClipEntry()
 
                                             clipboardManager.setClipEntry(clipData)
 

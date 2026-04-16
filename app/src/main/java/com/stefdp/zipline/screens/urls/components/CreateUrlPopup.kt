@@ -113,7 +113,7 @@ fun CreateUrlPopup(
                     iconContentDescription = "Copy URL",
                     onClick = {
                         coroutineScope.launch {
-                            val clipData = ClipData.newRawUri("URL", state.createdUrlResult?.toUri()).toClipEntry()
+                            val clipData = ClipData.newPlainText("URL", state.createdUrlResult).toClipEntry()
 
                             clipboardManager.setClipEntry(clipData)
 

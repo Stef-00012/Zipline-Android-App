@@ -76,7 +76,7 @@ internal fun CopyUrlButton(
                 },
                 onClick = {
                     coroutineScope.launch {
-                        val clipData = ClipData.newRawUri("File URL", standardUrl.toUri()).toClipEntry()
+                        val clipData = ClipData.newPlainText("File URL", standardUrl).toClipEntry()
 
                         clipboardManager.setClipEntry(clipData)
 
@@ -107,7 +107,7 @@ internal fun CopyUrlButton(
                 },
                 onClick = {
                     coroutineScope.launch {
-                        val clipData = ClipData.newRawUri("File URL", rawUrl.toUri()).toClipEntry()
+                        val clipData = ClipData.newPlainText("File URL", rawUrl).toClipEntry()
 
                         clipboardManager.setClipEntry(clipData)
 

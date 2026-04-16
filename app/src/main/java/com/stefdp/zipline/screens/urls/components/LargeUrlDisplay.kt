@@ -97,7 +97,7 @@ fun LargeUrlDisplay(
                         coroutineScope.launch {
                             val urlUrl = "${serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
 
-                            val clipData = ClipData.newRawUri("URL", urlUrl.toUri()).toClipEntry()
+                            val clipData = ClipData.newPlainText("URL", urlUrl).toClipEntry()
 
                             clipboardManager.setClipEntry(clipData)
 
@@ -118,7 +118,7 @@ fun LargeUrlDisplay(
                     iconDescription = "Copy destination",
                     onClick = {
                         coroutineScope.launch {
-                            val clipData = ClipData.newRawUri("URL", url.destination.toUri()).toClipEntry()
+                            val clipData = ClipData.newPlainText("URL", url.destination).toClipEntry()
 
                             clipboardManager.setClipEntry(clipData)
 

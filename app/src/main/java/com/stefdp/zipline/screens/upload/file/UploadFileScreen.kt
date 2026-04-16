@@ -266,7 +266,7 @@ fun UploadFileScreen(
                                 iconContentDescription = "Copy URL",
                                 onClick = {
                                     coroutineScope.launch {
-                                        val clipData = ClipData.newRawUri("File URL", fileState.url?.toUri()).toClipEntry()
+                                        val clipData = ClipData.newPlainText("File URL", fileState.url).toClipEntry()
 
                                         clipboardManager.setClipEntry(clipData)
 

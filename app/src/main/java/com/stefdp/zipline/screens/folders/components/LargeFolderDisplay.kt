@@ -140,7 +140,7 @@ fun LargeFolderDisplay(
                         coroutineScope.launch {
                             val urlUrl = "${serverUrl}/folder/${folder.id}"
 
-                            val clipData = ClipData.newRawUri("Folder URL", urlUrl.toUri()).toClipEntry()
+                            val clipData = ClipData.newPlainText("Folder URL", urlUrl).toClipEntry()
 
                             clipboardManager.setClipEntry(clipData)
 

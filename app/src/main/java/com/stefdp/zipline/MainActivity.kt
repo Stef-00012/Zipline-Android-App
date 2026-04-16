@@ -140,7 +140,9 @@ val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState
     {}
 }
 
-const val APP_VERSION = "2.0.0"
+const val APP_VERSION = "2.0.1"
+
+// TODO: add default domain in user settings (stored in the app secureStorage) and use it for the URLs
 
 class MainActivity : FragmentActivity() {
     private var isAppReady by mutableStateOf(false)

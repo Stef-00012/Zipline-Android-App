@@ -95,6 +95,8 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+          v1SigningEnabled: false
+          v2SigningEnabled: true
 
       - name: Copy debug and signed artifacts to output
         run: |

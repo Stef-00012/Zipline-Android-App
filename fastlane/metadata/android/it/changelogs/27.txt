@@ -1,0 +1,1 @@
+Corretto un bug che non faceva apparire negli appunti di gboard i dati copiati con i bottoni in app

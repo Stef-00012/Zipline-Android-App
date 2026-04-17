@@ -1,0 +1,3 @@
+Added a "Default Domain" select in app settings that will be used as base domain for any copied URL
+Fixed create URLs screen not showing a popup for newly created URLs
+Added client data in the login (can be anonymized with a switch in the login form to hide the device model & user agent)

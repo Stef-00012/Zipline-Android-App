@@ -1,0 +1,3 @@
+Aggiunta l'opzione "Default domain" nelle impostazioni dell'app, che verrà utilizzata come dominio di base per qualsiasi URL copiato
+Risolto il problema per cui la schermata di creazione degli URL non mostrava il popup per gli URL appena creati
+Aggiunti i dati del client nella schermata di accesso (possono essere anonimizzati tramite un'opzione nel form di login per nascondere il modello del dispositivo e l'user agent)

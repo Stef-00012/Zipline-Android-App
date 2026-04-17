@@ -2,6 +2,7 @@ package com.stefdp.zipline.network.requests
 
 import android.content.Context
 import com.google.gson.Gson
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.FilesFormat
@@ -45,6 +46,8 @@ suspend fun uploadFile(
 
     val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
     val token = secureStore.get(STORAGE_TOKEN_KEY)
+
+    Logger.debug("uploadFile", "Server URL: $serverUrl, token: $token")
 
     if (token.isNullOrEmpty()) {
         return Result.failure(

@@ -15,6 +15,8 @@ import com.stefdp.zipline.network.requests.getWebServerSettings
 import com.stefdp.zipline.network.requests.uploadFile
 import com.stefdp.zipline.network.requests.uploadPartialFile
 import com.stefdp.zipline.transferservice.TransferService
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
+import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.copyUriToTempFile
 import com.stefdp.zipline.utils.getFileInfo
 import com.stefdp.zipline.utils.parseBytes
@@ -23,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URI
 
 class QuickShareActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +59,16 @@ class QuickShareActivity : FragmentActivity() {
         ) {
             @OptIn(DelicateCoroutinesApi::class)
             GlobalScope.launch(Dispatchers.IO) {
+                val secureStore = SecureStorage.getInstance(applicationContext)
+
+                val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
+
                 createUrl(
                     context = applicationContext,
-                    destination = text
+                    destination = text,
+                    domain = defaultDomain?.let { domain ->
+                        URI(domain).host ?: domain
+                    }
                 )
                     .onSuccess {
                         copyToClipboardAndNotify(it.url)
@@ -105,6 +115,9 @@ class QuickShareActivity : FragmentActivity() {
             val webSettingsRes = getWebServerSettings(applicationContext)
             val uploadedUrls = mutableListOf<String>()
 
+            val secureStore = SecureStorage.getInstance(applicationContext)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
+
             webSettingsRes
                 .onSuccess { webSettings ->
                     val chunksEnabled = webSettings.config?.chunks?.enabled ?: true
@@ -127,7 +140,10 @@ class QuickShareActivity : FragmentActivity() {
                                 fileExtension = fileExtension,
                                 chunkSize = chunkSize,
                                 notificationTitle = title,
-                                notificationContent = displayName
+                                notificationContent = displayName,
+                                domain = defaultDomain?.let { domain ->
+                                    URI(domain).host ?: domain
+                                }
                             )
                                 .onSuccess { response ->
                                     uploadedUrls.addAll(response.files.map { it.url })
@@ -141,7 +157,10 @@ class QuickShareActivity : FragmentActivity() {
                                 filePath = tempFile.absolutePath,
                                 fileExtension = fileExtension,
                                 notificationTitle = title,
-                                notificationContent = displayName
+                                notificationContent = displayName,
+                                domain = defaultDomain?.let { domain ->
+                                    URI(domain).host ?: domain
+                                }
                             )
                                 .onSuccess { response ->
                                     uploadedUrls.addAll(response.files.map { it.url })

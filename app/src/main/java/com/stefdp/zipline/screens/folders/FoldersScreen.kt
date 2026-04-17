@@ -844,7 +844,7 @@ fun FoldersScreen(
                                     color = MaterialTheme.colorScheme.primary,
                                     iconColor = MaterialTheme.colorScheme.onPrimary,
                                     onClick = {
-                                        val fileUrl = "${state.serverUrl}/folder/${folder.id}"
+                                        val fileUrl = "${state.defaultDomain}/folder/${folder.id}"
 
                                         val clipData = ClipData.newPlainText("Folder URL", fileUrl).toClipEntry()
 
@@ -939,7 +939,7 @@ fun FoldersScreen(
                                     context = context,
                                     activity = activity,
                                     folder = folder,
-                                    serverUrl = state.serverUrl,
+                                    serverUrl = state.defaultDomain,
                                     onOpen = {
                                         viewModel.setMainFolder(folder)
                                         viewModel.setFolderPath(state.foldersPath + folder)
@@ -1475,7 +1475,7 @@ fun FoldersScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         iconColor = MaterialTheme.colorScheme.onPrimary,
                                         onClick = {
-                                            val fileUrl = "${state.serverUrl}${file.url}"
+                                            val fileUrl = "${state.defaultDomain}${file.url}"
 
                                             val clipData = ClipData.newPlainText("File URL", fileUrl).toClipEntry()
 

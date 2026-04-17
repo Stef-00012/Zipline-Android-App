@@ -11,6 +11,7 @@ import com.stefdp.zipline.network.requests.createUrl
 import com.stefdp.zipline.network.requests.deleteUrl
 import com.stefdp.zipline.network.requests.getUrls
 import com.stefdp.zipline.network.requests.updateUrl
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.SortOrder
@@ -51,6 +52,7 @@ data class UrlsUiState(
     val isLoading: Boolean = true,
     val urls: List<Url>? = null,
     val serverUrl: String? = null,
+    val defaultDomain: String? = null,
     val urlsRoute: String = "",
     val sortKey: GetUrlsQuerySortBy = GetUrlsQuerySortBy.CREATED_AT,
     val sortOrder: SortOrder = SortOrder.DESC,
@@ -89,11 +91,14 @@ class UrlsViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             val secureStore = SecureStorage.getInstance(context)
+
             val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
 
             _state.update {
                 it.copy(
                     serverUrl = serverUrl,
+                    defaultDomain = defaultDomain,
                     urlsRoute = urlsRoute,
                     createPopupBaseUrl = sharedUrl,
                     isCreatePopupOpen = sharedUrl != null,
@@ -142,7 +147,6 @@ class UrlsViewModel : ViewModel() {
                 isCreatePopupOpen = false,
                 createPopupBaseUrl = null,
                 popupErrorMessage = null,
-                createdUrlResult = null
             )
         }
     }

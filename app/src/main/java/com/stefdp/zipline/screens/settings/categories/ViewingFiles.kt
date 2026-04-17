@@ -127,7 +127,7 @@ internal fun ViewingFilesCategory(
                 onCheckedChange = {
                     viewModel.setShowMimetype(it)
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && state.enableViewRoutes,
                 label = "Show Mimetype",
                 description = "Show the mimetype of the file in the view-route."
             )
@@ -137,7 +137,7 @@ internal fun ViewingFilesCategory(
                 onCheckedChange = {
                     viewModel.setShowTags(it)
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && state.enableViewRoutes,
                 label = "Show Tags",
                 description = "Show the file's tags in the view-route."
             )
@@ -147,7 +147,7 @@ internal fun ViewingFilesCategory(
                 onCheckedChange = {
                     viewModel.setShowFolder(it)
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && state.enableViewRoutes,
                 label = "Show Folder",
                 description = "Show the name/link of the folder if possible in the view-route."
             )
@@ -164,7 +164,7 @@ internal fun ViewingFilesCategory(
                     .heightIn(
                         max = 200.dp
                     ),
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && state.enableViewRoutes,
                 singleLine = false,
             )
 
@@ -187,7 +187,7 @@ internal fun ViewingFilesCategory(
                 onSelectionChange = {
                     viewModel.setSelectedViewContentAlignment(it)
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && state.enableViewRoutes,
                 label = "View Content Alignment",
                 description = "Change the alignment of the content within view-routes.",
             )
@@ -197,7 +197,7 @@ internal fun ViewingFilesCategory(
                 onCheckedChange = {
                     viewModel.setEnableEmbed(it)
                 },
-                enabled = !state.isLoading,
+                enabled = !state.isLoading && state.enableViewRoutes,
                 label = "Enable Embed",
                 description = "Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
             )
@@ -209,7 +209,7 @@ internal fun ViewingFilesCategory(
                 },
                 label = "Embed Title",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isLoading && state.enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed && state.enableViewRoutes,
             )
 
             TextInput(
@@ -219,7 +219,7 @@ internal fun ViewingFilesCategory(
                 },
                 label = "Embed Description",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isLoading && state.enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed && state.enableViewRoutes,
                 singleLine = false,
             )
 
@@ -230,7 +230,7 @@ internal fun ViewingFilesCategory(
                 },
                 label = "Embed Site Name",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isLoading && state.enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed && state.enableViewRoutes,
             )
 
             ColorPicker(
@@ -239,7 +239,7 @@ internal fun ViewingFilesCategory(
                 onColorChange = {
                     viewModel.setEmbedColor(it)
                 },
-                enabled = !state.isLoading && state.enableEmbed,
+                enabled = !state.isLoading && state.enableEmbed && state.enableViewRoutes,
                 modifier = Modifier.fillMaxWidth()
             )
 

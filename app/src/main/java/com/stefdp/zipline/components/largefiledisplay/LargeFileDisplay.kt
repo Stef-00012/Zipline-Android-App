@@ -50,6 +50,7 @@ import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.Orange
 import com.stefdp.zipline.ui.theme.White
 import com.stefdp.zipline.ui.theme.Yellow
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
@@ -82,11 +83,13 @@ fun LargeFileDisplay(
     var isLoading by rememberSaveable { mutableStateOf(true) }
 
     var serverUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var defaultDomain by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         val secureStore = SecureStorage.getInstance(context)
 
         serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+        defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
 
         if (tags == null) {
             val tagsRes = getTags(
@@ -234,7 +237,7 @@ fun LargeFileDisplay(
                     onClick = { clickedFile ->
                         if (clickedFile.type.startsWith("video/") && clickedFile.password != true) return@FilePreview
 
-                        val fileUrl = "${serverUrl}${clickedFile.url}"
+                        val fileUrl = "${defaultDomain}${clickedFile.url}"
 
                         val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
                         context.startActivity(intent)
@@ -505,12 +508,12 @@ fun LargeFileDisplay(
 
                     IconButton(
                         onClick = {
-                            val fileUrl = "${serverUrl}${currentFile.url}"
+                            val fileUrl = "${defaultDomain}${currentFile.url}"
 
                             val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
                             context.startActivity(intent)
                         },
-                        enabled = !isLoading || serverUrl == null,
+                        enabled = !isLoading || defaultDomain == null,
                         color = MaterialTheme.colorScheme.primary,
                         iconColor = MaterialTheme.colorScheme.onPrimary,
                         icon = painterResource(id = R.drawable.open_new),
@@ -522,9 +525,9 @@ fun LargeFileDisplay(
                     CopyUrlButton(
                         context = context,
                         activity = activity,
-                        enabled = !isLoading || serverUrl == null,
-                        standardUrl = "${serverUrl}${currentFile.url}",
-                        rawUrl = "$serverUrl/raw/${currentFile.name}"
+                        enabled = !isLoading || defaultDomain == null,
+                        standardUrl = "${defaultDomain}${currentFile.url}",
+                        rawUrl = "$defaultDomain/raw/${currentFile.name}"
                     )
 
                     IconButtonSpacer()

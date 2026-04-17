@@ -3,9 +3,11 @@ package com.stefdp.zipline.network.requests
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import com.stefdp.zipline.APP_VERSION
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
+import com.stefdp.zipline.network.models.ZiplineClient
 import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.LoginResponse
@@ -18,7 +20,8 @@ suspend fun login(
     context: Context,
     username: String,
     password: String,
-    code: String? = null
+    code: String? = null,
+    anonymizeDeviceInfo: Boolean = false
 ): Result<LoginResult> {
     try {
         val secureStore = SecureStorage.getInstance(context)
@@ -37,8 +40,27 @@ suspend fun login(
             code
         )
 
+        val device = if (anonymizeDeviceInfo) {
+            "Android Mobile"
+        } else {
+            android.os.Build.MODEL ?: "Android Mobile"
+        }
+
+        val userAgent = if (anonymizeDeviceInfo) {
+            "Zipline/$APP_VERSION (Android; Mobile)"
+        } else {
+            System.getProperty("http.agent") ?: "Zipline/$APP_VERSION (Android; Mobile)"
+        }
+
+        val ziplineClient = ZiplineClient(
+            client = "Zipline Android",
+            device = device,
+            ua = userAgent
+        ).toString()
+
         val response = ZiplineApiClient.getZiplineApiService(serverUrl).login(
-            data = requestBody
+            data = requestBody,
+            client = ziplineClient
         )
 
         val body = response.body()

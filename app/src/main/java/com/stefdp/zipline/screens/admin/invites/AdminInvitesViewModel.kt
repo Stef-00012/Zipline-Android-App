@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.network.models.Invite
 import com.stefdp.zipline.network.requests.getInvites
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.network.requests.createInvite as apiCreateInvite
 import com.stefdp.zipline.network.requests.deleteInvite as apiDeleteInvite
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
@@ -50,6 +51,7 @@ data class AdminInvitesUiState(
     val isLoading: Boolean = false,
     val invites: List<Invite>? = null,
     val serverUrl: String? = null,
+    val defaultDomain: String? = null,
     val sortKey: GetInvitesQuerySortBy = GetInvitesQuerySortBy.CREATED_AT,
     val sortOrder: SortOrder = SortOrder.DESC,
     val createNewInvitePopupOpen: Boolean = false,
@@ -69,10 +71,12 @@ class AdminInvitesViewModel : ViewModel() {
             val secureStore = SecureStorage.getInstance(context)
 
             val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
 
             _state.update {
                 it.copy(
-                    serverUrl = serverUrl
+                    serverUrl = serverUrl,
+                    defaultDomain = defaultDomain
                 )
             }
         }

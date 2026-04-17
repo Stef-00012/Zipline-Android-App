@@ -135,10 +135,8 @@ fun CreateUrlPopup(
                     icon = painterResource(R.drawable.open_new),
                     iconContentDescription = "Open URL",
                     onClick = {
-                        coroutineScope.launch {
-                            val intent = Intent(Intent.ACTION_VIEW, state.createdUrlResult?.toUri())
-                            context.startActivity(intent)
-                        }
+                        val intent = Intent(Intent.ACTION_VIEW, state.createdUrlResult?.toUri())
+                        context.startActivity(intent)
                     },
                     color = MaterialTheme.colorScheme.primary,
                     iconColor = MaterialTheme.colorScheme.onPrimary
@@ -148,7 +146,7 @@ fun CreateUrlPopup(
     }
 
     Popup(
-        showPopup = showPopup,
+        showPopup = showPopup && state.createdUrlResult == null,
         onDismissRequest = onDismissRequest,
     ) {
         Row(

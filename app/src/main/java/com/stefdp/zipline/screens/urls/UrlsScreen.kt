@@ -57,6 +57,7 @@ import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalScreenViewState
 import com.stefdp.zipline.LocalUpdateScreenViewState
 import com.stefdp.zipline.LocalWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.HeaderButton
@@ -175,7 +176,7 @@ fun UrlsScreen(
     CreateUrlPopup(
         context = context,
         activity = activity,
-        showPopup = state.isCreatePopupOpen,
+        showPopup = state.isCreatePopupOpen || state.createdUrlResult != null,
         onDismissRequest = {
             viewModel.closeCreatePopup()
         },
@@ -612,7 +613,7 @@ fun UrlsScreen(
                                     iconColor = MaterialTheme.colorScheme.onPrimary,
                                     onClick = {
                                         coroutineScope.launch {
-                                            val urlUrl = "${state.serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
+                                            val urlUrl = "${state.defaultDomain}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
 
                                             val clipData = ClipData.newPlainText("URL", urlUrl).toClipEntry()
 
@@ -722,7 +723,7 @@ fun UrlsScreen(
                                 context = context,
                                 activity = activity,
                                 url = url,
-                                serverUrl = state.serverUrl,
+                                serverUrl = state.defaultDomain,
                                 urlsRoute = urlsRoute,
                                 onDelete = { viewModel.setDeleteUrl(url) },
                                 onEdit = { viewModel.setEditUrl(url) },

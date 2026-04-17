@@ -38,6 +38,7 @@ import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.screens.settings.categories.AppSettingsCategory
 import com.stefdp.zipline.screens.settings.categories.AvatarCategory
 import com.stefdp.zipline.screens.settings.categories.ExportFilesCategory
+import com.stefdp.zipline.screens.settings.categories.SessionsCategory
 import com.stefdp.zipline.screens.settings.categories.UserCategory
 import com.stefdp.zipline.screens.settings.categories.ViewingFilesCategory
 import com.stefdp.zipline.utils.hasNotificationsPermission
@@ -239,6 +240,15 @@ fun SettingsScreen(
                     state = state
                 )
 
+                SettingCategory.SESSIONS.toString() -> SessionsCategory(
+                    context = context,
+                    activity = activity,
+                    title = SettingCategory.SESSIONS.categoryName,
+                    user = localLoggedUser,
+                    viewModel = viewModel,
+                    state = state
+                )
+
                 SettingCategory.VIEWING_FILES.toString() -> ViewingFilesCategory(
                     updateUser = { updateUser(it) },
                     title = SettingCategory.VIEWING_FILES.categoryName,
@@ -281,7 +291,9 @@ fun SettingsScreen(
 private val settingCategories = listOf(
     SettingCategory.USER,
     SettingCategory.AVATAR,
+    SettingCategory.SESSIONS,
     SettingCategory.VIEWING_FILES,
     SettingCategory.EXPORT_FILES,
-    SettingCategory.APP_SETTINGS
+    SettingCategory.APP_SETTINGS,
+
 )

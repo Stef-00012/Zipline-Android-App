@@ -472,7 +472,7 @@ fun AdminInvitesScreen(
                                     iconColor = MaterialTheme.colorScheme.onPrimary,
                                     onClick = {
                                         coroutineScope.launch {
-                                            val url = "${state.serverUrl}/invite/${invite.code}"
+                                            val url = "${state.defaultDomain}/invite/${invite.code}"
 
                                             val clipData = ClipData.newPlainText("Invite URL", url).toClipEntry()
 
@@ -571,7 +571,7 @@ fun AdminInvitesScreen(
                                 context = context,
                                 activity = activity,
                                 invite = invite,
-                                serverUrl = state.serverUrl,
+                                serverUrl = state.defaultDomain,
                                 onDelete = {
                                     viewModel.setDeleteInvite(invite)
                                 },

@@ -7,6 +7,7 @@ import com.stefdp.zipline.network.models.ThumbnailFormat
 import com.stefdp.zipline.network.models.requests.UploadCompressionType
 import io.github.z4kn4fein.semver.toVersion
 import kotlinx.parcelize.Parcelize
+import java.net.URI
 
 const val STORAGE_SERVER_URL_KEY = "serverUrl"
 const val STORAGE_TOKEN_KEY = "token"
@@ -15,6 +16,7 @@ const val STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY = "folderExportDownloadFolde
 const val STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY = "adminExportDownloadFolder"
 const val STORAGE_EXPORT_DOWNLOAD_FOLDER_KEY = "exportDownloadFolder"
 const val STORAGE_UNLOCK_WITH_BIOMETRICS_KEY = "unlockWithBiometrics"
+const val STORAGE_DEFAULT_DOMAIN_KEY = "defaultDomain"
 
 @Parcelize
 data class ZiplineViewState(
@@ -275,4 +277,20 @@ fun getSettingName(path: List<String>): String {
     val key = path.joinToString(".")
 
     return settingNames.find { it.first == key }?.second ?: key
+}
+
+val validSchemes = listOf(
+    "http",
+    "https",
+)
+
+fun getServerScheme(serverUrl: String?): String {
+    return try {
+        val uri = URI(serverUrl)
+        val scheme = uri.scheme
+
+        if (scheme != null && scheme in validSchemes) scheme else "https"
+    } catch (_: Exception) {
+        "https"
+    }
 }

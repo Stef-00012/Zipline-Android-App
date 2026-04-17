@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +47,7 @@ import com.stefdp.zipline.Logger
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.PromptPopup
+import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.screens.*
@@ -239,6 +239,16 @@ fun LoginScreen(
                     }
                 }
 
+                Switch(
+                    label = "Anonymize Device Info",
+                    description = "Anonymize the device info sent to Zipline for device sessions management.",
+                    checked = state.anonymizeDeviceInfo,
+                    onCheckedChange = {
+                        viewModel.setAnonymizeDeviceInfo(it)
+                    },
+                    enabled = !state.isLoading,
+                )
+
                 Button(
                     onClick = {
                         viewModel.toggleTokenLogin()
@@ -258,8 +268,6 @@ fun LoginScreen(
                         text = "Use ${if (state.isTokenLogin) "Password" else "Token"} Login",
                     )
                 }
-
-                val coroutineScope = rememberCoroutineScope()
 
                 val updateServerVersion = LocalUpdateServerVersion.current
                 val updateLoggedUser = LocalUpdateLoggedUser.current

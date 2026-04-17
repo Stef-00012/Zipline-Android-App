@@ -32,6 +32,7 @@ import com.stefdp.zipline.network.models.WebInvite
 import com.stefdp.zipline.network.models.WebSettings
 import com.stefdp.zipline.network.models.WebhooksSettings
 import com.stefdp.zipline.network.models.WebsiteSettings
+import com.stefdp.zipline.network.models.ZiplineClient
 import com.stefdp.zipline.network.models.requests.BulkDeleteFilesBody
 import com.stefdp.zipline.network.models.requests.BulkUpdateFilesBody
 import com.stefdp.zipline.network.models.requests.CreateFolderBody
@@ -78,6 +79,7 @@ import com.stefdp.zipline.network.models.responses.GetTokenResponse
 import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
 import com.stefdp.zipline.network.models.responses.HealthCheckResponse
 import com.stefdp.zipline.network.models.responses.LoginResponse
+import com.stefdp.zipline.network.models.responses.LogoutResponse
 import com.stefdp.zipline.network.models.responses.RunJobResponse
 import com.stefdp.zipline.network.models.responses.UploadFileResponse
 import com.stefdp.zipline.network.models.responses.UploadPartialFileResponse
@@ -123,7 +125,13 @@ interface ZiplineApiService {
     @POST("auth/login")
     suspend fun login(
         @Body data: LoginBody,
+        @Header("x-zipline-client") client: String
     ): Response<LoginResponse>
+
+    @GET("auth/logout")
+    suspend fun logout(
+        @Header("Authorization") token: String,
+    ): Response<LogoutResponse>
 
     @POST("auth/invites")
     suspend fun createInvite(
@@ -464,7 +472,11 @@ interface ZiplineApiService {
         @Header("Authorization") token: String,
     ): Response<GetSessionsResponse>
 
-    @DELETE("user/sessions")
+    @HTTP(
+        method = "DELETE",
+        path = "user/sessions",
+        hasBody = true
+    )
     suspend fun deleteSession(
         @Header("Authorization") token: String,
         @Body data: DeleteSessionBody

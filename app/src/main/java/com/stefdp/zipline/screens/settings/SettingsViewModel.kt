@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.network.models.Export
 import com.stefdp.zipline.network.models.User
+import com.stefdp.zipline.network.models.UserSession
 import com.stefdp.zipline.network.models.UserViewSettingsAlign
 import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
 import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
@@ -22,13 +23,17 @@ import com.stefdp.zipline.network.requests.UpdateCurrentUserResult
 import com.stefdp.zipline.network.requests.downloadExport
 import com.stefdp.zipline.network.requests.getExports
 import com.stefdp.zipline.network.requests.getServerVersion
+import com.stefdp.zipline.network.requests.getSessions
 import com.stefdp.zipline.network.requests.getTokenWithToken
 import com.stefdp.zipline.network.requests.removeCurrentUserAvatar
 import com.stefdp.zipline.network.requests.startExport as apiStartExport
 import com.stefdp.zipline.network.requests.deleteExport as apiDeleteExport
+import com.stefdp.zipline.network.requests.deleteSession as apiDeleteSession
+import com.stefdp.zipline.network.requests.logout as apiLogout
 import com.stefdp.zipline.network.requests.updateCurrentUser
 import com.stefdp.zipline.screens.LoginScreen
 import com.stefdp.zipline.utils.STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_EXPORT_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY
@@ -38,6 +43,7 @@ import com.stefdp.zipline.utils.STORAGE_UNLOCK_WITH_BIOMETRICS_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.StorageUtil
 import com.stefdp.zipline.utils.getDisplayPath
+import com.stefdp.zipline.utils.getServerScheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +51,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URI
 
 enum class SettingCategory(
     val value: String,
@@ -73,6 +80,11 @@ enum class SettingCategory(
     APP_SETTINGS(
         value = "APP_SETTINGS",
         categoryName = "App Settings"
+    ),
+
+    SESSIONS(
+        value = "SESSIONS",
+        categoryName = "Sessions"
     );
 
     override fun toString(): String = value
@@ -112,6 +124,11 @@ data class SettingsUiState(
     val selectedExportUri: Uri? = null,
     val selectedExportPath: String? = null,
     val updateDownloadFolderType: UpdateDownloadFolderType = UpdateDownloadFolderType.FILE,
+    val selectedDefaultDomain: Set<String> = setOf("default"),
+    val sessions: List<UserSession>? = emptyList(),
+    val currentSession: UserSession? = null,
+    val deleteSession: UserSession? = null,
+    val deleteAllSessionsPopupOpen: Boolean = false,
 )
 
 class SettingsViewModel : ViewModel() {
@@ -126,6 +143,20 @@ class SettingsViewModel : ViewModel() {
         refreshVersion(context)
         refreshBiometricAuthenticationEnabled(context)
         refreshSelectedExportPath(context)
+        refreshDefaultDomain(context)
+        refreshSessions(context)
+    }
+
+    fun openDeleteAllSessionsPopup() {
+        _state.update {
+            it.copy(deleteAllSessionsPopupOpen = true)
+        }
+    }
+
+    fun closeDeleteAllSessionsPopup() {
+        _state.update {
+            it.copy(deleteAllSessionsPopupOpen = false)
+        }
     }
 
     fun setHasNotificationPermission(hasPermission: Boolean) {
@@ -271,6 +302,37 @@ class SettingsViewModel : ViewModel() {
         }
     }
 
+    fun setSelectedDefaultDomain(context: Context, domain: Set<String>) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(selectedDefaultDomain = domain)
+            }
+
+            val secureStore = SecureStorage.getInstance(context)
+
+            val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+
+            val selectedDomain = domain.firstOrNull() ?: "default"
+
+            secureStore.set(
+                STORAGE_DEFAULT_DOMAIN_KEY,
+                if (selectedDomain == "default" && serverUrl != null) {
+                    serverUrl
+                } else {
+                    val scheme = getServerScheme(serverUrl)
+
+                    "$scheme://$selectedDomain"
+                }
+            )
+        }
+    }
+
+    fun setDeleteSession(session: UserSession?) {
+        _state.update {
+            it.copy(deleteSession = session)
+        }
+    }
+
     fun updateDownloadFolder(
         context: Context,
         uri: Uri,
@@ -370,6 +432,8 @@ class SettingsViewModel : ViewModel() {
 
             secureStore.del(STORAGE_TOKEN_KEY)
             secureStore.del(STORAGE_SERVER_URL_KEY)
+
+            apiLogout(context)
 
             localUpdateLoggedUser()
 
@@ -532,6 +596,47 @@ class SettingsViewModel : ViewModel() {
             _state.update {
                 it.copy(
                     biometricAuthenticationEnabled = enabled
+                )
+            }
+        }
+    }
+
+    fun refreshSessions(context: Context) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoading = true)
+            }
+
+            val sessionsRes = getSessions(context)
+
+            Logger.debug("SettingsViewModel", "Fetched sessions success: ${sessionsRes.isSuccess}")
+
+            sessionsRes
+                .onSuccess { sessionsResponse ->
+                    _state.update {
+                        it.copy(
+                            sessions = sessionsResponse.other,
+                            currentSession = sessionsResponse.current
+                        )
+                    }
+                }
+
+            _state.update {
+                it.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun refreshDefaultDomain(context: Context) {
+        viewModelScope.launch {
+            val secureStore = SecureStorage.getInstance(context)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
+
+            val domain = defaultDomain?.let { URI(it).host ?: it } ?: "default"
+
+            _state.update {
+                it.copy(
+                    selectedDefaultDomain = setOf(domain)
                 )
             }
         }
@@ -769,6 +874,79 @@ class SettingsViewModel : ViewModel() {
                         }
                     }
             }
+
+            _state.update {
+                it.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun deleteSession(
+        context: Context,
+        onError: (String) -> Unit,
+        onSuccess: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            if (_state.value.deleteSession == null) return@launch
+
+            _state.update {
+                it.copy(isLoading = true)
+            }
+
+            val deleteRes = apiDeleteSession(
+                context = context,
+                sessionId = _state.value.deleteSession!!.id
+            )
+
+            deleteRes
+                .onSuccess { sessionsRes ->
+                    _state.update {
+                        it.copy(sessions = sessionsRes.other)
+                    }
+
+                    refreshSessions(context)
+
+                    onSuccess()
+                }
+                .onFailure { error ->
+                    onError("Failed to log out of session: ${error.message}")
+                }
+
+            _state.update {
+                it.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun deleteAllSessions(
+        context: Context,
+        onError: (String) -> Unit,
+        onSuccess: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoading = true)
+            }
+
+            val deleteRes = apiDeleteSession(
+                context = context,
+                all = true,
+                sessionId = ""
+            )
+
+            deleteRes
+                .onSuccess { sessionsRes ->
+                    _state.update {
+                        it.copy(sessions = sessionsRes.other)
+                    }
+
+                    refreshSessions(context)
+
+                    onSuccess()
+                }
+                .onFailure { error ->
+                    onError("Failed to delete all sessions: ${error.message}")
+                }
 
             _state.update {
                 it.copy(isLoading = false)

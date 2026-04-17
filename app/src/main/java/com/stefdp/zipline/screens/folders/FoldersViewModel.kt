@@ -29,6 +29,7 @@ import com.stefdp.zipline.network.requests.getFolderExportSize
 import com.stefdp.zipline.network.requests.getFolders
 import com.stefdp.zipline.network.requests.getTags
 import com.stefdp.zipline.network.requests.updateFolder
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_FILE_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
@@ -79,6 +80,7 @@ data class FoldersUiState(
     val folderFiles: List<File>? = null,
     val tags: List<Tag>? = null,
     val serverUrl: String? = null,
+    val defaultDomain: String? = null,
     val tagsLoading: Boolean = false,
     val currentPage: Long = 1,
     val totalPages: Long = 1,
@@ -121,6 +123,8 @@ class FoldersViewModel : ViewModel() {
             val secureStore = SecureStorage.getInstance(context)
 
             val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
+
             val fileDownloadFolder = secureStore.get(STORAGE_FILE_DOWNLOAD_FOLDER_KEY)
             val folderExportFolder = secureStore.get(STORAGE_FOLDER_EXPORT_DOWNLOAD_FOLDER_KEY)
 
@@ -130,6 +134,7 @@ class FoldersViewModel : ViewModel() {
             _state.update {
                 it.copy(
                     serverUrl = serverUrl,
+                    defaultDomain = defaultDomain,
                     selectedFileDownloadUri = fileDownloadFolderUri,
                     selectedFolderExportUri = folderExportFolderUri,
                     selectedFileDownloadPath = fileDownloadFolderUri?.let { uri -> getDisplayPath(uri) },

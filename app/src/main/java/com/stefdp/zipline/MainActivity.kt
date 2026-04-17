@@ -43,6 +43,7 @@ import com.stefdp.zipline.components.Sidebar
 import com.stefdp.zipline.network.models.PublicServerConfig
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings
+import com.stefdp.zipline.network.models.ZiplineClient
 import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
 import com.stefdp.zipline.network.requests.getAvatar
 import com.stefdp.zipline.network.requests.getCurrentUser
@@ -140,7 +141,7 @@ val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState
     {}
 }
 
-const val APP_VERSION = "2.0.1"
+const val APP_VERSION = "2.0.2"
 
 // TODO: add default domain in user settings (stored in the app secureStorage) and use it for the URLs
 
@@ -161,6 +162,8 @@ class MainActivity : FragmentActivity() {
             isAppReady = true
         }
 
+        val context = applicationContext
+
         enableEdgeToEdge()
 
         setContent {
@@ -168,7 +171,6 @@ class MainActivity : FragmentActivity() {
                 val activity = this@MainActivity
 
                 val navController = rememberNavController()
-                val context = LocalContext.current
 
                 var loggedUser by rememberSaveable {
                    mutableStateOf<User?>(null)

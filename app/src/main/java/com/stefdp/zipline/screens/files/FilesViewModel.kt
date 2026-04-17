@@ -29,6 +29,7 @@ import com.stefdp.zipline.network.requests.deleteIncompleteFiles as apiDeleteInc
 import com.stefdp.zipline.network.requests.deleteFile as apiDeleteFile
 import com.stefdp.zipline.network.requests.deleteTag as apiDeleteTag
 import com.stefdp.zipline.network.requests.updateTag
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.network.requests.createTag as apiCreateTag
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
@@ -52,6 +53,7 @@ data class FilesUiState(
     val incompleteFiles: List<IncompleteFile>? = null,
     val tags: List<Tag>? = null,
     val serverUrl: String? = null,
+    val defaultDomain: String? = null,
     val tagsLoading: Boolean = false,
     val manageTagsPopupOpen: Boolean = false,
     val showCreateTagPopup: Boolean = false,
@@ -88,12 +90,14 @@ class FilesViewModel : ViewModel() {
 
             val fileDownloadFolder = secureStore.get(STORAGE_FILE_DOWNLOAD_FOLDER_KEY)
             val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
 
             val fileDownloadFolderUri = fileDownloadFolder?.toUri()
 
             _state.update {
                 it.copy(
                     serverUrl = serverUrl,
+                    defaultDomain = defaultDomain,
                     selectedUri = fileDownloadFolderUri,
                     selectedPath = fileDownloadFolderUri?.let { uri -> getDisplayPath(uri) }
                 )

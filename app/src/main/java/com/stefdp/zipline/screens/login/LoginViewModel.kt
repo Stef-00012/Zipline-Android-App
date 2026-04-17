@@ -13,6 +13,7 @@ import com.stefdp.zipline.network.requests.LoginResult
 import com.stefdp.zipline.network.requests.getToken
 import com.stefdp.zipline.network.requests.login
 import com.stefdp.zipline.utils.DomainRegex
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
@@ -36,6 +37,7 @@ data class LoginUiState(
     val totp: TextFieldValue = TextFieldValue(""),
     val isTokenLogin: Boolean = false,
     val isTotpRequired: Boolean = false,
+    val anonymizeDeviceInfo: Boolean = false,
 )
 
 class LoginViewModel : ViewModel() {
@@ -84,6 +86,12 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun setAnonymizeDeviceInfo(anonymize: Boolean) {
+        _state.update {
+            it.copy(anonymizeDeviceInfo = anonymize)
+        }
+    }
+
     fun toggleTokenLogin() {
         _state.update {
             it.copy(isTokenLogin = !it.isTokenLogin)
@@ -127,6 +135,7 @@ class LoginViewModel : ViewModel() {
                     username = _state.value.username.text,
                     password = _state.value.password.text,
                     code = _state.value.totp.text.ifEmpty { null },
+                    anonymizeDeviceInfo = _state.value.anonymizeDeviceInfo
                 )
 
                 loginRes
@@ -209,8 +218,8 @@ class LoginViewModel : ViewModel() {
                         return@launch
                     }
                 }
-                .onFailure {
-                    onError("Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater and have the \"Version Checking\" feature enabled (${it.message})")
+                .onFailure { error ->
+                    onError("Failed to fetch server version, make sure you are running Zipline v$minimumZiplineVersion or greater and have the \"Version Checking\" feature enabled (${error.message})")
 
                     _state.update {
                         it.copy(isLoading = false)
@@ -223,6 +232,10 @@ class LoginViewModel : ViewModel() {
 
             userStatsRes
                 .onSuccess {
+                    val secureStore = SecureStorage.getInstance(context)
+
+                    secureStore.set(STORAGE_DEFAULT_DOMAIN_KEY, _state.value.serverUrl.text)
+
                     withContext(NonCancellable) {
                         updatePublicSettings()
                         updateWebSettings()

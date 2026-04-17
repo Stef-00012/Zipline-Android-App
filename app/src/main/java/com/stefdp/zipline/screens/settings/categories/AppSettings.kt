@@ -35,9 +35,12 @@ import androidx.navigation.NavHostController
 import com.stefdp.zipline.APP_VERSION
 import com.stefdp.zipline.IS_DEBUG
 import com.stefdp.zipline.LocalUpdateLoggedUser
+import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Notification
+import com.stefdp.zipline.components.Select
+import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.UserRole
@@ -67,6 +70,10 @@ internal fun AppSettingsCategory(
     viewModel: SettingsViewModel,
     state: SettingsUiState
 ) {
+    val webSettings = LocalWebSettings.current
+
+    val domains = webSettings?.config?.domains ?: emptyList()
+
     Container(
         scrollable = false,
         modifier = Modifier.fillMaxWidth()
@@ -200,6 +207,41 @@ internal fun AppSettingsCategory(
 //                        else ""
 //                    )
 //                )
+            )
+
+            Select(
+                label = "Default Domain",
+                description = "Set the default domain used for copied links anywhere in the dashboard. Leave blank or select \"Default domain\" to use the current domain that serves the dashboard.",
+                options = listOf(
+                    SelectOption(
+                        id = "default",
+                        label = { enabled ->
+                            Text(
+                                text = "Default domain",
+                                color = if (enabled)
+                                    MaterialTheme.colorScheme.onBackground
+                                else
+                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                            )
+                        }
+
+                    )
+                ) + domains.map { domain ->
+                    SelectOption(
+                        id = domain,
+                        label = {
+                            Text(domain)
+                        }
+                    )
+                },
+                onSelectionChange = {
+                    viewModel.setSelectedDefaultDomain(
+                        context = context,
+                        domain = it
+                    )
+                },
+                selectedIds = state.selectedDefaultDomain,
+                enabled = !state.isLoading
             )
 
             val directoryPicker = rememberLauncherForActivityResult(

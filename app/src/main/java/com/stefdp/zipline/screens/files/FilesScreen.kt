@@ -879,7 +879,7 @@ fun FilesScreen(
                                     color = MaterialTheme.colorScheme.primary,
                                     iconColor = MaterialTheme.colorScheme.onPrimary,
                                     onClick = {
-                                        val fileUrl = "${state.serverUrl}${file.url}"
+                                        val fileUrl = "${state.defaultDomain}${file.url}"
 
                                         val clipData = ClipData.newPlainText("File URL", fileUrl).toClipEntry()
 

@@ -1,26 +1,26 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
+import android.util.JsonToken
 import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.requests.DeleteSessionBody
+import com.stefdp.zipline.network.models.ZiplineClient
+import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
-import com.stefdp.zipline.network.models.responses.GetSessionsResponse
 import com.stefdp.zipline.network.models.responses.LoginResponse
+import com.stefdp.zipline.network.models.responses.LogoutResponse
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[deleteSession]"
+private const val TAG = "ZiplineApi[login]"
 
-suspend fun deleteSession(
+suspend fun logout(
     context: Context,
-    sessionId: String,
-    all: Boolean = false
-): Result<GetSessionsResponse> {
+): Result<LogoutResponse> {
     try {
         val secureStore = SecureStorage.getInstance(context)
 
@@ -39,19 +39,8 @@ suspend fun deleteSession(
             )
         }
 
-        val requestBody = if (all) {
-            DeleteSessionBody(
-                all = true
-            )
-        } else {
-            DeleteSessionBody(
-                sessionId = sessionId
-            )
-        }
-
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).deleteSession(
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).logout(
             token = token,
-            data = requestBody
         )
 
         val body = response.body()
@@ -83,7 +72,7 @@ suspend fun deleteSession(
             )
         }
 
-        if (body is GetSessionsResponse) {
+        if (body is LogoutResponse) {
             return Result.success(body)
         }
 

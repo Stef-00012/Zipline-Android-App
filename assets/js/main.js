@@ -4,11 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	
     if (currentYearElement) currentYearElement.innerText = new Date().getFullYear();
 
-    fetch("https://api.github.com/repos/Stef-00012/Zipline-Android-App/releases/latest")
+    fetch("https://git.stefdp.com/api/v1/repos/Stef/Zipline-Android-App/releases/latest")
         .then(res => res.json())
         .then(data => {
-            const version = data.tag_name.split("-").shift();
-
-            versionElement.innerText = version;
+            console.log(data);
+            versionElement.innerText = data.tag_name;
         })
 });

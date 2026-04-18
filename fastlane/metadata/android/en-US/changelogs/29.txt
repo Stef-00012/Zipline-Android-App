@@ -1,0 +1,1 @@
+Fixed paging system text input not being full width on larger devices like tablets

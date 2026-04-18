@@ -1,0 +1,1 @@
+Risolto il problema del box di testo del sistema di paginazione che non veniva visualizzato a larghezza intera su dispositivi più grandi come i tablet

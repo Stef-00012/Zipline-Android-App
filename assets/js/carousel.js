@@ -45,7 +45,9 @@ function goTo(idx) {
 prevBtn.addEventListener('click', () => goTo(current - 1));
 nextBtn.addEventListener('click', () => goTo(current + 1));
 
-dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => goTo(i))
+});
 
 let startX = null;
 

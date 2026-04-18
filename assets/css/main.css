@@ -47,14 +47,14 @@ header .title {
     margin: 0 0 0 12px;
 }
 
-header .github-logo {
+header .forgejo-logo {
     width: 50px;
     height: 50px;
     color: #676F82;
     transition: color 0.3s;
 }
 
-header .github-logo:hover {
+header .forgejo-logo:hover {
     color: #9ea8be;
 }
 

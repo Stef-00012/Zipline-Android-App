@@ -153,6 +153,7 @@ fun Pager(
                 .weight(1f)
                 .height(SIZE.dp),
             modifier = Modifier
+                .fillMaxWidth()
                 .onPreviewKeyEvent { keyEvent ->
                     if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
                         onEnter()

@@ -108,7 +108,7 @@ import kotlinx.coroutines.launch
 import nl.jacobras.humanreadable.HumanReadable
 import kotlin.time.Instant
 
-const val COMPACT_VIEW_FILE_COUNT = 20L
+const val COMPACT_VIEW_FILE_COUNT = 25L
 const val DETAILED_VIEW_FILE_COUNT = 15L
 
 const val VIEW_STATE_KEY = "filesViewState"

@@ -15,8 +15,8 @@ android {
         applicationId = "com.stefdp.zipline"
         minSdk = 26
         targetSdk = 36
-        versionCode = 28
-        versionName = "2.0.2" // TODO: reminder, when updating here, update the APP_VERSION constant in MainActivity too
+        versionCode = 29
+        versionName = "2.0.3" // TODO: reminder, when updating here, update the APP_VERSION constant in MainActivity too
         ndkVersion = "29.0.14206865"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

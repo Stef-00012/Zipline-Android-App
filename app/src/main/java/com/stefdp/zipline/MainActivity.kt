@@ -141,7 +141,7 @@ val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState
     {}
 }
 
-const val APP_VERSION = "2.0.2"
+const val APP_VERSION = "2.0.3"
 
 class MainActivity : FragmentActivity() {
     private var isAppReady by mutableStateOf(false)

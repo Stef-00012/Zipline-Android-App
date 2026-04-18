@@ -83,7 +83,7 @@ main {
     cursor: not-allowed;
 }
 
-.som-text {
+.flavortown-text {
     color: lightgray;
     font-weight: bold;
     text-decoration: underline dashed;
@@ -94,7 +94,7 @@ main {
     cursor: pointer;
 }
 
-.som-text:hover {
+.flavortown-text:hover {
     color: white;
 }
 

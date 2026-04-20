@@ -22,7 +22,7 @@ This is an android app made to manage your [Zipline V4](https://github.com/diced
 The app is available on the following platforms:
 - Google Play Store
 - Forgejo Releases
-- Fdroid (waiting for approval)
+- Fdroid [(waiting for approval)](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/36552)
 
 [![Get on Google Play](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png)](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
 [![Get on Forgejo](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png)](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-release-signed.apk)

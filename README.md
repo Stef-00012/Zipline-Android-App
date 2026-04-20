@@ -23,8 +23,8 @@ The app is available on the following platforms:
 - Google Play Store
 - GitHub Releases
 
-[![Get on Google Play](/assets/github/google-play.png)](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
-[![Get on GitHub](/assets/github/github.png)](https://git.stefdp.com/Stef/zipline-android-app/releases/latest/download/app-release.apk)
+[![Get on Google Play](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png)](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
+[![Get on Forgejo](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png)](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-release-signed.apk)
 
 # Creating a development build
 

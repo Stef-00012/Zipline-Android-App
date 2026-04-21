@@ -121,7 +121,6 @@ fun CreateTagPopup(
                     color = state.createTagColor,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -131,7 +130,6 @@ fun CreateTagPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

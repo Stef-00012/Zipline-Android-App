@@ -156,7 +156,6 @@ fun UploadFileScreen(
                 getFileInfo(context, uri)?.let { (name, size, mimeType) ->
                     if (size >= maxFileSize) {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -187,7 +186,6 @@ fun UploadFileScreen(
             context = context,
             onError = {
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -252,7 +250,7 @@ fun UploadFileScreen(
                             modifier = Modifier.clickable(
                                 onClick = {
                                     val intent = Intent(Intent.ACTION_VIEW, fileState.url?.toUri())
-                                    context.startActivity(intent)
+                                    activity.startActivity(intent)
                                 }
                             )
                         )
@@ -271,7 +269,6 @@ fun UploadFileScreen(
                                         clipboardManager.setClipEntry(clipData)
 
                                         Notification.show(
-                                            context = context,
                                             activity = activity,
                                         ) {
                                             Text(
@@ -290,7 +287,7 @@ fun UploadFileScreen(
                                 onClick = {
                                     coroutineScope.launch {
                                         val intent = Intent(Intent.ACTION_VIEW, fileState.url?.toUri())
-                                        context.startActivity(intent)
+                                        activity.startActivity(intent)
                                     }
                                 },
                                 color = MaterialTheme.colorScheme.primary,
@@ -395,7 +392,6 @@ fun UploadFileScreen(
                     launchCameraAction()
                 } else {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(

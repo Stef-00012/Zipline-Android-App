@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -32,10 +33,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-import com.stefdp.zipline.APP_VERSION
+import com.stefdp.zipline.BuildConfig
 import com.stefdp.zipline.IS_DEBUG
 import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalWebSettings
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Notification
@@ -93,11 +95,11 @@ internal fun AppSettingsCategory(
                 )
 
                 Text(
-                    text = AnnotatedString.fromHtml("<b>App Version:</b> $APP_VERSION"),
+                    text = AnnotatedString.fromHtml("<b>App Version:</b> ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 )
 
-                val appBuild = if (IS_DEBUG) "Debug" else "Release"
+                val appBuild = BuildConfig.BUILD_TYPE.replaceFirstChar { it.uppercase() }
 
                 Text(
                     text = AnnotatedString.fromHtml("<b>App Build:</b> $appBuild"),
@@ -117,6 +119,7 @@ internal fun AppSettingsCategory(
                     VersionDisplay(
                         version = version,
                         context = context,
+                        activity = activity
                     )
                 }
             }
@@ -162,7 +165,6 @@ internal fun AppSettingsCategory(
                         },
                         onError = { _, _ ->
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -240,9 +242,15 @@ internal fun AppSettingsCategory(
                         domain = it
                     )
                 },
-                selectedIds = state.selectedDefaultDomain,
+                selectedIds = if (state.selectedDefaultDomain.firstOrNull() in domains)
+                    state.selectedDefaultDomain
+                else setOf("default"),
                 enabled = !state.isLoading
             )
+
+            LaunchedEffect(Unit) {
+                Logger.debug("AppSettingsCategory", "Selected default domain: ${state.selectedDefaultDomain}, available domains: $domains")
+            }
 
             val directoryPicker = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocumentTree()

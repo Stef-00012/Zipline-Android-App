@@ -146,7 +146,6 @@ internal fun EditFilePopup(
                         }
                         editFileRes.onFailure {
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -203,7 +202,6 @@ internal fun EditFilePopup(
                     }
                     editFileRes.onFailure {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

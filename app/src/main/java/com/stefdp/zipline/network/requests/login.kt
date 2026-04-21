@@ -3,7 +3,7 @@ package com.stefdp.zipline.network.requests
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.stefdp.zipline.APP_VERSION
+import com.stefdp.zipline.BuildConfig
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
@@ -47,9 +47,9 @@ suspend fun login(
         }
 
         val userAgent = if (anonymizeDeviceInfo) {
-            "Zipline/$APP_VERSION (Android; Mobile)"
+            "Zipline/${BuildConfig.VERSION_NAME} (Android; Mobile)"
         } else {
-            System.getProperty("http.agent") ?: "Zipline/$APP_VERSION (Android; Mobile)"
+            System.getProperty("http.agent") ?: "Zipline/${BuildConfig.VERSION_NAME} (Android; Mobile)"
         }
 
         val ziplineClient = ZiplineClient(

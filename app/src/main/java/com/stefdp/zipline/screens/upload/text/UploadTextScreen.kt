@@ -152,7 +152,6 @@ fun UploadTextScreen(
             getFileInfo(context, uri)?.let { (name, size, mimeType) ->
                 if (size >= maxFileSize) {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -214,7 +213,6 @@ fun UploadTextScreen(
             context = context,
             onError = {
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -265,7 +263,7 @@ fun UploadTextScreen(
                     modifier = Modifier.clickable(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, state.fileState?.url?.toUri())
-                            context.startActivity(intent)
+                            activity.startActivity(intent)
                         }
                     )
                 )
@@ -284,7 +282,6 @@ fun UploadTextScreen(
                                 clipboardManager.setClipEntry(clipData)
 
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -302,7 +299,7 @@ fun UploadTextScreen(
                         iconContentDescription = "Open URL",
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, state.fileState?.url?.toUri())
-                            context.startActivity(intent)
+                            activity.startActivity(intent)
                         },
                         color = MaterialTheme.colorScheme.primary,
                         iconColor = MaterialTheme.colorScheme.onPrimary

@@ -119,7 +119,6 @@ fun LoginScreen(
             "Notifications Permission Denied, please go to the app settings and allow it from there"
 
         Notification.show(
-            context = context,
             activity = activity,
         ) {
             Text(notificationText)
@@ -141,7 +140,6 @@ fun LoginScreen(
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text("Notifications Permission is automatically granted on this version of Android")
@@ -290,7 +288,6 @@ fun LoginScreen(
                                 Logger.debug("LoginScreen", "Login error: $error")
 
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 6000L
                                 ) {

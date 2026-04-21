@@ -117,7 +117,6 @@ fun CreateFolderPopup(
                     viewState = viewState,
                     onSuccess = { folder ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -127,7 +126,6 @@ fun CreateFolderPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

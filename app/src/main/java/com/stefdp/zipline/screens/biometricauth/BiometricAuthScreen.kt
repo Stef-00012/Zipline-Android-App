@@ -52,7 +52,6 @@ fun BiometricAuthScreen(
             },
             onError = { _, _ ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(

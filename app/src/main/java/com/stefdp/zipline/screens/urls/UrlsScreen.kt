@@ -151,7 +151,6 @@ fun UrlsScreen(
                 viewState = viewState,
                 onSuccess = {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -161,7 +160,6 @@ fun UrlsScreen(
                 },
                 onError = { error ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -529,7 +527,7 @@ fun UrlsScreen(
                                             val urlUrl = "${state.serverUrl}${urlsRoute}/${url.code}"
 
                                             val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                                            context.startActivity(intent)
+                                            activity.startActivity(intent)
                                         }
                                     )
                                 )
@@ -547,7 +545,7 @@ fun UrlsScreen(
                                             val urlUrl = "${state.serverUrl}${urlsRoute}/${url.vanity}"
 
                                             val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                                            context.startActivity(intent)
+                                            activity.startActivity(intent)
                                         }
                                     )
                                 )
@@ -563,7 +561,7 @@ fun UrlsScreen(
                                         enabled = state.serverUrl != null,
                                         onClick = {
                                             val intent = Intent(Intent.ACTION_VIEW, url.destination.toUri())
-                                            context.startActivity(intent)
+                                            activity.startActivity(intent)
                                         }
                                     )
                                 )
@@ -620,7 +618,6 @@ fun UrlsScreen(
                                             clipboardManager.setClipEntry(clipData)
 
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(

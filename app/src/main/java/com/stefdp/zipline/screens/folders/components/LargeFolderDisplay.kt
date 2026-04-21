@@ -80,7 +80,7 @@ fun LargeFolderDisplay(
                         val urlUrl = "${serverUrl}/folder/${folder.id}"
 
                         val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                        context.startActivity(intent)
+                        activity.startActivity(intent)
                     }
                 )
             )
@@ -145,7 +145,6 @@ fun LargeFolderDisplay(
                             clipboardManager.setClipEntry(clipData)
 
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(

@@ -81,7 +81,6 @@ internal fun CopyUrlButton(
                         clipboardManager.setClipEntry(clipData)
 
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -112,7 +111,6 @@ internal fun CopyUrlButton(
                         clipboardManager.setClipEntry(clipData)
 
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

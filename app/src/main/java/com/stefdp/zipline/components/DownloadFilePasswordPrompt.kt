@@ -74,7 +74,6 @@ fun DownloadFilePasswordPrompt(
                         }
                         .onFailure {
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(

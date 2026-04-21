@@ -91,7 +91,6 @@ fun SettingsScreen(
             "Notifications Permission Denied, please go to the app settings and allow it from there"
 
         Notification.show(
-            context = context,
             activity = activity,
         ) {
             Text(notificationText)
@@ -103,7 +102,6 @@ fun SettingsScreen(
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             Notification.show(
-                context = context,
                 activity = activity,
             ) {
                 Text("Notifications Permission is automatically granted on this version of Android")
@@ -186,7 +184,6 @@ fun SettingsScreen(
                     localUpdateLoggedUserAvatar = localUpdateLoggedUserAvatar,
                     onError = { errors ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Column(
@@ -205,7 +202,6 @@ fun SettingsScreen(
                     },
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text("User settings updated successfully")

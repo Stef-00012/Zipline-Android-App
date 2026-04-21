@@ -119,7 +119,6 @@ fun EditTagPopup(
                     context = context,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -129,7 +128,6 @@ fun EditTagPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

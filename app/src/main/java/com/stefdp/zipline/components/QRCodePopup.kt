@@ -123,7 +123,6 @@ fun QRCodePopup(
                         clipboardManager.setClipEntry(clipData)
 
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -162,7 +161,6 @@ fun QRCodePopup(
                                 qrCode.compress(Bitmap.CompressFormat.PNG, 100, out)
 
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(

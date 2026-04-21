@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
@@ -35,6 +36,7 @@ import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 @Composable
 internal fun OAuthCategory(
     context: Context,
+    activity: FragmentActivity,
     updateSettings: (OauthSettings) -> Unit,
     title: String,
     viewModel: AdminSettingsViewModel,
@@ -112,7 +114,7 @@ internal fun OAuthCategory(
                                     val url = "https://discord.com/developers/applications"
 
                                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                    context.startActivity(intent)
+                                    activity.startActivity(intent)
                                 }
                             )
                     )
@@ -195,7 +197,7 @@ internal fun OAuthCategory(
                                     val url = "https://console.developers.google.com/"
 
                                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                    context.startActivity(intent)
+                                    activity.startActivity(intent)
                                 }
                             )
                     )
@@ -256,7 +258,7 @@ internal fun OAuthCategory(
                                     val url = "https://github.com/settings/developers"
 
                                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                    context.startActivity(intent)
+                                    activity.startActivity(intent)
                                 }
                             )
                     )

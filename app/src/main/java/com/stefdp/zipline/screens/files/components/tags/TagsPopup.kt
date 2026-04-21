@@ -187,7 +187,6 @@ fun TagsPopup(
                                         tagId = tag.id,
                                         onSuccess = {
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(
@@ -197,7 +196,6 @@ fun TagsPopup(
                                         },
                                         onError = { error ->
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(

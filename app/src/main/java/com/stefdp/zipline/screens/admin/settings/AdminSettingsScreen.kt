@@ -83,7 +83,6 @@ fun AdminSettingsScreen(
             onSuccess = {},
             onError = { errors ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                     duration = 8000L,
                 ) {
@@ -141,7 +140,6 @@ fun AdminSettingsScreen(
                             context = context,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -151,7 +149,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -226,7 +223,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -236,7 +232,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -270,7 +265,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -280,7 +274,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -314,7 +307,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -324,7 +316,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -358,7 +349,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -368,7 +358,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -402,7 +391,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -412,7 +400,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -446,7 +433,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -456,7 +442,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -490,7 +475,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -500,7 +484,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -534,7 +517,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -544,7 +526,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -578,7 +559,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -588,7 +568,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -622,7 +601,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -632,7 +610,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -666,7 +643,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -676,7 +652,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -697,6 +672,7 @@ fun AdminSettingsScreen(
                         )
                     },
                     context = context,
+                    activity = activity,
                     title = SettingCategory.OAUTH.categoryName,
                     viewModel = viewModel,
                     state = state
@@ -711,7 +687,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -721,7 +696,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -755,7 +729,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -765,7 +738,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -799,7 +771,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -809,7 +780,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -843,7 +813,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -853,7 +822,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -887,7 +855,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -897,7 +864,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {
@@ -931,7 +897,6 @@ fun AdminSettingsScreen(
                             data = data,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -941,7 +906,6 @@ fun AdminSettingsScreen(
                             },
                             onError = { errors ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                     duration = 8000L,
                                 ) {

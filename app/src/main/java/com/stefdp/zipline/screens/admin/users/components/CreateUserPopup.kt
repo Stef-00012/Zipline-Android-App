@@ -170,7 +170,6 @@ fun CreateUserPopup(
                     viewState = viewState,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -180,7 +179,6 @@ fun CreateUserPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

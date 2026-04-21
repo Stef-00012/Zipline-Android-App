@@ -142,7 +142,6 @@ fun CreateInvitePopup(
                     viewState = viewState,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -152,7 +151,6 @@ fun CreateInvitePopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

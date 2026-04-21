@@ -11,12 +11,14 @@ android {
         version = release(36)
     }
 
+    val baseAppName = "Zipline"
+
     defaultConfig {
         applicationId = "com.stefdp.zipline"
         minSdk = 26
         targetSdk = 36
-        versionCode = 29
-        versionName = "2.0.3" // TODO: reminder, when updating here, update the APP_VERSION constant in MainActivity too
+        versionCode = 30
+        versionName = "2.0.4"
         ndkVersion = "29.0.14206865"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -27,7 +29,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
 
-            manifestPlaceholders["appName"] = "Zipline"
+            manifestPlaceholders["appName"] = baseAppName
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -51,15 +53,18 @@ android {
 
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
-            manifestPlaceholders["appName"] = "Zipline (Debug)"
+            manifestPlaceholders["appName"] = "$baseAppName (Debug)"
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

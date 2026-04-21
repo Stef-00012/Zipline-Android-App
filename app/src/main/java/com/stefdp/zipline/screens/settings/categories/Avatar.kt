@@ -130,7 +130,6 @@ internal fun AvatarCategory(
                                 localUpdateLoggedUserAvatar = localUpdateLoggedUserAvatar,
                                 onError = { errors ->
                                     Notification.show(
-                                        context = context,
                                         activity = activity,
                                     ) {
                                         Column(
@@ -149,7 +148,6 @@ internal fun AvatarCategory(
                                 },
                                 onSuccess = {
                                     Notification.show(
-                                        context = context,
                                         activity = activity,
                                     ) {
                                         Text("User avatar removed successfully")

@@ -102,7 +102,6 @@ fun EditFolderNamePopup(
                     viewState = viewState,
                     onSuccess = { oldFolderName, newFolderName ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -112,7 +111,6 @@ fun EditFolderNamePopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

@@ -133,7 +133,6 @@ fun AdminInvitesScreen(
                 onError = { error ->
                     coroutineScope.launch {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -408,7 +407,7 @@ fun AdminInvitesScreen(
                                             val url = "${state.serverUrl}/invite/${invite.code}"
 
                                             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                            context.startActivity(intent)
+                                            activity.startActivity(intent)
                                         }
                                     )
                                 )
@@ -479,7 +478,6 @@ fun AdminInvitesScreen(
                                             clipboardManager.setClipEntry(clipData)
 
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(

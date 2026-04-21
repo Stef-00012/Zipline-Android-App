@@ -89,7 +89,6 @@ internal fun UserCategory(
                     },
                     onError = { _, _ ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -147,7 +146,6 @@ internal fun UserCategory(
                         clipboardManager.setClipEntry(clipData)
 
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

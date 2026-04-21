@@ -140,7 +140,6 @@ fun MoveFolderPopup(
                     viewState = viewState,
                     onSuccess = { folderName ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -150,7 +149,6 @@ fun MoveFolderPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

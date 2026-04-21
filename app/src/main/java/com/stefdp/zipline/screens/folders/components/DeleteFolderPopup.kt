@@ -201,7 +201,6 @@ fun DeleteFolderPopup(
                     viewState = viewState,
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -212,7 +211,6 @@ fun DeleteFolderPopup(
                     },
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

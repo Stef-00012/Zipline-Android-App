@@ -57,7 +57,6 @@ fun LoadingScreen(
             onError = { error ->
                 if (error != null) {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(

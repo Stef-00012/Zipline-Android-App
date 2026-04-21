@@ -73,7 +73,6 @@ fun AdminActionsScreen(
             context = context,
             onError = { error ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -107,7 +106,6 @@ fun AdminActionsScreen(
                 uri = it,
                 sendNotification = { content ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                         content = content
                     )
@@ -222,7 +220,6 @@ fun AdminActionsScreen(
                     uri = state.selectedUri!!,
                     sendNotification = { content ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                             content = content
                         )
@@ -300,7 +297,6 @@ fun AdminActionsScreen(
                 context = context,
                 onSuccess = { response ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(response)
@@ -308,7 +304,6 @@ fun AdminActionsScreen(
                 },
                 onError = { error ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -338,7 +333,6 @@ fun AdminActionsScreen(
                 context = context,
                 onSuccess = { response ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(response)
@@ -346,7 +340,6 @@ fun AdminActionsScreen(
                 },
                 onError = { error ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -376,7 +369,6 @@ fun AdminActionsScreen(
                 context = context,
                 onSuccess = { response ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                         duration = 8000L,
                     ) {
@@ -385,7 +377,6 @@ fun AdminActionsScreen(
                 },
                 onError = { error ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -433,7 +424,6 @@ fun AdminActionsScreen(
                 context = context,
                 onSuccess = { response ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                         duration = 8000L,
                     ) {
@@ -442,7 +432,6 @@ fun AdminActionsScreen(
                 },
                 onError = { error ->
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(

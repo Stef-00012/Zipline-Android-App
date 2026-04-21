@@ -64,7 +64,6 @@ fun AvatarInput(
 
                 if (size >= MAX_AVATAR_FILE_SIZE) {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(

@@ -80,7 +80,7 @@ fun LargeUrlDisplay(
                         val urlUrl = "${serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
 
                         val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                        context.startActivity(intent)
+                        activity.startActivity(intent)
                     }
                 )
             )
@@ -102,7 +102,6 @@ fun LargeUrlDisplay(
                             clipboardManager.setClipEntry(clipData)
 
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -123,7 +122,6 @@ fun LargeUrlDisplay(
                             clipboardManager.setClipEntry(clipData)
 
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(

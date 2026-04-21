@@ -28,3 +28,9 @@
 
 -keep class com.stefdp.zipline.screens.** { *; }
 -keep interface com.stefdp.zipline.screens.** { *; }
+
+-keep class com.stefdp.zipline.BuildConfig { *; }
+
+-keep class androidx.lifecycle.ViewTreeLifecycleOwner { *; }
+-keep class androidx.lifecycle.ViewTreeViewModelStoreOwner { *; }
+-keep class androidx.savedstate.ViewTreeSavedStateRegistryOwner { *; }

@@ -167,7 +167,6 @@ fun FoldersScreen(
             viewState = viewState,
             onError = { error ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -178,7 +177,6 @@ fun FoldersScreen(
             },
             onSuccess = { folder ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -196,7 +194,6 @@ fun FoldersScreen(
             viewState = viewState,
             onError = { error ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -207,7 +204,6 @@ fun FoldersScreen(
             },
             onSuccess = { folder ->
                 Notification.show(
-                    context = context,
                     activity = activity,
                 ) {
                     Text(
@@ -240,7 +236,6 @@ fun FoldersScreen(
                         folderExportUri = it,
                         sendNotification = { content ->
                             Notification.show(
-                                context = context,
                                 activity = activity,
                                 content = content
                             )
@@ -257,7 +252,6 @@ fun FoldersScreen(
                         fileDownloadUri = it,
                         sendNotification = { content ->
                             Notification.show(
-                                context = context,
                                 activity = activity,
                                 content = content
                             )
@@ -683,7 +677,6 @@ fun FoldersScreen(
                                                 folderExportUri = state.selectedFolderExportUri!!,
                                                 sendNotification = { content ->
                                                     Notification.show(
-                                                        context = context,
                                                         activity = activity,
                                                         content = content
                                                     )
@@ -852,7 +845,6 @@ fun FoldersScreen(
                                             clipboardManager.setClipEntry(clipData)
 
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(
@@ -964,7 +956,6 @@ fun FoldersScreen(
                                             folderExportUri = state.selectedFolderExportUri!!,
                                             sendNotification = { content ->
                                                 Notification.show(
-                                                    context = context,
                                                     activity = activity,
                                                     content = content
                                                 )
@@ -1342,7 +1333,6 @@ fun FoldersScreen(
                                 filesPerPage = filesPerPage,
                                 onSuccess = {
                                     Notification.show(
-                                        context = context,
                                         activity = activity,
                                     ) {
                                         Text(
@@ -1352,7 +1342,6 @@ fun FoldersScreen(
                                 },
                                 onError = { error ->
                                     Notification.show(
-                                        context = context,
                                         activity = activity,
                                     ) {
                                         Text(
@@ -1460,7 +1449,7 @@ fun FoldersScreen(
                                             val fileUrl = "${state.serverUrl}${file.url}"
 
                                             val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
-                                            context.startActivity(intent)
+                                            activity.startActivity(intent)
                                         },
                                         enabled = state.serverUrl != null && !state.isLoading
                                     )
@@ -1483,7 +1472,6 @@ fun FoldersScreen(
                                                 clipboardManager.setClipEntry(clipData)
 
                                                 Notification.show(
-                                                    context = context,
                                                     activity = activity,
                                                 ) {
                                                     Text(
@@ -1518,7 +1506,6 @@ fun FoldersScreen(
                                                     fileDownloadUri = state.selectedFileDownloadUri!!,
                                                     sendNotification = { content ->
                                                         Notification.show(
-                                                            context = context,
                                                             activity = activity,
                                                             content = content
                                                         )
@@ -1550,7 +1537,6 @@ fun FoldersScreen(
                                                 fileDownloadUri = state.selectedFileDownloadUri!!,
                                                 sendNotification = { content ->
                                                     Notification.show(
-                                                        context = context,
                                                         activity = activity,
                                                         content = content
                                                     )

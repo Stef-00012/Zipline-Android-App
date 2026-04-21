@@ -112,7 +112,6 @@ fun PendingFile(
                     ids = listOf(file.id),
                     onSuccess = {
                         Notification.show(
-                            context,
                             activity = activity,
                         ) {
                             Text(
@@ -122,7 +121,6 @@ fun PendingFile(
                     },
                     onError = { error ->
                         Notification.show(
-                            context,
                             activity = activity,
                         ) {
                             Text(

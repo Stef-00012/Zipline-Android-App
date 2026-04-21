@@ -66,7 +66,6 @@ internal fun ExportFilesCategory(
                         context = context,
                         onError = { error ->
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -77,7 +76,6 @@ internal fun ExportFilesCategory(
                         },
                         onSuccess = {
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -209,7 +207,6 @@ internal fun ExportFilesCategory(
                                         exportId = export.id,
                                         onError = { error ->
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(
@@ -220,7 +217,6 @@ internal fun ExportFilesCategory(
                                         },
                                         onSuccess = {
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(
@@ -256,7 +252,6 @@ internal fun ExportFilesCategory(
                                         exportUri = it,
                                         sendNotification = { content ->
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                                 content = content
                                             )
@@ -283,7 +278,6 @@ internal fun ExportFilesCategory(
                                         exportUri = state.selectedExportUri,
                                         sendNotification = { content ->
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                                 content = content,
                                                 duration = 5000L

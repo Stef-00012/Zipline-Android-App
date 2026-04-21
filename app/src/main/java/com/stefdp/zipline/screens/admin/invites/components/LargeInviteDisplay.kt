@@ -67,7 +67,7 @@ fun LargeInviteDisplay(
                         val inviteUrl = "${serverUrl}/invite/${invite.code}"
 
                         val intent = Intent(Intent.ACTION_VIEW, inviteUrl.toUri())
-                        context.startActivity(intent)
+                        activity.startActivity(intent)
                     }
                 )
             )
@@ -89,7 +89,6 @@ fun LargeInviteDisplay(
                             clipboardManager.setClipEntry(clipData)
 
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(

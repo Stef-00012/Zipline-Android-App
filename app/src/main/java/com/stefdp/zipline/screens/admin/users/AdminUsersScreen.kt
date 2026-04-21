@@ -141,7 +141,6 @@ fun AdminUsersScreen(
                     deleteUserFilesAndUrls = true,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -151,7 +150,6 @@ fun AdminUsersScreen(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -169,7 +167,6 @@ fun AdminUsersScreen(
                     deleteUserFilesAndUrls = false,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -179,7 +176,6 @@ fun AdminUsersScreen(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

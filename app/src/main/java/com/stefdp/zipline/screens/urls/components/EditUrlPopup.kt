@@ -169,7 +169,6 @@ fun EditUrlPopup(
             onClick = {
                 if (!urlRegex.matches(state.editUrlDestination.text)) {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -193,7 +192,6 @@ fun EditUrlPopup(
                     password = state.editUrlPassword.text.takeIf { it.isNotBlank() },
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -205,7 +203,6 @@ fun EditUrlPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

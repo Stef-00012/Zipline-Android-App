@@ -306,7 +306,6 @@ fun FilesScreen(
                         onClick = {},
                         onLongClick = {
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(titleText)
@@ -746,7 +745,6 @@ fun FilesScreen(
                             filesPerPage = filesPerPage,
                             onSuccess = {
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -756,7 +754,6 @@ fun FilesScreen(
                             },
                             onError = { error ->
                                 Notification.show(
-                                    context = context,
                                     activity = activity,
                                 ) {
                                     Text(
@@ -864,7 +861,7 @@ fun FilesScreen(
                                         val fileUrl = "${state.serverUrl}${file.url}"
 
                                         val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
-                                        context.startActivity(intent)
+                                        activity.startActivity(intent)
                                     },
                                     enabled = state.serverUrl != null && !state.isLoading
                                 )
@@ -887,7 +884,6 @@ fun FilesScreen(
                                             clipboardManager.setClipEntry(clipData)
 
                                             Notification.show(
-                                                context = context,
                                                 activity = activity,
                                             ) {
                                                 Text(
@@ -919,7 +915,6 @@ fun FilesScreen(
                                             password = it,
                                             sendNotification = { content ->
                                                 Notification.show(
-                                                    context = context,
                                                     activity = activity,
                                                     content = content
                                                 )
@@ -947,7 +942,6 @@ fun FilesScreen(
                                             password = state.downloadFilePassword,
                                             sendNotification = { content ->
                                                 Notification.show(
-                                                    context = context,
                                                     activity = activity,
                                                     content = content
                                                 )
@@ -975,7 +969,6 @@ fun FilesScreen(
                                             password = state.downloadFilePassword,
                                             sendNotification = { content ->
                                                 Notification.show(
-                                                    context = context,
                                                     activity = activity,
                                                     content = content
                                                 )

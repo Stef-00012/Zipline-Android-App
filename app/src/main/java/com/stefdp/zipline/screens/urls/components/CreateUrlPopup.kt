@@ -97,7 +97,7 @@ fun CreateUrlPopup(
                 modifier = Modifier.clickable(
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW, state.createdUrlResult?.toUri())
-                        context.startActivity(intent)
+                        activity.startActivity(intent)
                     }
                 )
             )
@@ -118,7 +118,6 @@ fun CreateUrlPopup(
                             clipboardManager.setClipEntry(clipData)
 
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -136,7 +135,7 @@ fun CreateUrlPopup(
                     iconContentDescription = "Open URL",
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW, state.createdUrlResult?.toUri())
-                        context.startActivity(intent)
+                        activity.startActivity(intent)
                     },
                     color = MaterialTheme.colorScheme.primary,
                     iconColor = MaterialTheme.colorScheme.onPrimary
@@ -305,7 +304,6 @@ fun CreateUrlPopup(
             onClick = {
                 if (!urlRegex.matches(state.createUrlDestination.text)) {
                     Notification.show(
-                        context = context,
                         activity = activity,
                     ) {
                         Text(
@@ -330,7 +328,6 @@ fun CreateUrlPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

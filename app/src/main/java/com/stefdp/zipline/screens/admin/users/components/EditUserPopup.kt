@@ -326,7 +326,6 @@ fun EditUserPopup(
                     viewState = viewState,
                     onSuccess = {
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(
@@ -336,7 +335,6 @@ fun EditUserPopup(
                     },
                     onError = { error ->
                         Notification.show(
-                            context = context,
                             activity = activity,
                         ) {
                             Text(

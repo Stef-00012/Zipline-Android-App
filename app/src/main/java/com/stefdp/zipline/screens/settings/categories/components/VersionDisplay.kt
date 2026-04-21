@@ -35,6 +35,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
@@ -47,7 +48,8 @@ import com.stefdp.zipline.utils.shimmerable
 fun VersionDisplay(
     modifier: Modifier = Modifier,
     version: GetServerVersionResponse?,
-    context: Context
+    context: Context,
+    activity: FragmentActivity,
 ) {
     val versionData = version?.data
 
@@ -174,7 +176,7 @@ fun VersionDisplay(
                                 val url = "https://github.com/diced/zipline/releases/${versionData?.version?.tag}"
 
                                 val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                context.startActivity(intent)
+                                activity.startActivity(intent)
                             }
                         )
                     )
@@ -200,7 +202,7 @@ fun VersionDisplay(
                                 val url = "https://github.com/diced/zipline/commit/${versionData?.version?.sha}"
 
                                 val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                context.startActivity(intent)
+                                activity.startActivity(intent)
                             }
                         )
                     )
@@ -279,7 +281,7 @@ fun VersionDisplay(
                                     val url = "https://github.com/diced/zipline/commit/${versionData.latest.commit.sha}"
 
                                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                    context.startActivity(intent)
+                                    activity.startActivity(intent)
                                 }
                             )
                         )
@@ -328,7 +330,7 @@ fun VersionDisplay(
                     val url = versionData.latest.url
 
                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
+                    activity.startActivity(intent)
                 }
             ) {
                 Text(
@@ -346,7 +348,7 @@ fun VersionDisplay(
                     val url = "https://zipline.diced.sh/docs/get-started/docker#updating"
 
                     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
+                    activity.startActivity(intent)
                 }
             ) {
                 Text(

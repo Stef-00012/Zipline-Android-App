@@ -169,7 +169,6 @@ fun LargeFileDisplay(
                         }
                         .onFailure {
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(
@@ -240,7 +239,7 @@ fun LargeFileDisplay(
                         val fileUrl = "${defaultDomain}${clickedFile.url}"
 
                         val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
-                        context.startActivity(intent)
+                        activity.startActivity(intent)
                     },
                     serverUrl = serverUrl
                 )
@@ -482,7 +481,6 @@ fun LargeFileDisplay(
                                     }
                                     .onFailure {
                                         Notification.show(
-                                            context = context,
                                             activity = activity,
                                         ) {
                                             Text(
@@ -511,7 +509,7 @@ fun LargeFileDisplay(
                             val fileUrl = "${defaultDomain}${currentFile.url}"
 
                             val intent = Intent(Intent.ACTION_VIEW, fileUrl.toUri())
-                            context.startActivity(intent)
+                            activity.startActivity(intent)
                         },
                         enabled = !isLoading || defaultDomain == null,
                         color = MaterialTheme.colorScheme.primary,
@@ -549,7 +547,6 @@ fun LargeFileDisplay(
                     fun showToast(message: String) {
                         coroutineScope.launch(Dispatchers.Main) {
                             Notification.show(
-                                context = context,
                                 activity = activity,
                             ) {
                                 Text(

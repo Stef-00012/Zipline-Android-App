@@ -1,0 +1,3 @@
+Risolto il problema per cui le notifiche in-app a volte non venivano visualizzate
+Le impostazioni dell'app ora mostrano anche il codice di versione
+Risolto il problema per cui la selezione del dominio predefinito nelle impostazioni risultava vuota anziché utilizzare il valore predefinito

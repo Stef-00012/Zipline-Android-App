@@ -19,9 +19,6 @@ This is an android app made to manage your [Zipline V4](https://github.com/diced
 
 # Download
 
-> [!NOTE]
-> For Flavortown reviewer, please use the Forgejo one as Play Store latest update which fixes a crash is currently pending approval
-
 The app is available on the following platforms:
 - Google Play Store
 - Forgejo Releases

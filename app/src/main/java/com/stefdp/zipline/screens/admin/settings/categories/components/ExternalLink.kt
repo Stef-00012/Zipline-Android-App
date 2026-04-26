@@ -168,7 +168,7 @@ fun ExternalLink(
                 color = MaterialTheme.colorScheme.primary,
                 iconColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = onMoveUp,
-                enabled = !isLoading || isFirst
+                enabled = !isLoading && !isFirst
             )
 
             IconButton(
@@ -177,7 +177,7 @@ fun ExternalLink(
                 color = MaterialTheme.colorScheme.primary,
                 iconColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = onMoveDown,
-                enabled = !isLoading || isLast
+                enabled = !isLoading && !isLast
             )
         }
     }

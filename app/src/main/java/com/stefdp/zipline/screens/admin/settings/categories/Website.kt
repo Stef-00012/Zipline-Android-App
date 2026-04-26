@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Container
@@ -320,6 +321,8 @@ internal fun WebsiteCategory(
                             .padding(8.dp)
                     ) {
                         state.websiteExternalLinks.forEachIndexed { index, url ->
+                            Logger.debug("External Urls", "Displaying external link: $index (lastIndex: ${state.websiteExternalLinks.lastIndex}, isLast: ${index == state.websiteExternalLinks.lastIndex}, isFirst: ${index == 0})")
+
                             ExternalLink(
                                 url = url,
                                 isLoading = state.isLoading || "websiteExternalLinks" in state.tamperedSettings,

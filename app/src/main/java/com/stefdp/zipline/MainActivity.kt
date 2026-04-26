@@ -8,13 +8,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -26,8 +33,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
@@ -203,6 +214,8 @@ class MainActivity : FragmentActivity() {
                 val networkMonitor = NetworkMonitor(context)
 
                 val isConnected by networkMonitor.isConnected.collectAsState(initial = true)
+
+
 
                 suspend fun updateLoggedUser(): Result<User> {
                     val tag = "MainActivity[updateLoggedUser]"
@@ -442,6 +455,40 @@ class MainActivity : FragmentActivity() {
                                     navController = navController,
                                     context = context,
                                     activity = activity,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (!isConnected) {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPadding ->
+                        Surface(
+                            modifier = Modifier.padding(innerPadding),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.wifi_off),
+                                    contentDescription = "No internet connection",
+                                    modifier = Modifier.size(50.dp)
+                                )
+
+                                Spacer(
+                                    modifier = Modifier.height(20.dp)
+                                )
+
+                                Text(
+                                    text = "No Internet Connection",
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 )
                             }
                         }

@@ -26,6 +26,7 @@ import com.stefdp.zipline.components.Container
 import com.stefdp.zipline.components.Select
 import com.stefdp.zipline.components.SelectOption
 import com.stefdp.zipline.components.Switch
+import com.stefdp.zipline.components.TextDivider
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.FeaturesSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
@@ -152,6 +153,11 @@ internal fun FeaturesCategory(
                 enabled = !state.isLoading && "featuresMetricsShowUserSpecific" !in state.tamperedSettings
             )
 
+            TextDivider(
+                text = "Thumbnails",
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
             Switch(
                 checked = state.featuresThumbnailsEnabled,
                 onCheckedChange = {
@@ -207,6 +213,11 @@ internal fun FeaturesCategory(
                     viewModel.setFeaturesSelectedThumbnailsFormat(it)
                 },
                 enabled = !state.isLoading && "featuresThumbnailsFormat" !in state.tamperedSettings,
+            )
+
+            TextDivider(
+                text = "Version Checking",
+                modifier = Modifier.padding(vertical = 8.dp)
             )
 
             Switch(

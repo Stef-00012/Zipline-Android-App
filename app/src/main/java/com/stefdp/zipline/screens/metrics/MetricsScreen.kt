@@ -92,7 +92,7 @@ fun MetricsScreen(
     val localLoggedUser = LocalLoggedUser.current
 
     if (localLoggedUser == null) {
-        navController.navigate(LoginScreen) {
+        navController.navigate(LoginScreen()) {
             popUpTo(navController.graph.id) { inclusive = true }
         }
     }

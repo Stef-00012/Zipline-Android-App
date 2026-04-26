@@ -97,7 +97,8 @@ internal fun ViewingFilesCategory(
                                     styles = TextLinkStyles(
                                         style = SpanStyle(
                                             color = MaterialTheme.colorScheme.tertiary,
-                                            textDecoration = TextDecoration.Underline
+                                            textDecoration = TextDecoration.Underline,
+                                            fontWeight = FontWeight.Bold
                                         ),
                                     )
                                 ),

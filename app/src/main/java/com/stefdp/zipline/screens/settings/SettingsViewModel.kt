@@ -406,7 +406,7 @@ class SettingsViewModel : ViewModel() {
 
             localUpdateLoggedUser()
 
-            navController.navigate(LoginScreen) {
+            navController.navigate(LoginScreen()) {
                 popUpTo(navController.graph.id) { inclusive = true }
             }
         }

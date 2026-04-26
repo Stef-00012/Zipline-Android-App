@@ -10,6 +10,7 @@ import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.network.models.WebSettings
 import com.stefdp.zipline.network.models.responses.GetServerVersionResponse
 import com.stefdp.zipline.network.requests.LoginResult
+import com.stefdp.zipline.network.requests.getPublicConfig
 import com.stefdp.zipline.network.requests.getToken
 import com.stefdp.zipline.network.requests.login
 import com.stefdp.zipline.utils.DomainRegex
@@ -38,11 +39,18 @@ data class LoginUiState(
     val isTokenLogin: Boolean = false,
     val isTotpRequired: Boolean = false,
     val anonymizeDeviceInfo: Boolean = false,
+    val supportsRegistration: Boolean = false,
 )
 
 class LoginViewModel : ViewModel() {
     private val _state = MutableStateFlow(LoginUiState())
     val state: StateFlow<LoginUiState> = _state.asStateFlow()
+    
+    fun init(context: Context, serverUrl: String? = null) {
+        if (serverUrl != null) {
+            setServerUrl(context, TextFieldValue(serverUrl))
+        }
+    }
 
     fun setShowNotificationsPopup(show: Boolean) {
         _state.update {
@@ -56,9 +64,29 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun setServerUrl(url: TextFieldValue) {
-        _state.update {
-            it.copy(serverUrl = url)
+    fun setServerUrl(context: Context, url: TextFieldValue) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    serverUrl = url,
+                    supportsRegistration = false
+                )
+            }
+
+            if (DomainRegex.matches(url.text)) {
+                val publicSettings = getPublicConfig(
+                    context = context,
+                    serverUrl = url.text.lowercase()
+                )
+
+                publicSettings.onSuccess { settings ->
+                    _state.update {
+                        it.copy(
+                            supportsRegistration = settings.features.userRegistration
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -140,6 +168,8 @@ class LoginViewModel : ViewModel() {
 
                 loginRes
                     .onSuccess { loginStatus ->
+                        Logger.debug("LoginViewModel", "Login successful, status: $loginStatus")
+
                         if (loginStatus is LoginResult.TotpRequired) {
                             _state.update {
                                 it.copy(

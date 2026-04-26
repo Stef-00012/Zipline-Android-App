@@ -76,6 +76,7 @@ import com.stefdp.zipline.screens.home.HomeScreen
 import com.stefdp.zipline.screens.loading.LoadingScreen
 import com.stefdp.zipline.screens.login.LoginScreen
 import com.stefdp.zipline.screens.metrics.MetricsScreen
+import com.stefdp.zipline.screens.register.RegisterScreen
 import com.stefdp.zipline.screens.settings.SettingsScreen
 import com.stefdp.zipline.screens.urls.UrlsScreen
 import com.stefdp.zipline.screens.upload.file.UploadFileScreen
@@ -410,6 +411,7 @@ class MainActivity : FragmentActivity() {
 
                     val invalidRoutes = listOf(
                         LoginScreen::class.qualifiedName,
+                        RegisterScreen::class.qualifiedName,
                         LoadingScreen::class.qualifiedName,
                         BiometricAuthScreen::class.qualifiedName
                     )
@@ -417,18 +419,20 @@ class MainActivity : FragmentActivity() {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                         topBar = {
-                            Header(
-                                navController = navController,
-                                onMenuClick = {
-                                    if (currentDestination?.route in invalidRoutes) {
-                                        return@Header
-                                    }
+                            val isInvalid = invalidRoutes.any { routeName ->
+                                currentDestination?.route?.startsWith(routeName ?: "") == true
+                            }
 
-                                    coroutineScope.launch {
-                                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                            if (!isInvalid) {
+                                Header(
+                                    navController = navController,
+                                    onMenuClick = {
+                                        coroutineScope.launch {
+                                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     ) { innerPadding ->
                         Surface(
@@ -529,11 +533,25 @@ fun AppNavigation(
             )
         }
 
-        composable<LoginScreen> {
+        composable<LoginScreen> { backStackEntry ->
+            val loginScreen = backStackEntry.toRoute<LoginScreen>()
+
             LoginScreen(
                 navController = navController,
                 context = context,
-                activity = activity
+                activity = activity,
+                serverUrl = loginScreen.serverUrl,
+            )
+        }
+
+        composable<RegisterScreen> { backStackEntry ->
+            val registerScreen = backStackEntry.toRoute<RegisterScreen>()
+
+            RegisterScreen(
+                navController = navController,
+                context = context,
+                activity = activity,
+                serverUrl = registerScreen.serverUrl,
             )
         }
 

@@ -35,14 +35,6 @@ fun Header(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val invalidRoutes = listOf(
-        LoginScreen::class.qualifiedName,
-        LoadingScreen::class.qualifiedName,
-        BiometricAuthScreen::class.qualifiedName
-    )
-
-    if (currentDestination?.route in invalidRoutes) return
-
     val outlineColor = MaterialTheme.colorScheme.outline
 
     Surface(

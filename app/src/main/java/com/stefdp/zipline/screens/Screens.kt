@@ -9,7 +9,10 @@ sealed interface AppScreen
 object LoadingScreen : AppScreen
 
 @Serializable
-object LoginScreen : AppScreen
+data class LoginScreen(val serverUrl: String? = null) : AppScreen
+
+@Serializable
+data class RegisterScreen(val serverUrl: String) : AppScreen
 
 @Serializable
 object BiometricAuthScreen : AppScreen

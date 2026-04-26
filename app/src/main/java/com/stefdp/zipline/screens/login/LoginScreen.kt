@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,6 +50,7 @@ import com.stefdp.zipline.components.Button
 import com.stefdp.zipline.components.Notification
 import com.stefdp.zipline.components.PromptPopup
 import com.stefdp.zipline.components.Switch
+import com.stefdp.zipline.components.TextDivider
 import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.User
 import com.stefdp.zipline.screens.*
@@ -63,6 +66,7 @@ fun LoginScreen(
     navController: NavHostController,
     context: Context,
     activity: FragmentActivity,
+    serverUrl: String? = null,
     viewModel: LoginViewModel = viewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -89,6 +93,10 @@ fun LoginScreen(
     val state by viewModel.state.collectAsState()
 
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(Unit) {
+        viewModel.init(context, serverUrl)
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -178,7 +186,10 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = state.serverUrl,
                     onValueChange = {
-                        viewModel.setServerUrl(it)
+                        viewModel.setServerUrl(
+                            context = context,
+                            url = it
+                        )
                     },
                     placeholder = "https://example.com",
                     label = "Zipline URL",
@@ -278,7 +289,7 @@ fun LoginScreen(
                         viewModel.onLogin(
                             context = context,
                             onSuccess = {
-                                if (currentDestination?.route == LoginScreen::class.qualifiedName) {
+                                if (currentDestination?.route?.startsWith(LoginScreen::class.qualifiedName ?: "") == true) {
                                     navController.navigate(HomeScreen) {
                                         popUpTo(navController.graph.id) { inclusive = true }
                                     }
@@ -304,7 +315,10 @@ fun LoginScreen(
                             updateWebSettings = updateWebSettings,
                         )
                     },
-                    enabled = !state.isLoading,
+                    enabled = !state.isLoading && (
+                        if (state.isTokenLogin) state.token.text.isNotBlank()
+                        else state.username.text.isNotBlank() && state.password.text.isNotBlank()
+                    ),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -328,6 +342,32 @@ fun LoginScreen(
                             fontWeight = FontWeight.Bold,
                             color = LocalContentColor.current,
                         )
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = state.supportsRegistration
+                ) {
+                    Column {
+                        TextDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            text = "or"
+                        )
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                navController.navigate(RegisterScreen(serverUrl = state.serverUrl.text)) {
+                                    popUpTo(navController.graph.id) { inclusive = true }
+                                }
+                            }
+                        ) {
+                            Text(
+                                text = "Register",
+                                fontWeight = FontWeight.Bold,
+                                color = LocalContentColor.current,
+                            )
+                        }
                     }
                 }
             }

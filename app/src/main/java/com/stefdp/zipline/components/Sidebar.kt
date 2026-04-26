@@ -428,7 +428,7 @@ fun Sidebar(
                             Text("Login")
                         },
                         selected = false,
-                        onClick = { onItemClick(LoginScreen) },
+                        onClick = { onItemClick(LoginScreen()) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                         shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                     )

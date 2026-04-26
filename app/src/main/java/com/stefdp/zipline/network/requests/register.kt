@@ -1,26 +1,30 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
+import com.stefdp.zipline.BuildConfig
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.PublicServerConfig
+import com.stefdp.zipline.network.models.ZiplineClient
+import com.stefdp.zipline.network.models.requests.RegisterBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
+import com.stefdp.zipline.network.models.responses.LoginResponse
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 
-private const val TAG = "ZiplineApi[getPublicConfig]"
+private const val TAG = "ZiplineApi[register]"
 
-suspend fun getPublicConfig(
+suspend fun register(
     context: Context,
-    serverUrl: String? = null
-): Result<PublicServerConfig> {
+    username: String,
+    password: String,
+    anonymizeDeviceInfo: Boolean = false
+): Result<LoginResponse> {
     try {
         val secureStore = SecureStorage.getInstance(context)
 
-        val serverUrl = serverUrl ?: secureStore.get(STORAGE_SERVER_URL_KEY)
+        val serverUrl = secureStore.get(STORAGE_SERVER_URL_KEY)
 
         if (serverUrl.isNullOrEmpty()) {
             return Result.failure(
@@ -28,7 +32,33 @@ suspend fun getPublicConfig(
             )
         }
 
-        val response = ZiplineApiClient.getZiplineApiService(serverUrl).getPublicConfig()
+        val requestBody = RegisterBody(
+            username,
+            password,
+        )
+
+        val device = if (anonymizeDeviceInfo) {
+            "Android Mobile"
+        } else {
+            android.os.Build.MODEL ?: "Android Mobile"
+        }
+
+        val userAgent = if (anonymizeDeviceInfo) {
+            "Zipline/${BuildConfig.VERSION_NAME} (Android; Mobile)"
+        } else {
+            System.getProperty("http.agent") ?: "Zipline/${BuildConfig.VERSION_NAME} (Android; Mobile)"
+        }
+
+        val ziplineClient = ZiplineClient(
+            client = "Zipline Android",
+            device = device,
+            ua = userAgent
+        ).toString()
+
+        val response = ZiplineApiClient.getZiplineApiService(serverUrl).register(
+            data = requestBody,
+            client = ziplineClient
+        )
 
         val body = response.body()
 
@@ -59,7 +89,7 @@ suspend fun getPublicConfig(
             )
         }
 
-        if (body is PublicServerConfig) {
+        if (body is LoginResponse) {
             return Result.success(body)
         }
 

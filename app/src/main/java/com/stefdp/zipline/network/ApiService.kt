@@ -52,6 +52,7 @@ import com.stefdp.zipline.network.models.requests.GetFilesQuerySortBy
 import com.stefdp.zipline.network.models.requests.GetUrlsQuerySearchField
 import com.stefdp.zipline.network.models.requests.LoginBody
 import com.stefdp.zipline.network.models.requests.MoveFolderBody
+import com.stefdp.zipline.network.models.requests.RegisterBody
 import com.stefdp.zipline.network.models.requests.RemoveCurrentUserAvatarBody
 import com.stefdp.zipline.network.models.requests.RunRequerySizeJobBody
 import com.stefdp.zipline.network.models.requests.RunThumbnailGenerationJobBody
@@ -132,6 +133,12 @@ interface ZiplineApiService {
     suspend fun logout(
         @Header("Authorization") token: String,
     ): Response<LogoutResponse>
+
+    @POST("auth/register")
+    suspend fun register(
+        @Body data: RegisterBody,
+        @Header("x-zipline-client") client: String
+    ): Response<LoginResponse>
 
     @POST("auth/invites")
     suspend fun createInvite(

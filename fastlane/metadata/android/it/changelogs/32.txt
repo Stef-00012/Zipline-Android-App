@@ -1,0 +1,2 @@
+Aggiunto il supporto per la registrazione degli utenti (visibile nella schermata di login solo se il link inserito lo ha abilitato)
+Aggiunti i divisori nelle impostazioni admin delle features

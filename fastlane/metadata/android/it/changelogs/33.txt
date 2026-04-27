@@ -1,0 +1,1 @@
+Corretto un crash quando si cliccava il tasto "sposta su" nel primo elemento (o il tasto "sposta giù" nell'ultimo elemento) dei link esterni nelle impostazioni admin per il sito

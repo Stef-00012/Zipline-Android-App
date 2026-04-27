@@ -1,0 +1,2 @@
+Added support for user registration (only displayed in login when the typed URL has it enabled)
+Added dividers in the admin features settings

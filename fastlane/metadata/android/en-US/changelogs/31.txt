@@ -1,0 +1,1 @@
+Added a message for when the phone has no internet access

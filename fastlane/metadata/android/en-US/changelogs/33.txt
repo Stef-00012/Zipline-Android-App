@@ -1,0 +1,1 @@
+Fixed a crash when pressing the "move up" button in the first element (or "move down" button in the last element) of external links of the admin website settings

@@ -1,0 +1,2 @@
+Corretto un crash quando l'app veniva spostata in background e l'avatar era troppo largo per essere salvato in memoria
+Rese tutte le impostazioni scrollabili

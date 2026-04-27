@@ -1,0 +1,2 @@
+Fixed a crash when moving the app in background and the user avatar was too large to be stored in memory
+Made all settings scrollable

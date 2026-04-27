@@ -262,6 +262,7 @@ fun AdminUsersScreen(
                         val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
 
                         updateScreenViewState(
+                            context,
                             screenViewState.copy(
                                 adminUsers = newState
                             )

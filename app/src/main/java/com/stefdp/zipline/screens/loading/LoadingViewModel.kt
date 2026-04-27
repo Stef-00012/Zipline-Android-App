@@ -33,11 +33,11 @@ class LoadingViewModel : ViewModel() {
         context: Context,
         onError: (String?) -> Unit,
         onSuccess: (Boolean) -> Unit,
-        updateServerVersion: suspend () -> Result<GetServerVersionResponse>,
-        updateLoggedUser: suspend () -> Result<User>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updateLoggedUserAvatar: suspend () -> Result<String>,
+        updateServerVersion: suspend (context: Context) -> Result<GetServerVersionResponse>,
+        updateLoggedUser: suspend (context: Context) -> Result<User>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updateLoggedUserAvatar: suspend (context: Context) -> Result<String>,
     ) {
         viewModelScope.launch {
             _state.update {
@@ -62,7 +62,7 @@ class LoadingViewModel : ViewModel() {
 
             val biometricAuthenticationStatus = getBiometricStatus(context)
 
-            val serverVersionRes = updateServerVersion()
+            val serverVersionRes = updateServerVersion(context)
 
             serverVersionRes
                 .onSuccess { versionData ->
@@ -96,7 +96,7 @@ class LoadingViewModel : ViewModel() {
                     return@launch
                 }
 
-            val newUserStatsRes = updateLoggedUser()
+            val newUserStatsRes = updateLoggedUser(context)
 
             newUserStatsRes
                 .onFailure {
@@ -109,9 +109,9 @@ class LoadingViewModel : ViewModel() {
                     return@launch
                 }
                 .onSuccess {
-                    updatePublicSettings()
-                    updateWebSettings()
-                    updateLoggedUserAvatar()
+                    updatePublicSettings(context)
+                    updateWebSettings(context)
+                    updateLoggedUserAvatar(context)
 
                     onSuccess(unlockWithBiometrics && biometricAuthenticationStatus == BiometricManager.BIOMETRIC_SUCCESS)
 

@@ -88,11 +88,11 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         if (publicSettings == null) {
-            updatePublicSettings()
+            updatePublicSettings(context)
         }
 
         if (webSettings == null) {
-            updateWebSettings()
+            updateWebSettings(context)
         }
 
         updateData()

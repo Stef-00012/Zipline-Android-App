@@ -130,11 +130,11 @@ class LoginViewModel : ViewModel() {
         context: Context,
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
-        updateServerVersion: suspend () -> Result<GetServerVersionResponse>,
-        updateLoggedUser: suspend () -> Result<User>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updateLoggedUserAvatar: suspend () -> Result<String>,
+        updateServerVersion: suspend (context: Context) -> Result<GetServerVersionResponse>,
+        updateLoggedUser: suspend (context: Context) -> Result<User>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updateLoggedUserAvatar: suspend (context: Context) -> Result<String>,
     ) {
         Logger.debug("LoginViewModel", "Starting login process")
 
@@ -224,7 +224,7 @@ class LoginViewModel : ViewModel() {
                     }
             }
 
-            val serverVersionRes = updateServerVersion()
+            val serverVersionRes = updateServerVersion(context)
 
             serverVersionRes
                 .onSuccess { versionData ->
@@ -258,7 +258,7 @@ class LoginViewModel : ViewModel() {
                     return@launch
                 }
 
-            val userStatsRes = updateLoggedUser()
+            val userStatsRes = updateLoggedUser(context)
 
             userStatsRes
                 .onSuccess {
@@ -267,9 +267,9 @@ class LoginViewModel : ViewModel() {
                     secureStore.set(STORAGE_DEFAULT_DOMAIN_KEY, _state.value.serverUrl.text)
 
                     withContext(NonCancellable) {
-                        updatePublicSettings()
-                        updateWebSettings()
-                        updateLoggedUserAvatar()
+                        updatePublicSettings(context)
+                        updateWebSettings(context)
+                        updateLoggedUserAvatar(context)
                     }
 
                     _state.update {

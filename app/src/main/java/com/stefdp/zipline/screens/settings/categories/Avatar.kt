@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +34,7 @@ import com.stefdp.zipline.network.models.requests.UpdateCurrentUserBody
 import com.stefdp.zipline.screens.settings.SettingsUiState
 import com.stefdp.zipline.screens.settings.SettingsViewModel
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 
 @Composable
 internal fun AvatarCategory(
@@ -53,9 +55,15 @@ internal fun AvatarCategory(
         scrollable = false,
         modifier = Modifier.fillMaxWidth()
     ) {
+        val scrollState = rememberScrollState()
+
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier
+                .verticalScrollWithScrollbar(
+                    scrollState = scrollState,
+                )
+                .padding(12.dp)
         ) {
             Text(
                 text = title,
@@ -185,6 +193,7 @@ internal fun AvatarCategory(
                     updateUser(data)
 
                     viewModel.updateUserAvatar(
+                        context = context,
                         localUpdateLoggedUserAvatar = localUpdateLoggedUserAvatar,
                     )
                 },

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -94,7 +95,7 @@ import com.stefdp.zipline.screens.urls.VIEW_STATE_KEY as URLS_VIEW_STATE_KEY
 const val BASE_CORNER_RADIUS = 10
 
 val LocalLoggedUser = compositionLocalOf<User?> { null }
-val LocalUpdateLoggedUser = compositionLocalOf<suspend () -> Result<User>> {
+val LocalUpdateLoggedUser = compositionLocalOf<suspend (context: Context) -> Result<User>> {
     {
         Result.failure(
             Exception("Placeholder")
@@ -103,7 +104,7 @@ val LocalUpdateLoggedUser = compositionLocalOf<suspend () -> Result<User>> {
 }
 
 val LocalLoggedUserAvatar = compositionLocalOf<String?> { null }
-val LocalUpdateLoggedUserAvatar = compositionLocalOf<suspend () -> Result<String>> {
+val LocalUpdateLoggedUserAvatar = compositionLocalOf<suspend (context: Context) -> Result<String>> {
     {
         Result.failure(
             Exception("Placeholder")
@@ -112,7 +113,7 @@ val LocalUpdateLoggedUserAvatar = compositionLocalOf<suspend () -> Result<String
 }
 
 val LocalPublicSettings = compositionLocalOf<PublicServerConfig?> { null }
-val LocalUpdatePublicSettings = compositionLocalOf<suspend () -> Result<PublicServerConfig>> {
+val LocalUpdatePublicSettings = compositionLocalOf<suspend (context: Context) -> Result<PublicServerConfig>> {
     {
         Result.failure(
             Exception("Placeholder")
@@ -121,7 +122,7 @@ val LocalUpdatePublicSettings = compositionLocalOf<suspend () -> Result<PublicSe
 }
 
 val LocalWebSettings = compositionLocalOf<WebSettings?> { null }
-val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings>> {
+val LocalUpdateWebSettings = compositionLocalOf<suspend (context: Context) -> Result<WebSettings>> {
     {
         Result.failure(
             Exception("Placeholder")
@@ -131,7 +132,7 @@ val LocalUpdateWebSettings = compositionLocalOf<suspend () -> Result<WebSettings
 
 val LocalServerVersion = compositionLocalOf<GetServerVersionResponse?> { null }
 
-val LocalUpdateServerVersion = compositionLocalOf<suspend () -> Result<GetServerVersionResponse>> {
+val LocalUpdateServerVersion = compositionLocalOf<suspend (context: Context) -> Result<GetServerVersionResponse>> {
     {
         Result.failure(
             Exception("Placeholder")
@@ -149,12 +150,14 @@ val LocalScreenViewState = compositionLocalOf {
     )
 }
 
-val LocalUpdateScreenViewState = compositionLocalOf<(viewState: ZiplineViewState) -> Unit> {
-    {}
+val LocalUpdateScreenViewState = compositionLocalOf<(context: Context, viewState: ZiplineViewState) -> Unit> {
+    {_, _ -> }
 }
 
 class MainActivity : FragmentActivity() {
     private var isAppReady by mutableStateOf(false)
+
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -180,195 +183,20 @@ class MainActivity : FragmentActivity() {
 
                 val navController = rememberNavController()
 
-                var loggedUser by rememberSaveable {
-                   mutableStateOf<User?>(null)
-                }
-
-                var loggedUserAvatar by rememberSaveable {
-                    mutableStateOf<String?>(null)
-                }
-
-                var publicSettings by rememberSaveable {
-                    mutableStateOf<PublicServerConfig?>(null)
-                }
-
-                var webSettings by rememberSaveable {
-                    mutableStateOf<WebSettings?>(null)
-                }
-
-                var serverVersion by rememberSaveable {
-                    mutableStateOf<GetServerVersionResponse?>(null)
-                }
-
-                var screenViewState by rememberSaveable {
-                    mutableStateOf(
-                        ZiplineViewState(
-                            adminUsers = ZiplineViewStateType.LARGE,
-                            adminInvites = ZiplineViewStateType.LARGE,
-                            files = ZiplineViewStateType.LARGE,
-                            folders = ZiplineViewStateType.LARGE,
-                            urls = ZiplineViewStateType.LARGE,
-                        )
-                    )
-                }
+                val state by viewModel.state.collectAsState()
 
                 val networkMonitor = NetworkMonitor(context)
 
                 val isConnected by networkMonitor.isConnected.collectAsState(initial = true)
 
-
-
-                suspend fun updateLoggedUser(): Result<User> {
-                    val tag = "MainActivity[updateLoggedUser]"
-
-                    Logger.debug(tag, "Checking if user is already logged in...")
-
-                    val currentUserRes = getCurrentUser(
-                        context = context
-                    )
-
-                    currentUserRes
-                        .onSuccess { currentUserData ->
-                            if (currentUserData.user == null) return Result.failure(
-                                Exception("User is not logged in")
-                            )
-
-                            Logger.debug(tag, "User is logged in as ${currentUserData.user.username}")
-
-                            loggedUser = currentUserData.user
-
-                            return@updateLoggedUser Result.success(currentUserData.user)
-                        }
-                        .onFailure { error ->
-                            Logger.debug(tag, "User is not logged in")
-                            Logger.error(tag, "Failed to fetch user stats: ${error.message}")
-
-                            loggedUser = null
-
-                            return@updateLoggedUser Result.failure(error)
-                        }
-
-                    return Result.failure(
-                        Exception("Something went wrong...")
-                    )
-                }
-
-                suspend fun updateLoggedUserAvatar(): Result<String> {
-                    val tag = "MainActivity[updateLoggedUserAvatar]"
-
-                    val loggedUserAvatarRes = getAvatar(
-                        context = context
-                    )
-
-                    loggedUserAvatarRes
-                        .onSuccess { avatarBase64 ->
-                            loggedUserAvatar = avatarBase64
-
-                            return@updateLoggedUserAvatar Result.success(avatarBase64)
-                        }
-                        .onFailure { error ->
-                            Logger.error(tag, "Failed to fetch user avatar: ${error.message}")
-
-                            loggedUserAvatar = null
-
-                            return@updateLoggedUserAvatar Result.failure(error)
-                        }
-
-                    return Result.failure(
-                        Exception("Something went wrong...")
-                    )
-                }
-
-                suspend fun updatePublicSettings(): Result<PublicServerConfig> {
-                    val tag = "MainActivity[updatePublicSettings]"
-
-                    val publicConfigRes = getPublicConfig(
-                        context = context
-                    )
-
-                    publicConfigRes
-                        .onSuccess { publicConfigData ->
-                            publicSettings = publicConfigData
-
-                            return@updatePublicSettings Result.success(publicConfigData)
-                        }
-                        .onFailure { error ->
-                            Logger.error(tag, "Failed to fetch public server config: ${error.message}")
-
-                            publicSettings = null
-
-                            return@updatePublicSettings Result.failure(error)
-                        }
-
-                    return Result.failure(
-                        Exception("Something went wrong...")
-                    )
-                }
-
-                suspend fun updateWebSettings(): Result<WebSettings> {
-                    val tag = "MainActivity[updateWebSettings]"
-
-                    val webSettingsRes = getWebServerSettings(
-                        context = context
-                    )
-
-                    webSettingsRes
-                        .onSuccess { webSettingsData ->
-                            webSettings = webSettingsData
-
-                            return@updateWebSettings Result.success(webSettingsData)
-                        }
-                        .onFailure { error ->
-                            Logger.error(tag, "Failed to fetch web settings: ${error.message}")
-
-                            webSettings = null
-
-                            return@updateWebSettings Result.failure(error)
-                        }
-
-                    return Result.failure(
-                        Exception("Something went wrong...")
-                    )
-                }
-
-                suspend fun updateServerVersion(): Result<GetServerVersionResponse> {
-                    val tag = "MainActivity[updateServerVersion]"
-
-                    val serverVersionRes = getServerVersion(
-                        context = context
-                    )
-
-                    serverVersionRes
-                        .onSuccess { serverVersionData ->
-                            serverVersion = serverVersionData
-
-                            return@updateServerVersion Result.success(serverVersionData)
-                        }
-                        .onFailure { error ->
-                            Logger.error(tag, "Failed to fetch web settings: ${error.message}")
-
-                            webSettings = null
-
-                            return@updateServerVersion Result.failure(error)
-                        }
-
-                    return Result.failure(
-                        Exception("Something went wrong...")
-                    )
-                }
-
-                fun updateScreenViewState(viewState: ZiplineViewState) {
-                    screenViewState = viewState
-                }
-
                 val coroutineScope = rememberCoroutineScope()
 
                 LaunchedEffect(isConnected) {
                     if (isConnected) {
-                        updateLoggedUser()
-                        updateLoggedUserAvatar()
-                        updateWebSettings()
-                        updatePublicSettings()
+                        viewModel.updateLoggedUser(context)
+                        viewModel.updateLoggedUserAvatar(context)
+                        viewModel.updateWebSettings(context)
+                        viewModel.updatePublicSettings(context)
                     }
 
                     coroutineScope.launch {
@@ -380,12 +208,15 @@ class MainActivity : FragmentActivity() {
                         val foldersViewState = secureStore.get(FOLDERS_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
                         val urlsViewState = secureStore.get(URLS_VIEW_STATE_KEY) ?: ZiplineViewStateType.LARGE.name
 
-                        screenViewState = ZiplineViewState(
-                            adminInvites = if (adminInvitesViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(adminInvitesViewState) else ZiplineViewStateType.LARGE,
-                            adminUsers = if (adminUsersViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(adminUsersViewState) else ZiplineViewStateType.LARGE,
-                            files = if (filesViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(filesViewState) else ZiplineViewStateType.LARGE,
-                            folders = if (foldersViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(foldersViewState) else ZiplineViewStateType.LARGE,
-                            urls = if (urlsViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(urlsViewState) else ZiplineViewStateType.LARGE,
+                        viewModel.updateScreenViewState(
+                            context = context,
+                            viewState = ZiplineViewState(
+                                adminInvites = if (adminInvitesViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(adminInvitesViewState) else ZiplineViewStateType.LARGE,
+                                adminUsers = if (adminUsersViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(adminUsersViewState) else ZiplineViewStateType.LARGE,
+                                files = if (filesViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(filesViewState) else ZiplineViewStateType.LARGE,
+                                folders = if (foldersViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(foldersViewState) else ZiplineViewStateType.LARGE,
+                                urls = if (urlsViewState in ZiplineViewStateType) ZiplineViewStateType.valueOf(urlsViewState) else ZiplineViewStateType.LARGE,
+                            )
                         )
                     }
                 }
@@ -393,18 +224,18 @@ class MainActivity : FragmentActivity() {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
                 CompositionLocalProvider(
-                    LocalLoggedUser provides loggedUser,
-                    LocalUpdateLoggedUser provides ::updateLoggedUser,
-                    LocalLoggedUserAvatar provides loggedUserAvatar,
-                    LocalUpdateLoggedUserAvatar provides ::updateLoggedUserAvatar,
-                    LocalPublicSettings provides publicSettings,
-                    LocalUpdatePublicSettings provides ::updatePublicSettings,
-                    LocalWebSettings provides webSettings,
-                    LocalUpdateWebSettings provides ::updateWebSettings,
-                    LocalServerVersion provides serverVersion,
-                    LocalUpdateServerVersion provides ::updateServerVersion,
-                    LocalScreenViewState provides screenViewState,
-                    LocalUpdateScreenViewState provides ::updateScreenViewState
+                    LocalLoggedUser provides state.loggedUser,
+                    LocalUpdateLoggedUser provides viewModel::updateLoggedUser,
+                    LocalLoggedUserAvatar provides state.loggedUserAvatar,
+                    LocalUpdateLoggedUserAvatar provides viewModel::updateLoggedUserAvatar,
+                    LocalPublicSettings provides state.publicSettings,
+                    LocalUpdatePublicSettings provides viewModel::updatePublicSettings,
+                    LocalWebSettings provides state.webSettings,
+                    LocalUpdateWebSettings provides viewModel::updateWebSettings,
+                    LocalServerVersion provides state.serverVersion,
+                    LocalUpdateServerVersion provides viewModel::updateServerVersion,
+                    LocalScreenViewState provides state.screenViewState,
+                    LocalUpdateScreenViewState provides viewModel::updateScreenViewState
                 ) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination

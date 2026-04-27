@@ -326,8 +326,8 @@ class SettingsViewModel : ViewModel() {
         updateAvatar: Boolean = false,
         onError: (List<String>) -> Unit = {},
         onSuccess: () -> Unit = {},
-        localUpdateLoggedUser: suspend () -> Result<User>,
-        localUpdateLoggedUserAvatar: suspend () -> Result<String> = { Result.success("") }
+        localUpdateLoggedUser: suspend (context: Context) -> Result<User>,
+        localUpdateLoggedUserAvatar: suspend (context: Context) -> Result<String> = { Result.success("") }
     ) {
         viewModelScope.launch {
             _state.update {
@@ -351,10 +351,10 @@ class SettingsViewModel : ViewModel() {
                                 it.copy(isLoading = false)
                             }
                         } else if (response is UpdateCurrentUserResult.Success) {
-                            localUpdateLoggedUser()
+                            localUpdateLoggedUser(context)
 
                             if (updateAvatar) {
-                                localUpdateLoggedUserAvatar()
+                                localUpdateLoggedUserAvatar(context)
                             }
 
                             onSuccess()
@@ -377,7 +377,7 @@ class SettingsViewModel : ViewModel() {
                         }
                     }
             } else {
-                localUpdateLoggedUser()
+                localUpdateLoggedUser(context)
 
                 onSuccess()
 
@@ -394,7 +394,7 @@ class SettingsViewModel : ViewModel() {
     fun logout(
         context: Context,
         navController: NavHostController,
-        localUpdateLoggedUser: suspend () -> Result<User>,
+        localUpdateLoggedUser: suspend (context: Context) -> Result<User>,
     ) {
         viewModelScope.launch {
             val secureStore = SecureStorage.getInstance(context)
@@ -404,7 +404,7 @@ class SettingsViewModel : ViewModel() {
 
             apiLogout(context)
 
-            localUpdateLoggedUser()
+            localUpdateLoggedUser(context)
 
             navController.navigate(LoginScreen()) {
                 popUpTo(navController.graph.id) { inclusive = true }
@@ -413,10 +413,11 @@ class SettingsViewModel : ViewModel() {
     }
 
     fun updateUserAvatar(
-        localUpdateLoggedUserAvatar: suspend () -> Result<String>
+        context: Context,
+        localUpdateLoggedUserAvatar: suspend (context: Context) -> Result<String>
     ) {
         viewModelScope.launch {
-            localUpdateLoggedUserAvatar()
+            localUpdateLoggedUserAvatar(context)
         }
     }
 
@@ -424,8 +425,8 @@ class SettingsViewModel : ViewModel() {
         context: Context,
         onError: (List<String>) -> Unit,
         onSuccess: () -> Unit,
-        localUpdateLoggedUser: suspend () -> Result<User>,
-        localUpdateLoggedUserAvatar: suspend () -> Result<String>
+        localUpdateLoggedUser: suspend (context: Context) -> Result<User>,
+        localUpdateLoggedUserAvatar: suspend (context: Context) -> Result<String>
     ) {
         viewModelScope.launch {
             _state.update {
@@ -445,7 +446,7 @@ class SettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateCurrentUserResult.Success) {
-                        localUpdateLoggedUserAvatar()
+                        localUpdateLoggedUserAvatar(context)
 
                         onSuccess()
 
@@ -454,7 +455,7 @@ class SettingsViewModel : ViewModel() {
                             localUpdateLoggedUser = localUpdateLoggedUser
                         )
 
-                        localUpdateLoggedUserAvatar()
+                        localUpdateLoggedUserAvatar(context)
 
                         _state.update {
                             it.copy(isLoading = false)

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,6 +58,7 @@ import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
 import com.stefdp.zipline.utils.getBiometricStatus
 import com.stefdp.zipline.utils.promptBiometricAuthentication
+import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 
 @Composable
 internal fun AppSettingsCategory(
@@ -80,9 +82,15 @@ internal fun AppSettingsCategory(
         scrollable = false,
         modifier = Modifier.fillMaxWidth()
     ) {
+        val scrollState = rememberScrollState()
+
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier
+                .verticalScrollWithScrollbar(
+                    scrollState = scrollState,
+                )
+                .padding(12.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)

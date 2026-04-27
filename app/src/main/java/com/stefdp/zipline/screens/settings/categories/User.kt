@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
 import com.stefdp.zipline.utils.promptBiometricAuthentication
 import com.stefdp.zipline.utils.shimmerable
+import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -53,9 +55,15 @@ internal fun UserCategory(
         scrollable = false,
         modifier = Modifier.fillMaxWidth()
     ) {
+        val scrollState = rememberScrollState()
+
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier
+                .verticalScrollWithScrollbar(
+                    scrollState = scrollState,
+                )
+                .padding(12.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)

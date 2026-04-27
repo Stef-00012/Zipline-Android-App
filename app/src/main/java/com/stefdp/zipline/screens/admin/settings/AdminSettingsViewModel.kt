@@ -1373,1400 +1373,11 @@ class AdminSettingsViewModel : ViewModel() {
         }
     }
 
-//    fun updateCoreSettings(
-//        context: Context,
-//        data: CoreSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateCoreSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//
-//            }
-//        }
-//    }
-//
-//    fun updateChunksSettings(
-//        context: Context,
-//        data: ChunksSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateChunksSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateDiscordSettings(
-//        context: Context,
-//        data: DiscordSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateDiscordSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateDiscordOnUploadSettings(
-//        context: Context,
-//        data: DiscordOnUploadSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateDiscordOnUploadSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateDiscordOnShortenSettings(
-//        context: Context,
-//        data: DiscordOnShortenSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateDiscordOnShortenSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateFeaturesSettings(
-//        context: Context,
-//        data: FeaturesSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateFeaturesSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateFilesSettings(
-//        context: Context,
-//        data: FilesSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateFilesSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateInvitesSettings(
-//        context: Context,
-//        data: InvitesSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateInvitesSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateMfaSettings(
-//        context: Context,
-//        data: MfaSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateMfaSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateOauthSettings(
-//        context: Context,
-//        data: OauthSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateOauthSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updatePwaSettings(
-//        context: Context,
-//        data: PwaSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdatePwaSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateRatelimitSettings(
-//        context: Context,
-//        data: RatelimitSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateRatelimitSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateTasksSettings(
-//        context: Context,
-//        data: TasksSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateTasksSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateUrlsSettings(
-//        context: Context,
-//        data: UrlShortenerSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateUrlsSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateWebhooksSettings(
-//        context: Context,
-//        data: WebhooksSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateWebhookSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateWebsiteSettings(
-//        context: Context,
-//        data: WebsiteSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateWebsiteSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-//
-//    fun updateDomainsSettings(
-//        context: Context,
-//        data: DomainsSettings? = null,
-//        updateWebSettings: suspend () -> Result<WebSettings>,
-//        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
-//        onSuccess: () -> Unit,
-//        onError: (errors: List<String>, isUpdate: Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            _state.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            if (data != null) {
-//                val updateServerSettingsRes = apiUpdateDomainsSettings(
-//                    context = context,
-//                    data = data
-//                )
-//
-//                updateServerSettingsRes
-//                    .onSuccess { response ->
-//                        if (response is UpdateServerSettingsResult.Error) {
-//                            val errors = response.error.issues?.map { error -> "${getSettingName(error.path)}: ${error.message}." } ?: listOf(response.error.message ?: response.error.error)
-//
-//                            onError(errors, true)
-//
-//                            _state.update {
-//                                it.copy(isLoading = false)
-//                            }
-//                        } else if (response is UpdateServerSettingsResult.Success) {
-//                            updateWebSettings()
-//                            updatePublicSettings()
-//
-//                            onSuccess()
-//
-//                            _state.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    settings = response.settings,
-//                                    settingsUpdateTick = it.settingsUpdateTick + 1
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                            )
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, true)
-//                    }
-//            } else {
-//                val settingsRes = getServerSettings(
-//                    context = context,
-//                )
-//
-//                settingsRes
-//                    .onSuccess { settings ->
-//                        _state.update {
-//                            it.copy(
-//                                settings = settings,
-//                                isLoading = false,
-//                                settingsUpdateTick = it.settingsUpdateTick + 1
-//                            )
-//                        }
-//                    }
-//                    .onFailure { error ->
-//                        _state.update {
-//                            it.copy(isLoading = false)
-//                        }
-//
-//                        val error = listOf(error.message ?: "Something went wrong...")
-//
-//                        onError(error, false)
-//                    }
-//            }
-//        }
-//    }
-
     fun updateCoreSettings(
         context: Context,
         data: CoreSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -2791,8 +1402,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -2822,8 +1433,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateChunksSettings(
         context: Context,
         data: ChunksSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -2848,8 +1459,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -2879,8 +1490,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateDiscordSettings(
         context: Context,
         data: DiscordSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -2905,8 +1516,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -2936,8 +1547,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateDiscordOnUploadSettings(
         context: Context,
         data: DiscordOnUploadSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -2962,8 +1573,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -2993,8 +1604,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateDiscordOnShortenSettings(
         context: Context,
         data: DiscordOnShortenSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3019,8 +1630,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3050,8 +1661,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateFeaturesSettings(
         context: Context,
         data: FeaturesSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3076,8 +1687,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3107,8 +1718,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateFilesSettings(
         context: Context,
         data: FilesSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3133,8 +1744,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3164,8 +1775,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateInvitesSettings(
         context: Context,
         data: InvitesSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3190,8 +1801,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3221,8 +1832,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateMfaSettings(
         context: Context,
         data: MfaSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3247,8 +1858,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3278,8 +1889,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateOauthSettings(
         context: Context,
         data: OauthSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3304,8 +1915,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3335,8 +1946,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updatePwaSettings(
         context: Context,
         data: PwaSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3361,8 +1972,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3392,8 +2003,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateRatelimitSettings(
         context: Context,
         data: RatelimitSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3418,8 +2029,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3449,8 +2060,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateTasksSettings(
         context: Context,
         data: TasksSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3475,8 +2086,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3506,8 +2117,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateUrlsSettings(
         context: Context,
         data: UrlShortenerSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3532,8 +2143,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3563,8 +2174,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateWebhooksSettings(
         context: Context,
         data: WebhooksSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3589,8 +2200,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3620,8 +2231,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateWebsiteSettings(
         context: Context,
         data: WebsiteSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3646,8 +2257,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 
@@ -3677,8 +2288,8 @@ class AdminSettingsViewModel : ViewModel() {
     fun updateDomainsSettings(
         context: Context,
         data: DomainsSettings,
-        updateWebSettings: suspend () -> Result<WebSettings>,
-        updatePublicSettings: suspend () -> Result<PublicServerConfig>,
+        updateWebSettings: suspend (context: Context) -> Result<WebSettings>,
+        updatePublicSettings: suspend (context: Context) -> Result<PublicServerConfig>,
         onSuccess: () -> Unit,
         onError: (errors: List<String>) -> Unit
     ) {
@@ -3703,8 +2314,8 @@ class AdminSettingsViewModel : ViewModel() {
                             it.copy(isLoading = false)
                         }
                     } else if (response is UpdateServerSettingsResult.Success) {
-                        updateWebSettings()
-                        updatePublicSettings()
+                        updateWebSettings(context)
+                        updatePublicSettings(context)
 
                         onSuccess()
 

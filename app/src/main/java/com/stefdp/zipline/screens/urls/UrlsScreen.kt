@@ -247,6 +247,7 @@ fun UrlsScreen(
                         val newState = if (viewState == ZiplineViewStateType.COMPACT) ZiplineViewStateType.LARGE else ZiplineViewStateType.COMPACT
 
                         updateScreenViewState(
+                            context,
                             screenViewState.copy(
                                 urls = newState
                             )

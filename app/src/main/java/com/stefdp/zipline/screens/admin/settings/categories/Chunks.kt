@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import com.stefdp.zipline.components.TextInput
 import com.stefdp.zipline.network.models.ChunksSettings
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsUiState
 import com.stefdp.zipline.screens.admin.settings.AdminSettingsViewModel
+import com.stefdp.zipline.utils.verticalScrollWithScrollbar
 
 @Composable
 internal fun ChunksCategory(
@@ -34,9 +36,15 @@ internal fun ChunksCategory(
         scrollable = false,
         modifier = Modifier.fillMaxWidth()
     ) {
+        val scrollState = rememberScrollState()
+
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier
+                .verticalScrollWithScrollbar(
+                    scrollState = scrollState,
+                )
+                .padding(12.dp)
         ) {
             Text(
                 text = title,

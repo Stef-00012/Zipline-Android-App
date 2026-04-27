@@ -50,15 +50,9 @@ internal fun ExportFilesCategory(
         scrollable = false,
         modifier = Modifier.fillMaxWidth()
     ) {
-        val scrollState = rememberScrollState()
-
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-                .verticalScrollWithScrollbar(
-                    scrollState = scrollState,
-                )
-                .padding(12.dp)
+            modifier = Modifier.padding(12.dp)
         ) {
             Text(
                 text = title,

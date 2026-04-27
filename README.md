@@ -43,8 +43,8 @@ This will create an APK in `app/build/outputs/apk/release/app-release(-unsigned)
 
 If you're from flavortown and don't want to host your own [Zipline V4](https://github.com/diced/zipline) instance, you can use the following credentials:
 
-Server URL: `https://i.stefdp.com`
-Username: `FT Demo`
+Server URL: `https://i.stefdp.com`<br />
+Username: `FT Demo`<br />
 Password: `FT Demo` [^1]
 
 > [!NOTE]

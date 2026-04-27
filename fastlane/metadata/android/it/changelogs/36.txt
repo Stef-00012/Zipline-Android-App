@@ -1,0 +1,1 @@
+Corretto un crash quando si apriva la sezione "exports" delle impostazioni

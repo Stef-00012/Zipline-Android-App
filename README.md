@@ -43,6 +43,10 @@ This will create an APK in `app/build/outputs/apk/release/app-release(-unsigned)
 
 If you're from flavortown and don't want to host your own [Zipline V4](https://github.com/diced/zipline) instance, you can use the following credentials:
 
+Server URL: `https://i.stefdp.com`
+Username: `FT Demo`
+Password: `FT Demo` [^1]
+
 > [!NOTE]
 > This user has the following limits:
 > - 2GB max file size (across all uploaded files)
@@ -52,10 +56,6 @@ If you're from flavortown and don't want to host your own [Zipline V4](https://g
 
 If you are a flavortown reviewer, you can DM me on [Slack](https://hackclub.enterprise.slack.com/team/U0823APHVK7) and I'll give you a instance as a `SUPERADMIN` (highest role).<br />
 You can choose to either use a pre-made admin account on an already existing testing instance, or i can setup a temporary new instance and you create your own `SUPERADMIN` account (since this account can only be created on the first login).
-
-Server URL: https://i.stefdp.com
-Username: FT Demo
-Password: FT Demo [^1]
 
 # Optimization
 

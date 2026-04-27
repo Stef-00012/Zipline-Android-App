@@ -525,9 +525,9 @@ fun FoldersScreen(
                             TableCellData(
                                 width = tableNameWidth,
                             ) {
-                                Row(
+                                FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalArrangement = Arrangement.Center
                                 ) {
                                     Text(
                                         text = folder.name,

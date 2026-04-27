@@ -61,15 +61,17 @@ fun LargeInviteDisplay(
                 text = invite.code,
                 color = MaterialTheme.colorScheme.tertiary,
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable(
-                    enabled = serverUrl != null,
-                    onClick = {
-                        val inviteUrl = "${serverUrl}/invite/${invite.code}"
+                modifier = Modifier
+                    .weight(0.9f)
+                    .clickable(
+                        enabled = serverUrl != null,
+                        onClick = {
+                            val inviteUrl = "${serverUrl}/invite/${invite.code}"
 
-                        val intent = Intent(Intent.ACTION_VIEW, inviteUrl.toUri())
-                        activity.startActivity(intent)
-                    }
-                )
+                            val intent = Intent(Intent.ACTION_VIEW, inviteUrl.toUri())
+                            activity.startActivity(intent)
+                        }
+                    )
             )
 
             val clipboardManager = LocalClipboard.current
@@ -116,6 +118,7 @@ fun LargeInviteDisplay(
 
             MoreActionsButton(
                 items = moreActionsButtonItems,
+                modifier = Modifier.weight(0.1f)
             )
         }
 

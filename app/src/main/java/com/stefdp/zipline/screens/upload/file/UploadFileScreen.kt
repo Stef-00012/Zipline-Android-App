@@ -247,17 +247,25 @@ fun UploadFileScreen(
                                 color = MaterialTheme.colorScheme.tertiary,
                                 textDecoration = TextDecoration.Underline
                             ),
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW, fileState.url?.toUri())
-                                    activity.startActivity(intent)
-                                }
-                            )
+                            modifier = Modifier
+                                .weight(0.75f)
+                                .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                                .clickable(
+                                    onClick = {
+                                        val intent = Intent(Intent.ACTION_VIEW, fileState.url?.toUri())
+                                        activity.startActivity(intent)
+                                    }
+                                )
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(8.dp)
                         )
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.weight(0.25f)
                         ) {
                             IconButton(
                                 icon = painterResource(R.drawable.content_copy),

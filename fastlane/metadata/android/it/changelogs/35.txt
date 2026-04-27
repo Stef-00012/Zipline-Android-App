@@ -1,0 +1,6 @@
+Risolti dei casi limite che causavano un overflow, impedendo la visualizzazione di alcuni pulsanti:
+- Pulsante "..." che andava in overflow quando un codice di invito era troppo lungo
+- Pulsanti "nascondi" e "copia" che andavano in overflow quando il codice o vanity di un link o il link di un file/testo erano troppo lunghi
+- Pulsante "..." che andava in overflow quando un nome di una cartella era troppo lungo
+- Testo "X sottocartelle" che andava in overflow quando un nome di una cartella era troppo lungo
+- Pulsanti "apri" e "..." che andavano in overflow quando un nome utente era troppo lungo

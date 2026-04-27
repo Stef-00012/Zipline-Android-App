@@ -51,7 +51,8 @@ fun LargeUserDisplay(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(0.8f)
             ) {
                 Avatar(
                     avatar = user.avatar,
@@ -66,7 +67,9 @@ fun LargeUserDisplay(
             }
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(0.2f)
             ) {
                 LargeDisplayIconButton(
                     icon = painterResource(R.drawable.folder_open),

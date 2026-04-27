@@ -260,20 +260,6 @@ fun UrlsScreen(
 
         val lazyColumnListState = rememberLazyListState()
 
-//        LaunchedEffect(viewState) {
-//            if (viewState == ZiplineViewStateType.COMPACT) return@LaunchedEffect
-//
-//            if (
-//                (searchKey != null && searchValue.text.isNotBlank()) ||
-//                (sortKey != GetUrlsQuerySortBy.CREATED_AT && sortOrder != SortOrder.DESC)
-//            ) {
-//                updateUrls(
-//                    search = false,
-//                    sort = false
-//                )
-//            }
-//        }
-
         if (viewState == ZiplineViewStateType.COMPACT) {
             var uiSearchValue by rememberSaveable(
                 stateSaver = TextFieldValue.Saver

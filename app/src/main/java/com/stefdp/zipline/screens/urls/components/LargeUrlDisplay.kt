@@ -74,15 +74,17 @@ fun LargeUrlDisplay(
                 textDecoration = if (url.enabled)
                     TextDecoration.Underline
                 else null,
-                modifier = Modifier.clickable(
-                    enabled = serverUrl != null && url.enabled,
-                    onClick = {
-                        val urlUrl = "${serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
+                modifier = Modifier
+                    .weight(0.9f)
+                    .clickable(
+                        enabled = serverUrl != null && url.enabled,
+                        onClick = {
+                            val urlUrl = "${serverUrl}${urlsRoute}/${if (url.vanity.isNullOrBlank()) url.code else url.vanity}"
 
-                        val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                        activity.startActivity(intent)
-                    }
-                )
+                            val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
+                            activity.startActivity(intent)
+                        }
+                    )
             )
 
             val clipboardManager = LocalClipboard.current
@@ -155,6 +157,7 @@ fun LargeUrlDisplay(
 
             MoreActionsButton(
                 items = moreActionsButtonItems,
+                modifier = Modifier.weight(0.1f)
             )
         }
 

@@ -74,15 +74,17 @@ fun LargeFolderDisplay(
                 textDecoration = if (folder.public)
                     TextDecoration.Underline
                 else null,
-                modifier = Modifier.clickable(
-                    enabled = serverUrl != null && folder.public,
-                    onClick = {
-                        val urlUrl = "${serverUrl}/folder/${folder.id}"
+                modifier = Modifier
+                    .weight(0.9f)
+                    .clickable(
+                        enabled = serverUrl != null && folder.public,
+                        onClick = {
+                            val urlUrl = "${serverUrl}/folder/${folder.id}"
 
-                        val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
-                        activity.startActivity(intent)
-                    }
-                )
+                            val intent = Intent(Intent.ACTION_VIEW, urlUrl.toUri())
+                            activity.startActivity(intent)
+                        }
+                    )
             )
 
             val clipboardManager = LocalClipboard.current
@@ -166,6 +168,7 @@ fun LargeFolderDisplay(
 
             MoreActionsButton(
                 items = moreActionsButtonItems,
+                modifier = Modifier.weight(0.1f)
             )
         }
 

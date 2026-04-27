@@ -1,0 +1,6 @@
+Fixed edge cases that caused the app to overflow, not displaying some buttons:
+- Overflowing "..." button when an invite code was too long
+- Overflowing "hide" and "copy" button when a url code or vanity or file/text url was too long
+- Overflowing "..." button when a folder name was too long
+- Overflowing "X subfolders" text when a folder name was too long
+- Overflowing "open" and "... buttons when a user name was too long

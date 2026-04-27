@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
@@ -44,6 +47,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.stefdp.zipline.BASE_CORNER_RADIUS
 import com.stefdp.zipline.LocalLoggedUser
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.R
@@ -260,17 +264,25 @@ fun UploadTextScreen(
                         color = MaterialTheme.colorScheme.tertiary,
                         textDecoration = TextDecoration.Underline
                     ),
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, state.fileState?.url?.toUri())
-                            activity.startActivity(intent)
-                        }
-                    )
+                    modifier = Modifier
+                        .weight(0.75f)
+                        .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                        .clickable(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW, state.fileState?.url?.toUri())
+                                activity.startActivity(intent)
+                            }
+                        )
+                )
+
+                Spacer(
+                    modifier = Modifier.width(8.dp)
                 )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(0.25f)
                 ) {
                     IconButton(
                         icon = painterResource(R.drawable.content_copy),

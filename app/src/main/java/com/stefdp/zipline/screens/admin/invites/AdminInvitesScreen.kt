@@ -264,7 +264,7 @@ fun AdminInvitesScreen(
                         shape = RoundedCornerShape(BASE_CORNER_RADIUS.dp)
                     )
             ) {
-                val tableCodeWidth = 100.dp
+                val tableCodeWidth = 150.dp
                 val tableCreatedByWidth = 150.dp
                 val tableCreatedWidth = 150.dp
                 val tableLastUpdatedWidth = 170.dp

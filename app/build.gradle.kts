@@ -17,8 +17,8 @@ android {
         applicationId = "com.stefdp.zipline"
         minSdk = 26
         targetSdk = 36
-        versionCode = 35
-        versionName = "2.1.3"
+        versionCode = 36
+        versionName = "2.1.4"
         ndkVersion = "29.0.14206865"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

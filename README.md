@@ -17,6 +17,10 @@ This is an android app made to manage your [Zipline V4](https://github.com/diced
 - Manage Users (requires an admin account)
 - Manage Server Settings (requires a admin or superadmin account)
 
+> [!NOTE]
+> If you add a widget but it appears empty or has null values, set the app battery usage to "Unrestricted" and re-add them.<br />
+This should fix it.
+
 # Download
 
 The app is available on the following platforms:

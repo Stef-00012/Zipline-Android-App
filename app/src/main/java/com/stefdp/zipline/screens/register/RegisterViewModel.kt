@@ -9,6 +9,7 @@ import com.stefdp.zipline.network.requests.getPublicConfig
 import com.stefdp.zipline.network.requests.register
 import com.stefdp.zipline.screens.urls.components.urlRegex
 import com.stefdp.zipline.utils.DomainRegex
+import com.stefdp.zipline.utils.IPRegex
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.SecureStorage
 import com.stefdp.zipline.utils.minimumZiplineVersion
@@ -26,6 +27,8 @@ data class RegisterUiState(
     val password: TextFieldValue = TextFieldValue(""),
     val anonymizeDeviceInfo: Boolean = false,
     val agreeTos: Boolean = false,
+    val isInsecureUrl: Boolean = false,
+    val hasAcknowledgedInsecureUrlWarning: Boolean = false,
 )
 
 class RegisterViewModel : ViewModel() {
@@ -35,10 +38,14 @@ class RegisterViewModel : ViewModel() {
     fun init(context: Context, serverUrl: String) {
         viewModelScope.launch {
             _state.update {
-                it.copy(serverUrl = TextFieldValue(serverUrl))
+                it.copy(
+                    serverUrl = TextFieldValue(serverUrl),
+                    isInsecureUrl = serverUrl.lowercase().startsWith("http://"),
+                    hasAcknowledgedInsecureUrlWarning = false,
+                )
             }
 
-            if (urlRegex.matches(serverUrl)) {
+            if (DomainRegex.matches(serverUrl) || IPRegex.matches(serverUrl)) {
                 val publicSettings = getPublicConfig(
                     context = context,
                     serverUrl = serverUrl.lowercase()
@@ -53,6 +60,12 @@ class RegisterViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    fun setHasAcknowledgedInsecureUrlWarning(acknowledged: Boolean) {
+        _state.update {
+            it.copy(hasAcknowledgedInsecureUrlWarning = acknowledged)
         }
     }
 
@@ -88,7 +101,7 @@ class RegisterViewModel : ViewModel() {
         Logger.debug("RegisterViewModel", "Starting register process")
 
         viewModelScope.launch {
-            val isValidDomain = DomainRegex.matches(_state.value.serverUrl.text.lowercase())
+            val isValidDomain = DomainRegex.matches(_state.value.serverUrl.text.lowercase()) || IPRegex.matches(_state.value.serverUrl.text.lowercase())
 
             if (!isValidDomain) {
                 onError("Please enter a valid server URL")

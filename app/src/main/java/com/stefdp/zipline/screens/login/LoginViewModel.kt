@@ -14,6 +14,7 @@ import com.stefdp.zipline.network.requests.getPublicConfig
 import com.stefdp.zipline.network.requests.getToken
 import com.stefdp.zipline.network.requests.login
 import com.stefdp.zipline.utils.DomainRegex
+import com.stefdp.zipline.utils.IPRegex
 import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
@@ -40,6 +41,8 @@ data class LoginUiState(
     val isTotpRequired: Boolean = false,
     val anonymizeDeviceInfo: Boolean = false,
     val supportsRegistration: Boolean = false,
+    val isInsecureUrl: Boolean = false,
+    val hasAcknowledgedInsecureUrlWarning: Boolean = false,
 )
 
 class LoginViewModel : ViewModel() {
@@ -64,16 +67,24 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun setHasAcknowledgedInsecureUrlWarning(acknowledged: Boolean) {
+        _state.update {
+            it.copy(hasAcknowledgedInsecureUrlWarning = acknowledged)
+        }
+    }
+
     fun setServerUrl(context: Context, url: TextFieldValue) {
         viewModelScope.launch {
             _state.update {
                 it.copy(
                     serverUrl = url,
-                    supportsRegistration = false
+                    supportsRegistration = false,
+                    isInsecureUrl = url.text.startsWith("http://"),
+                    hasAcknowledgedInsecureUrlWarning = false,
                 )
             }
 
-            if (DomainRegex.matches(url.text)) {
+            if (DomainRegex.matches(url.text) || IPRegex.matches(url.text)) {
                 val publicSettings = getPublicConfig(
                     context = context,
                     serverUrl = url.text.lowercase()
@@ -139,7 +150,7 @@ class LoginViewModel : ViewModel() {
         Logger.debug("LoginViewModel", "Starting login process")
 
         viewModelScope.launch {
-            val isValidDomain = DomainRegex.matches(_state.value.serverUrl.text.lowercase())
+            val isValidDomain = DomainRegex.matches(_state.value.serverUrl.text.lowercase()) || IPRegex.matches(_state.value.serverUrl.text.lowercase())
 
             if (!isValidDomain) {
                 onError("Please enter a valid server URL")

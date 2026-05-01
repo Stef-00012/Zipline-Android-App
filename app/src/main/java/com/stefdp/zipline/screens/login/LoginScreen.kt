@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
@@ -175,7 +179,48 @@ fun LoginScreen(
                 )
                 .padding(16.dp),
         ) {
-            Column {
+            val scrollState = rememberScrollState()
+
+            Column(
+                modifier = Modifier.verticalScroll(scrollState)
+            ) {
+                AnimatedVisibility(
+                    visible = state.isInsecureUrl
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(BASE_CORNER_RADIUS.dp))
+                            .background(MaterialTheme.colorScheme.error.copy(alpha = 0.1f))
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = "Warning: You are using an unencrypted connection. Your password and data may be visible to others on your network. It is recommended to use HTTPS.",
+                                color = MaterialTheme.colorScheme.error,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Spacer(
+                                modifier = Modifier.size(8.dp)
+                            )
+
+                            Switch(
+                                checked = state.hasAcknowledgedInsecureUrlWarning,
+                                onCheckedChange = {
+                                    viewModel.setHasAcknowledgedInsecureUrlWarning(it)
+                                },
+                                label = "I understand the risks",
+                                description = "I acknowledge that using an unencrypted connection may expose my password and data to others on the network, and I accept these risks."
+                            )
+                        }
+
+                        Spacer(
+                            modifier = Modifier.size(8.dp)
+                        )
+                    }
+                }
+
                 Text(
                     text = "Login",
                     style = MaterialTheme.typography.titleLarge,
@@ -316,6 +361,9 @@ fun LoginScreen(
                         )
                     },
                     enabled = !state.isLoading && (
+                            if (state.isInsecureUrl) state.hasAcknowledgedInsecureUrlWarning
+                            else true
+                    ) && (
                         if (state.isTokenLogin) state.token.text.isNotBlank()
                         else state.username.text.isNotBlank() && state.password.text.isNotBlank()
                     ),

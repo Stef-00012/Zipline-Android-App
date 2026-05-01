@@ -17,7 +17,7 @@ android {
         applicationId = "com.stefdp.zipline"
         minSdk = 26
         targetSdk = 36
-        versionCode = 36
+        versionCode = 37
         versionName = "2.1.5"
         ndkVersion = "29.0.14206865"
 

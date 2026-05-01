@@ -1,0 +1,1 @@
+Added support for Zipline Instance that use HTTP insetad of HTTPS (but HTTPS is reccomended)

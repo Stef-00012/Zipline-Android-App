@@ -1,0 +1,1 @@
+Aggiunto il supporto per le instance di Zipline che utilizzano HTTP invece di HTTPS (ma HTTPS è consigliato)

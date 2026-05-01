@@ -15,8 +15,9 @@ p {
 }
 
 a {
-    color: #4E56A5;
+    color: #6973cf;
     text-decoration: none;
+    font-weight: bold;
 }
 
 a:hover {
@@ -84,9 +85,10 @@ main {
 }
 
 .flavortown-text {
-    color: lightgray;
     font-weight: bold;
-    text-decoration: underline dashed;
+    font-size: 1.15em;
+    letter-spacing: 0.01em;
+    text-decoration: underline dotted #aaad;
     text-underline-offset: 4px;
     transition: color 0.3s;
     position: relative;

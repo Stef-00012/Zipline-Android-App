@@ -60,6 +60,8 @@ Password: `FT Demo` [^1]
 
 If you are a flavortown reviewer, you can DM me on [Slack](https://hackclub.enterprise.slack.com/team/U0823APHVK7) and I'll give you a instance as a `SUPERADMIN` (highest role).<br />
 You can choose to either use a pre-made admin account on an already existing testing instance, or i can setup a temporary new instance and you create your own `SUPERADMIN` account (since this account can only be created on the first login).
+<br />
+Or well... you can just host your own instance of [Zipline V4](https://github.com/diced/zipline), just make sure you put it on a `https` URL
 
 # Optimization
 

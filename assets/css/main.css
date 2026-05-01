@@ -1,5 +1,7 @@
 body {
     background-color: #101321;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 20px;
 }
 
 h1, h2, h3, h4, h5, h6, p, li {

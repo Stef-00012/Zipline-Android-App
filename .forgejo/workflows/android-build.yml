@@ -64,7 +64,7 @@ jobs:
         run: |
           mkdir -p ${{ github.workspace }}/output
           
-          SYMBOLS_DIR="${{ env.main_project_module }}/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/"
+          SYMBOLS_DIR="${{ env.main_project_module }}/build/intermediates/merged_native_libs/release/mergePlayReleaseNativeLibs/out/lib/"
           
           if [ -d "$SYMBOLS_DIR" ]; then
             cd "$SYMBOLS_DIR"

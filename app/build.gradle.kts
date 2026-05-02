@@ -17,8 +17,8 @@ android {
         applicationId = "com.stefdp.zipline"
         minSdk = 26
         targetSdk = 36
-        versionCode = 37
-        versionName = "2.1.5"
+        versionCode = 40
+        versionName = "2.1.6"
         ndkVersion = "29.0.14206865"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -54,6 +54,18 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             manifestPlaceholders["appName"] = "$baseAppName (Debug)"
+        }
+    }
+
+    flavorDimensions.add("store")
+
+    productFlavors {
+        create("play") {
+            dimension = "store"
+        }
+
+        create("fdroid") {
+            dimension = "store"
         }
     }
 
@@ -146,4 +158,9 @@ dependencies {
 
     // SemVer
     implementation(libs.semver)
+
+    // Play Store In-App Updates
+    "playImplementation"(libs.app.update)
+    "playImplementation"(libs.app.update.ktx)
+    "playImplementation"(libs.kotlinx.coroutines.play.services)
 }

@@ -29,6 +29,7 @@ import com.stefdp.zipline.network.requests.deleteExport as apiDeleteExport
 import com.stefdp.zipline.network.requests.logout as apiLogout
 import com.stefdp.zipline.network.requests.updateCurrentUser
 import com.stefdp.zipline.screens.LoginScreen
+import com.stefdp.zipline.updatemanager.UpdateManager
 import com.stefdp.zipline.utils.STORAGE_ADMIN_EXPORT_DOWNLOAD_FOLDER_KEY
 import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
 import com.stefdp.zipline.utils.STORAGE_EXPORT_DOWNLOAD_FOLDER_KEY
@@ -117,6 +118,7 @@ data class SettingsUiState(
     val selectedExportPath: String? = null,
     val updateDownloadFolderType: UpdateDownloadFolderType = UpdateDownloadFolderType.FILE,
     val selectedDefaultDomain: Set<String> = setOf("default"),
+    val isUpdateAvailable: Boolean = false,
 )
 
 class SettingsViewModel : ViewModel() {
@@ -124,8 +126,18 @@ class SettingsViewModel : ViewModel() {
     val state: StateFlow<SettingsUiState> = _state.asStateFlow()
 
     fun initData(
-        context: Context
+        context: Context,
+        update: Boolean,
+        updateSwitchCategory: Boolean
     ) {
+        _state.update {
+            it.copy(
+                isUpdateAvailable = update,
+                selectedCategory = if (updateSwitchCategory) setOf(SettingCategory.APP_SETTINGS.toString())
+                else it.selectedCategory
+            )
+        }
+
         refreshToken(context)
         refreshExports(context)
         refreshVersion(context)
@@ -822,6 +834,36 @@ class SettingsViewModel : ViewModel() {
             _state.update {
                 it.copy(isLoading = false)
             }
+        }
+    }
+
+    fun checkForUpdates(
+        updateManager: UpdateManager,
+        onSuccess: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoading = true)
+            }
+
+            val hasUpdate = updateManager.checkForUpdates()
+
+            onSuccess(hasUpdate)
+
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    isUpdateAvailable = hasUpdate
+                )
+            }
+        }
+    }
+
+    fun downloadUpdate(
+        updateManager: UpdateManager,
+    ) {
+        viewModelScope.launch {
+            updateManager.update()
         }
     }
 }

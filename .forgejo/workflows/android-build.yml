@@ -57,9 +57,8 @@ jobs:
 
       - name: Build All Artifacts
         run: |
-          ./gradlew assembleDebug
-          ./gradlew assembleRelease
-          ./gradlew ${{ env.main_project_module }}:bundleRelease
+          ./gradlew assembleFdroidRelease
+          ./gradlew ${{ env.main_project_module }}:bundlePlayRelease
 
       - name: Zip Native Debug Symbols
         run: |
@@ -81,20 +80,9 @@ jobs:
       - name: Prepare for signing
         run: |
           mkdir -p signing_staging
-          cp ${{ env.main_project_module }}/build/outputs/apk/release/*.apk signing_staging/
-          cp ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab signing_staging/
 
-      # - name: Sign Release Artifacts
-      #   id: sign_app
-      #   uses: https://github.com/r0adkll/sign-android-release@v1
-      #   env:
-      #     BUILD_TOOLS_VERSION: "36.0.0"
-      #   with:
-      #     releaseDirectory: signing_staging
-      #     signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
-      #     alias: ${{ secrets.KEY_ALIAS }}
-      #     keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-      #     keyPassword: ${{ secrets.KEY_PASSWORD }}
+          cp ${{ env.main_project_module }}/build/outputs/apk/fdroid/release/*.apk signing_staging/
+          cp ${{ env.main_project_module }}/build/outputs/bundle/playRelease/*.aab signing_staging/
 
       - name: Sign Release Artifacts
         run: |
@@ -126,12 +114,10 @@ jobs:
 
           rm keystore.jks
 
-      - name: Copy debug and signed artifacts to output
+      - name: Copy signed artifacts to output
         run: |
-          cp ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk ${{ github.workspace }}/output/
-          
           # ---- reminder for myself, if this apk file name is changed, change in the froid repo too in the binary part ----
-          cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-release-signed.apk
+          cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-release-fdroid-signed.apk
           cp signing_staging/*-signed*.aab ${{ github.workspace }}/output/
 
       - name: Publish Release

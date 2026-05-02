@@ -1,5 +1,6 @@
 package com.stefdp.zipline.screens.settings.categories
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,9 +12,13 @@ import androidx.biometric.BiometricManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +40,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.stefdp.zipline.BuildConfig
-import com.stefdp.zipline.IS_DEBUG
 import com.stefdp.zipline.LocalUpdateLoggedUser
 import com.stefdp.zipline.LocalWebSettings
 import com.stefdp.zipline.Logger
@@ -54,6 +58,7 @@ import com.stefdp.zipline.screens.settings.UpdateDownloadFolderType
 import com.stefdp.zipline.screens.settings.categories.components.VersionDisplay
 import com.stefdp.zipline.ui.theme.DarkGray
 import com.stefdp.zipline.ui.theme.getButtonColors
+import com.stefdp.zipline.updatemanager.UpdateManager
 import com.stefdp.zipline.utils.createBiometricPrompt
 import com.stefdp.zipline.utils.createPromptInfo
 import com.stefdp.zipline.utils.getBiometricStatus
@@ -283,6 +288,7 @@ internal fun AppSettingsCategory(
                 if (!hasNotificationPermission) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
+                        enabled = !state.isLoading,
                         onClick = {
                             requestNotificationPermission()
                         }
@@ -295,6 +301,7 @@ internal fun AppSettingsCategory(
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading,
                     colors = getButtonColors().copy(
                         containerColor = DarkGray,
                         disabledContainerColor = DarkGray.copy(alpha = 0.5f)
@@ -312,6 +319,7 @@ internal fun AppSettingsCategory(
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading,
                     colors = getButtonColors().copy(
                         containerColor = DarkGray,
                         disabledContainerColor = DarkGray.copy(alpha = 0.5f)
@@ -329,6 +337,7 @@ internal fun AppSettingsCategory(
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading,
                     colors = getButtonColors().copy(
                         containerColor = DarkGray,
                         disabledContainerColor = DarkGray.copy(alpha = 0.5f)
@@ -347,6 +356,7 @@ internal fun AppSettingsCategory(
                 if (user != null && user.role.level <= UserRole.ADMIN.level) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
+                        enabled = !state.isLoading,
                         colors = getButtonColors().copy(
                             containerColor = DarkGray,
                             disabledContainerColor = DarkGray.copy(alpha = 0.5f)
@@ -363,10 +373,70 @@ internal fun AppSettingsCategory(
                     }
                 }
 
+                val updateLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.StartIntentSenderForResult()
+                ) { result ->
+                    if (result.resultCode != RESULT_OK) {
+                        Notification.show(
+                            activity
+                        ) {
+                            Text(
+                                text = "Update failed or was cancelled"
+                            )
+                        }
+                    }
+                }
+
+                val updateManager = UpdateManager(
+                    activity = activity,
+                    context = context,
+                    updateLauncher = updateLauncher,
+                )
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading,
+                    onClick = {
+                        if (state.isUpdateAvailable) {
+                            viewModel.downloadUpdate(updateManager)
+                        } else {
+                            viewModel.checkForUpdates(
+                                updateManager = updateManager,
+                                onSuccess = { hasUpdate ->
+                                    Notification.show(
+                                        activity = activity,
+                                    ) {
+                                        Text(
+                                            text = if (hasUpdate) "An update is available!" else "You are on the latest version."
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    if (state.isLoading && !state.isUpdateAvailable) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = LocalContentColor.current,
+                        )
+
+                        Spacer(
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+
+                    Text(
+                        text = if (state.isUpdateAvailable) "Download Update" else "Check for updates"
+                    )
+                }
+
                 val localUpdateLoggedUser = LocalUpdateLoggedUser.current
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading,
                     colors = getButtonColors().copy(
                         containerColor = MaterialTheme.colorScheme.error,
                         disabledContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)

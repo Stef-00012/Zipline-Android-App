@@ -507,7 +507,7 @@ fun UploadTextScreen(
                         addLink(
                             clickable = LinkAnnotation.Clickable(
                                 linkInteractionListener = LinkInteractionListener {
-                                    navController.navigate(SettingsScreen)
+                                    navController.navigate(SettingsScreen())
                                 },
                                 tag = "settings",
                                 styles = TextLinkStyles(

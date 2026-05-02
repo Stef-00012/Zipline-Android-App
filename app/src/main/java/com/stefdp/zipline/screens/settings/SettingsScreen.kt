@@ -46,6 +46,8 @@ import com.stefdp.zipline.utils.hasNotificationsPermission
 fun SettingsScreen(
     navController: NavHostController,
     context: Context,
+    update: Boolean = false,
+    updateSwitchCategory: Boolean = false,
     activity: FragmentActivity,
     viewModel: SettingsViewModel = viewModel()
 ) {
@@ -110,7 +112,11 @@ fun SettingsScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.initData(context)
+        viewModel.initData(
+            context = context,
+            update = update,
+            updateSwitchCategory = updateSwitchCategory,
+        )
     }
 
     LaunchedEffect(state.settingsUpdateTick, localLoggedUser) {

@@ -52,4 +52,7 @@ object AdminActionsScreen : AppScreen
 object AdminInvitesScreen : AppScreen
 
 @Serializable
-object SettingsScreen : AppScreen
+data class SettingsScreen(
+    val update: Boolean = false,
+    val updateSwitchCategory: Boolean = false
+) : AppScreen

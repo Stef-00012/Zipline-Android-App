@@ -256,6 +256,8 @@ class MainActivity : FragmentActivity() {
 
                             if (!isInvalid) {
                                 Header(
+                                    activity = activity,
+                                    context = context,
                                     navController = navController,
                                     onMenuClick = {
                                         coroutineScope.launch {
@@ -402,11 +404,15 @@ fun AppNavigation(
             )
         }
 
-        composable<SettingsScreen> {
+        composable<SettingsScreen> { backStackEntry ->
+            val settingsScreen = backStackEntry.toRoute<SettingsScreen>()
+
             SettingsScreen(
                 navController = navController,
                 context = context,
-                activity = activity
+                activity = activity,
+                update = settingsScreen.update,
+                updateSwitchCategory = settingsScreen.updateSwitchCategory
             )
         }
 

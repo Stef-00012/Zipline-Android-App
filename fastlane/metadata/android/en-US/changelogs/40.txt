@@ -1,0 +1,1 @@
+Added update checking to notify for new updates

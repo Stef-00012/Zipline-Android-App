@@ -16,7 +16,7 @@ class UpdateManager(
     private val updateLauncher: ActivityResultLauncher<IntentSenderRequest>,
 ) : BaseUpdateManager {
     companion object {
-        const val RELEASE_FILE_NAME = "app-release-fdroid-signed.apk"
+        const val RELEASE_FILE_NAME = "app-fdroid-release-signed.apk"
     }
 
     override fun getInstaller(): Installer {

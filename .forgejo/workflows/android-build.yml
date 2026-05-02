@@ -64,7 +64,7 @@ jobs:
         run: |
           mkdir -p ${{ github.workspace }}/output
           
-          SYMBOLS_DIR="${{ env.main_project_module }}/build/intermediates/merged_native_libs/release/mergePlayReleaseNativeLibs/out/lib/"
+          SYMBOLS_DIR="${{ env.main_project_module }}/build/intermediates/merged_native_libs/playRelease/mergePlayReleaseNativeLibs/out/lib/"
           
           if [ -d "$SYMBOLS_DIR" ]; then
             cd "$SYMBOLS_DIR"
@@ -117,7 +117,7 @@ jobs:
       - name: Copy signed artifacts to output
         run: |
           # ---- reminder for myself, if this apk file name is changed, change in the froid repo too in the binary part ----
-          cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-release-fdroid-signed.apk
+          cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-fdroid-release-signed.apk
           cp signing_staging/*-signed*.aab ${{ github.workspace }}/output/
 
       - name: Publish Release

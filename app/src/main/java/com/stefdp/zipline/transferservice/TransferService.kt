@@ -21,14 +21,31 @@ import com.stefdp.zipline.utils.formatSpeed
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import com.stefdp.zipline.network.requests.createUrl
+import com.stefdp.zipline.network.requests.getWebServerSettings
+import com.stefdp.zipline.network.requests.uploadFile
+import com.stefdp.zipline.network.requests.uploadPartialFile
+import com.stefdp.zipline.utils.SecureStorage
+import com.stefdp.zipline.utils.STORAGE_DEFAULT_DOMAIN_KEY
+import com.stefdp.zipline.utils.parseBytes
+import kotlinx.coroutines.*
+import java.net.URI
+import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class TransferService : Service() {
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     companion object {
         const val CHANNEL_ID = "zipline_transfer_channel"
         const val ACTION_CANCEL = "com.stefdp.zipline.ACTION_CANCEL_TRANSFER"
         const val EXTRA_TRANSFER_ID = "transfer_id"
         private const val ONGOING_NOTIFICATION_ID_BASE = 10000
+
+        const val ACTION_QUICK_SHARE = "com.stefdp.zipline.ACTION_QUICK_SHARE"
+        const val EXTRA_TEXT = "EXTRA_TEXT"
+        const val EXTRA_FILE_PATHS = "EXTRA_FILE_PATHS"
     }
 
     private val binder = TransferBinder()
@@ -81,25 +98,133 @@ class TransferService : Service() {
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Start as foreground with a silent initial notification only if needed
-        // This will be replaced immediately by the real transfer notification
-        if (activeTransfers.isEmpty()) {
-            val notification = buildPlaceholderNotification()
-//            startForeground(ONGOING_NOTIFICATION_ID_BASE, notification)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    ONGOING_NOTIFICATION_ID_BASE,
-                    notification,
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                )
-            } else {
-                startForeground(
-                    ONGOING_NOTIFICATION_ID_BASE,
-                    notification
-                )
+        val notification = buildPlaceholderNotification()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(ONGOING_NOTIFICATION_ID_BASE, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            startForeground(ONGOING_NOTIFICATION_ID_BASE, notification)
+        }
+
+        val text = intent?.getStringExtra(EXTRA_TEXT)
+        val filePaths = intent?.getStringArrayListExtra(EXTRA_FILE_PATHS)
+
+        if (text != null || !filePaths.isNullOrEmpty()) {
+            processQuickShare(text, filePaths)
+        }
+
+        return START_NOT_STICKY
+    }
+
+    private fun processQuickShare(text: String?, filePaths: List<String>?) {
+        serviceScope.launch {
+            try {
+                if (text != null && text.startsWith("http", ignoreCase = true)) {
+                    handleUrlShortening(text)
+                }
+
+                if (!filePaths.isNullOrEmpty()) {
+                    handleFileUploads(filePaths)
+                }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    stopSelfIfIdle()
+                }
             }
         }
-        return START_NOT_STICKY
+    }
+
+    private suspend fun handleUrlShortening(url: String) {
+        val transferId = registerTransfer("Shortening URL", url)
+        val secureStore = SecureStorage.getInstance(applicationContext)
+        val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
+
+        createUrl(
+            context = applicationContext,
+            destination = url,
+            domain = defaultDomain?.let { URI(it).host ?: it }
+        ).onSuccess {
+            completeTransfer(transferId)
+            copyToClipboardAndNotify(it.url)
+        }.onFailure { error ->
+            failTransfer(transferId, error.message ?: "Unknown Error")
+        }
+    }
+
+    private suspend fun handleFileUploads(filePaths: List<String>) {
+        val webSettingsRes = getWebServerSettings(applicationContext)
+        val uploadedUrls = mutableListOf<String>()
+
+        webSettingsRes.onSuccess { webSettings ->
+            val chunksEnabled = webSettings.config?.chunks?.enabled ?: true
+            val maxChunkSize = parseBytes(webSettings.config?.chunks?.max ?: "95mb")
+            val chunkSize = parseBytes(webSettings.config?.chunks?.size ?: "25mb")
+
+            val secureStore = SecureStorage.getInstance(applicationContext)
+            val defaultDomain = secureStore.get(STORAGE_DEFAULT_DOMAIN_KEY)
+            val domainHost = defaultDomain?.let { URI(it).host ?: it }
+
+            filePaths.forEachIndexed { index, filePath ->
+                val tempFile = File(filePath)
+                val displayName = tempFile.name
+                val transferId = registerTransfer("Uploading (${index + 1}/${filePaths.size})", displayName)
+                val fileExtension = displayName.substringAfterLast('.', "")
+                val title = "Uploading (${index + 1}/${filePaths.size})"
+
+                if (chunksEnabled && tempFile.length() >= maxChunkSize) {
+                    uploadPartialFile(
+                        context = applicationContext,
+                        filePath = filePath,
+                        fileExtension = fileExtension,
+                        chunkSize = chunkSize,
+                        notificationTitle = title,
+                        notificationContent = displayName,
+                        domain = domainHost
+                    ).onSuccess { response ->
+                        uploadedUrls.addAll(response.files.map { it.url })
+                        completeTransfer(transferId)
+                    }.onFailure { error ->
+                        failTransfer(transferId, error.message ?: "Partial upload failed")
+                    }
+                } else {
+                    uploadFile(
+                        context = applicationContext,
+                        filePath = filePath,
+                        fileExtension = fileExtension,
+                        notificationTitle = title,
+                        notificationContent = displayName,
+                        domain = domainHost
+                    ).onSuccess { response ->
+                        uploadedUrls.addAll(response.files.map { it.url })
+                        completeTransfer(transferId)
+                    }.onFailure { error ->
+                        failTransfer(transferId, error.message ?: "Standard upload failed")
+                    }
+                }
+
+                tempFile.delete()
+            }
+
+            if (uploadedUrls.isNotEmpty()) {
+                copyToClipboardAndNotify(uploadedUrls.joinToString("\n"))
+            }
+        }.onFailure { error ->
+            showToast("Server Settings Error: ${error.message}")
+        }
+    }
+
+    private suspend fun copyToClipboardAndNotify(text: String) {
+        withContext(Dispatchers.Main) {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("Zipline", text)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(applicationContext, "Links copied to clipboard!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private suspend fun showToast(message: String) {
+        withContext(Dispatchers.Main) {
+            Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun createNotificationChannel() {
@@ -146,7 +271,6 @@ class TransferService : Service() {
         val notification = buildProgressNotification(info)
 
         if (activeTransfers.size == 1) {
-//            startForeground(notificationId, notification)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startForeground(
                     notificationId,
@@ -321,9 +445,7 @@ class TransferService : Service() {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
                 builder.setContentIntent(openPendingIntent)
-            } catch (_: Exception) {
-                // Ignore if we can't create the intent
-            }
+            } catch (_: Exception) {}
         }
 
         return builder.build()

@@ -1,0 +1,1 @@
+Made Zipline URL checking less strict (now an URL is considered valid also when it has a trailing "/")

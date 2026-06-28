@@ -67,6 +67,10 @@ android {
         create("fdroid") {
             dimension = "store"
         }
+
+        create("apk") {
+            dimension = "store"
+        }
     }
 
     compileOptions {

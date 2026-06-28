@@ -2,6 +2,6 @@ package com.stefdp.zipline.utils
 
 val DecimalRegex = Regex("""^(\d)+\.?(\d?)+$""")
 val NumberRegex = Regex("""^(\d)*$""")
-val DomainRegex = Regex("""^https?://([a-z0-9-]+\.)+[a-z]{2,}$""")
+val DomainRegex = Regex("""^https?://([a-z0-9-]+\.)+[a-z]{2,}/?$""")
 val IPRegex = Regex("""^https?://(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::(?:6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0))?$""")
 

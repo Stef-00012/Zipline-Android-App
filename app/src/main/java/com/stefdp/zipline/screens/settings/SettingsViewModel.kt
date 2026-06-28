@@ -846,7 +846,9 @@ class SettingsViewModel : ViewModel() {
                 it.copy(isLoading = true)
             }
 
-            val hasUpdate = updateManager.checkForUpdates()
+            val hasUpdate = updateManager.checkForUpdates(
+                openStore = true
+            )
 
             onSuccess(hasUpdate)
 

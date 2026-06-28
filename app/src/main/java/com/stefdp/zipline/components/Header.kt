@@ -75,8 +75,6 @@ fun Header(
         updateLauncher = updateLauncher
     )
 
-//    val coroutineScope = rememberCoroutineScope()
-
     LaunchedEffect(Unit) {
         val update = updateManager.checkForUpdates()
 

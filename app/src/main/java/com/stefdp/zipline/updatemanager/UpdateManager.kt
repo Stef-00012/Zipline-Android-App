@@ -6,7 +6,9 @@ import androidx.fragment.app.FragmentActivity
 interface BaseUpdateManager {
     fun getInstaller(): Installer
 
-    suspend fun checkForUpdates(): Boolean
+    suspend fun checkForUpdates(
+        openStore: Boolean = false
+    ): Boolean
 
     suspend fun update()
 }

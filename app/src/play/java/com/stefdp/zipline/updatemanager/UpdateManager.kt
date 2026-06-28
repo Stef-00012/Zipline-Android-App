@@ -19,7 +19,9 @@ class UpdateManager(
         return getInstaller(activity)
     }
 
-    override suspend fun checkForUpdates(): Boolean {
+    override suspend fun checkForUpdates(
+        openStore: Boolean
+    ): Boolean {
         return try {
             val appUpdateManager = AppUpdateManagerFactory.create(context)
             val appUpdateInfo = appUpdateManager.appUpdateInfo.await()

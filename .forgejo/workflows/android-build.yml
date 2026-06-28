@@ -58,6 +58,7 @@ jobs:
       - name: Build All Artifacts
         run: |
           ./gradlew assembleFdroidRelease
+          ./gradlew assembleApkRelease
           ./gradlew ${{ env.main_project_module }}:bundlePlayRelease
 
       - name: Zip Native Debug Symbols
@@ -81,6 +82,7 @@ jobs:
         run: |
           mkdir -p signing_staging
 
+          cp ${{ env.main_project_module }}/build/outputs/apk/apk/release/*.apk signing_staging/
           cp ${{ env.main_project_module }}/build/outputs/apk/fdroid/release/*.apk signing_staging/
           cp ${{ env.main_project_module }}/build/outputs/bundle/playRelease/*.aab signing_staging/
 
@@ -117,7 +119,8 @@ jobs:
       - name: Copy signed artifacts to output
         run: |
           # ---- reminder for myself, if this apk file name is changed, change in the froid repo too in the binary part ----
-          cp signing_staging/*-signed*.apk ${{ github.workspace }}/output/app-fdroid-release-signed.apk
+          cp signing_staging/*fdroid*-signed*.apk ${{ github.workspace }}/output/app-fdroid-release-signed.apk
+          cp signing_staging/*apk*-signed*.apk ${{ github.workspace }}/output/app-apk-release-signed.apk
           cp signing_staging/*-signed*.aab ${{ github.workspace }}/output/
 
       - name: Publish Release

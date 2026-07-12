@@ -1,13 +1,13 @@
 package com.stefdp.zipline.network.requests
 
-import com.stefdp.zipline.transferservice.TransferServiceConnection
-import com.stefdp.zipline.transferservice.util.copyStreamWithProgress
-import com.stefdp.zipline.utils.SecureStorage
 import android.content.Context
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
+import com.stefdp.zipline.transferservice.TransferServiceConnection
+import com.stefdp.zipline.transferservice.util.copyStreamWithProgress
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
+import com.stefdp.zipline.utils.SecureStorage
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.CancellationException

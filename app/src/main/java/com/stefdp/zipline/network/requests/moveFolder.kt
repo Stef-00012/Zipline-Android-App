@@ -7,7 +7,6 @@ import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.BaseFolder
 import com.stefdp.zipline.network.models.requests.MoveFolderBody
-import com.stefdp.zipline.network.models.requests.UpdateFolderBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY

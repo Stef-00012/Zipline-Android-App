@@ -1,12 +1,10 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.Tag
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.GetTokenResponse
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY

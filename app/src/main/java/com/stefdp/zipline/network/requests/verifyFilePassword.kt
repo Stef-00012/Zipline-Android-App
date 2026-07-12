@@ -1,15 +1,10 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
 import com.stefdp.zipline.network.ZiplineApiClient
-import com.stefdp.zipline.network.models.File
-import com.stefdp.zipline.network.models.Folder
-import com.stefdp.zipline.network.models.requests.AddFileToFolderBody
-import com.stefdp.zipline.network.models.requests.UpdateFileBody
 import com.stefdp.zipline.network.models.requests.VerifyFilePasswordBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.VerifyFilePasswordResponse

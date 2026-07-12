@@ -1,7 +1,6 @@
 package com.stefdp.zipline.network.requests
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.stefdp.zipline.Logger
 import com.stefdp.zipline.R
@@ -9,7 +8,6 @@ import com.stefdp.zipline.network.ZiplineApiClient
 import com.stefdp.zipline.network.models.requests.DeleteSessionBody
 import com.stefdp.zipline.network.models.responses.ErrorResponse
 import com.stefdp.zipline.network.models.responses.GetSessionsResponse
-import com.stefdp.zipline.network.models.responses.LoginResponse
 import com.stefdp.zipline.utils.STORAGE_SERVER_URL_KEY
 import com.stefdp.zipline.utils.STORAGE_TOKEN_KEY
 import com.stefdp.zipline.utils.SecureStorage

@@ -164,7 +164,11 @@ class LoginViewModel : ViewModel() {
 
             val secureStore = SecureStorage.getInstance(context)
 
-            secureStore.set(STORAGE_SERVER_URL_KEY, _state.value.serverUrl.text.lowercase())
+            secureStore.set(STORAGE_SERVER_URL_KEY, if (_state.value.serverUrl.text.lowercase().endsWith("/"))
+                _state.value.serverUrl.text.lowercase().dropLast(1)
+            else
+                _state.value.serverUrl.text.lowercase()
+            )
 
             if (_state.value.isTokenLogin) {
                 secureStore.set(STORAGE_TOKEN_KEY, _state.value.token.text)

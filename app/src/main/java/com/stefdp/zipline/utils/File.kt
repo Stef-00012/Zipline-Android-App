@@ -4,9 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
-import com.google.common.math.LongMath.pow
 import nl.jacobras.humanreadable.HumanReadable
 import java.io.File
+import kotlin.math.pow
 
 data class SelectedFile(
     val uri: Uri,
@@ -62,10 +62,10 @@ fun parseBytes(
     val multiplier: Long = when (unitPart) {
         "b" -> 1L
         "k", "kb", "kib" -> base
-        "m", "mb", "mib" -> pow(base, 2)
-        "g", "gb", "gib" -> pow(base, 3)
-        "t", "tb", "tib" -> pow(base, 4)
-        "p", "pb", "pib" -> pow(base, 5)
+        "m", "mb", "mib" -> base.toDouble().pow(2.0).toLong()
+        "g", "gb", "gib" -> base.toDouble().pow(3.0).toLong()
+        "t", "tb", "tib" -> base.toDouble().pow(4.0).toLong()
+        "p", "pb", "pib" -> base.toDouble().pow(5.0).toLong()
         else -> return 0L
     }
 

@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.stefdp.zipline"
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     val baseAppName = "Zipline"
@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId = "com.stefdp.zipline"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 43
-        versionName = "2.1.9"
+        targetSdk = 37
+        versionCode = 44
+        versionName = "2.1.10"
         ndkVersion = "29.0.14206865"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

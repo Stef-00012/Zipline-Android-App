@@ -1,0 +1,1 @@
+Applicato il check del link meno severo anche ai login con IP

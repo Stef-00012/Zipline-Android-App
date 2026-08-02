@@ -28,17 +28,11 @@ The app is available on the following platforms:
 - [Forgejo Releases](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
 - [Fdroid](https://f-droid.org/en/packages/com.stefdp.zipline)
 
-[<img src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png"
-    alt="Get it on Google Play"
-    height="120">](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
+[![Get on Google Play](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png)](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
 
-[<img src="https://f-droid.org/badge/get-it-on.png"
-    alt="Get it on F-Droid"
-    height="120">](https://f-droid.org/en/packages/com.stefdp.zipline)
+[![Get it on F-Droid](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/f-droid.png)](https://f-droid.org/en/packages/com.stefdp.zipline)
 
-[<img src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png"
-    alt="Get it on Forgejo"
-    height="120">](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
+[![Get on Forgejo](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png)](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
 
 # Creating a development build
 

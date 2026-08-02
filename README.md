@@ -24,11 +24,12 @@ This should fix it.
 # Download
 
 The app is available on the following platforms:
-- Google Play Store
-- Forgejo Releases
-- Fdroid [(waiting for approval)](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/36552)
+- [Google Play Store](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
+- [Forgejo Releases](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
+- [Fdroid](https://f-droid.org/en/packages/com.stefdp.zipline)
 
 [![Get on Google Play](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png)](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
+[![Get it on F-Droid](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/f-droid.png)](https://f-droid.org/en/packages/com.stefdp.zipline)
 [![Get on Forgejo](https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png)](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
 
 # Creating a development build

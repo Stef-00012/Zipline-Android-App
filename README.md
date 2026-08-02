@@ -39,7 +39,7 @@ The app is available on the following platforms:
   <img 
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/f-droid.png" 
     alt="Get it on F-Droid"
-    height="120" 
+    height="100" 
   />
 </a>
 <a href="https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk">

@@ -33,6 +33,7 @@ The app is available on the following platforms:
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png" 
     alt="Get on Google Play" 
     height="100" 
+    align="middle"
   />
 </a>
 <a href="https://f-droid.org/en/packages/com.stefdp.zipline">
@@ -40,6 +41,7 @@ The app is available on the following platforms:
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/f-droid.png" 
     alt="Get it on F-Droid"
     height="120" 
+    align="middle"
   />
 </a>
 <a href="https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk">
@@ -47,6 +49,7 @@ The app is available on the following platforms:
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png" 
     alt="Get on Forgejo" 
     height="100" 
+    align="middle"
   />
 </a>
 

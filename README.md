@@ -32,21 +32,20 @@ The app is available on the following platforms:
   <img 
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/google-play.png" 
     alt="Get on Google Play" 
-    style="margin-left: 5px; margin-right: 5px;"
   />
 </a>
+&nbsp;&nbsp;
 <a href="https://f-droid.org/en/packages/com.stefdp.zipline">
   <img 
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/f-droid.png" 
     alt="Get it on F-Droid"
-    style="margin-left: 5px; margin-right: 5px;"
   />
 </a>
+&nbsp;&nbsp;
 <a href="https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk">
   <img
     src="https://git.stefdp.com/Stef/Zipline-Android-App/raw/branch/native/assets/forgejo.png" 
     alt="Get on Forgejo"
-    style="margin-left: 5px; margin-right: 5px;"
   />
 </a>
 

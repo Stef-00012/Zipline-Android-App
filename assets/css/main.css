@@ -76,30 +76,9 @@ main {
     flex-wrap: wrap;
 }
 
-.google-play-logo.disabled {
-    opacity: 0.5;
-    filter: grayscale(100%);
-    pointer-events: none;
-}
-
-.google-play-link-container {
-    cursor: not-allowed;
-}
-
-.flavortown-text {
-    font-weight: bold;
-    font-size: 1.15em;
-    letter-spacing: 0.01em;
-    text-decoration: underline dotted #aaad;
-    text-underline-offset: 4px;
-    transition: color 0.3s;
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.flavortown-text:hover {
-    color: white;
+.get-it-on-container {
+    margin-right: 10px;
+    margin-left: 10px;
 }
 
 footer {

@@ -25,8 +25,8 @@ This should fix it.
 
 The app is available on the following platforms:
 - [Google Play Store](https://play.google.com/store/apps/details?id=com.stefdp.zipline)
-- [Forgejo Releases](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
 - [F-Droid](https://f-droid.org/en/packages/com.stefdp.zipline)
+- [Forgejo Releases](https://git.stefdp.com/Stef/Zipline-Android-App/releases/download/latest/app-fdroid-release-signed.apk)
 
 <a href="https://play.google.com/store/apps/details?id=com.stefdp.zipline">
   <img 
